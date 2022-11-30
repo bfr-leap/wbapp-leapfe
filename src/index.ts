@@ -96,6 +96,7 @@ function updateDriverNames(lapChartInfo: LapChartInfo) {
 
     for (let driver of lapChartInfo.startgrid) {
         activeColors.push(baseColors[i % baseColors.length]);
+        activePatterns.push(basePatterns[i % basePatterns.length]);
 
         addDriverName(driver, i, nameCardsDiv);
 
@@ -269,7 +270,22 @@ let baseColors: string[] = [
     '#d027b3ff',
 ];
 
+let basePatterns: string[] = [
+    '',
+    '16,2',
+    '16,2,2,2',
+    '16,8',
+    '16,2,2,2,2,2',
+    '4,4',
+    '16,2,2,2,2,2,2,2',
+    '8,2',
+    '16,2,2,2,2,2,2,2,2,2,2,2',
+    '32,2',
+    '16,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2',
+];
+
 let activeColors: string[] = [];
+let activePatterns: string[] = [];
 
 let needsRedraw = true;
 
@@ -355,6 +371,7 @@ export function chart() {
             .datum(data[i])
             .attr('fill', 'none')
             .attr('stroke', activeColors[i])
+            .attr('stroke-dasharray', activePatterns[i])
             .attr('stroke-width', 1.5)
             .attr(
                 'd',
