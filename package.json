@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack",
     "start": "webpack serve",
-    "start_": "webpack --watch --progress"
+    "scrape": "node scraper/main.mjs"
   },
   "repository": {
     "type": "git",
@@ -21,8 +21,16 @@
   },
   "homepage": "https://github.com/arturo-mayorga/irl_stats#readme",
   "devDependencies": {
+    "@root/file-cookie-store": "^1.0.1",
+    "@types/crypto-js": "^4.1.1",
+    "@types/tough-cookie": "^4.0.2",
+    "axios": "^1.2.0",
+    "crypto-js": "^4.1.1",
+    "http-cookie-agent": "^4.0.2",
     "prettier": "2.8.0",
+    "tough-cookie": "^4.1.2",
     "ts-loader": "^9.4.1",
+    "ts-node": "^10.9.1",
     "typescript": "^4.9.3",
     "webpack": "^5.75.0",
     "webpack-cli": "^5.0.0",
