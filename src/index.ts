@@ -41,7 +41,7 @@ function main() {
         return;
     }
 
-    fetch('./data/lapchart_sessionId_192046751_subSessionId_52396226.json')
+    fetch('./data/GetLapChart-suz-feature.json')
         .then((response) => {
             return response.json();
         })
