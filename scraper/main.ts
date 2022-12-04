@@ -1,4 +1,4 @@
-import { clientGet, auth } from './iracing-client.mjs';
+import { clientGet, auth } from './iracing-client.js';
 (async () => {
     const username = process.env.IWP_USERNAME || 'test';
     const password = process.env.IWP_PASSWORD || 'test';
