@@ -25,7 +25,10 @@ export const client = axios.create({
     httpsAgent: new HttpsCookieAgent({ cookies: { jar } }),
 });
 
-export const clientGet = async (url, queryParams = {}) => {
+export async function clientGet(
+    url: string,
+    queryParams: { [name: string]: any } = {}
+): Promise<any> {
     await sleep(Math.random() * 1000);
 
     const params = new URLSearchParams();
@@ -34,7 +37,7 @@ export const clientGet = async (url, queryParams = {}) => {
         params.append(key, value);
     });
 
-    let response = {};
+    let response: any = {};
 
     if (params.toString().length > 0) {
         response = await client.get(`${url}?${params.toString()}`);
@@ -53,7 +56,7 @@ export const clientGet = async (url, queryParams = {}) => {
             ci.chunk_file_names &&
             ci.chunk_file_names.length > 0
         ) {
-            let newChunk = [];
+            let newChunk: any[] = [];
 
             let chunkFile = await clientGet(
                 response.data.chunk_info.base_download_url +
@@ -66,9 +69,9 @@ export const clientGet = async (url, queryParams = {}) => {
     }
 
     return response.data;
-};
+}
 
-export async function auth(username, password) {
+export async function auth(username: string, password: string) {
     const cookies = await jar.getCookies(BASE_URL);
     const authCookie = cookies.find(
         (cookie) => cookie.key === 'authtoken_members'
