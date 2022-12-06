@@ -4,6 +4,7 @@ import type {
     // LeagueSeasonSessions,
     LapChartData,
     LCD_Chunk,
+    SeasonSimsessionIndex,
 } from './iracing-endpoints';
 
 interface LapDelta {
@@ -39,13 +40,49 @@ function main() {
             return response.json();
         })
         .then((jsondata: LapChartData) => {
-            console.log(jsondata);
+            // console.log(jsondata);
 
             updateDriverNames(jsondata);
 
             data = getLapDeltas(getLapTimes(jsondata));
             window.setTimeout(chart, 0);
         });
+
+    let league = 6555;
+    fetch(`./data/derived/leagueSimsessionIndex_${league}.json`)
+        .then((response) => {
+            return response.json();
+        })
+        .then((jsondata: SeasonSimsessionIndex[]) => {
+            console.log(jsondata);
+
+            renderIndex(jsondata);
+        });
+}
+
+function renderIndex(index: SeasonSimsessionIndex[]) {
+    let indexCard = document.getElementById('index-card');
+    for (let idx of index) {
+        let seasonName = document.createElement('div');
+        seasonName.className = 'linkbtn-item linkbtn-fullrow';
+        seasonName.innerHTML = idx.season_title;
+        indexCard.appendChild(seasonName);
+        for (let ses of idx.sessions) {
+            let sesName = document.createElement('div');
+            sesName.className = 'linkbtn-item linkbtn-fullrow';
+            sesName.innerHTML = ' :: ' + ses.session_title;
+            indexCard.appendChild(sesName);
+            for (let sim of ses.simsessions) {
+                if (sim.type === 'race' || sim.type === 'sprint') {
+                    let simLink = document.createElement('a');
+                    simLink.innerHTML = sim.type;
+                    simLink.className = 'linkbtn-inline-item';
+                    simLink.href = `index.html?&subsession=${ses.subsession_id}&simsession=${sim.simsession_id}`;
+                    sesName.appendChild(simLink);
+                }
+            }
+        }
+    }
 }
 
 function getUrlVars(): { [name: string]: string } {
@@ -366,6 +403,8 @@ export function chart() {
 
     if (!targetDiv) return;
 
+    console.log(data);
+
     // set the dimensions and margins of the graph
     var margin = { top: 10, right: 10, bottom: 30, left: 50 },
         width = sizeDiv.offsetWidth - margin.left - margin.right,
@@ -406,10 +445,10 @@ export function chart() {
     var y = d3
         .scaleLinear()
         .domain([
-            -1 *
-                d3.min(data, (da: LapDelta[]) =>
-                    d3.min(da, (d: LapDelta) => +d.delta)
-                ),
+            d3.max(data, (da: LapDelta[]) =>
+                d3.max(da, (d: LapDelta) => +d.delta)
+            ),
+
             d3.min(data, (da: LapDelta[]) =>
                 d3.min(da, (d: LapDelta) => +d.delta)
             ),

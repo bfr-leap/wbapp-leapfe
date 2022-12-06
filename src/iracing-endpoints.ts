@@ -227,3 +227,21 @@ export interface LS_CarInClass {
     car_id: number;
     car_name: string;
 }
+
+export interface SeasonSimsessionIndex {
+    season_id: number;
+    season_title: string;
+    sessions: SSI_Session[];
+}
+
+export interface SSI_Session {
+    session_id: number;
+    subsession_id: number;
+    session_title: string;
+    simsessions: SSI_Simsession[];
+}
+
+export interface SSI_Simsession {
+    simsession_id: number;
+    type: 'race' | 'sprint' | 'qualify' | 'practice';
+}
