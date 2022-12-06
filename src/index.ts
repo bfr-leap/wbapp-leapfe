@@ -1,3 +1,11 @@
+import type {
+    // LeagueDirectory,
+    // LeagueSeasons,
+    // LeagueSeasonSessions,
+    LapChartData,
+    LCD_Chunk,
+} from './iracing-endpoints';
+
 interface LapDelta {
     lap: number;
     delta: number;
@@ -8,32 +16,12 @@ interface LapTime {
     time: number;
 }
 
-interface SessionDetails {
-    eventDate: string;
-    privateSessionName: string;
-    trackName: string;
-}
-
 interface GridItem {
     custid: number;
     is_ai: number;
     displayName: string;
     helmetPattern: number;
-    licenseColor: string;
-}
-
-interface LapItem {
-    lapnum: number;
-    custid: number;
-    carnum: string;
-    sesTime: number;
-    flags: number;
-}
-
-interface LapChartInfo {
-    details: SessionDetails;
-    startgrid: GridItem[];
-    lapdata: LapItem[];
+    licenseLevel: number;
 }
 
 function main() {
@@ -41,11 +29,16 @@ function main() {
         return;
     }
 
-    fetch('./data/GetLapChart-suz-feature.json')
+    let urlVars = getUrlVars();
+
+    let subsession = urlVars['subsession'] || '58009723';
+    let simsession = urlVars['simsession'] || '-3';
+
+    fetch(`./data/scraped/lapChartData_${subsession}_${simsession}.json`)
         .then((response) => {
             return response.json();
         })
-        .then((jsondata: LapChartInfo) => {
+        .then((jsondata: LapChartData) => {
             console.log(jsondata);
 
             updateDriverNames(jsondata);
@@ -55,7 +48,22 @@ function main() {
         });
 }
 
-function updateDriverNames(lapChartInfo: LapChartInfo) {
+function getUrlVars(): { [name: string]: string } {
+    let vars = Object.create(null);
+
+    let hashes = window.location.href
+        .slice(window.location.href.indexOf('?') + 1)
+        .split('&');
+    for (let i = 0; i < hashes.length; i++) {
+        let hash = hashes[i].split('=');
+        if (hash[1]) {
+            vars[hash[0]] = hash[1];
+        }
+    }
+    return vars;
+}
+
+function updateDriverNames(lapChartInfo: LapChartData) {
     let nameCardsDiv = document.getElementById('name-cards');
 
     const toggleAll = document.createElement('a');
@@ -94,7 +102,9 @@ function updateDriverNames(lapChartInfo: LapChartInfo) {
 
     let i = 0;
 
-    for (let driver of lapChartInfo.startgrid) {
+    let startgrid: GridItem[] = getStartGrid(lapChartInfo.chunk_info);
+
+    for (let driver of startgrid) {
         activeColors.push(baseColors[i % baseColors.length]);
         activePatterns.push(basePatterns[i % basePatterns.length]);
 
@@ -144,51 +154,90 @@ function addDriverName(driver: GridItem, i: number, nameCardsDiv: HTMLElement) {
     nameCardsDiv.appendChild(dNameContainer);
 }
 
-function getLapTimes(lapChartInfo: LapChartInfo): LapTime[][] {
+function getStartGrid(chunks: LCD_Chunk[]): GridItem[] {
+    let startgrid: GridItem[] = [];
+    let gridMap: { [name: number]: GridItem } = {};
+    let sortMap: {
+        [name: number]: { last_lap: number; last_position: number };
+    } = {};
+
+    for (let chunk of chunks) {
+        gridMap[chunk.cust_id] = {
+            custid: chunk.cust_id,
+            is_ai: 0,
+            displayName: chunk.display_name,
+            helmetPattern: chunk.helmet.pattern,
+            licenseLevel: chunk.license_level,
+        };
+
+        sortMap[chunk.cust_id] = {
+            last_lap: chunk.lap_number,
+            last_position: chunk.lap_position,
+        };
+    }
+
+    for (let cId in gridMap) {
+        startgrid.push(gridMap[cId]);
+    }
+
+    startgrid.sort((a: GridItem, b: GridItem) => {
+        let sortIdxA = sortMap[a.custid];
+        let sortIdxB = sortMap[b.custid];
+        if (sortIdxA.last_lap === sortIdxB.last_lap) {
+            return sortIdxA.last_position - sortIdxB.last_position;
+        }
+        return sortIdxB.last_lap - sortIdxA.last_lap;
+    });
+
+    return startgrid;
+}
+
+function getLapTimes(lapChartInfo: LapChartData): LapTime[][] {
     let sessionNameStrDiv = document.getElementById('sessionNameStr');
-    sessionNameStrDiv.innerHTML = `${lapChartInfo.details.trackName.replace(
+    sessionNameStrDiv.innerHTML = `${lapChartInfo.session_info.track.track_name.replace(
         /\+/g,
         ' '
-    )} - ${lapChartInfo.details.privateSessionName.replace(/\+/g, ' ')} ${
-        lapChartInfo.details.eventDate
+    )} - ${lapChartInfo.session_info.session_name.replace(/\+/g, ' ')} ${
+        lapChartInfo.session_info.start_time
     }`;
 
     let uid2gridMap: { [name: number]: number } = {};
 
+    let startgrid: GridItem[] = getStartGrid(lapChartInfo.chunk_info);
+
     let ret: LapTime[][] = [];
 
     let i = 0;
-    for (let gridItem of lapChartInfo.startgrid) {
+    for (let gridItem of startgrid) {
         uid2gridMap[gridItem.custid] = i++;
         ret.push([]);
     }
 
     let prevLapMap: { [name: number]: number } = {};
-    let firstTime = lapChartInfo.lapdata[0].sesTime;
+    let firstTime = lapChartInfo.chunk_info[0].session_time;
 
-    for (let lapdataIt of lapChartInfo.lapdata) {
-        if (lapdataIt.lapnum !== 0) {
+    for (let lapdataIt of lapChartInfo.chunk_info) {
+        if (lapdataIt.lap_number !== 0) {
             break;
         }
 
-        let cTime = lapdataIt.sesTime - firstTime;
+        let cTime = lapdataIt.session_time - firstTime;
 
-        prevLapMap[lapdataIt.custid] = lapdataIt.sesTime;
-
-        ret[uid2gridMap[lapdataIt.custid]].push({ lap: 0, time: cTime });
+        prevLapMap[lapdataIt.cust_id] = lapdataIt.session_time;
+        ret[uid2gridMap[lapdataIt.cust_id]].push({ lap: 0, time: cTime });
     }
 
-    for (let lapdataIt of lapChartInfo.lapdata) {
-        if (lapdataIt.lapnum === 0) {
+    for (let lapdataIt of lapChartInfo.chunk_info) {
+        if (lapdataIt.lap_number === 0) {
             continue;
         }
 
-        let cTime = lapdataIt.sesTime - prevLapMap[lapdataIt.custid];
+        let cTime = lapdataIt.session_time - prevLapMap[lapdataIt.cust_id];
 
-        prevLapMap[lapdataIt.custid] = lapdataIt.sesTime;
+        prevLapMap[lapdataIt.cust_id] = lapdataIt.session_time;
 
-        ret[uid2gridMap[lapdataIt.custid]].push({
-            lap: lapdataIt.lapnum,
+        ret[uid2gridMap[lapdataIt.cust_id]].push({
+            lap: lapdataIt.lap_number,
             time: cTime,
         });
     }
@@ -203,26 +252,32 @@ function getLapTimes(lapChartInfo: LapChartInfo): LapTime[][] {
 }
 
 function getLapDeltas(lapTimes: LapTime[][]): LapDelta[][] {
-    let avgTime = Math.round(
+    let baselineTime = Math.round(
         lapTimes
             .map((driverLaps: LapTime[]) =>
                 driverLaps
                     .map((lapTime) => lapTime.time)
-                    .reduce(function (avg, value, _, { length }) {
-                        return avg + value / length;
-                    }, 0)
+                    .reduce(function (min, value, _, { length }) {
+                        if (value <= 1 || isNaN(value)) {
+                            return min;
+                        }
+                        return Math.min(min, value);
+                    }, Infinity)
             )
-            .reduce(function (avg, value, _, { length }) {
-                return avg + value / length;
-            }, 0) * 1.07
+            .reduce(function (min, value, _, { length }) {
+                if (value <= 1 || isNaN(value)) {
+                    return min;
+                }
+                return Math.min(min, value);
+            }, Infinity) * 1.07
     );
 
     let baselineStrDiv = document.getElementById('baselineStr');
-    baselineStrDiv.innerHTML = avgTime.toString() + 's';
+    baselineStrDiv.innerHTML = baselineTime.toString() + 's';
 
     let ret: LapDelta[][] = lapTimes.map((dLapTimes) =>
         dLapTimes.map((dLapTime) => {
-            return { lap: dLapTime.lap, delta: dLapTime.time - avgTime };
+            return { lap: dLapTime.lap, delta: dLapTime.time - baselineTime };
         })
     );
 
@@ -351,9 +406,10 @@ export function chart() {
     var y = d3
         .scaleLinear()
         .domain([
-            d3.max(data, (da: LapDelta[]) =>
-                d3.max(da, (d: LapDelta) => +d.delta)
-            ),
+            -1 *
+                d3.min(data, (da: LapDelta[]) =>
+                    d3.min(da, (d: LapDelta) => +d.delta)
+                ),
             d3.min(data, (da: LapDelta[]) =>
                 d3.min(da, (d: LapDelta) => +d.delta)
             ),
