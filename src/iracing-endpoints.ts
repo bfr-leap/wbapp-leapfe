@@ -245,3 +245,46 @@ export interface SSI_Simsession {
     simsession_id: number;
     type: 'race' | 'sprint' | 'qualify' | 'practice';
 }
+
+export interface MembersData {
+    success: boolean;
+    cust_ids: number[];
+    members: M_Member[];
+}
+
+export interface M_Member {
+    cust_id: number;
+    display_name: string;
+    helmet: M_Helmet;
+    last_login: string;
+    member_since: string;
+    club_id: number;
+    club_name: number;
+    ai: boolean;
+    licenses: M_License[];
+}
+
+export interface M_License {
+    category_id: number;
+    category: string;
+    license_level: number;
+    safety_rating: number;
+    cpi: number;
+    irating: number;
+    tt_rating: number;
+    mpr_num_races: number;
+    color: string;
+    group_name: string;
+    group_id: number;
+    pro_promotable: boolean;
+    mpr_num_tts: number;
+}
+
+export interface M_Helmet {
+    pattern: 48;
+    color1: '000000';
+    color2: 'fff500';
+    color3: '000000';
+    face_type: 0;
+    helmet_type: 0;
+}

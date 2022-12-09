@@ -3,6 +3,7 @@ import {
     getLeagueSeasons,
     getLeagueSeasonSessions,
     getLapChartData,
+    getMembers,
 } from './iracing-endpoint-client.js';
 
 import { writeFileSync } from 'fs';
@@ -19,6 +20,8 @@ export async function scrapeLeague(leagueId: number) {
     for (let season of seasons.seasons) {
         await scrapeLeagueSeasonSessions(leagueId, season.season_id, false);
     }
+
+    await scrapeMembersData(getEncounteredCustIds(), leagueId);
 }
 
 export async function scrapeLeagueSeasonSessions(
@@ -53,6 +56,10 @@ export async function scrapeLapChartData(
         );
         const chartData = await getLapChartData(subsessionId, simsessionNumber);
         wf(chartData, `lapChartData_${subsessionId}_${simsessionNumber}.json`);
+
+        for (let c of chartData.chunk_info) {
+            _encounteredCustIds[c.cust_id] = c.cust_id;
+        }
     } catch (e) {
         console.log(
             '            error on scrapeLapChartData: ',
@@ -61,4 +68,19 @@ export async function scrapeLapChartData(
             'continuing'
         );
     }
+}
+
+let _encounteredCustIds: { [name: number]: number } = {};
+export function resetEncounteredCustIds() {
+    _encounteredCustIds = {};
+}
+
+export function getEncounteredCustIds(): number[] {
+    return Object.keys(_encounteredCustIds).map((s) => Number.parseInt(s, 10));
+}
+
+export async function scrapeMembersData(custIds: number[], leagueId: number) {
+    console.log('scrapeMembersData: ', custIds.length);
+    const memData = await getMembers(custIds);
+    wf(memData, `membersData_${leagueId}.json`);
 }

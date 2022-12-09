@@ -4,6 +4,7 @@ import type {
     LeagueSeasons,
     LeagueSeasonSessions,
     LapChartData,
+    MembersData,
 } from '../src/iracing-endpoints';
 
 export async function getLeagueDirectory(
@@ -58,6 +59,15 @@ export async function getLapChartData(
             simsession_number: simsessionNumber,
         })
     );
+
+    return ret;
+}
+
+export async function getMembers(custIds: number[]): Promise<MembersData> {
+    let ret: MembersData = <MembersData>await clientGet('/data/member/get', {
+        cust_ids: custIds.join(','),
+        include_licenses: true,
+    });
 
     return ret;
 }

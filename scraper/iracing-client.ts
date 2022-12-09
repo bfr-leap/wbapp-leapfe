@@ -76,9 +76,9 @@ export async function auth(username: string, password: string) {
     const authCookie = cookies.find(
         (cookie) => cookie.key === 'authtoken_members'
     );
-    if (authCookie && authCookie.TTL() > 0) {
-        return;
-    }
+    // if (authCookie && authCookie.TTL() > 0) {
+    //     return;
+    // }
 
     const hashPassword = Base64.stringify(
         sha256(password + username.toLowerCase())
@@ -87,5 +87,6 @@ export async function auth(username: string, password: string) {
         email: username,
         password: hashPassword,
     });
+    console.log('posted auth:');
     store.save();
 }
