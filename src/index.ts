@@ -28,6 +28,7 @@ function main() {
     let subsession = urlVars['subsession'] || '58009723';
     let simsession = urlVars['simsession'] || '-3';
     let league: string = urlVars['league'] || '6555';
+    let season: string = urlVars['season'] || '80139';
     let mode: string = urlVars['m'] || 'user-index';
 
     switch (mode) {
@@ -37,7 +38,7 @@ function main() {
             break;
         case 'user-index':
         default:
-            pageElements.push(new UserIndex(league));
+            pageElements.push(new UserIndex(league, season));
     }
 }
 

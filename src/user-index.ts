@@ -1,20 +1,39 @@
-import type { MembersData, M_License } from './iracing-endpoints';
+import type {
+    MembersData,
+    M_License,
+    SeasonSimsessionIndex,
+} from './iracing-endpoints';
 
 export class UserIndex {
-    constructor(league: string) {
+    private membersData: null | MembersData = null;
+    private seasonSimsessionIndex: null | SeasonSimsessionIndex = null;
+    constructor(league: string, season: string) {
         let element = document.createElement('div');
+        element.className = 'card-container';
+        element.innerHTML = `<div class='card-item' id="season-title-card"></div>`;
+        document.body.appendChild(element);
+
+        element = document.createElement('div');
         element.className = 'card-container';
         element.innerHTML = `<div class='card-item' id="user-index-card"></div>`;
         document.body.appendChild(element);
 
-        fetch(`./data/scraped/membersData_${league}.json`)
+        fetch(`./data/scraped/membersData_${league}_${season}.json`)
             .then((response) => {
                 return response.json();
             })
             .then((jsondata: MembersData) => {
                 console.log(jsondata);
+                this.renderUserList(jsondata);
+            });
 
-                this.renderIndex(jsondata);
+        fetch(`./data/derived/leagueSimsessionIndex_${league}.json`)
+            .then((response) => {
+                return response.json();
+            })
+            .then((jsondata: SeasonSimsessionIndex[]) => {
+                console.log(jsondata);
+                this.renderHeader(jsondata, Number.parseInt(season, 10));
             });
     }
 
@@ -30,7 +49,24 @@ export class UserIndex {
         return rL;
     }
 
-    private renderIndex(index: MembersData) {
+    private renderHeader(
+        seasonIndex: SeasonSimsessionIndex[],
+        seasonId: number
+    ) {
+        let titleCard = document.getElementById('season-title-card');
+
+        let season = seasonIndex.find((s) => s.season_id === seasonId);
+        if (undefined === season) {
+            return;
+        }
+
+        let tableHeader = document.createElement('div');
+        tableHeader.className = 'linkbtn-item linkbtn-fullrow';
+        tableHeader.innerHTML = `${season.season_title}`;
+        titleCard.appendChild(tableHeader);
+    }
+
+    private renderUserList(index: MembersData) {
         let indexCard = document.getElementById('user-index-card');
 
         let tableHeader = document.createElement('div');
