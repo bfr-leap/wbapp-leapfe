@@ -14,14 +14,20 @@ function wf(obj: any, name: string) {
 
 export async function scrapeLeague(leagueId: number) {
     console.log('scrapeLeague: ', leagueId);
-    const seasons = await getLeagueSeasons(leagueId, false);
+    const seasons = await getLeagueSeasons(leagueId, true);
     wf(seasons, `leagueSeasons_${leagueId}.json`);
 
     for (let season of seasons.seasons) {
-        await scrapeLeagueSeasonSessions(leagueId, season.season_id, false);
+        resetEncounteredCustIds();
+        if (season.season_name.toLocaleLowerCase().indexOf('practice') === -1) {
+            await scrapeLeagueSeasonSessions(leagueId, season.season_id, false);
+            await scrapeMembersData(
+                getEncounteredCustIds(),
+                leagueId,
+                season.season_id
+            );
+        }
     }
-
-    await scrapeMembersData(getEncounteredCustIds(), leagueId);
 }
 
 export async function scrapeLeagueSeasonSessions(
@@ -79,8 +85,12 @@ export function getEncounteredCustIds(): number[] {
     return Object.keys(_encounteredCustIds).map((s) => Number.parseInt(s, 10));
 }
 
-export async function scrapeMembersData(custIds: number[], leagueId: number) {
+export async function scrapeMembersData(
+    custIds: number[],
+    leagueId: number,
+    seasonId: number
+) {
     console.log('scrapeMembersData: ', custIds.length);
     const memData = await getMembers(custIds);
-    wf(memData, `membersData_${leagueId}.json`);
+    wf(memData, `membersData_${leagueId}_${seasonId}.json`);
 }
