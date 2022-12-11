@@ -2,11 +2,13 @@ import type {
     MembersData,
     M_License,
     SeasonSimsessionIndex,
+    CuratedLeagueTeamsInfo,
+    CLTI_Team,
 } from './iracing-endpoints';
 
 export class UserIndex {
-    private membersData: null | MembersData = null;
-    private seasonSimsessionIndex: null | SeasonSimsessionIndex = null;
+    private _teamInfoMap: { [name: number]: CLTI_Team } = {};
+    private _userTeamIdMap: { [name: number]: number } = {};
     constructor(league: string, season: string) {
         let element = document.createElement('div');
         element.className = 'card-container';
@@ -18,13 +20,25 @@ export class UserIndex {
         element.innerHTML = `<div class='card-item' id="user-index-card"></div>`;
         document.body.appendChild(element);
 
-        fetch(`./data/scraped/membersData_${league}_${season}.json`)
+        fetch(`./data/curated/leagueTeamsInfo_${league}.json`)
             .then((response) => {
                 return response.json();
             })
-            .then((jsondata: MembersData) => {
+            .then((jsondata: CuratedLeagueTeamsInfo) => {
                 console.log(jsondata);
-                this.renderUserList(jsondata);
+                this.populateTeamInfoMaps(
+                    jsondata,
+                    Number.parseInt(season, 10)
+                );
+
+                fetch(`./data/scraped/membersData_${league}_${season}.json`)
+                    .then((response) => {
+                        return response.json();
+                    })
+                    .then((jsondata: MembersData) => {
+                        console.log(jsondata);
+                        this.renderUserList(jsondata);
+                    });
             });
 
         fetch(`./data/derived/leagueSimsessionIndex_${league}.json`)
@@ -35,6 +49,25 @@ export class UserIndex {
                 console.log(jsondata);
                 this.renderHeader(jsondata, Number.parseInt(season, 10));
             });
+    }
+
+    private populateTeamInfoMaps(
+        leagueTeamsInfo: CuratedLeagueTeamsInfo,
+        seasonId: number
+    ) {
+        let season = leagueTeamsInfo.seasons.find(
+            (s) => s.season_id === seasonId
+        );
+        if (!season) {
+            return;
+        }
+
+        for (let team of season.teams) {
+            this._teamInfoMap[team.team_id] = team;
+            for (let member of team.team_members) {
+                this._userTeamIdMap[member] = team.team_id;
+            }
+        }
     }
 
     private getRoadLicense(licenses: M_License[]): M_License {
@@ -62,7 +95,7 @@ export class UserIndex {
 
         let tableHeader = document.createElement('div');
         tableHeader.className = 'linkbtn-item linkbtn-fullrow';
-        tableHeader.innerHTML = `${season.season_title}`;
+        tableHeader.innerHTML = `${season.season_title} ${season.season_id}`;
         titleCard.appendChild(tableHeader);
     }
 
@@ -114,15 +147,24 @@ export class UserIndex {
                 Math.floor((irating % 1000) / 100) +
                 'k';
 
+            let teamName = 'Privateer';
+            let teamId = this._userTeamIdMap[mem.cust_id];
+            if (teamId) {
+                let team = this._teamInfoMap[teamId];
+                teamName = team.team_name;
+            }
+
             sesName.innerHTML = `
             <div class='p-ranking'><span>${powerRanking}<span></div>
             <div class='p-points'>${irating}</div>
             <div class='driver-img club-${mem.club_id}'></div>
             <div class='driver'>
-                <span style="display:inline-block"><div><span class='last-name'>${lastName}</span> <span class='firt-name'>${firstName}</span>  <span class='license-pill-${classLevel.toLowerCase()}'>${iratingStr} | ${classLevel} ${
+                <span style="display:inline-block"><div><span class='last-name'>${lastName}</span> <span class='firt-name'>${firstName} ${
+                mem.cust_id
+            }</span>  <span class='license-pill-${classLevel.toLowerCase()}'>${iratingStr} | ${classLevel} ${
                 rL.safety_rating
             }<span></div>
-                <div>Team Name</div></span>
+                <div>${teamName}</div></span>
             </div>
             `;
             indexCard.appendChild(sesName);

@@ -1,0 +1,28 @@
+{
+    "league_id": 6555,
+    "seasons": [
+        {
+            "season_id": 80139,
+            "teams": [
+                {
+                    "team_id": 1,
+                    "team_name": "Blue Frog Racing",
+                    "team_members": [174470, 822137, 522124],
+                    "team_logo_url": ""
+                },
+                {
+                    "team_id": 2,
+                    "team_name": "Git Gud Racing",
+                    "team_members": [575753, 643236],
+                    "team_logo_url": ""
+                },
+                {
+                    "team_id": 3,
+                    "team_name": "Bieser Racing",
+                    "team_members": [227791 , 227791 ],
+                    "team_logo_url": ""
+                }
+            ]
+        }
+    ]
+}

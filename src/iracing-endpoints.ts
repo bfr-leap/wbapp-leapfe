@@ -288,3 +288,20 @@ export interface M_Helmet {
     face_type: 0;
     helmet_type: 0;
 }
+
+export interface CuratedLeagueTeamsInfo {
+    league_id: number;
+    seasons: CLTI_Season[];
+}
+
+export interface CLTI_Season {
+    season_id: number;
+    teams: CLTI_Team[];
+}
+
+export interface CLTI_Team {
+    team_id: number;
+    team_name: string;
+    team_members: number[];
+    team_logo: string;
+}
