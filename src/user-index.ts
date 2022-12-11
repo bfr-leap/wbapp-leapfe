@@ -32,14 +32,91 @@ export class UserIndex {
 
     private renderIndex(index: MembersData) {
         let indexCard = document.getElementById('user-index-card');
-        for (let mem of index.members) {
+
+        let tableHeader = document.createElement('div');
+        tableHeader.className = 'linkbtn-item linkbtn-fullrow';
+        tableHeader.innerHTML = `
+        <div class='p-ranking-header'>Power Ranking</div>
+        <div class='p-points-header'>Power Points</div>
+        <div class='driver-img-header'></div>
+        <div class='driver-header'>Driver</div>
+        `;
+        indexCard.appendChild(tableHeader);
+
+        let powerRanking = 1;
+
+        let members = index.members.sort(
+            (a, b) =>
+                (this.getRoadLicense(b.licenses).irating | 0) -
+                (this.getRoadLicense(a.licenses).irating | 0)
+        );
+
+        for (let mem of members) {
             let sesName = document.createElement('div');
             sesName.className = 'linkbtn-item linkbtn-fullrow';
 
             let rL = this.getRoadLicense(mem.licenses);
 
-            sesName.innerHTML = `${mem.display_name} :: ${rL.irating} :: ${rL.group_name} ${rL.safety_rating}`;
+            let nameA = mem.display_name.split(' ');
+
+            let lastName = nameA[nameA.length - 1] + ' ';
+
+            nameA.pop();
+            let firstName = nameA.join(' ');
+
+            let classLevel =
+                rL.group_name[rL.group_name.length - 1].toUpperCase();
+
+            let irating = rL.irating;
+            if (!irating) {
+                irating = 0;
+            }
+
+            let iratingStr =
+                Math.floor(irating / 1000) +
+                '.' +
+                Math.floor((irating % 1000) / 100) +
+                'k';
+
+            sesName.innerHTML = `
+            <div class='p-ranking'><span>${powerRanking}<span></div>
+            <div class='p-points'>${irating}</div>
+            <div class='driver-img club-${mem.club_id}'></div>
+            <div class='driver'>
+                <span style="display:inline-block"><div><span class='last-name'>${lastName}</span> <span class='firt-name'>${firstName}</span>  <span class='license-pill-${classLevel.toLowerCase()}'>${iratingStr} | ${classLevel} ${
+                rL.safety_rating
+            }<span></div>
+                <div>Team Name</div></span>
+            </div>
+            `;
             indexCard.appendChild(sesName);
+
+            sesName = document.createElement('div');
+            sesName.className = 'linkbtn-item more-detail-btn';
+            sesName.innerHTML = '&#x25BC;';
+            indexCard.appendChild(sesName);
+
+            sesName.onclick = () => {
+                let newParent = document.createElement('span');
+
+                let newNode = document.createElement('div');
+                newNode.className = 'linkbtn-item';
+                newNode.innerHTML = 'Comming Soon!';
+                newParent.appendChild(newNode);
+
+                newNode = document.createElement('div');
+                newNode.className = 'linkbtn-item more-detail-btn';
+                newNode.innerHTML = '&#x25B2;';
+                newParent.appendChild(newNode);
+
+                indexCard.replaceChild(newParent, sesName);
+
+                newNode.onclick = () => {
+                    indexCard.replaceChild(sesName, newParent);
+                };
+            };
+
+            ++powerRanking;
         }
     }
 }
