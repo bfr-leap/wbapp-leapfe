@@ -305,3 +305,20 @@ export interface CLTI_Team {
     team_members: number[];
     team_logo: string;
 }
+
+export interface SimsessionResults {
+    subsession_id: number;
+    simsession_number: number;
+    results: SSR_ResultsEntry[];
+}
+
+export interface SSR_ResultsEntry {
+    cust_id: number;
+    position: number;
+    start_position: number;
+    interval: number;
+    avg_lap_time: number;
+    fastest_lap_time: number;
+    fast_lap: number;
+    laps_completed: number;
+}

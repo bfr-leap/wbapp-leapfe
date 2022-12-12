@@ -1,5 +1,11 @@
 import {
+    LapChartData,
+    LeagueSeasons,
+    LeagueSeasonSessions,
+    LSS_Session,
+    LS_SeasonSummary,
     SeasonSimsessionIndex,
+    SimsessionResults,
     SSI_Session,
     SSI_Simsession,
 } from '../src/iracing-endpoints';
@@ -9,10 +15,91 @@ import {
     getLeagueSeasonSessions,
 } from './iracing-scraped-data-loader.js';
 
+import {
+    calculateQualifyResults,
+    calculateRaceResults,
+} from './results-utils.js';
+
 import { writeFileSync } from 'fs';
 
 function wf(obj: any, name: string) {
     writeFileSync(`./dist/data/derived/${name}`, JSON.stringify(obj));
+}
+
+type LapChartDataVisitor = (
+    leagueSeasons: LeagueSeasons,
+    seasonInfo: LS_SeasonSummary,
+    leaguSeasonSessions: LeagueSeasonSessions,
+    sessionInfo: LSS_Session,
+    lapChartData: LapChartData
+) => void;
+function acceptLapChartDataVisitor(
+    leagueId: number,
+    visitor: LapChartDataVisitor
+) {
+    let leagueSeasons = getLeagueSeasons(leagueId);
+
+    for (let seasonInfo of leagueSeasons.seasons) {
+        seasonInfo.season_id;
+
+        try {
+            let leaguSeasonSessions = getLeagueSeasonSessions(
+                leagueId,
+                seasonInfo.season_id
+            );
+
+            for (let sessionInfo of leaguSeasonSessions.sessions) {
+                sessionInfo.subsession_id;
+                let simSessionRetry = 8;
+
+                for (let i = 0; i < simSessionRetry; ++i) {
+                    try {
+                        let lapChartData = getLapChartData(
+                            sessionInfo.subsession_id,
+                            -1 * i
+                        );
+
+                        visitor(
+                            leagueSeasons,
+                            seasonInfo,
+                            leaguSeasonSessions,
+                            sessionInfo,
+                            lapChartData
+                        );
+                    } catch (e) {}
+                }
+            }
+        } catch (e) {
+            console.log(
+                `error fetching info for season [${seasonInfo.season_name}: ${seasonInfo.season_id}] continuing to next season`
+            );
+        }
+    }
+}
+
+function deriveLeagueSimSessionResults(leagueId: number) {
+    acceptLapChartDataVisitor(
+        leagueId,
+        (
+            leagueSeasons: LeagueSeasons,
+            seasonInfo: LS_SeasonSummary,
+            leaguSeasonSessions: LeagueSeasonSessions,
+            sessionInfo: LSS_Session,
+            lapChartData: LapChartData
+        ) => {
+            let r: SimsessionResults;
+            if (lapChartData.session_info.simsession_type === 6) {
+                r = calculateRaceResults(lapChartData);
+            } else {
+                r = calculateQualifyResults(lapChartData);
+            }
+
+            wf(
+                r,
+                `simSessionResults_${lapChartData.session_info.subsession_id}_${lapChartData.session_info.simsession_number}.json`
+            );
+        }
+    );
 }
 
 function deriveLeagueSimSessionIndex(leagueId: number) {
@@ -84,4 +171,5 @@ function deriveLeagueSimSessionIndex(leagueId: number) {
     wf(indices, `leagueSimsessionIndex_${leagueId}.json`);
 }
 
-deriveLeagueSimSessionIndex(6555);
+//deriveLeagueSimSessionIndex(6555);
+deriveLeagueSimSessionResults(6555);
