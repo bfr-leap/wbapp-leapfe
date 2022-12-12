@@ -267,6 +267,6 @@ function deriveLeagueSimSessionIndex(leagueId: number) {
     wf(indices, `leagueSimsessionIndex_${leagueId}.json`);
 }
 
-//deriveLeagueSimSessionIndex(6555);
-// deriveLeagueSimSessionResults(6555);
+deriveLeagueSimSessionIndex(6555);
+deriveLeagueSimSessionResults(6555);
 deriveDriverStats(6555);

@@ -58,11 +58,12 @@ export async function clientGet(
         ) {
             let newChunk: any[] = [];
 
-            let chunkFile = await clientGet(
-                response.data.chunk_info.base_download_url +
-                    response.data.chunk_info.chunk_file_names[0]
-            );
-            newChunk = newChunk.concat(chunkFile);
+            for (let chukName of response.data.chunk_info.chunk_file_names) {
+                let chunkFile = await clientGet(
+                    response.data.chunk_info.base_download_url + chukName
+                );
+                newChunk = newChunk.concat(chunkFile);
+            }
 
             response.data.chunk_info = newChunk;
         }
