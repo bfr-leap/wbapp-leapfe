@@ -322,3 +322,19 @@ export interface SSR_ResultsEntry {
     fast_lap: number;
     laps_completed: number;
 }
+
+export type DriverStatsMap = { [name: number]: DriverStats };
+
+export interface DriverStats {
+    cust_id: number;
+    started: number;
+    finished: number;
+    wins: number;
+    podiums: number;
+    top_10: number;
+    top_20: number;
+    fast_laps: number;
+    hard_charger: number;
+    poles: number;
+    power_points: number;
+}

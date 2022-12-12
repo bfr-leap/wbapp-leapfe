@@ -58,7 +58,9 @@ function getResultEntries(chunks: LCD_Chunk[]): SSR_ResultsEntry[] {
         if (
             entry.fastest_lap_time > chunk.lap_time &&
             chunk.incident === false &&
-            chunk.lap_number
+            chunk.lap_events.length === 0 &&
+            chunk.lap_number > 0 &&
+            chunk.lap_time > 0
         ) {
             entry.fast_lap = chunk.lap_number;
             entry.fastest_lap_time = chunk.lap_time;

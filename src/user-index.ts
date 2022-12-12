@@ -4,12 +4,18 @@ import type {
     SeasonSimsessionIndex,
     CuratedLeagueTeamsInfo,
     CLTI_Team,
+    DriverStatsMap,
+    DriverStats,
 } from './iracing-endpoints';
 
 export class UserIndex {
     private _teamInfoMap: { [name: number]: CLTI_Team } = {};
     private _userTeamIdMap: { [name: number]: number } = {};
+    private _leagueDriverStats: { [name: number]: DriverStatsMap } = {};
+    private _seasonId: number = 0;
     constructor(league: string, season: string) {
+        this._seasonId = Number.parseInt(season, 10);
+
         let element = document.createElement('div');
         element.className = 'card-container';
         element.innerHTML = `<div class='card-item' id="season-title-card"></div>`;
@@ -20,24 +26,33 @@ export class UserIndex {
         element.innerHTML = `<div class='card-item' id="user-index-card"></div>`;
         document.body.appendChild(element);
 
-        fetch(`./data/curated/leagueTeamsInfo_${league}.json`)
+        fetch(`./data/derived/leagueDriverStats_${league}.json`)
             .then((response) => {
                 return response.json();
             })
-            .then((jsondata: CuratedLeagueTeamsInfo) => {
-                console.log(jsondata);
-                this.populateTeamInfoMaps(
-                    jsondata,
-                    Number.parseInt(season, 10)
-                );
-
-                fetch(`./data/scraped/membersData_${league}_${season}.json`)
+            .then((leagueDriverStats: { [name: number]: DriverStatsMap }) => {
+                console.log(leagueDriverStats);
+                this._leagueDriverStats = leagueDriverStats;
+                fetch(`./data/curated/leagueTeamsInfo_${league}.json`)
                     .then((response) => {
                         return response.json();
                     })
-                    .then((jsondata: MembersData) => {
-                        console.log(jsondata);
-                        this.renderUserList(jsondata);
+                    .then((leagueTeamsInfo: CuratedLeagueTeamsInfo) => {
+                        console.log(leagueTeamsInfo);
+                        this.populateTeamInfoMaps(
+                            leagueTeamsInfo,
+                            Number.parseInt(season, 10)
+                        );
+                        fetch(
+                            `./data/scraped/membersData_${league}_${season}.json`
+                        )
+                            .then((response) => {
+                                return response.json();
+                            })
+                            .then((memberData: MembersData) => {
+                                console.log(memberData);
+                                this.renderUserList(memberData);
+                            });
                     });
             });
 
@@ -95,7 +110,7 @@ export class UserIndex {
 
         let tableHeader = document.createElement('div');
         tableHeader.className = 'linkbtn-item linkbtn-fullrow';
-        tableHeader.innerHTML = `${season.season_title} ${season.season_id}`;
+        tableHeader.innerHTML = `${season.season_title}`; // ${season.season_id}`;
         titleCard.appendChild(tableHeader);
     }
 
@@ -159,9 +174,7 @@ export class UserIndex {
             <div class='p-points'>${irating}</div>
             <div class='driver-img club-${mem.club_id}'></div>
             <div class='driver'>
-                <span style="display:inline-block"><div><span class='last-name'>${lastName}</span> <span class='firt-name'>${firstName} ${
-                mem.cust_id
-            }</span>  <span class='license-pill-${classLevel.toLowerCase()}'>${iratingStr} | ${classLevel} ${
+                <span style="display:inline-block"><div><span class='last-name'>${lastName}</span> <span class='firt-name'>${firstName}</span>  <span class='license-pill-${classLevel.toLowerCase()}'>${iratingStr} | ${classLevel} ${
                 rL.safety_rating
             }<span></div>
                 <div>${teamName}</div></span>
@@ -177,12 +190,29 @@ export class UserIndex {
             sesName.onclick = () => {
                 let newParent = document.createElement('span');
 
-                let newNode = document.createElement('div');
-                newNode.className = 'linkbtn-item';
-                newNode.innerHTML = 'Comming Soon!';
-                newParent.appendChild(newNode);
+                let stats =
+                    this._leagueDriverStats[this._seasonId][mem.cust_id];
 
-                newNode = document.createElement('div');
+                if (stats) {
+                    let newNode = document.createElement('div');
+                    newNode.className = 'linkbtn-item';
+                    newNode.innerHTML = `
+                    <div class='driver-stat'><span class='name'>Starts:</span><span class='value'> ${stats.started}</span></div>
+                    <div class='driver-stat'><span class='name'>Poles:</span><span class='value'> ${stats.poles}</span></div>
+                    <div class='driver-stat'><span class='name'>Wins:</span><span class='value'> ${stats.wins}</span></div>
+                    <div class='driver-stat'><span class='name'>Podiums:</span><span class='value'> ${stats.podiums}</span></div>
+                    <div class='driver-stat'><span class='name'>Top 10:</span><span class='value'> ${stats.top_10}</span></div>
+                    <div class='driver-stat'><span class='name'>Top 20:</span><span class='value'> ${stats.top_20}</span></div>`;
+
+                    // todo:
+                    // finished: number;
+                    // fast_laps: number;
+                    // hard_charger: number;
+                    // power_points: number;
+                    newParent.appendChild(newNode);
+                }
+
+                let newNode = document.createElement('div');
                 newNode.className = 'linkbtn-item more-detail-btn';
                 newNode.innerHTML = '&#x25B2;';
                 newParent.appendChild(newNode);

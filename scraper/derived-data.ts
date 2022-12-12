@@ -8,6 +8,8 @@ import {
     SimsessionResults,
     SSI_Session,
     SSI_Simsession,
+    DriverStatsMap,
+    DriverStats,
 } from '../src/iracing-endpoints';
 import {
     getLapChartData,
@@ -77,22 +79,6 @@ function acceptLapChartDataVisitor(
     }
 }
 
-type DriverStatsMap = { [name: number]: DriverStats };
-
-interface DriverStats {
-    cust_id: number;
-    started: number;
-    finished: number;
-    wins: number;
-    podiums: number;
-    top_10: number;
-    top_20: number;
-    fast_laps: number;
-    hard_charger: number;
-    poles: number;
-    power_points: number;
-}
-
 function getStats(map: DriverStatsMap, custId: number): DriverStats {
     let ret = map[custId];
     if (!ret) {
@@ -152,6 +138,7 @@ function deriveDriverStats(leagueId: number) {
                     let cStats = getStats(carrerStatsMap, res.cust_id);
                     let sStats = getStats(seasonStatsMap, res.cust_id);
                     cStats.started += 1;
+                    sStats.started += 1;
 
                     if (res.position === 1) {
                         cStats.wins += 1;
@@ -173,7 +160,7 @@ function deriveDriverStats(leagueId: number) {
                         sStats.top_20 += 1;
                     }
                 }
-            } else {
+            } else if (lapChartData.session_info.simsession_type === 5) {
                 r = calculateQualifyResults(lapChartData);
                 let cStats = getStats(carrerStatsMap, r.results[0].cust_id);
                 let sStats = getStats(seasonStatsMap, r.results[0].cust_id);

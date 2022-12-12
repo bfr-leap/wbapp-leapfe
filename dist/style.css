@@ -312,6 +312,31 @@ div {
     background-image: url(flags/australia.png);
 }
 
+.driver-stat {
+    text-align: left;
+    font-size: 14pt;
+    min-width: 10em;
+    display: inline-block;
+}
+
+.driver-stat::before {
+    content: "---";
+    background-color: #aaa;
+    color:#aaa;
+    border-radius: 1em;
+    background-size: cover;
+    background-position: center;
+    margin: .5em;
+    ;
+}
+
+.driver-stat .name {
+   color:#aaa;
+}
+.driver-stat .value {
+    color:#eee;
+}
+
 /* .first-name {
 
 } */
