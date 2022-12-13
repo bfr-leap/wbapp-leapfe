@@ -8,6 +8,8 @@ import type {
     DriverStats,
 } from './iracing-endpoints';
 
+const INCLUDE_IDS = false;
+
 export class UserIndex {
     private _teamInfoMap: { [name: number]: CLTI_Team } = {};
     private _userTeamIdMap: { [name: number]: number } = {};
@@ -110,7 +112,11 @@ export class UserIndex {
 
         let tableHeader = document.createElement('div');
         tableHeader.className = 'linkbtn-item linkbtn-fullrow';
-        tableHeader.innerHTML = `${season.season_title}`; // ${season.season_id}`;
+        tableHeader.innerHTML = `${
+            INCLUDE_IDS
+                ? season.season_title + ' ' + season.season_id
+                : season.season_title
+        }`;
         titleCard.appendChild(tableHeader);
     }
 
@@ -129,10 +135,15 @@ export class UserIndex {
 
         let powerRanking = 1;
 
-        let members = index.members.sort(
-            (a, b) =>
-                (this.getRoadLicense(b.licenses).irating | 0) -
-                (this.getRoadLicense(a.licenses).irating | 0)
+        let members = index.members.sort((a, b) =>
+            this._leagueDriverStats[this._seasonId][b.cust_id].power_points !==
+            this._leagueDriverStats[this._seasonId][a.cust_id].power_points
+                ? this._leagueDriverStats[this._seasonId][b.cust_id]
+                      .power_points -
+                  this._leagueDriverStats[this._seasonId][a.cust_id]
+                      .power_points
+                : (this.getRoadLicense(b.licenses).irating | 0) -
+                  (this.getRoadLicense(a.licenses).irating | 0)
         );
 
         for (let mem of members) {
@@ -162,6 +173,10 @@ export class UserIndex {
                 Math.floor((irating % 1000) / 100) +
                 'k';
 
+            let powerPoints =
+                this._leagueDriverStats[this._seasonId][mem.cust_id]
+                    .power_points;
+
             let teamName = 'Privateer';
             let teamId = this._userTeamIdMap[mem.cust_id];
             if (teamId) {
@@ -171,10 +186,12 @@ export class UserIndex {
 
             sesName.innerHTML = `
             <div class='p-ranking'><span>${powerRanking}<span></div>
-            <div class='p-points'>${irating}</div>
+            <div class='p-points'>${powerPoints}</div>
             <div class='driver-img club-${mem.club_id}'></div>
             <div class='driver'>
-                <span style="display:inline-block"><div><span class='last-name'>${lastName}</span> <span class='firt-name'>${firstName}</span>  <span class='license-pill-${classLevel.toLowerCase()}'>${iratingStr} | ${classLevel} ${
+                <span style="display:inline-block"><div><span class='last-name'>${lastName}</span> <span class='firt-name'>${
+                INCLUDE_IDS ? firstName + ' ' + mem.cust_id : firstName
+            }</span>  <span class='license-pill-${classLevel.toLowerCase()}'>${iratingStr} | ${classLevel} ${
                 rL.safety_rating
             }<span></div>
                 <div>${teamName}</div></span>

@@ -94,6 +94,7 @@ function getStats(map: DriverStatsMap, custId: number): DriverStats {
             hard_charger: 0,
             poles: 0,
             power_points: 0,
+            incidents: 0,
         };
     }
 
@@ -137,6 +138,13 @@ function deriveDriverStats(leagueId: number) {
                 for (let res of r.results) {
                     let cStats = getStats(carrerStatsMap, res.cust_id);
                     let sStats = getStats(seasonStatsMap, res.cust_id);
+
+                    cStats.power_points += res.points;
+                    sStats.power_points += res.points;
+
+                    cStats.incidents += res.incidents;
+                    sStats.incidents += res.incidents;
+
                     cStats.started += 1;
                     sStats.started += 1;
 
@@ -166,6 +174,14 @@ function deriveDriverStats(leagueId: number) {
                 let sStats = getStats(seasonStatsMap, r.results[0].cust_id);
                 cStats.poles += 1;
                 sStats.poles += 1;
+
+                for (let res of r.results) {
+                    let cStats = getStats(carrerStatsMap, res.cust_id);
+                    let sStats = getStats(seasonStatsMap, res.cust_id);
+
+                    cStats.incidents += res.incidents;
+                    sStats.incidents += res.incidents;
+                }
             }
         }
     );

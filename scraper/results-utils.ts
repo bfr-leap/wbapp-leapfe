@@ -5,7 +5,81 @@ import {
     SSR_ResultsEntry,
 } from '../src/iracing-endpoints';
 
+interface ScoringRules {
+    position_pts: number[];
+    fastest_lap_pts: number;
+    safest_driver: number;
+}
+
+const featureScoring: ScoringRules = {
+    position_pts: [25, 22, 20, 18, 16, 14, 12, 10, 8, 6, 4, 2],
+    fastest_lap_pts: 1,
+    safest_driver: 1,
+};
+
+const sprintScoring: ScoringRules = {
+    position_pts: [12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
+    fastest_lap_pts: 0,
+    safest_driver: 0,
+};
+
+function applyScoring(
+    simsessionResults: SimsessionResults,
+    rules: ScoringRules
+) {
+    let fastestLapTime = Infinity;
+    let fastestLapIdx = -1;
+
+    let leastIncidents = Infinity;
+    let leastIncidentsIdx = -1;
+
+    let totalLaps = simsessionResults.results[0].laps_completed;
+
+    let i = 0;
+    for (let r of simsessionResults.results) {
+        if (r.fastest_lap_time < fastestLapTime) {
+            fastestLapTime = r.fastest_lap_time;
+            fastestLapIdx = i;
+        }
+
+        if (r.incidents < leastIncidents && r.laps_completed > totalLaps / 2) {
+            leastIncidents = r.incidents;
+            leastIncidentsIdx = i;
+        }
+
+        if (rules.position_pts[i]) {
+            r.points += rules.position_pts[i];
+        }
+
+        ++i;
+    }
+
+    if (fastestLapIdx >= 0) {
+        simsessionResults.results[fastestLapIdx].points +=
+            rules.fastest_lap_pts;
+    }
+
+    if (leastIncidentsIdx >= 0) {
+        simsessionResults.results[leastIncidentsIdx].points +=
+            rules.safest_driver;
+    }
+}
+
 export function calculateRaceResults(lapData: LapChartData): SimsessionResults {
+    let ret: SimsessionResults = arrangeSimsessionResults(lapData);
+
+    let numLaps = ret.results[0].laps_completed;
+
+    if (numLaps > 10) {
+        applyScoring(ret, featureScoring);
+    } else {
+        applyScoring(ret, sprintScoring);
+    }
+
+    return ret;
+}
+
+function arrangeSimsessionResults(lapData: LapChartData): SimsessionResults {
     let ret: SimsessionResults = {
         subsession_id: lapData.session_info.subsession_id,
         simsession_number: lapData.session_info.simsession_number,
@@ -18,7 +92,7 @@ export function calculateRaceResults(lapData: LapChartData): SimsessionResults {
 export function calculateQualifyResults(
     lapData: LapChartData
 ): SimsessionResults {
-    let ret: SimsessionResults = calculateRaceResults(lapData);
+    let ret: SimsessionResults = arrangeSimsessionResults(lapData);
 
     ret.results.sort((a, b) => a.fastest_lap_time - b.fastest_lap_time);
 
@@ -50,6 +124,8 @@ function getResultEntries(chunks: LCD_Chunk[]): SSR_ResultsEntry[] {
                 fastest_lap_time: Infinity,
                 fast_lap: -1,
                 laps_completed: chunk.lap_number,
+                points: 0,
+                incidents: 0,
             };
         }
 
@@ -65,6 +141,8 @@ function getResultEntries(chunks: LCD_Chunk[]): SSR_ResultsEntry[] {
             entry.fast_lap = chunk.lap_number;
             entry.fastest_lap_time = chunk.lap_time;
         }
+
+        entry.incidents += chunk.lap_events.length;
 
         sortMap[chunk.cust_id] = {
             last_lap: chunk.lap_number,
