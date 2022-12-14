@@ -5,6 +5,7 @@ import type {
     LeagueSeasons,
     LeagueSeasonSessions,
     LapChartData,
+    MembersData,
 } from '../src/iracing-endpoints';
 
 const MNT_PT = './dist/data/scraped/';
@@ -55,6 +56,20 @@ export function getLapChartData(
     let ret: LapChartData = <LapChartData>JSON.parse(
         readFileSync(
             `${MNT_PT}lapChartData_${subsessionId}_${simsessionNumber}.json`,
+            {
+                encoding: 'utf8',
+                flag: 'r',
+            }
+        )
+    );
+
+    return ret;
+}
+
+export function getMembersData(leagueId: number, seasonId: number): MembersData {
+    let ret: MembersData = <MembersData>JSON.parse(
+        readFileSync(
+            `${MNT_PT}membersData_${leagueId}_${seasonId}.json`,
             {
                 encoding: 'utf8',
                 flag: 'r',

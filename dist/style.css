@@ -3,6 +3,7 @@ body {
     font-family: Lato;
     font-size: 9pt;
     color: #ddd; 
+    cursor: default;
 }
 
 div {

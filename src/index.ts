@@ -1,6 +1,7 @@
 import { CumulativeChart } from './cumulative-delta-chart';
 import { LeagueIndex } from './league-index';
 import { UserIndex } from './user-index';
+import { DriverProfile } from './driver-profile';
 
 function getUrlVars(): { [name: string]: string } {
     let vars: { [name: string]: string } = {};
@@ -29,12 +30,16 @@ function main() {
     let simsession = urlVars['simsession'] || '-3';
     let league: string = urlVars['league'] || '6555';
     let season: string = urlVars['season'] || '80139';
+    let driver: string = urlVars['driver'] || '174470';
     let mode: string = urlVars['m'] || 'user-index';
 
     switch (mode) {
         case 'cumulative-chart':
             pageElements.push(new CumulativeChart(subsession, simsession));
             pageElements.push(new LeagueIndex(league));
+            break;
+        case 'driver':
+            pageElements.push(new DriverProfile(league, driver));
             break;
         case 'user-index':
         default:

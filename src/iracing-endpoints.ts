@@ -338,6 +338,6 @@ export interface DriverStats {
     fast_laps: number;
     hard_charger: number;
     poles: number;
-    power_points: number; 
+    power_points: number;
     incidents: number;
 }
