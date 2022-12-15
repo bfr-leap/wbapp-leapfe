@@ -11,6 +11,7 @@ import {
     DriverStatsMap,
     DriverStats,
     M_Member,
+    SSR_ResultsEntry,
 } from '../src/iracing-endpoints';
 import {
     getLapChartData,
@@ -191,7 +192,35 @@ function deriveDriverStats(leagueId: number) {
     wf(seasonStatsMapStore, `leagueDriverStats_${leagueId}.json`);
 }
 
+type ResultsByDriverStore = {
+    [name: number]: {
+        [name: number]: { [name: number]: SSR_ResultsEntry };
+    };
+}; // driver -> season -> session -> result
+
+function getDriverSeasonResults(
+    custId: number,
+    seasonId: number,
+    resultsStore: ResultsByDriverStore
+) {
+    let driverStore = resultsStore[custId];
+    if (!driverStore) {
+        driverStore = resultsStore[custId] = {};
+    }
+
+    let seasonStore = driverStore[seasonId];
+    if (!seasonStore) {
+        seasonStore = driverStore[seasonId] = {};
+    }
+
+    return seasonStore;
+}
+
 function deriveLeagueSimSessionResults(leagueId: number) {
+    let resultsStoreRace: ResultsByDriverStore = {}; // driver -> season -> session -> result
+    let resultsStoreSprint: ResultsByDriverStore = {}; // driver -> season -> session -> result
+    let resultsStoreQuali: ResultsByDriverStore = {}; // driver -> season -> session -> result
+
     acceptLapChartDataVisitor(
         leagueId,
         (
@@ -202,10 +231,26 @@ function deriveLeagueSimSessionResults(leagueId: number) {
             lapChartData: LapChartData
         ) => {
             let r: SimsessionResults;
+            let activeStore: ResultsByDriverStore;
             if (lapChartData.session_info.simsession_type === 6) {
                 r = calculateRaceResults(lapChartData);
+
+                if (r.results[0].laps_completed > 10) {
+                    activeStore = resultsStoreRace;
+                } else {
+                    activeStore = resultsStoreSprint;
+                }
             } else {
                 r = calculateQualifyResults(lapChartData);
+                activeStore = resultsStoreQuali;
+            }
+
+            for (let res of r.results) {
+                getDriverSeasonResults(
+                    res.cust_id,
+                    seasonInfo.season_id,
+                    activeStore
+                )[sessionInfo.subsession_id] = res;
             }
 
             wf(
@@ -214,6 +259,30 @@ function deriveLeagueSimSessionResults(leagueId: number) {
             );
         }
     );
+
+    let driverIds: string[] = Object.keys(resultsStoreRace);
+    for (let custId of driverIds) {
+        wf(
+            resultsStoreRace[Number.parseInt(custId)],
+            `driverSessionResults_race_${custId}.json`
+        );
+    }
+
+    driverIds = Object.keys(resultsStoreSprint);
+    for (let custId of driverIds) {
+        wf(
+            resultsStoreSprint[Number.parseInt(custId)],
+            `driverSessionResults_sprint_${custId}.json`
+        );
+    }
+
+    driverIds = Object.keys(resultsStoreQuali);
+    for (let custId of driverIds) {
+        wf(
+            resultsStoreQuali[Number.parseInt(custId)],
+            `driverSessionResults_quali_${custId}.json`
+        );
+    }
 }
 
 function deriveLeagueSimSessionIndex(leagueId: number) {
@@ -309,7 +378,7 @@ function deriveSingleMemberInfo(leagueId: number) {
     }
 }
 
-// deriveLeagueSimSessionIndex(6555);
-// deriveLeagueSimSessionResults(6555);
-// deriveDriverStats(6555);
+deriveLeagueSimSessionIndex(6555);
+deriveLeagueSimSessionResults(6555);
+deriveDriverStats(6555);
 deriveSingleMemberInfo(6555);
