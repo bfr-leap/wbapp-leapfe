@@ -8,6 +8,7 @@ import type {
     DriverStats,
     M_Member,
     LeagueSeasons,
+    DriverResults,
 } from './iracing-endpoints';
 
 const INCLUDE_IDS = false;
@@ -25,6 +26,9 @@ async function fetchObjects(urls: string[]): Promise<any[]> {
 export class DriverProfile {
     private _teamsInfo: CuratedLeagueTeamsInfo | null = null;
     private _driverStatsMap: { [name: number]: DriverStatsMap } | null = null;
+    private _driverSessionResultsRace: DriverResults | null = null;
+    private _driverSessionResultsSprint: DriverResults | null = null;
+    private _driverSessionResultsQuali: DriverResults | null = null;
 
     public constructor(leagueId: string, custId: string) {
         let element = document.createElement('div');
@@ -38,19 +42,32 @@ export class DriverProfile {
                 leagueTeamsInfo,
                 singleMemberData,
                 leagueSeasons,
+                driverSessionResultsRace,
+                driverSessionResultsSprint,
+                driverSessionResultsQuali,
             ] = <
                 [
                     { [name: number]: DriverStatsMap },
                     CuratedLeagueTeamsInfo,
                     M_Member,
-                    LeagueSeasons
+                    LeagueSeasons,
+                    DriverResults,
+                    DriverResults,
+                    DriverResults
                 ]
             >await fetchObjects([
                 `./data/derived/leagueDriverStats_${leagueId}.json`,
                 `./data/curated/leagueTeamsInfo_${leagueId}.json`,
                 `./data/derived/singleMemberData_${custId}.json`,
                 `./data/scraped/leagueSeasons_${leagueId}.json`,
+                `./data/derived/driverSessionResults_race_${custId}.json`,
+                `./data/derived/driverSessionResults_sprint_${custId}.json`,
+                `./data/derived/driverSessionResults_quali_${custId}.json`,
             ]);
+
+            this._driverSessionResultsRace = driverSessionResultsRace;
+            this._driverSessionResultsSprint = driverSessionResultsSprint;
+            this._driverSessionResultsQuali = driverSessionResultsQuali;
 
             this._driverStatsMap = driverStatsMap;
             this._teamsInfo = leagueTeamsInfo;
@@ -109,7 +126,8 @@ export class DriverProfile {
         let optionalHref =
             seasonId === 0 ? '' : ` href="?&m=user-index&season=${seasonId}"`;
         newNode.className = 'linkbtn-item';
-        newNode.innerHTML = `
+        let htmlStrings: string[] = [
+            `
                     <div class='linkbtn-item linkbtn-fullrow'><${seasonTag}${optionalHref}>${seasonName}</${seasonTag}></div>
                     <div class='driver-stat'><span class='name'>Starts:</span><span class='value'> ${stats.started}</span></div>
                     <div class='driver-stat'><span class='name'>Poles:</span><span class='value'> ${stats.poles}</span></div>
@@ -118,13 +136,109 @@ export class DriverProfile {
                     <div class='driver-stat'><span class='name'>Top 10:</span><span class='value'> ${stats.top_10}</span></div>
                     <div class='driver-stat'><span class='name'>Top 20:</span><span class='value'> ${stats.top_20}</span></div>
                     <div class='driver-stat'><span class='name'>Power Points:</span><span class='value'> ${stats.power_points}</span></div>
-                    <div class='linkbtn-item linkbtn-fullrow'></div>`;
+                    `,
+        ];
+
+        this.renderResultsTable(
+            htmlStrings,
+            seasonId,
+            this._driverSessionResultsRace
+        );
+        this.renderResultsTable(
+            htmlStrings,
+            seasonId,
+            this._driverSessionResultsSprint
+        );
+        this.renderResultsTable(
+            htmlStrings,
+            seasonId,
+            this._driverSessionResultsQuali
+        );
+
+        htmlStrings.push(`<div class='linkbtn-item linkbtn-fullrow'></div>`);
+
+        newNode.innerHTML = htmlStrings.join('');
 
         // todo:
         // finished: number;
         // fast_laps: number;
         // hard_charger: number;
         parentDiv.appendChild(newNode);
+    }
+
+    private renderResultsTable(
+        htmlStrings: string[],
+        seasonId: number,
+        sessionResults: DriverResults
+    ) {
+        let seasonRaceResults = sessionResults[seasonId];
+        if (seasonRaceResults) {
+            let sessionIds: string[] = Object.keys(seasonRaceResults);
+            htmlStrings.push(
+                `<table><div class='linkbtn-item linkbtn-fullrow'>`
+            );
+
+            htmlStrings.push(`
+                <tr>
+                <th>session</th>
+                <th>position</th>
+                <th>points</th>
+                <th>start position</th>
+                <th>fast lap</th>
+                <th>fastest lap time</th>
+                <th>incidents</th>
+                <th>laps completed</th>
+                </tr>
+                `);
+
+            /**
+             * todo
+             * <td>avg lap time</td>
+             * <td>interval</td>
+             */
+
+            let totalPts = 0;
+
+            for (let sessionId of sessionIds) {
+                let r = seasonRaceResults[Number.parseInt(sessionId)];
+                htmlStrings.push(`
+                <tr>
+                <td>${sessionId}</td>
+                <td>${r.position}</td>
+                <td>${r.points}</td>
+                <td>${r.start_position}</td>
+                <td>${r.fast_lap}</td>
+                <td>${Math.round(r.fastest_lap_time / 100) / 100}s</td>
+                <td>${r.incidents}</td>
+                <td>${r.laps_completed}</td>
+                
+                </tr>
+                `);
+                /**
+                 * todo
+                 * <td>${r.avg_lap_time}</td>
+                 * <td>${r.interval}</td>
+                 *
+                 */
+                totalPts += r.points;
+            }
+
+            htmlStrings.push(`
+                <tr>
+                <td</td>
+                <td></td>
+                <td></td>
+                <td>${totalPts}</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                
+                </tr>
+                `);
+
+            htmlStrings.push('</table></div>');
+        }
     }
 
     private renderTitle(

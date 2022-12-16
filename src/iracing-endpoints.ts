@@ -341,3 +341,7 @@ export interface DriverStats {
     power_points: number;
     incidents: number;
 }
+
+export type DriverResults = {
+    [name: number]: { [name: number]: SSR_ResultsEntry };
+};

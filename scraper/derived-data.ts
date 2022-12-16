@@ -12,6 +12,7 @@ import {
     DriverStats,
     M_Member,
     SSR_ResultsEntry,
+    DriverResults,
 } from '../src/iracing-endpoints';
 import {
     getLapChartData,
@@ -193,9 +194,7 @@ function deriveDriverStats(leagueId: number) {
 }
 
 type ResultsByDriverStore = {
-    [name: number]: {
-        [name: number]: { [name: number]: SSR_ResultsEntry };
-    };
+    [name: number]: DriverResults;
 }; // driver -> season -> session -> result
 
 function getDriverSeasonResults(
@@ -231,7 +230,7 @@ function deriveLeagueSimSessionResults(leagueId: number) {
             lapChartData: LapChartData
         ) => {
             let r: SimsessionResults;
-            let activeStore: ResultsByDriverStore;
+            let activeStore: ResultsByDriverStore | null;
             if (lapChartData.session_info.simsession_type === 6) {
                 r = calculateRaceResults(lapChartData);
 
@@ -242,15 +241,19 @@ function deriveLeagueSimSessionResults(leagueId: number) {
                 }
             } else {
                 r = calculateQualifyResults(lapChartData);
-                activeStore = resultsStoreQuali;
+                if (lapChartData.session_info.simsession_type === 5) {
+                    activeStore = resultsStoreQuali;
+                }
             }
 
             for (let res of r.results) {
-                getDriverSeasonResults(
-                    res.cust_id,
-                    seasonInfo.season_id,
-                    activeStore
-                )[sessionInfo.subsession_id] = res;
+                if (activeStore) {
+                    getDriverSeasonResults(
+                        res.cust_id,
+                        seasonInfo.season_id,
+                        activeStore
+                    )[sessionInfo.subsession_id] = res;
+                }
             }
 
             wf(
