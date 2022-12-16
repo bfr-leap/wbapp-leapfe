@@ -138,6 +138,7 @@ function getResultEntries(chunks: LCD_Chunk[]): SSR_ResultsEntry[] {
                 laps_completed: chunk.lap_number,
                 points: 0,
                 incidents: 0,
+                pace_percent: -1,
             };
         }
 
@@ -176,9 +177,19 @@ function getResultEntries(chunks: LCD_Chunk[]): SSR_ResultsEntry[] {
     });
 
     let p = 1;
+    let fastestLap = Infinity;
     for (let r of resultEntries) {
         r.position = p;
+        if (r.fastest_lap_time < fastestLap) {
+            fastestLap = r.fastest_lap_time;
+        }
         ++p;
+    }
+
+    for (let r of resultEntries) {
+        r.pace_percent = r.fastest_lap_time / fastestLap - 1;
+        r.pace_percent *= 100;
+        r.pace_percent = Math.round(r.pace_percent * 100) / 100;
     }
 
     return resultEntries;

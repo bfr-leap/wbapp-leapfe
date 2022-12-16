@@ -186,6 +186,7 @@ export class DriverProfile {
                 <th>start position</th>
                 <th>fast lap</th>
                 <th>fastest lap time</th>
+                <th>pace percent</th>
                 <th>incidents</th>
                 <th>laps completed</th>
                 </tr>
@@ -209,6 +210,7 @@ export class DriverProfile {
                 <td>${r.start_position}</td>
                 <td>${r.fast_lap}</td>
                 <td>${Math.round(r.fastest_lap_time / 100) / 100}s</td>
+                <td>${r.pace_percent}%</td>
                 <td>${r.incidents}</td>
                 <td>${r.laps_completed}</td>
                 
