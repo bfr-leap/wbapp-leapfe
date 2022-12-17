@@ -35,7 +35,7 @@ export class LeagueIndex {
                         let simLink = document.createElement('a');
                         simLink.innerHTML = sim.type;
                         simLink.className = 'linkbtn-inline-item';
-                        simLink.href = `index.html?&m=cumulative-chart&subsession=${ses.subsession_id}&simsession=${sim.simsession_id}`;
+                        simLink.href = `?&m=charts&subsession=${ses.subsession_id}&simsession=${sim.simsession_id}`;
                         sesName.appendChild(simLink);
                     }
                 }

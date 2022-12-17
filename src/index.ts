@@ -34,7 +34,7 @@ function main() {
     let mode: string = urlVars['m'] || 'user-index';
 
     switch (mode) {
-        case 'cumulative-chart':
+        case 'charts':
             pageElements.push(new CumulativeChart(subsession, simsession));
             pageElements.push(new LeagueIndex(league));
             break;

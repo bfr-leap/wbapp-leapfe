@@ -10,8 +10,10 @@ import type {
     LeagueSeasons,
     DriverResults,
 } from './iracing-endpoints';
+import { SingleVariableBarChart } from './single-variable-bar-chart';
 
 const INCLUDE_IDS = false;
+const INCLUDE_TABLES = true;
 
 async function fetchObjects(urls: string[]): Promise<any[]> {
     let objs = await Promise.all(
@@ -136,33 +138,63 @@ export class DriverProfile {
                     <div class='driver-stat'><span class='name'>Top 10:</span><span class='value'> ${stats.top_10}</span></div>
                     <div class='driver-stat'><span class='name'>Top 20:</span><span class='value'> ${stats.top_20}</span></div>
                     <div class='driver-stat'><span class='name'>Power Points:</span><span class='value'> ${stats.power_points}</span></div>
+                    <div class='small-chart' id='pare-percent-${seasonId}'></div>
                     `,
         ];
 
-        this.renderResultsTable(
-            htmlStrings,
-            seasonId,
-            this._driverSessionResultsRace
-        );
-        this.renderResultsTable(
-            htmlStrings,
-            seasonId,
-            this._driverSessionResultsSprint
-        );
-        this.renderResultsTable(
-            htmlStrings,
-            seasonId,
-            this._driverSessionResultsQuali
-        );
+        if (INCLUDE_TABLES) {
+            this.renderResultsTable(
+                htmlStrings,
+                seasonId,
+                this._driverSessionResultsRace
+            );
+            this.renderResultsTable(
+                htmlStrings,
+                seasonId,
+                this._driverSessionResultsSprint
+            );
+            this.renderResultsTable(
+                htmlStrings,
+                seasonId,
+                this._driverSessionResultsQuali
+            );
+        }
 
         htmlStrings.push(`<div class='linkbtn-item linkbtn-fullrow'></div>`);
 
         newNode.innerHTML = htmlStrings.join('');
 
+        this._driverSessionResultsQuali;
+
+        if (this._driverSessionResultsQuali[seasonId]) {
+            let x = 0;
+            let series = Object.keys(this._driverSessionResultsQuali[seasonId])
+                .map((v) => Number.parseInt(v, 10))
+                .sort((a, b) => a - b)
+                .map(
+                    (v) =>
+                        this._driverSessionResultsQuali[seasonId][v]
+                            .pace_percent
+                )
+                .map((p) => {
+                    return { x: x++, y: p };
+                });
+
+            setTimeout(
+                () =>
+                    new SingleVariableBarChart(
+                        document.getElementById(`pare-percent-${seasonId}`),
+                        series
+                    ),
+                0
+            );
+        }
+
         // todo:
         // finished: number;
         // fast_laps: number;
         // hard_charger: number;
+
         parentDiv.appendChild(newNode);
     }
 
@@ -199,18 +231,28 @@ export class DriverProfile {
              */
 
             let totalPts = 0;
+            let pacePctTotal = 0;
+            let pacePctCount = 0;
+            let posTotal = 0;
+            let posCount = 0;
+            let startPosTotal = 0;
+            let startPosCount = 0;
+            let incidentTotal = 0;
+            let lapsTotal = 0;
 
             for (let sessionId of sessionIds) {
                 let r = seasonRaceResults[Number.parseInt(sessionId)];
                 htmlStrings.push(`
                 <tr>
-                <td>${sessionId}</td>
+                <td><a href="?&m=charts&simsession=0&subsession=${sessionId}">${sessionId}</a></td>
                 <td>${r.position}</td>
                 <td>${r.points}</td>
                 <td>${r.start_position}</td>
                 <td>${r.fast_lap}</td>
                 <td>${Math.round(r.fastest_lap_time / 100) / 100}s</td>
-                <td>${r.pace_percent}%</td>
+                <td>${
+                    null === r.pace_percent ? '--' : r.pace_percent + '%'
+                }</td>
                 <td>${r.incidents}</td>
                 <td>${r.laps_completed}</td>
                 
@@ -223,19 +265,38 @@ export class DriverProfile {
                  *
                  */
                 totalPts += r.points;
+                if (!isNaN(r.pace_percent)) {
+                    pacePctCount += 1;
+                    pacePctTotal += r.pace_percent;
+                }
+
+                posTotal += r.position;
+                posCount += 1;
+                startPosTotal += r.start_position;
+                startPosCount += 1;
+                incidentTotal += r.incidents;
+                lapsTotal += r.laps_completed;
             }
 
             htmlStrings.push(`
                 <tr>
-                <td</td>
-                <td></td>
-                <td></td>
+                <td>average/total</td>
+                <td>${Math.round((100 * posTotal) / posCount) / 100}</td>
                 <td>${totalPts}</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                
+                <td>${
+                    Math.round((100 * startPosTotal) / startPosCount) / 100
+                }</td>
+                <td>--</td>
+                <td>--</td>
+                <td>${
+                    pacePctCount
+                        ? Math.round((100 * pacePctTotal) / pacePctCount) /
+                              100 +
+                          '%'
+                        : ''
+                }</td>
+                <td>${incidentTotal}</td>
+                <td>${lapsTotal}</td>
                 </tr>
                 `);
 

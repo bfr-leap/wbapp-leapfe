@@ -338,10 +338,10 @@ div {
     color:#eee;
 }
 
-/* .first-name {
-
-} */
-
-/* .driver-header, .driver {
-    
-} */
+.small-chart {
+    display: inline-block;
+    min-width: 50em;
+    max-width: 45%;
+    height: 10em;
+    background-color: aqua;
+}
