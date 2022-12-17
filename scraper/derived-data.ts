@@ -10,11 +10,15 @@ import {
     SSI_Simsession,
     DriverStatsMap,
     DriverStats,
+    M_Member,
+    SSR_ResultsEntry,
+    DriverResults,
 } from '../src/iracing-endpoints';
 import {
     getLapChartData,
     getLeagueSeasons,
     getLeagueSeasonSessions,
+    getMembersData,
 } from './iracing-scraped-data-loader.js';
 
 import {
@@ -189,7 +193,33 @@ function deriveDriverStats(leagueId: number) {
     wf(seasonStatsMapStore, `leagueDriverStats_${leagueId}.json`);
 }
 
+type ResultsByDriverStore = {
+    [name: number]: DriverResults;
+}; // driver -> season -> session -> result
+
+function getDriverSeasonResults(
+    custId: number,
+    seasonId: number,
+    resultsStore: ResultsByDriverStore
+) {
+    let driverStore = resultsStore[custId];
+    if (!driverStore) {
+        driverStore = resultsStore[custId] = {};
+    }
+
+    let seasonStore = driverStore[seasonId];
+    if (!seasonStore) {
+        seasonStore = driverStore[seasonId] = {};
+    }
+
+    return seasonStore;
+}
+
 function deriveLeagueSimSessionResults(leagueId: number) {
+    let resultsStoreRace: ResultsByDriverStore = {}; // driver -> season -> session -> result
+    let resultsStoreSprint: ResultsByDriverStore = {}; // driver -> season -> session -> result
+    let resultsStoreQuali: ResultsByDriverStore = {}; // driver -> season -> session -> result
+
     acceptLapChartDataVisitor(
         leagueId,
         (
@@ -200,10 +230,30 @@ function deriveLeagueSimSessionResults(leagueId: number) {
             lapChartData: LapChartData
         ) => {
             let r: SimsessionResults;
+            let activeStore: ResultsByDriverStore | null;
             if (lapChartData.session_info.simsession_type === 6) {
                 r = calculateRaceResults(lapChartData);
+
+                if (r.results[0].laps_completed > 10) {
+                    activeStore = resultsStoreRace;
+                } else {
+                    activeStore = resultsStoreSprint;
+                }
             } else {
                 r = calculateQualifyResults(lapChartData);
+                if (lapChartData.session_info.simsession_type === 5) {
+                    activeStore = resultsStoreQuali;
+                }
+            }
+
+            for (let res of r.results) {
+                if (activeStore) {
+                    getDriverSeasonResults(
+                        res.cust_id,
+                        seasonInfo.season_id,
+                        activeStore
+                    )[sessionInfo.subsession_id] = res;
+                }
             }
 
             wf(
@@ -212,6 +262,30 @@ function deriveLeagueSimSessionResults(leagueId: number) {
             );
         }
     );
+
+    let driverIds: string[] = Object.keys(resultsStoreRace);
+    for (let custId of driverIds) {
+        wf(
+            resultsStoreRace[Number.parseInt(custId)],
+            `driverSessionResults_race_${custId}.json`
+        );
+    }
+
+    driverIds = Object.keys(resultsStoreSprint);
+    for (let custId of driverIds) {
+        wf(
+            resultsStoreSprint[Number.parseInt(custId)],
+            `driverSessionResults_sprint_${custId}.json`
+        );
+    }
+
+    driverIds = Object.keys(resultsStoreQuali);
+    for (let custId of driverIds) {
+        wf(
+            resultsStoreQuali[Number.parseInt(custId)],
+            `driverSessionResults_quali_${custId}.json`
+        );
+    }
 }
 
 function deriveLeagueSimSessionIndex(leagueId: number) {
@@ -283,6 +357,31 @@ function deriveLeagueSimSessionIndex(leagueId: number) {
     wf(indices, `leagueSimsessionIndex_${leagueId}.json`);
 }
 
+function deriveSingleMemberInfo(leagueId: number) {
+    let leagueSeasons = getLeagueSeasons(leagueId);
+
+    let mMap: { [name: number]: M_Member } = {};
+
+    for (let season of leagueSeasons.seasons) {
+        try {
+            let membersData = getMembersData(leagueId, season.season_id);
+            for (let member of membersData.members) {
+                mMap[member.cust_id] = member;
+            }
+        } catch (e) {
+            console.log(
+                `can't find member data for: ${season.season_name} ...continuing`
+            );
+        }
+    }
+
+    let allCustIds = Object.keys(mMap);
+    for (let custId of allCustIds) {
+        wf(mMap[custId], `singleMemberData_${custId}.json`);
+    }
+}
+
 deriveLeagueSimSessionIndex(6555);
 deriveLeagueSimSessionResults(6555);
 deriveDriverStats(6555);
+deriveSingleMemberInfo(6555);

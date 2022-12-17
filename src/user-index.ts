@@ -147,8 +147,11 @@ export class UserIndex {
         );
 
         for (let mem of members) {
-            let sesName = document.createElement('div');
-            sesName.className = 'linkbtn-item linkbtn-fullrow';
+            let memDiv = document.createElement('div');
+            memDiv.className = 'linkbtn-item linkbtn-fullrow';
+            memDiv.onclick = () => {
+                window.location.assign(`/?&m=driver&driver=${mem.cust_id}`);
+            };
 
             let rL = this.getRoadLicense(mem.licenses);
 
@@ -184,7 +187,7 @@ export class UserIndex {
                 teamName = team.team_name;
             }
 
-            sesName.innerHTML = `
+            memDiv.innerHTML = `
             <div class='p-ranking'><span>${powerRanking}<span></div>
             <div class='p-points'>${powerPoints}</div>
             <div class='driver-img club-${mem.club_id}'></div>
@@ -197,14 +200,14 @@ export class UserIndex {
                 <div>${teamName}</div></span>
             </div>
             `;
-            indexCard.appendChild(sesName);
+            indexCard.appendChild(memDiv);
 
-            sesName = document.createElement('div');
-            sesName.className = 'linkbtn-item more-detail-btn';
-            sesName.innerHTML = '&#x25BC;';
-            indexCard.appendChild(sesName);
+            memDiv = document.createElement('div');
+            memDiv.className = 'linkbtn-item more-detail-btn';
+            memDiv.innerHTML = '&#x25BC;';
+            indexCard.appendChild(memDiv);
 
-            sesName.onclick = () => {
+            memDiv.onclick = () => {
                 let newParent = document.createElement('span');
 
                 let stats =
@@ -234,10 +237,10 @@ export class UserIndex {
                 newNode.innerHTML = '&#x25B2;';
                 newParent.appendChild(newNode);
 
-                indexCard.replaceChild(newParent, sesName);
+                indexCard.replaceChild(newParent, memDiv);
 
                 newNode.onclick = () => {
-                    indexCard.replaceChild(sesName, newParent);
+                    indexCard.replaceChild(memDiv, newParent);
                 };
             };
 

@@ -323,6 +323,7 @@ export interface SSR_ResultsEntry {
     laps_completed: number;
     points: number;
     incidents: number;
+    pace_percent: number;
 }
 
 export type DriverStatsMap = { [name: number]: DriverStats };
@@ -338,6 +339,10 @@ export interface DriverStats {
     fast_laps: number;
     hard_charger: number;
     poles: number;
-    power_points: number; 
+    power_points: number;
     incidents: number;
 }
+
+export type DriverResults = {
+    [name: number]: { [name: number]: SSR_ResultsEntry };
+};
