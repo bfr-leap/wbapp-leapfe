@@ -1,0 +1,1 @@
+import{d as a,q as n,u as s,D as o,o as r,s as t}from"./index-1baea1f3.js";const i=a({__name:"DriverStandings",setup(u){const e=t();return(c,l)=>(r(),n(o,{season:s(e).query.season,league:s(e).query.league},null,8,["season","league"]))}});export{i as default};
