@@ -22,7 +22,7 @@ watchEffect(async () => {
         return;
     }
     const response = await fetch(
-        `/data/scraped/lapChartData_${props.subsession}_${props.simsession}.json`
+        `./data/scraped/lapChartData_${props.subsession}_${props.simsession}.json`
     );
     lapChartData.value = await response.json();
 });
