@@ -19,7 +19,7 @@ const props = defineProps<{
                 <RouterLink
                     class="link-light"
                     v-if="leagueId && driverId"
-                    v-bind:to="`driver?league=${leagueId}&driver=${driverId}`"
+                    v-bind:to="`?m=driver&league=${leagueId}&driver=${driverId}`"
                     ><span class="last-name"
                         >{{ props.lastName.toUpperCase() + ', ' }}
                     </span>

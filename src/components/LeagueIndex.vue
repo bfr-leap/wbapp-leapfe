@@ -86,7 +86,7 @@ async function fectchJsonData() {
         ) {
             seasonOptions.value.options.push({
                 display: seasonIt.season_title,
-                href: `?&league=${leagueId}&season=${seasonIt.season_id}&subsession=${seasonIt.sessions[0]?.subsession_id}&simsession=${seasonIt.sessions[0]?.simsessions[0]?.simsession_id}`,
+                href: `?m=results&league=${leagueId}&season=${seasonIt.season_id}&subsession=${seasonIt.sessions[0]?.subsession_id}&simsession=${seasonIt.sessions[0]?.simsessions[0]?.simsession_id}`,
             });
         }
     }
@@ -94,7 +94,7 @@ async function fectchJsonData() {
     for (let subsessionIt of selectedSeason.sessions) {
         subsessionOptions.value.options.push({
             display: subsessionIt.session_title,
-            href: `?&league=${leagueId}&season=${selectedSeason.season_id}&subsession=${subsessionIt.subsession_id}&simsession=${subsessionIt.simsessions[0]?.simsession_id}`,
+            href: `?m=results&league=${leagueId}&season=${selectedSeason.season_id}&subsession=${subsessionIt.subsession_id}&simsession=${subsessionIt.simsessions[0]?.simsession_id}`,
         });
     }
 
@@ -102,7 +102,7 @@ async function fectchJsonData() {
         if (simsessionIt.type === 'race' || simsessionIt.type === 'sprint')
             simsessionOptions.value.options.push({
                 display: simsessionIt.type,
-                href: `?&league=${leagueId}&season=${selectedSeason.season_id}&subsession=${selectedSubsession.subsession_id}&simsession=${simsessionIt.simsession_id}`,
+                href: `?m=results&league=${leagueId}&season=${selectedSeason.season_id}&subsession=${selectedSubsession.subsession_id}&simsession=${simsessionIt.simsession_id}`,
             });
     }
 }

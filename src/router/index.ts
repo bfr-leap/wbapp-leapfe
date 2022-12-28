@@ -9,33 +9,6 @@ const router = createRouter({
             name: 'home',
             component: HomeView,
         },
-        {
-            path: '/results',
-            name: 'results',
-            // route level code-splitting
-            // this generates a separate chunk (About.[hash].js) for this route
-            // which is lazy-loaded when the route is visited.
-            component: () => import('../views/ResultsView.vue'),
-        },
-        {
-            path: '/standings',
-            name: 'standings',
-            // route level code-splitting
-            // this generates a separate chunk (About.[hash].js) for this route
-            // which is lazy-loaded when the route is visited.
-            component: () => import('../views/DriverStandings.vue'),
-        },
-        {
-            path: '/driver',
-            name: 'driver',
-            component: () => import('../views/DriverView.vue'),
-        },
-        {
-            path: '/track',
-            name: 'track',
-            props: true,
-            component: () => import('../views/TrackResults.vue'),
-        },
     ],
 });
 

@@ -75,7 +75,7 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
         <RouterLink
             class="link-light"
             v-if="seasonId"
-            :to="`/standings?league=6555&season=${seasonId}`"
+            :to="`/?m=standings&league=6555&season=${seasonId}`"
             >{{ seasonName }}</RouterLink
         >
         <span v-else>{{ seasonName }}</span>

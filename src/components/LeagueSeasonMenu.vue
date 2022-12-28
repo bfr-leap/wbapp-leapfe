@@ -36,7 +36,7 @@ async function fectchJsonData() {
         if (!blockedSeasons[`${props.league}_${season.season_id}`]) {
             seasonOptions.value.options.push({
                 display: season.season_name,
-                href: `${props.targetPage}?league=${props.league}&season=${season.season_id}`,
+                href: `?m=${props.targetPage}&league=${props.league}&season=${season.season_id}`,
             });
         }
     }

@@ -118,7 +118,7 @@ watchEffect(fectchJsonData);
                 <td>
                     <RouterLink
                         class="link-light"
-                        :to="`/results?league=${league}&season=${props.seasonId}&simsession=0&subsession=${result.sessionId}`"
+                        :to="`/?m=results&league=${league}&season=${props.seasonId}&simsession=0&subsession=${result.sessionId}`"
                         >{{ result.sessionName }}</RouterLink
                     >
                 </td>

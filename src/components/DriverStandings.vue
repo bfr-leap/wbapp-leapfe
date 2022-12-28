@@ -208,7 +208,7 @@ watchEffect(fectchJsonData);
                     <RouterLink
                         class="dropdown-item"
                         type="button"
-                        v-bind:to="`standings?league=${props.league}&season=${props.season}`"
+                        v-bind:to="`?m=standings&league=${props.league}&season=${props.season}`"
                         >See all Standings</RouterLink
                     >
                 </div>

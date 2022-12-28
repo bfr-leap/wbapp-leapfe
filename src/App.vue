@@ -21,22 +21,22 @@ import HelloWorld from './components/HelloWorld.vue';
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="navbar-nav">
                     <RouterLink class="nav-link" to="/">Home</RouterLink>
-                    <RouterLink class="nav-link" to="/results?league=6555"
+                    <RouterLink class="nav-link" to="/?m=results&league=6555"
                         >Results</RouterLink
                     >
                     <RouterLink
                         class="nav-link"
-                        to="/standings?league=6555&season=80139"
+                        to="/?m=standings&league=6555&season=80139"
                         >Driver Standings</RouterLink
                     >
                     <RouterLink
                         class="nav-link"
-                        to="/driver?league=6555&driver=174470"
+                        to="/?m=driver&league=6555&driver=174470"
                         >Driver</RouterLink
                     >
                     <RouterLink
                         class="nav-link"
-                        to="/track?league=6555&car=106&track=239"
+                        to="/?m=track&league=6555&car=106&track=239"
                         >Track</RouterLink
                     >
                 </div>

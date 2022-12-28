@@ -47,7 +47,7 @@ async function fectchJsonData() {
     for (let trackIdOption of trackInfoDirectory.car_2_track_map[props.car]) {
         trackOptions.value.options.push({
             display: trackInfoDirectory.track_display[trackIdOption],
-            href: `track?league=${props.league}&car=${props.car}&track=${trackIdOption}`,
+            href: `?m=track&league=${props.league}&car=${props.car}&track=${trackIdOption}`,
         });
     }
 
@@ -62,7 +62,7 @@ async function fectchJsonData() {
 
         carOptions.value.options.push({
             display: trackInfoDirectory.car_display[carIdOption],
-            href: `track?league=${props.league}&car=${carIdOption}&track=${trackOption}`,
+            href: `?m=track&league=${props.league}&car=${carIdOption}&track=${trackOption}`,
         });
     }
 }

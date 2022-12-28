@@ -57,7 +57,7 @@ watchEffect(fectchJsonData);
                         <span class="fs-5 badge text-bg-primary rounded-pill">
                             <RouterLink
                                 class="link-light"
-                                v-bind:to="`track?league=${props.league_id}&car=${props.car_id}&track=${props.track_id}`"
+                                v-bind:to="`?m=track&league=${props.league_id}&car=${props.car_id}&track=${props.track_id}`"
                                 >track stats</RouterLink
                             ></span
                         >
