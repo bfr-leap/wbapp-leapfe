@@ -9,7 +9,7 @@ import {
 import { writeFileSync } from 'fs';
 
 function wf(obj: any, name: string) {
-    writeFileSync(`./dist/data/scraped/${name}`, JSON.stringify(obj));
+    writeFileSync(`./public/data/scraped/${name}`, JSON.stringify(obj));
 }
 
 export async function scrapeLeague(leagueId: number) {

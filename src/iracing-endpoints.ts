@@ -346,3 +346,53 @@ export interface DriverStats {
 export type DriverResults = {
     [name: number]: { [name: number]: SSR_ResultsEntry };
 };
+
+export interface TS_RecordTable {
+    title: string;
+    keys: string[];
+    rows: { [name: string]: string }[];
+}
+
+export interface TrackStats {
+    league_id: number;
+    car_id: number;
+    track_id: number;
+    display_name: string;
+    best_quali: TS_RecordTable;
+    poles: TS_RecordTable;
+    race_lap: TS_RecordTable;
+    fastest_race_lap: TS_RecordTable;
+    numb_entries: TS_RecordTable;
+    wins: TS_RecordTable;
+    podiums: TS_RecordTable;
+    hard_chargers: TS_RecordTable;
+}
+
+export interface TrackInfoDirectory {
+    league_name: string;
+    track_display: { [name: string]: string }; // gets the track display name from the track-id
+    car_display: { [name: string]: string }; // gets the car display name from the car-id
+    car_2_track_map: { [name: string]: string[] }; // gets the track-id of track ran with the car by car-id
+}
+
+export type BlockedSeasons = { [name: string]: boolean }; // set of '${league_id}_${season_id}' keys
+
+export interface ActiveLeagueSchedule {
+    leagues: ALS_LeagueInfo[];
+}
+
+export interface ALS_LeagueInfo {
+    league_id: number;
+    seasons: ALS_SeasonInfo[];
+}
+
+export interface ALS_SeasonInfo {
+    season_id: number;
+    car_id: number;
+    events: ALS_EventInfo[];
+}
+
+export interface ALS_EventInfo {
+    track_id: number;
+    time: string;
+}
