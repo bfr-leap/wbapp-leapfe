@@ -6,7 +6,7 @@ import HelloWorld from './components/HelloWorld.vue';
 <template>
     <nav class="navbar navbar-dark navbar-expand-lg bg-primary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Navbar</a>
+            <a class="navbar-brand" href="#">LEAP</a>
             <button
                 class="navbar-toggler"
                 type="button"
@@ -45,6 +45,10 @@ import HelloWorld from './components/HelloWorld.vue';
     </nav>
 
     <RouterView />
+
+    <div class="text-center">
+        Live Event Analysis and Performance by Blue Frog Racing
+    </div>
 </template>
 
 <style scoped></style>

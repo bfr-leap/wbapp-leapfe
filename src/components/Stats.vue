@@ -106,7 +106,7 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
             ><span class="value"> {{ stats.top_20 }}</span>
         </div>
         <div :class="statClasses">
-            <span class="name">Power Points: </span
+            <span class="name">LEAP Points: </span
             ><span class="value"> {{ stats.power_points }}</span>
         </div>
     </div>

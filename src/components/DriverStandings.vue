@@ -162,8 +162,8 @@ watchEffect(fectchJsonData);
         <div class="card-body p-2">
             <div class="container">
                 <div v-if="view.drivers.length !== 0" class="row">
-                    <div class="col-2 text-center">Power Ranking</div>
-                    <div class="col-2 text-center">Power Points</div>
+                    <div class="col-2 text-center">LEAP Ranking</div>
+                    <div class="col-2 text-center">LEAP Points</div>
                     <div class="col-1 text-center"></div>
                     <div class="col-7 text-left">Driver</div>
                 </div>
