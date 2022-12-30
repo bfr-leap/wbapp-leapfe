@@ -344,6 +344,7 @@ export interface DriverStats {
 }
 
 export type DriverResults = {
+    // season -> subsession -> SSR_ResultsEntry
     [name: number]: { [name: number]: SSR_ResultsEntry };
 };
 

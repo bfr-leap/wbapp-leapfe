@@ -1,14 +1,8 @@
 <script setup lang="ts">
-import {
-    ref,
-    onMounted,
-    nextTick,
-    computed,
-    watch,
-} from 'vue';
+import { ref, onMounted, nextTick, computed, watch } from 'vue';
 
 const d3: any = (<any>globalThis).d3;
-const aspectRatio = 0.5;
+const aspectRatio = 0.37;
 
 const props = withDefaults(
     defineProps<{

@@ -11,6 +11,7 @@ import type {
     M_Member,
     LeagueSeasons,
     DriverResults,
+    SSR_ResultsEntry,
 } from '../iracing-endpoints';
 import { fetchObjects } from '@/fetch-util';
 
@@ -27,6 +28,8 @@ const _teamsInfo: Ref<CuratedLeagueTeamsInfo | null> = ref(null);
 const _driverStatsMap: Ref<{ [name: number]: DriverStatsMap } | null> =
     ref(null);
 const _driverResults: Ref<DriverResults[]> = ref([]);
+
+const _allTimeResults: Ref<DriverResults[]> = ref([]);
 
 watchEffect(async () => {
     const [driverStatsMap, leagueTeamsInfo, singleMemberData, leagueSeasons] = <
@@ -71,7 +74,40 @@ watchEffect(async () => {
     _teamsInfo.value = leagueTeamsInfo;
     _singleMemberData.value = singleMemberData;
     _leagueSeasons.value = leagueSeasons;
+
+    _allTimeResults.value = [];
+    _allTimeResults.value.push(
+        calculateAllTimeResults(driverSessionResultsRace)
+    );
+    _allTimeResults.value.push(
+        calculateAllTimeResults(driverSessionResultsSprint)
+    );
+    _allTimeResults.value.push(
+        calculateAllTimeResults(driverSessionResultsQuali)
+    );
 });
+
+function calculateAllTimeResults(
+    inDriverResults: DriverResults
+): DriverResults {
+    let ret: DriverResults = {};
+    let allTime: { [name: number]: SSR_ResultsEntry } = {};
+
+    let inSeasonKeys = Object.keys(inDriverResults);
+
+    for (let seasonKey of inSeasonKeys) {
+        let season = inDriverResults[Number.parseInt(seasonKey)];
+        let eventKeys = Object.keys(season);
+        for (let eventKey of eventKeys) {
+            let eventKeyNum = Number.parseInt(eventKey);
+            allTime[eventKeyNum] = season[eventKeyNum];
+        }
+    }
+
+    ret[0] = allTime;
+
+    return ret;
+}
 
 const driverId = computed(() => Number.parseInt(props.driver));
 const memberView = computed(() => {
@@ -117,7 +153,9 @@ const memberView = computed(() => {
                     v-if="_driverStatsMap?.[0]?.[driverId]"
                     :stats="_driverStatsMap[0][driverId]"
                     :results="[]"
+                    :bar-chart-results="_allTimeResults[2]"
                     seasonName="All Time"
+                    :seasonId="0"
                     v-bind:league-id="props.league"
                 />
             </div>

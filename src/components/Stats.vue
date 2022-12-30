@@ -110,12 +110,14 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
             ><span class="value"> {{ stats.power_points }}</span>
         </div>
     </div>
+    <div v-if="barChartData" class="row">
+        <div class="d-flex flex-wrap">Qualifying Performance:</div>
+    </div>
     <div class="row">
-        <div class="col-4 m-auto">
+        <div class="col-12 m-auto">
             <BarChart v-if="barChartData" :data="barChartData" />
         </div>
     </div>
-    <div class="small-chart"></div>
 
     <template v-for="(result, i) in results">
         <div
