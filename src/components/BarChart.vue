@@ -82,9 +82,9 @@ function redrawAxis() {
             .domain([0, Math.max(...props.data.map((d) => d.value))])
             .range([innerHeight.value, 0]);
         yAxisSelection
-            .call(d3.axisLeft(scaleY.value))
+            .call(d3.axisLeft(scaleY.value).ticks(5))
             .selectAll(['line', 'path', 'text'])
-            .style('font-size', 20)
+            .style('font-size', 16)
             .style('stroke', 'white');
     }
 }
@@ -133,7 +133,7 @@ function getHeightAttr(seriesValue: number) {
                         :y="getYAttr(series.value)"
                         :width="scaleX?.bandwidth()"
                         :height="getHeightAttr(series.value)"
-                        style="fill: var(--bs-primary)"
+                        style="fill: #1aa179"
                     ></rect>
                 </g>
             </svg>

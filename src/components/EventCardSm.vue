@@ -30,26 +30,26 @@ const shortMonthNames = [
             v-if="is_next"
             v-bind:class="`${
                 is_selected ? 'selected' : 'hv'
-            } content row fs-2 text-center`"
+            } content d-flex align-items-center justify-content-center fs-6 text-center h-100`"
         >
-            <div style="margin: 0.5em 0em">Next Race</div>
+            <div>Next Race</div>
         </div>
 
         <div
             v-else
-            v-bind:class="`${is_selected ? 'selected' : 'hv'} content row`"
+            v-bind:class="`${is_selected ? 'selected' : 'hv'} content d-flex h-100`"
         >
-            <div class="col fs-2">
-                <div class="row text-center">
+            <div class="d-flex flex-column fs-6 justify-content-center mx-1 mx-sm-3">
+                <div class="" style="line-height:1rem">
                     <span>{{
                         shortMonthNames[new Date(date).getMonth()]
                     }}</span>
                 </div>
-                <div class="row text-center">
+                <div class="d-flex justify-content-center fs-4" style="line-height:1em">
                     <span>{{ new Date(date).getDate() }}</span>
                 </div>
             </div>
-            <div class="col fs-4 text-center" style="margin: auto">
+            <div class="fs-6 fs-sm-4  flex-grow-1 d-flex justify-content-center align-items-center">
                 {{ getshortTrackName(track_id) }}
             </div>
         </div>
