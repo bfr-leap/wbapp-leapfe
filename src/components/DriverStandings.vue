@@ -162,10 +162,22 @@ watchEffect(fectchJsonData);
         <div class="card-body p-2">
             <div class="container">
                 <div v-if="view.drivers.length !== 0" class="row">
-                    <div class="col-2 text-center">LEAP Ranking</div>
-                    <div class="col-2 text-center">LEAP Points</div>
-                    <div class="col-1 text-center"></div>
-                    <div class="col-7 text-left">Driver</div>
+                    <div class="col-2 d-flex d-sm-none text-center flex-column">
+                        <div class="mx-1 inline-block"><span>LEAP</span></div>
+                        <div class="inline-block"><span>R-P</span></div>
+                    </div>
+                    <div
+                        class="col-2 d-none d-sm-flex text-center justify-content-center"
+                    >
+                        <div>LEAP Ranking</div>
+                    </div>
+                    <div
+                        class="col-2 d-none d-sm-flex text-center justify-content-center"
+                    >
+                        <div>LEAP Points</div>
+                    </div>
+                    <div class="col-2 col-lg-1 text-center"></div>
+                    <div class="col-6 col-lg-7 text-left">Driver</div>
                 </div>
 
                 <template
@@ -173,16 +185,32 @@ watchEffect(fectchJsonData);
                     v-for="(member, i) in view.drivers"
                 >
                     <div class="row">
-                        <div class="col-2 text-center">
-                            <span>{{ member.position }}</span>
+                        <div
+                            class="col-2 justify-content-center d-flex d-sm-none text-center flex-column"
+                        >
+                            <div class="fs-1 mx-1">
+                                {{ member.position }}
+                            </div>
+                            <div class="d-flex fs-4 justify-content-center">
+                                <span>{{ member.points }}</span>
+                            </div>
                         </div>
-                        <div class="col-2 text-center">{{ member.points }}</div>
-                        <div class="col-1 text-center">
+                        <div
+                            class="col-2 d-none d-sm-flex justify-content-center fs-2"
+                        >
+                            <div>{{ member.position }}</div>
+                        </div>
+                        <div
+                            class="col-2 d-none d-sm-flex justify-content-center fs-4"
+                        >
+                            <div>{{ member.points }}</div>
+                        </div>
+                        <div class="col-2 col-lg-1 text-center">
                             <div
                                 v-bind:class="`driver-img club-${member.clubId}`"
                             ></div>
                         </div>
-                        <div class="col-7">
+                        <div class="col-6 col-lg-7">
                             <DriverTag
                                 v-bind:lastName="member.lastName"
                                 v-bind:firstName="member.firstName"

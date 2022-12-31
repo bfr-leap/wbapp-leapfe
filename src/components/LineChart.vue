@@ -80,8 +80,9 @@ function redrawAxis() {
             .tickFormat(d3.format('d'));
         axisX(xAxisSelection);
         xAxisSelection
+            .call(d3.axisBottom(scaleX.value).ticks(5))
             .selectAll(['line', 'path', 'text'])
-            .style('font-size', 20)
+            .style('font-size', 16)
             .style('stroke', 'white');
 
         // add y axis
@@ -100,9 +101,9 @@ function redrawAxis() {
             ])
             .range([innerHeight.value, 0]);
         yAxisSelection
-            .call(d3.axisLeft(scaleY.value))
+            .call(d3.axisLeft(scaleY.value).ticks(5))
             .selectAll(['line', 'path', 'text'])
-            .style('font-size', 20)
+            .style('font-size', 16)
             .style('stroke', 'white');
     }
 }
