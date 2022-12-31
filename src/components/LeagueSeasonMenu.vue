@@ -48,7 +48,7 @@ watch(props, fectchJsonData);
 <template>
     <div class="card bg-dark text-light m-2">
         <div class="card-body p-2">
-            <form class="row row-cols-lg-auto g-3 align-items-center">
+            <form class="row row-cols-auto g-3 align-items-center">
                 <span>
                     {{ currentLeague }}
                 </span>
