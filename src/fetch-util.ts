@@ -115,6 +115,7 @@ export async function getLeagueSeasons(
         );
 
         _leagueSeasons[leagueId] = leagueSeasons;
+        leagueSeasons.seasons.sort((la, lb) => lb.season_id - la.season_id);
     }
 
     return leagueSeasons;

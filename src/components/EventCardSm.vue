@@ -37,19 +37,50 @@ const shortMonthNames = [
 
         <div
             v-else
-            v-bind:class="`${is_selected ? 'selected' : 'hv'} content d-flex h-100`"
+            v-bind:class="`${
+                is_selected ? 'selected' : 'hv'
+            } content d-flex h-100`"
         >
-            <div class="d-flex flex-column fs-6 justify-content-center mx-1 mx-sm-3">
-                <div class="" style="line-height:1rem">
+            <div
+                class="d-flex flex-column fs-6 justify-content-center mx-1 mx-sm-3"
+            >
+                <div class="" style="line-height: 1rem">
                     <span>{{
                         shortMonthNames[new Date(date).getMonth()]
                     }}</span>
                 </div>
-                <div class="d-flex justify-content-center fs-4" style="line-height:1em">
+                <div
+                    class="d-flex d-sm-none justify-content-center fs-4"
+                    style="line-height: 1em"
+                >
+                    <span>{{ new Date(date).getDate() }}</span>
+                </div>
+                <div
+                    class="d-none d-sm-flex d-md-none justify-content-center fs-2"
+                    style="line-height: 1em"
+                >
+                    <span>{{ new Date(date).getDate() }}</span>
+                </div>
+                <div
+                    class="d-none d-sm-none d-md-flex justify-content-center fs-1"
+                    style="line-height: 1em"
+                >
                     <span>{{ new Date(date).getDate() }}</span>
                 </div>
             </div>
-            <div class="fs-6 fs-sm-4  flex-grow-1 d-flex justify-content-center align-items-center">
+            <div
+                class="fs-6 d-flex d-sm-none flex-grow-1 justify-content-center align-items-center"
+            >
+                {{ getshortTrackName(track_id) }}
+            </div>
+            <div
+                class="fs-3 d-none d-sm-flex d-md-none flex-grow-1 justify-content-center align-items-center"
+            >
+                {{ getshortTrackName(track_id) }}
+            </div>
+            <div
+                class="fs-2 d-none d-sm-none d-md-flex flex-grow-1 justify-content-center align-items-center"
+            >
                 {{ getshortTrackName(track_id) }}
             </div>
         </div>

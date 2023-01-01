@@ -6,7 +6,8 @@ import HelloWorld from './components/HelloWorld.vue';
 <template>
     <nav class="navbar navbar-dark navbar-expand-lg bg-primary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">LEAP</a>
+            <!-- <a class="navbar-brand" href="#">LEAP</a> -->
+            <RouterLink class="navbar-brand" to="/">LEAP</RouterLink>
             <button
                 class="navbar-toggler"
                 type="button"
@@ -21,7 +22,7 @@ import HelloWorld from './components/HelloWorld.vue';
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="navbar-nav">
                     <RouterLink class="nav-link" to="/">Home</RouterLink>
-                    <RouterLink class="nav-link" to="/?m=results&league=6555"
+                    <!-- <RouterLink class="nav-link" to="/?m=results&league=6555"
                         >Results</RouterLink
                     >
                     <RouterLink
@@ -38,7 +39,7 @@ import HelloWorld from './components/HelloWorld.vue';
                         class="nav-link"
                         to="/?m=track&league=6555&car=106&track=239"
                         >Track</RouterLink
-                    >
+                    > -->
                 </div>
             </div>
         </div>
