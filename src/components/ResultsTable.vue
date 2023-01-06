@@ -14,7 +14,7 @@ const props = defineProps<{
 const league = inject<string>('league');
 
 const seasonRaceResults = computed(() => {
-    return props.results[props.seasonId];
+    return props?.results?.[props.seasonId];
 });
 
 const _subsessionNames: { [name: string]: string } = {};

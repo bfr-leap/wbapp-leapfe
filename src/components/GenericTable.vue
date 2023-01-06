@@ -93,6 +93,7 @@ watchEffect(fectchJsonData);
                         <template v-for="key in table.keys">
                             <td v-if="key === 'cust_id'">
                                 <RouterLink
+                                    class="link-light"
                                     v-bind:to="`/?m=driver&league=6555&driver=${
                                         _nameToIdMap[row[key]]
                                     }`"

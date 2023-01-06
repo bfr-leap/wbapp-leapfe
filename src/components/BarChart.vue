@@ -82,7 +82,7 @@ function redrawAxis() {
             .domain([0, Math.max(...props.data.map((d) => d.value))])
             .range([innerHeight.value, 0]);
         yAxisSelection
-            .call(d3.axisLeft(scaleY.value).ticks(5))
+            .call(d3.axisLeft(scaleY.value).ticks(3))
             .selectAll(['line', 'path', 'text'])
             .style('font-size', 16)
             .style('stroke', 'white');

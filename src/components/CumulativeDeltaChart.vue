@@ -213,10 +213,16 @@ const series = computed(() => {
 
     const ret: SeriesXY<LapDelta>[] = lapDeltaAndBaseline.value.data.map(
         (d, index) => {
-            let driverName = startGrid?.value?.[index].displayName ?? '';
+            let driverName: string =
+                startGrid?.value?.[index].displayName ?? '';
             driverName = decodeURI(driverName).replace(/\+/g, ' ');
+            // let da = driverName.split(' ');
+            // driverName = da[da.length - 1];
+            // if (driverName.length > 3) {
+            //     driverName = driverName.substring(0, 3);
+            // }
             return {
-                name: driverName,
+                name: `P${index + 1} - ${driverName}`,
                 xProp: 'lap',
                 yProp: 'delta',
                 data: d,

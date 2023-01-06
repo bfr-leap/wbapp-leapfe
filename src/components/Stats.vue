@@ -29,7 +29,6 @@ async function fectchJsonData() {
         barChartData.value = null;
         return;
     }
-    console.log('here');
     const seasonRaceResults = props.barChartResults[props.seasonId];
 
     const names: { [name: string]: string } = {};

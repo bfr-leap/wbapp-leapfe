@@ -5,7 +5,10 @@ import CumulativeDeltaChart from '../components/CumulativeDeltaChart.vue';
 import type { SeasonSimsessionIndex } from '../iracing-endpoints';
 import { ref, watchEffect } from 'vue';
 import type { Ref } from 'vue';
-import { getLeagueSimsessionIndex } from '@/fetch-util';
+import {
+    getLeagueSimsessionIndex,
+    getLeagueSeasonSessions,
+} from '@/fetch-util';
 
 const route = useRoute();
 
@@ -14,7 +17,14 @@ let props: Ref<{
     seasonId: string;
     subsessionId: string;
     simsessionId: string;
-}> = ref({ leagueId: '', seasonId: '', subsessionId: '', simsessionId: '' });
+    trackId: string;
+}> = ref({
+    leagueId: '',
+    seasonId: '',
+    subsessionId: '',
+    simsessionId: '',
+    trackId: '',
+});
 
 async function fectchJsonData() {
     let leagueId: string = '6555';
@@ -77,10 +87,25 @@ async function fectchJsonData() {
         simsessionId = selectedSimsession?.simsession_id?.toString() || '';
     }
 
+    let leagueSeasonSessions = await getLeagueSeasonSessions(
+        leagueId,
+        seasonId
+    );
+
+    let trackId: string = '-1';
+
+    for (let s of leagueSeasonSessions.sessions) {
+        if (s.subsession_id.toString() === subsessionId) {
+            trackId = s.track.track_id.toString();
+            break;
+        }
+    }
+
     props.value.leagueId = leagueId;
     props.value.seasonId = seasonId;
     props.value.simsessionId = simsessionId;
     props.value.subsessionId = subsessionId;
+    props.value.trackId = trackId;
 }
 watchEffect(fectchJsonData);
 </script>
@@ -96,6 +121,12 @@ watchEffect(fectchJsonData);
 
         <div class="card bg-dark text-light m-2">
             <div class="card-body p-2">
+                <div class="wrap track-bg">
+                    <img
+                        class="bg"
+                        v-bind:src="`./tracks/${props.trackId}.jpg`"
+                    />
+                </div>
                 <div class="container">
                     <div class="row">
                         <CumulativeDeltaChart
@@ -115,3 +146,24 @@ watchEffect(fectchJsonData);
         </div>
     </div>
 </template>
+
+<style scoped>
+.track-bg {
+    background-size: cover;
+    background-position: center;
+    width: 100%;
+}
+.wrap {
+    overflow: hidden;
+    position: relative;
+}
+.bg {
+    opacity: 0.8;
+    _position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 8em;
+    object-fit: cover;
+}
+</style>

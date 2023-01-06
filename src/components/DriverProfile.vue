@@ -87,6 +87,9 @@ function calculateAllTimeResults(
     inDriverResults: DriverResults
 ): DriverResults {
     let ret: DriverResults = {};
+    if (!inDriverResults) {
+        return ret;
+    }
     let allTime: { [name: number]: SSR_ResultsEntry } = {};
 
     let inSeasonKeys = Object.keys(inDriverResults);
@@ -114,16 +117,23 @@ const memberView = computed(() => {
 <template>
     <div class="card bg-dark text-light m-2 sticky-top">
         <div class="card-body p-2">
-            <DriverTag
-                class="fs-4"
-                v-bind:lastName="memberView.lastName"
-                v-bind:firstName="memberView.firstName"
-                v-bind:licenseLevel="memberView.licenseLevel"
-                v-bind:iRating="memberView.iRating"
-                v-bind:safetyRating="memberView.safetyRating"
-                v-bind:teamName="memberView.teamName"
-                v-bind:clubId="memberView.clubId"
-            />
+            <div class="row p-2">
+                <div
+                    v-bind:class="`col-1 driver-img club-${memberView.clubId}`"
+                ></div>
+                <div class="col">
+                    <DriverTag
+                        class="fs-4"
+                        v-bind:lastName="memberView.lastName"
+                        v-bind:firstName="memberView.firstName"
+                        v-bind:licenseLevel="memberView.licenseLevel"
+                        v-bind:iRating="memberView.iRating"
+                        v-bind:safetyRating="memberView.safetyRating"
+                        v-bind:teamName="memberView.teamName"
+                        v-bind:clubId="memberView.clubId"
+                    />
+                </div>
+            </div>
         </div>
     </div>
     <template v-for="season in _leagueSeasons?.seasons">
@@ -156,3 +166,71 @@ const memberView = computed(() => {
         </div>
     </div>
 </template>
+
+<style scoped>
+.driver-img {
+    height: 3em;
+    width: 3em;
+    background-color: aqua;
+    border-radius: 1.5em;
+    background-size: cover;
+    background-position: center;
+}
+
+.club-30,
+.club-14,
+.club-6,
+.club-27,
+.club-23,
+.club-28,
+.club-23,
+.club-17,
+.club-33,
+.club-26,
+.club-22,
+.club-29,
+.club-16,
+.club-32 {
+    background-image: url(/flags/usa.png);
+}
+
+.club-36 {
+    background-image: url(/flags/ukandi.jpg);
+}
+
+.club-44 {
+    background-image: url(/flags/finland.png);
+}
+
+.club-1 {
+    background-image: url(/flags/international.png);
+}
+
+.club-43 {
+    background-image: url(/flags/scandinavia.png);
+}
+
+.club-40 {
+    background-image: url(/flags/benelux.png);
+}
+
+.club-46 {
+    background-image: url(/flags/europe.png);
+}
+
+.club-45 {
+    background-image: url(/flags/brazil.png);
+}
+
+.club-41 {
+    background-image: url(/flags/italy.png);
+}
+
+.club-38 {
+    background-image: url(/flags/iberia.png);
+}
+
+.club-34 {
+    background-image: url(/flags/australia.png);
+}
+</style>

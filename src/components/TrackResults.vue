@@ -81,7 +81,10 @@ watchEffect(fectchJsonData);
 
     <div class="card bg-dark text-light m-2">
         <div class="card-body p-2">
-            <div class="d-flex flex-wrap">
+            <div class="wrap track-bg">
+                <img class="bg" v-bind:src="`./tracks/${props.track}.jpg`" />
+            </div>
+            <div class="container d-flex flex-wrap">
                 <GenericTable
                     v-bind:title="trackResult.best_quali.title"
                     v-bind:rows="trackResult.best_quali.rows"
@@ -115,3 +118,24 @@ watchEffect(fectchJsonData);
         </div>
     </div>
 </template>
+
+<style scoped>
+.track-bg {
+    background-size: cover;
+    background-position: center;
+    width: 100%;
+}
+.wrap {
+    overflow: hidden;
+    position: relative;
+}
+.bg {
+    opacity: 0.8;
+    _position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 8em;
+    object-fit: cover;
+}
+</style>

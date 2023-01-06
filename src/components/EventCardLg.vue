@@ -44,8 +44,8 @@ watchEffect(fectchJsonData);
 
 <template>
     <div class="">
-        <div class="wrap track-bg">
-            <img class="bg" v-bind:src="`./tracks/${track_id}.jpg`" />
+        <div class="wrap">
+            <img class="bg track-bg" v-bind:src="`./tracks/${track_id}.jpg`" />
             <div class="content">
                 <div class="row text-center">
                     <div class="col fs-1 padded-title">
@@ -96,6 +96,7 @@ watchEffect(fectchJsonData);
     top: 0;
     width: 100%;
     height: 100%;
+    object-fit: cover;
 }
 
 .content {
