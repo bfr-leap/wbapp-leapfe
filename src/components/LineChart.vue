@@ -59,7 +59,6 @@ let scaleY = ref();
 watch(() => props.data, redrawAxis); // reset the d3 avg axis when the data changes.
 function redrawAxis() {
     if (svgRoot.value && props.data.length > 0) {
-        console.log(props.data);
         height.value = svgRoot.value.clientWidth * aspectRatio;
         width.value = svgRoot.value.clientWidth;
 

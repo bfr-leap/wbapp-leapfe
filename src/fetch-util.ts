@@ -7,6 +7,7 @@ import type {
     ActiveLeagueSchedule,
     SeasonSimsessionIndex,
     LeagueSeasonSessions,
+    SimsessionResults,
 } from './iracing-endpoints';
 
 export async function fetchObjects(urls: string[]): Promise<any[]> {
@@ -100,6 +101,26 @@ export async function getLeagueSeasonSessions(
     let leagueSeasonSessions: LeagueSeasonSessions = a[0];
 
     return leagueSeasonSessions;
+}
+
+const _simsessionResults: { [name: string]: Promise<any[]> } = {};
+export async function getSimsessionResults(
+    subsessionId: string,
+    simsessionNumber: string
+): Promise<SimsessionResults> {
+    let k = `${subsessionId}_${simsessionNumber}`;
+    let p = _simsessionResults[k];
+
+    if (!p) {
+        p = fetchObjects([`./data/derived/simSessionResults_${k}.json`]);
+        _simsessionResults[k] = p;
+    }
+
+    let a = await p;
+
+    let simsessionResults: SimsessionResults = a[0];
+
+    return simsessionResults;
 }
 
 const _leagueSimsessionIndexCache: {

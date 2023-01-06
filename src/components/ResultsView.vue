@@ -2,12 +2,17 @@
 import { useRoute } from 'vue-router';
 import LeagueIndex from '../components/LeagueIndex.vue';
 import CumulativeDeltaChart from '../components/CumulativeDeltaChart.vue';
-import type { SeasonSimsessionIndex } from '../iracing-endpoints';
+import GenericTable from './GenericTable.vue';
+import type {
+    SeasonSimsessionIndex,
+    SSR_ResultsEntry,
+} from '../iracing-endpoints';
 import { ref, watchEffect } from 'vue';
 import type { Ref } from 'vue';
 import {
     getLeagueSimsessionIndex,
     getLeagueSeasonSessions,
+    getSimsessionResults,
 } from '@/fetch-util';
 
 const route = useRoute();
@@ -18,12 +23,16 @@ let props: Ref<{
     subsessionId: string;
     simsessionId: string;
     trackId: string;
+    results: {
+        [name: string]: string;
+    }[];
 }> = ref({
     leagueId: '',
     seasonId: '',
     subsessionId: '',
     simsessionId: '',
     trackId: '',
+    results: [],
 });
 
 async function fectchJsonData() {
@@ -106,6 +115,28 @@ async function fectchJsonData() {
     props.value.simsessionId = simsessionId;
     props.value.subsessionId = subsessionId;
     props.value.trackId = trackId;
+
+    let simsessionResults = await getSimsessionResults(
+        subsessionId,
+        simsessionId
+    );
+
+    props.value.results = <any>simsessionResults.results.map((row) => {
+        return {
+            pos: row.position,
+            cust_id: row.cust_id,
+            start: row.start_position,
+            fastest_lap: row.fastest_lap_time,
+            pace_percent:
+                row.pace_percent || row.pace_percent === 0
+                    ? row.pace_percent + '%'
+                    : '',
+            fast_lap: row.fast_lap,
+            laps_completed: row.laps_completed,
+            points: row.points,
+            incidents: row.incidents,
+        };
+    });
 }
 watchEffect(fectchJsonData);
 </script>
@@ -132,6 +163,13 @@ watchEffect(fectchJsonData);
                         <CumulativeDeltaChart
                             v-bind:subsession="props.subsessionId"
                             v-bind:simsession="props.simsessionId"
+                        />
+                    </div>
+                    <div style="height: 2em"></div>
+                    <div class="row">
+                        <GenericTable
+                            title="Session Report"
+                            :rows="props.results"
                         />
                     </div>
                 </div>

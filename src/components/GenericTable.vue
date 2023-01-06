@@ -27,11 +27,18 @@ async function formatRows(
     for (let r of ret) {
         for (let k of keys) {
             switch (k) {
-                case 'time': {
-                    let totalSec = Number.parseInt(r[k]) / 10000;
-                    let min = Math.floor(Math.floor(totalSec) / 60);
-                    let sec = totalSec - 60 * min;
-                    r[k] = `${min}:${sec.toPrecision(5)}`;
+                case 'time':
+                case 'fastest_lap': {
+                    let v = Number.parseInt(r[k], 10);
+
+                    if (isNaN(v)) {
+                        r[k] = '';
+                    } else {
+                        let totalSec = Number.parseInt(v) / 10000;
+                        let min = Math.floor(Math.floor(totalSec) / 60);
+                        let sec = totalSec - 60 * min;
+                        r[k] = `${min}:${sec.toPrecision(5)}`;
+                    }
                     break;
                 }
                 case 'date': {
@@ -60,6 +67,8 @@ function formatHeader(name: string): string {
         return 'driver';
     }
 
+    name = name.replaceAll('_', ' ');
+
     return name;
 }
 
@@ -76,12 +85,12 @@ watchEffect(fectchJsonData);
 
 <template>
     <div>
-        <div class="border border-secondary rounded m-1">
+        <div class="table-responsive border border-secondary rounded m-1">
             <div class="d-flex justify-content-center">
                 {{ table.title }}
             </div>
             <table class="table table-dark table-hover">
-                <thead>
+                <thead style="position: sticky; top: 0">
                     <tr>
                         <th v-for="header in table.keys">
                             {{ formatHeader(header) }}
@@ -108,3 +117,24 @@ watchEffect(fectchJsonData);
         </div>
     </div>
 </template>
+
+<style scoepd>
+.table {
+    /* background: #ee99a0; */
+    border-radius: 0.2rem;
+    width: 100%;
+    padding-bottom: 1rem;
+    /* color: #212529; */
+    margin-bottom: 0;
+}
+.table th:first-child,
+.table td:first-child {
+    position: sticky;
+    left: 0;
+    /* background-color: #ad6c80;
+    color: #373737; */
+}
+.table td {
+    /* white-space: nowrap; */
+}
+</style>

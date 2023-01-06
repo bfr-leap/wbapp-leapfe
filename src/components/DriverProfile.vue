@@ -117,7 +117,7 @@ const memberView = computed(() => {
 <template>
     <div class="card bg-dark text-light m-2 sticky-top">
         <div class="card-body p-2">
-            <div class="row p-2">
+            <div class="row p-3">
                 <div
                     v-bind:class="`col-1 driver-img club-${memberView.clubId}`"
                 ></div>
