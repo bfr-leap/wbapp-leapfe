@@ -244,7 +244,7 @@ const yRange = computed(() => {
 
     let lapNum = lapDeltaAndBaseline.value.data[0].length;
 
-    const relevantLapPercent = 0.85;
+    const relevantLapPercent = 0.95;
 
     for (let ld of lapDeltaAndBaseline.value.data) {
         let r1 = ret[0];
