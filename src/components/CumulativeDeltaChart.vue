@@ -55,7 +55,7 @@ const title = computed(() => {
     );
     const startTime = lapChartData.value.session_info.start_time;
     const baseLine = lapDeltaAndBaseline.value.baselineTime;
-    return `Cumulative Delta | Baseline ${baseLine}s`;
+    return `Baseline ${baseLine}s`;
 });
 
 interface LapTime {
@@ -231,8 +231,45 @@ const series = computed(() => {
     );
     return ret;
 });
+
+const yRange = computed(() => {
+    let ret = [1, -1];
+
+    if (!lapDeltaAndBaseline.value || !startGrid.value) {
+        return ret;
+    }
+
+    ret[0] = Math.max(ret[0], lapDeltaAndBaseline.value.data[0][0].delta);
+    ret[1] = Math.min(ret[1], lapDeltaAndBaseline.value.data[0][0].delta);
+
+    let lapNum = lapDeltaAndBaseline.value.data[0].length;
+
+    const relevantLapPercent = 0.85;
+
+    for (let ld of lapDeltaAndBaseline.value.data) {
+        let r1 = ret[0];
+        let r2 = ret[1];
+        for (let lDelta of ld) {
+            r1 = Math.max(r1, lDelta.delta);
+            r2 = Math.min(r2, lDelta.delta);
+        }
+
+        if (lapNum * relevantLapPercent <= ld.length) {
+            ret[0] = r1;
+            ret[1] = r2;
+        } else {
+            break;
+        }
+    }
+
+    return ret;
+});
 </script>
 
 <template>
-    <LineChart :title="title" :data="series" />
+    <LineChart
+        :title="title"
+        :data="series"
+        :y-range="[yRange[0], yRange[1]]"
+    />
 </template>

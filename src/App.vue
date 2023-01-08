@@ -7,7 +7,10 @@ import HelloWorld from './components/HelloWorld.vue';
     <nav class="navbar navbar-dark navbar-expand-lg bg-primary">
         <div class="container-fluid">
             <!-- <a class="navbar-brand" href="#">LEAP</a> -->
-            <RouterLink class="navbar-brand" to="/">LEAP</RouterLink>
+            <RouterLink class="navbar-brand" to="/">
+                <img class="icon" v-bind:src="`blue-frog-racing-s4-icon.png`" />
+                LEAP</RouterLink
+            >
             <button
                 class="navbar-toggler"
                 type="button"
@@ -21,11 +24,11 @@ import HelloWorld from './components/HelloWorld.vue';
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="navbar-nav">
-                    <RouterLink class="nav-link" to="/">Home</RouterLink>
-                    <!-- <RouterLink class="nav-link" to="/?m=results&league=6555"
+                    <!-- <RouterLink class="nav-link" to="/">Home</RouterLink> -->
+                    <RouterLink class="nav-link" to="/?m=results&league=6555"
                         >Results</RouterLink
                     >
-                    <RouterLink
+                    <!-- <RouterLink
                         class="nav-link"
                         to="/?m=standings&league=6555&season=80139"
                         >Driver Standings</RouterLink
@@ -52,4 +55,10 @@ import HelloWorld from './components/HelloWorld.vue';
     </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.icon {
+    height: 1.5em;
+    width: 1.5em;
+    border-radius: 1em;
+}
+</style>

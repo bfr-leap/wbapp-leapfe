@@ -82,7 +82,8 @@ async function fectchJsonData() {
     );
 
     if (!selectedSubsession) {
-        selectedSubsession = selectedSeason?.sessions[0];
+        selectedSubsession =
+            selectedSeason?.sessions[selectedSeason.sessions.length - 1];
         subsessionId = selectedSubsession?.subsession_id?.toString() || '';
         simsessionId = '';
     }
@@ -132,9 +133,9 @@ async function fectchJsonData() {
                     ? row.pace_percent + '%'
                     : '',
             fast_lap: row.fast_lap,
-            laps_completed: row.laps_completed,
-            points: row.points,
-            incidents: row.incidents,
+            laps: row.laps_completed,
+            pts: row.points,
+            inc: row.incidents,
         };
     });
 }
@@ -158,20 +159,63 @@ watchEffect(fectchJsonData);
                         v-bind:src="`./tracks/${props.trackId}.jpg`"
                     />
                 </div>
+                <div style="height: 2em"></div>
                 <div class="container">
-                    <div class="row">
-                        <CumulativeDeltaChart
-                            v-bind:subsession="props.subsessionId"
-                            v-bind:simsession="props.simsessionId"
-                        />
+                    <nav>
+                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                            <button
+                                class="nav-link active"
+                                id="nav-home-tab"
+                                data-bs-toggle="tab"
+                                data-bs-target="#nav-home"
+                                type="button"
+                                role="tab"
+                                aria-controls="nav-home"
+                                aria-selected="true"
+                            >
+                                Cumulative Delta
+                            </button>
+                            <button
+                                class="nav-link"
+                                id="nav-profile-tab"
+                                data-bs-toggle="tab"
+                                data-bs-target="#nav-profile"
+                                type="button"
+                                role="tab"
+                                aria-controls="nav-profile"
+                                aria-selected="false"
+                            >
+                                Session Report
+                            </button>
+                        </div>
+                    </nav>
+                    <div class="tab-content" id="nav-tabContent">
+                        <div
+                            class="tab-pane fade show active"
+                            id="nav-home"
+                            role="tabpanel"
+                            aria-labelledby="nav-home-tab"
+                            tabindex="0"
+                        >
+                            <CumulativeDeltaChart
+                                v-bind:subsession="props.subsessionId"
+                                v-bind:simsession="props.simsessionId"
+                            />
+                        </div>
+                        <div
+                            class="tab-pane fade"
+                            id="nav-profile"
+                            role="tabpanel"
+                            aria-labelledby="nav-profile-tab"
+                            tabindex="0"
+                        >
+                            <GenericTable title="" :rows="props.results" />
+                        </div>
                     </div>
+
+                    <div class="row"></div>
                     <div style="height: 2em"></div>
-                    <div class="row">
-                        <GenericTable
-                            title="Session Report"
-                            :rows="props.results"
-                        />
-                    </div>
+                    <div class="row"></div>
                 </div>
             </div>
         </div>

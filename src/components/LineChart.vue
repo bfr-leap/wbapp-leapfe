@@ -26,6 +26,7 @@ const aspectRatio = 0.5;
 const props = defineProps<{
     data: SeriesXY<any>[];
     title?: string;
+    yRange?: [number, number];
 }>();
 
 const svgRoot = ref<SVGGElement | null>(null);
@@ -84,20 +85,24 @@ function redrawAxis() {
             .style('font-size', 16)
             .style('stroke', 'white');
 
+        let maxY = d3.max(props.data, (sXY: SeriesXY<any>) =>
+            d3.max(sXY.data, (d: any) => d[sXY.yProp])
+        );
+        let minY = d3.min(props.data, (sXY: SeriesXY<any>) =>
+            d3.min(sXY.data, (d: any) => d[sXY.yProp])
+        );
+
+        if (props.yRange) {
+            maxY = props.yRange[0];
+            minY = props.yRange[1];
+        }
+
         // add y axis
         const yAxisSelection = d3.select(yAxis.value);
         yAxisSelection.html('');
         scaleY.value = d3
             .scaleLinear()
-            .domain([
-                d3.max(props.data, (sXY: SeriesXY<any>) =>
-                    d3.max(sXY.data, (d: any) => d[sXY.yProp])
-                ),
-
-                d3.min(props.data, (sXY: SeriesXY<any>) =>
-                    d3.min(sXY.data, (d: any) => d[sXY.yProp])
-                ),
-            ])
+            .domain([maxY, minY])
             .range([innerHeight.value, 0]);
         yAxisSelection
             .call(d3.axisLeft(scaleY.value).ticks(5))
@@ -186,6 +191,22 @@ function onToggleAll() {
     <div>
         {{ title }}
     </div>
+    <div ref="divRoot">
+        <svg ref="svgRoot" class="w-100" :height="height">
+            <g :transform="`translate(${margin.left},${margin.top})`">
+                <g ref="xAxis" :transform="`translate(0,${innerHeight})`"></g>
+                <g ref="yAxis"></g>
+                <path
+                    v-for="(series, i) in data"
+                    fill="none"
+                    :stroke="getColor(i)"
+                    :stroke-dasharray="basePatterns[i % basePatterns.length]"
+                    stroke-width="1.5"
+                    :d="getDPathAttr(series)"
+                ></path>
+            </g>
+        </svg>
+    </div>
     <div class="d-flex flex-wrap justify-content-center">
         <button class="btn bg-dark text-white" @click="onToggleAll">
             Toggle All
@@ -203,22 +224,6 @@ function onToggleAll() {
                 {{ series.name }}
             </button>
         </div>
-    </div>
-    <div ref="divRoot">
-        <svg ref="svgRoot" class="w-100" :height="height">
-            <g :transform="`translate(${margin.left},${margin.top})`">
-                <g ref="xAxis" :transform="`translate(0,${innerHeight})`"></g>
-                <g ref="yAxis"></g>
-                <path
-                    v-for="(series, i) in data"
-                    fill="none"
-                    :stroke="getColor(i)"
-                    :stroke-dasharray="basePatterns[i % basePatterns.length]"
-                    stroke-width="1.5"
-                    :d="getDPathAttr(series)"
-                ></path>
-            </g>
-        </svg>
     </div>
 </template>
 <style scoped>
