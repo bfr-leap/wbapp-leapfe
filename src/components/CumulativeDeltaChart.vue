@@ -239,8 +239,8 @@ const yRange = computed(() => {
         return ret;
     }
 
-    ret[0] = Math.max(ret[0], lapDeltaAndBaseline.value.data[0][0].delta);
-    ret[1] = Math.min(ret[1], lapDeltaAndBaseline.value.data[0][0].delta);
+    ret[0] = lapDeltaAndBaseline.value.data[0][0].delta;
+    ret[1] = lapDeltaAndBaseline.value.data[0][0].delta;
 
     let lapNum = lapDeltaAndBaseline.value.data[0].length;
 
