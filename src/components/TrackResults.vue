@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import { getMemberViewFromM_Memeber, getRoadLicense } from './driverUtils';
-import { RouterLink } from 'vue-router';
 import { ref, watchEffect } from 'vue';
 import type { Ref } from 'vue';
 import type { TrackStats } from '../iracing-endpoints';
-import { getTrackStats, getTrackInfoDirectory } from '@/fetch-util';
-import type { DefineStoreOptionsInPlugin } from 'pinia';
+import { getTrackStats } from '@/fetch-util';
 import GenericTable from './GenericTable.vue';
 import TrackResultsMenu from './TrackResultsMenu.vue';
+import TrackBanner from './TrackBanner.vue';
 
 const props = defineProps<{
     league: string;
@@ -81,9 +79,7 @@ watchEffect(fectchJsonData);
 
     <div class="card bg-dark text-light m-2">
         <div class="card-body p-2">
-            <div class="wrap track-bg">
-                <img class="bg" v-bind:src="`./tracks/${props.track}.jpg`" />
-            </div>
+            <TrackBanner v-bind:track-id="props.track" />
             <div class="container d-flex flex-wrap">
                 <GenericTable
                     v-bind:title="trackResult.best_quali.title"

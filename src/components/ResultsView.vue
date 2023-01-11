@@ -3,6 +3,7 @@ import { useRoute } from 'vue-router';
 import LeagueIndex from '../components/LeagueIndex.vue';
 import CumulativeDeltaChart from '../components/CumulativeDeltaChart.vue';
 import GenericTable from './GenericTable.vue';
+import TrackBanner from './TrackBanner.vue';
 import type {
     SeasonSimsessionIndex,
     SSR_ResultsEntry,
@@ -153,12 +154,7 @@ watchEffect(fectchJsonData);
 
         <div class="card bg-dark text-light m-2">
             <div class="card-body p-2">
-                <div class="wrap track-bg">
-                    <img
-                        class="bg"
-                        v-bind:src="`./tracks/${props.trackId}.jpg`"
-                    />
-                </div>
+                <TrackBanner v-bind:track-id="props.trackId" />
                 <div style="height: 2em"></div>
                 <div class="container">
                     <nav>
@@ -228,24 +224,3 @@ watchEffect(fectchJsonData);
         </div>
     </div>
 </template>
-
-<style scoped>
-.track-bg {
-    background-size: cover;
-    background-position: center;
-    width: 100%;
-}
-.wrap {
-    overflow: hidden;
-    position: relative;
-}
-.bg {
-    opacity: 0.8;
-    _position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 8em;
-    object-fit: cover;
-}
-</style>
