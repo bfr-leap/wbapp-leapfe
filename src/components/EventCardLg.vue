@@ -46,6 +46,10 @@ watchEffect(fectchJsonData);
     <div class="">
         <div class="wrap">
             <img class="bg track-bg" v-bind:src="`./tracks/${track_id}.jpg`" />
+            <img
+                class="bg track-logo"
+                v-bind:src="`./tracks/${track_id}_logo.png`"
+            />
             <div class="content">
                 <div class="row text-center">
                     <div class="col fs-1 padded-title">
@@ -83,6 +87,17 @@ watchEffect(fectchJsonData);
     background-size: cover;
     background-position: center;
     width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.3;
+}
+
+.track-logo {
+    object-fit: contain;
+    background: #ffffff44;
+    /* background-position: center; */
+    width: 100%;
+    height: 6em;
 }
 .wrap {
     overflow: hidden;
@@ -90,13 +105,9 @@ watchEffect(fectchJsonData);
 }
 
 .bg {
-    opacity: 0.3;
     position: absolute;
     left: 0;
     top: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
 }
 
 .content {

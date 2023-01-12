@@ -34,8 +34,6 @@ let carId: Ref<string> = ref('');
 async function fectchJsonData() {
     let now: number = new Date().getTime();
 
-    console.log('home view');
-
     let s = await getActiveLeagueSchedule();
 
     leagueId.value = route.query.league as string;
@@ -127,14 +125,17 @@ function onClick(eventInfo: { trackId: string; date: string }) {
                 <div v-if="schedule.nextRace.date !== ''" class="row g-1">
                     <div class="col-12 col-sm-3 col-lg-2">
                         <div class="row g-1 flex-sm-column h-100">
-                            <div 
-                            class="col"
-                            @click="onClick(schedule.nextRace)">
+                            <div
+                                class="col"
+                                @click="onClick(schedule.nextRace)"
+                            >
                                 <EventCardSm
                                     class="h-100"
                                     v-bind:track_id="schedule.nextRace.trackId"
                                     v-bind:is_next="true"
-                                    v-bind:date="new Date(schedule.nextRace.date)"
+                                    v-bind:date="
+                                        new Date(schedule.nextRace.date)
+                                    "
                                     v-bind:is_selected="
                                         schedule.nextRace.isSelected
                                     "
