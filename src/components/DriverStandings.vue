@@ -188,10 +188,10 @@ watchEffect(fectchJsonData);
                         <div
                             class="col-2 justify-content-center d-flex d-sm-none text-center flex-column"
                         >
-                            <div class="fs-1 mx-1">
+                            <div class="fs-2 mx-1">
                                 {{ member.position }}
                             </div>
-                            <div class="d-flex fs-4 justify-content-center">
+                            <div class="d-flex fs-7 justify-content-center">
                                 <span>{{ member.points }}</span>
                             </div>
                         </div>
