@@ -66,7 +66,7 @@ watchEffect(fectchJsonData);
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 v-bind:href="`?m=track&league=${props.league_id}&car=${props.car_id}&track=${props.track_id}`"
-                                >track stats e</a
+                                >track stats</a
                             >
                             <RouterLink
                                 v-else
