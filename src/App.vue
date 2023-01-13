@@ -1,10 +1,18 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router';
-import HelloWorld from './components/HelloWorld.vue';
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
 </script>
 
 <template>
-    <nav class="navbar navbar-dark navbar-expand-lg bg-primary">
+    <nav
+        v-if="
+            ['nextEventTimerEmbed'].indexOf(route.query.m?.toString() || '') ==
+            -1
+        "
+        class="navbar navbar-dark navbar-expand-lg bg-primary"
+    >
         <div class="container-fluid">
             <!-- <a class="navbar-brand" href="#">LEAP</a> -->
             <RouterLink class="navbar-brand" to="/">
@@ -28,21 +36,6 @@ import HelloWorld from './components/HelloWorld.vue';
                     <RouterLink class="nav-link" to="/?m=results&league=6555"
                         >Results</RouterLink
                     >
-                    <!-- <RouterLink
-                        class="nav-link"
-                        to="/?m=standings&league=6555&season=80139"
-                        >Driver Standings</RouterLink
-                    >
-                    <RouterLink
-                        class="nav-link"
-                        to="/?m=driver&league=6555&driver=174470"
-                        >Driver</RouterLink
-                    >
-                    <RouterLink
-                        class="nav-link"
-                        to="/?m=track&league=6555&car=106&track=239"
-                        >Track</RouterLink
-                    > -->
                 </div>
             </div>
         </div>

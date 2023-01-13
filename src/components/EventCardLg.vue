@@ -9,6 +9,7 @@ const props = defineProps<{
     date: Date;
     car_id: string;
     league_id: string;
+    embed_mode?: boolean;
 }>();
 
 let countdown: Ref<String> = ref('---');
@@ -59,7 +60,16 @@ watchEffect(fectchJsonData);
                 <div class="row text-center">
                     <div>
                         <span class="fs-5 badge text-bg-primary rounded-pill">
+                            <a
+                                v-if="props.embed_mode"
+                                class="link-light"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                v-bind:href="`?m=track&league=${props.league_id}&car=${props.car_id}&track=${props.track_id}`"
+                                >track stats e</a
+                            >
                             <RouterLink
+                                v-else
                                 class="link-light"
                                 v-bind:to="`?m=track&league=${props.league_id}&car=${props.car_id}&track=${props.track_id}`"
                                 >track stats</RouterLink

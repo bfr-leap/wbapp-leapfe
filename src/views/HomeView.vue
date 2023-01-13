@@ -6,6 +6,7 @@ import ResultsView from '../components/ResultsView.vue';
 import DriverStandingsView from '../components/DriverStandingsView.vue';
 import DriverView from '../components/DriverView.vue';
 import TrackResultsView from '../components/TrackResultsView.vue';
+import NextEventTimerEmbed from '@/components/NextEventTimerEmbed.vue';
 
 const route = useRoute();
 </script>
@@ -18,4 +19,5 @@ const route = useRoute();
     ></DriverStandingsView>
     <DriverView v-if="route.query.m === 'driver'"></DriverView>
     <TrackResultsView v-if="route.query.m === 'track'"></TrackResultsView>
+    <NextEventTimerEmbed v-if="route.query.m === 'nextEventTimerEmbed'" />
 </template>
