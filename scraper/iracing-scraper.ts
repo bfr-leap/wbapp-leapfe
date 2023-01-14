@@ -6,6 +6,8 @@ import {
     getMembers,
 } from './iracing-endpoint-client.js';
 
+import { getLapChartData as getLapChartDataCached } from './iracing-scraped-data-loader.js';
+
 import { writeFileSync } from 'fs';
 
 function wf(obj: any, name: string) {
@@ -40,13 +42,29 @@ export async function scrapeLeagueSeasonSessions(
     wf(sessions, `leagueSeasonSessions_${leagueId}_${seasonId}.json`);
 
     for (let sub of sessions.sessions) {
-        await scrapeLapChartData(sub.subsession_id, 0);
-        await scrapeLapChartData(sub.subsession_id, -1);
-        await scrapeLapChartData(sub.subsession_id, -2);
-        await scrapeLapChartData(sub.subsession_id, -3);
-        await scrapeLapChartData(sub.subsession_id, -4);
-        await scrapeLapChartData(sub.subsession_id, -5);
-        await scrapeLapChartData(sub.subsession_id, -6);
+        let foundCached = false;
+        try {
+            let cachedLapData = getLapChartDataCached(sub.subsession_id, 0);
+            for (let c of cachedLapData.chunk_info) {
+                _encounteredCustIds[c.cust_id] = c.cust_id;
+            }
+            foundCached = true;
+            console.log(
+                '        scrapeLapChartData: [using local copy]',
+                sub.subsession_id,
+                0
+            );
+        } catch (e) {}
+
+        if (!foundCached) {
+            await scrapeLapChartData(sub.subsession_id, 0);
+            await scrapeLapChartData(sub.subsession_id, -1);
+            await scrapeLapChartData(sub.subsession_id, -2);
+            await scrapeLapChartData(sub.subsession_id, -3);
+            await scrapeLapChartData(sub.subsession_id, -4);
+            await scrapeLapChartData(sub.subsession_id, -5);
+            await scrapeLapChartData(sub.subsession_id, -6);
+        }
     }
 }
 
