@@ -10,6 +10,7 @@ import {
 } from '../iracing-scraped-data-loader.js';
 
 import { wf } from './file-writer.js';
+import { RACE_SPRINT_THRESHOLD } from './results-utils.js';
 
 export function deriveLeagueSimSessionIndex(leagueId: number) {
     let ls = getLeagueSeasons(leagueId);
@@ -61,7 +62,7 @@ export function deriveLeagueSimSessionIndex(leagueId: number) {
                                 .map((c) => c.lap_number)
                                 .reduce((p, c) => Math.max(p, c), 0);
 
-                            if (lapCount < 10) {
+                            if (lapCount < RACE_SPRINT_THRESHOLD) {
                                 simsession.type = 'sprint';
                             }
                         }

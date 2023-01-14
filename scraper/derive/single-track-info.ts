@@ -10,6 +10,7 @@ import {
 import {
     calculateRaceResults,
     calculateQualifyResults,
+    RACE_SPRINT_THRESHOLD,
 } from './results-utils.js';
 import { acceptLapChartDataVisitor } from './lap-chart-data-visitor.js';
 import { wf } from './file-writer.js';
@@ -211,7 +212,7 @@ export function deriveSingleTrackInfo(leagueId: number) {
                 ).toString();
                 // /fastest race lap
 
-                if (r.results[0].laps_completed > 10) {
+                if (r.results[0].laps_completed > RACE_SPRINT_THRESHOLD) {
                     trackStats.numb_entries.rows.push({
                         subsession_id: sessionInfo.subsession_id.toString(),
                         count: r.results.length.toString(),

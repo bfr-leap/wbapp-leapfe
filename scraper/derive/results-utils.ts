@@ -5,6 +5,8 @@ import {
     SSR_ResultsEntry,
 } from '../../src/iracing-endpoints';
 
+export const RACE_SPRINT_THRESHOLD = 15;
+
 interface ScoringRules {
     position_pts: number[];
     fastest_lap_pts: number;
@@ -70,7 +72,7 @@ export function calculateRaceResults(lapData: LapChartData): SimsessionResults {
 
     let numLaps = ret.results[0].laps_completed;
 
-    if (numLaps > 10) {
+    if (numLaps > RACE_SPRINT_THRESHOLD) {
         applyScoring(ret, featureScoring);
     } else {
         applyScoring(ret, sprintScoring);

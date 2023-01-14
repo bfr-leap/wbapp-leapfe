@@ -11,6 +11,7 @@ import {
 import {
     calculateRaceResults,
     calculateQualifyResults,
+    RACE_SPRINT_THRESHOLD,
 } from './results-utils.js';
 
 import { wf } from './file-writer.js';
@@ -58,7 +59,7 @@ export function deriveLeagueSimSessionResults(leagueId: number) {
             if (lapChartData.session_info.simsession_type === 6) {
                 r = calculateRaceResults(lapChartData);
 
-                if (r.results[0].laps_completed > 10) {
+                if (r.results[0].laps_completed > RACE_SPRINT_THRESHOLD) {
                     activeStore = resultsStoreRace;
                 } else {
                     activeStore = resultsStoreSprint;
