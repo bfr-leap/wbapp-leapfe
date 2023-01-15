@@ -7,8 +7,17 @@ import DriverStandingsView from '../components/DriverStandingsView.vue';
 import DriverView from '../components/DriverView.vue';
 import TrackResultsView from '../components/TrackResultsView.vue';
 import NextEventTimerEmbed from '@/components/NextEventTimerEmbed.vue';
+import { watch } from 'vue';
+import mixpanel from 'mixpanel-browser';
 
 const route = useRoute();
+
+function track() {
+    mixpanel.track(route.query.m, route.query);
+}
+
+track();
+watch(() => route.params, track);
 </script>
 
 <template>

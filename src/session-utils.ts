@@ -16,7 +16,7 @@ export async function getSubsessionName(
 
     for (let seasonIt of seasonSimsessionIndex) {
         for (let sIt of seasonIt.sessions) {
-            if (sIt.subsession_id.toString() === subsessionId) {
+            if (sIt?.subsession_id.toString() || '' === subsessionId) {
                 _subsessionNames[k] = ret = sIt.session_title;
                 return ret;
             }
