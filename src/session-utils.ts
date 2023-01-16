@@ -1,4 +1,5 @@
 import { getLeagueSimsessionIndex } from './fetch-util';
+import type { SeasonSimsessionIndex } from './iracing-endpoints';
 
 const _subsessionNames: { [name: string]: string } = {};
 export async function getSubsessionName(
@@ -12,7 +13,9 @@ export async function getSubsessionName(
         return ret;
     }
 
-    let seasonSimsessionIndex = await getLeagueSimsessionIndex(leagueId);
+    let seasonSimsessionIndex: SeasonSimsessionIndex[] = JSON.parse(
+        JSON.stringify(await getLeagueSimsessionIndex(leagueId))
+    );
 
     seasonSimsessionIndex.sort((a, b) => a.season_id - b.season_id);
 
