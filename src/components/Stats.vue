@@ -6,7 +6,7 @@ import BarChart from './BarChart.vue';
 import { computed, ref, watchEffect } from 'vue';
 import type { Ref } from 'vue';
 import { stringifyExpression } from '@vue/compiler-core';
-import { getSubsessionName } from '../session-utils';
+import { getShortSubsessionName, getSubsessionName } from '../session-utils';
 
 const props = withDefaults(
     defineProps<{
@@ -40,13 +40,13 @@ async function fectchJsonData() {
     let usedNames: { [name: string]: boolean } = {};
 
     for (let subsessionIt of sessionKeys) {
-        let shortName =
-            (
-                await getSubsessionName(props.leagueId, subsessionIt.toString())
-            ).substring(0, 8) + '...';
+        let shortName = await getShortSubsessionName(
+            props.leagueId,
+            subsessionIt.toString()
+        );
 
         while (usedNames[shortName]) {
-            shortName += '.';
+            shortName += ' ';
         }
 
         usedNames[shortName] = true;

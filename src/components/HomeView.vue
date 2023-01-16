@@ -174,7 +174,7 @@ function onClick(eventInfo: { trackId: string; date: string }) {
     </div>
     <DriverStandings
         summary_mode
-        v-bind:season="(route.query.season as string)"
-        v-bind:league="(route.query.league as string)"
+        v-bind:season="seasonId"
+        v-bind:league="leagueId"
     />
 </template>
