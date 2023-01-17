@@ -189,6 +189,8 @@ const memberView = computed(() => {
 .club-22,
 .club-29,
 .club-16,
+.club-12,
+.club-21,
 .club-32 {
     background-image: url(/flags/usa.png);
 }
@@ -231,5 +233,17 @@ const memberView = computed(() => {
 
 .club-34 {
     background-image: url(/flags/australia.png);
+}
+
+.club-15 {
+    background-image: url(/flags/canada.png);
+}
+
+.club-50 {
+    background-image: url(/flags/southafrica.png);
+}
+
+.club-42 {
+    background-image: url(/flags/deatch.png);
 }
 </style>

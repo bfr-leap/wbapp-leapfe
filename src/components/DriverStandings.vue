@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { getMemberViewFromM_Memeber, getRoadLicense } from './driverUtils';
 import { RouterLink } from 'vue-router';
-import { ref, watchEffect } from 'vue';
+import { ref, watch, watchEffect } from 'vue';
 import type { Ref } from 'vue';
 import type {
     MembersData,
@@ -77,6 +77,8 @@ function populateTeamInfoMaps(
 }
 
 async function fectchJsonData() {
+    console.log('fetch standings');
+
     let [
         _driverStatsMap,
         _curatedLeagueTeamsInfo,
@@ -107,15 +109,16 @@ async function fectchJsonData() {
         _teamInfoMap
     );
 
-    let sortedM =
-        _membersData?.members.sort((a, b) =>
-            _driverStatsMap[_seasonId][b.cust_id].power_points !==
-            _driverStatsMap[_seasonId][a.cust_id].power_points
-                ? _driverStatsMap[_seasonId][b.cust_id].power_points -
-                  _driverStatsMap[_seasonId][a.cust_id].power_points
-                : (getRoadLicense(b.licenses).irating | 0) -
-                  (getRoadLicense(a.licenses).irating | 0)
-        ) || [];
+    let sortedM = _driverStatsMap
+        ? _membersData?.members.sort((a, b) =>
+              _driverStatsMap[_seasonId][b.cust_id].power_points !==
+              _driverStatsMap[_seasonId][a.cust_id].power_points
+                  ? _driverStatsMap[_seasonId][b.cust_id].power_points -
+                    _driverStatsMap[_seasonId][a.cust_id].power_points
+                  : (getRoadLicense(b.licenses).irating | 0) -
+                    (getRoadLicense(a.licenses).irating | 0)
+          )
+        : [];
 
     view.value.drivers = [];
 
@@ -152,6 +155,7 @@ async function fectchJsonData() {
     }
 }
 watchEffect(fectchJsonData);
+watch(props, fectchJsonData);
 </script>
 
 <template>
@@ -275,6 +279,8 @@ watchEffect(fectchJsonData);
 .club-22,
 .club-29,
 .club-16,
+.club-12,
+.club-21,
 .club-32 {
     background-image: url(/flags/usa.png);
 }
@@ -317,5 +323,17 @@ watchEffect(fectchJsonData);
 
 .club-34 {
     background-image: url(/flags/australia.png);
+}
+
+.club-15 {
+    background-image: url(/flags/canada.png);
+}
+
+.club-50 {
+    background-image: url(/flags/southafrica.png);
+}
+
+.club-42 {
+    background-image: url(/flags/deatch.png);
 }
 </style>
