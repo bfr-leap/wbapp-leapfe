@@ -11,8 +11,12 @@ import type {
     CLTI_Team,
     DriverStatsMap,
 } from '../iracing-endpoints';
-import { fetchObjects } from '@/fetch-util';
-import type { DefineStoreOptionsInPlugin } from 'pinia';
+import {
+    getCuratedLeagueTeamsInfo,
+    getLeagueDriverStats,
+    getMembersData,
+    getSeasonSimsessionIndex,
+} from '@/fetch-util';
 import DriverTag from './DriverTag.vue';
 import LeagueSeasonMenu from './LeagueSeasonMenu.vue';
 
@@ -20,7 +24,7 @@ const props = withDefaults(
     defineProps<{
         league: string;
         season: string;
-        summary_mode: boolean;
+        summary_mode?: boolean;
     }>(),
     { summary_mode: false }
 );
@@ -85,12 +89,12 @@ async function fectchJsonData() {
             MembersData,
             SeasonSimsessionIndex[]
         ]
-    >await fetchObjects([
-        `./data/derived/leagueDriverStats_${props.league}.json`,
-        `./data/curated/leagueTeamsInfo_${props.league}.json`,
-        `./data/scraped/membersData_${props.league}_${props.season}.json`,
-        `./data/derived/leagueSimsessionIndex_${props.league}.json`,
-    ]);
+    >[
+        await getLeagueDriverStats(props.league),
+        await getCuratedLeagueTeamsInfo(props.league),
+        await getMembersData(props.league, props.season),
+        await getSeasonSimsessionIndex(props.league),
+    ];
 
     let _seasonId = Number.parseInt(props.season);
 

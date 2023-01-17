@@ -13,7 +13,13 @@ import type {
     DriverResults,
     SSR_ResultsEntry,
 } from '../iracing-endpoints';
-import { fetchObjects, getLeagueSeasons } from '@/fetch-util';
+import {
+    getCuratedLeagueTeamsInfo,
+    getDriverResults,
+    getLeagueDriverStats,
+    getLeagueSeasons,
+    getSingleMemberData,
+} from '@/fetch-util';
 
 const props = defineProps<{
     league: string;
@@ -32,32 +38,25 @@ const _driverResults: Ref<DriverResults[]> = ref([]);
 const _allTimeResults: Ref<DriverResults[]> = ref([]);
 
 watchEffect(async () => {
-    const [driverStatsMap, leagueTeamsInfo, singleMemberData] = <
-        [{ [name: number]: DriverStatsMap }, CuratedLeagueTeamsInfo, M_Member]
-    >await fetchObjects([
-        `./data/derived/leagueDriverStats_${props.league}.json`,
-        `./data/curated/leagueTeamsInfo_${props.league}.json`,
-        `./data/derived/singleMemberData_${props.driver}.json`,
-    ]);
+    const driverStatsMap = await getLeagueDriverStats(props.league);
+    const leagueTeamsInfo = await getCuratedLeagueTeamsInfo(props.league);
+    const singleMemberData = await getSingleMemberData(props.driver);
 
     const leagueSeasons = await getLeagueSeasons(props.league);
 
-    const [driverSessionResultsRace] = <[DriverResults]>(
-        await fetchObjects([
-            `./data/derived/driverSessionResults_race_${props.driver}.json`,
-        ])
+    const driverSessionResultsRace = await getDriverResults(
+        props.driver,
+        'race'
     );
 
-    const [driverSessionResultsSprint] = <[DriverResults]>(
-        await fetchObjects([
-            `./data/derived/driverSessionResults_sprint_${props.driver}.json`,
-        ])
+    const driverSessionResultsSprint = await getDriverResults(
+        props.driver,
+        'sprint'
     );
 
-    const [driverSessionResultsQuali] = <[DriverResults]>(
-        await fetchObjects([
-            `./data/derived/driverSessionResults_quali_${props.driver}.json`,
-        ])
+    const driverSessionResultsQuali = await getDriverResults(
+        props.driver,
+        'quali'
     );
 
     _driverResults.value = [

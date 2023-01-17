@@ -13,9 +13,8 @@ export async function getSubsessionName(
         return ret;
     }
 
-    let seasonSimsessionIndex: SeasonSimsessionIndex[] = JSON.parse(
-        JSON.stringify(await getLeagueSimsessionIndex(leagueId))
-    );
+    let seasonSimsessionIndex: SeasonSimsessionIndex[] =
+        await getLeagueSimsessionIndex(leagueId);
 
     seasonSimsessionIndex.sort((a, b) => a.season_id - b.season_id);
 
