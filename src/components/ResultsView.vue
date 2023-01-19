@@ -157,7 +157,7 @@ watchEffect(fectchJsonData);
                 <TrackBanner v-bind:track-id="props.trackId" />
                 <div style="height: 2em"></div>
                 <div class="container">
-                    <nav>
+                    <!-- <nav>
                         <div class="nav nav-tabs" id="nav-tab" role="tablist">
                             <button
                                 class="nav-link active"
@@ -207,11 +207,30 @@ watchEffect(fectchJsonData);
                         >
                             <GenericTable title="" :rows="props.results" />
                         </div>
-                    </div>
+                    </div> -->
 
-                    <div class="row"></div>
+                    <div class="row">
+                        <GenericTable
+                            title="Session Report"
+                            :rows="props.results"
+                        />
+                    </div>
                     <div style="height: 2em"></div>
-                    <div class="row"></div>
+                </div>
+            </div>
+        </div>
+        <div class="page-break"></div>
+
+        <div class="card bg-dark text-light m-2">
+            <div class="card-body p-2">
+                <div class="container">
+                    <div class="row"><div>Comulative Delta</div></div>
+                    <div class="row">
+                        <CumulativeDeltaChart
+                            v-bind:subsession="props.subsessionId"
+                            v-bind:simsession="props.simsessionId"
+                        />
+                    </div>
                 </div>
             </div>
         </div>
@@ -224,3 +243,13 @@ watchEffect(fectchJsonData);
         </div>
     </div>
 </template>
+<style scoped>
+@media print {
+    /* .row{
+        display: block;
+    } */
+    .page-break {
+        page-break-before: always;
+    }
+}
+</style>

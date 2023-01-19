@@ -191,8 +191,10 @@ function onToggleAll() {
     <div>
         {{ title }}
     </div>
-    <div ref="divRoot">
-        <svg ref="svgRoot" class="w-100" :height="height">
+    <div ref="divRoot" style="overflow: hidden">
+        <!-- class="w-100"
+            :height="height" -->
+        <svg ref="svgRoot" v-bind:viewBox="`0 0 ${width} ${height}`">
             <g :transform="`translate(${margin.left},${margin.top})`">
                 <g ref="xAxis" :transform="`translate(0,${innerHeight})`"></g>
                 <g ref="yAxis"></g>
@@ -207,12 +209,12 @@ function onToggleAll() {
             </g>
         </svg>
     </div>
-    <div class="d-flex flex-wrap justify-content-center">
+    <div class="d-flex flex-wrap justify-content-center d-print-none">
         <button class="btn bg-dark text-white" @click="onToggleAll">
             Toggle All
         </button>
     </div>
-    <div class="d-flex flex-wrap justify-content-center">
+    <div class="d-flex flex-wrap justify-content-center d-print-none">
         <div v-for="(series, i) in data" class="p-1">
             <button class="btn bg-dark text-white" @click="onToggle(i)">
                 <span
