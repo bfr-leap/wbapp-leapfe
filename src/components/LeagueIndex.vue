@@ -14,7 +14,7 @@ const props = defineProps<{
 
 let seasons: Ref<SeasonSimsessionIndex[]> = ref([]);
 
-let currentLeague: Ref<string> = ref('League Name');
+let currentLeague: Ref<string> = ref('iFormula League');
 
 let seasonOptions: Ref<{
     selected: string;
