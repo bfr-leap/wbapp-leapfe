@@ -2,6 +2,7 @@
 import { useRoute } from 'vue-router';
 import LeagueIndex from '../components/LeagueIndex.vue';
 import CumulativeDeltaChart from '../components/CumulativeDeltaChart.vue';
+import StartFinishChart from './StartFinishChart.vue';
 import GenericTable from './GenericTable.vue';
 import TrackBanner from './TrackBanner.vue';
 import type {
@@ -227,6 +228,19 @@ watchEffect(fectchJsonData);
                     <div class="row"><div>Comulative Delta</div></div>
                     <div class="row">
                         <CumulativeDeltaChart
+                            v-bind:subsession="props.subsessionId"
+                            v-bind:simsession="props.simsessionId"
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card bg-dark text-light m-2">
+            <div class="card-body p-2">
+                <div class="container">
+                    <div class="row">
+                        <StartFinishChart
                             v-bind:subsession="props.subsessionId"
                             v-bind:simsession="props.simsessionId"
                         />

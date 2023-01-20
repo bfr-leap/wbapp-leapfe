@@ -4,6 +4,7 @@ import type { Ref } from 'vue';
 import LineChart from './LineChart.vue';
 import type { SeriesXY } from './LineChart.vue';
 import type { LapChartData, LCD_Chunk } from '../iracing-endpoints';
+import { getLapChartData } from '@/fetch-util';
 
 interface LapDelta {
     lap: number;
@@ -21,10 +22,11 @@ watchEffect(async () => {
     if (props.simsession == undefined || props.subsession == undefined) {
         return;
     }
-    const response = await fetch(
-        `./data/scraped/lapChartData_${props.subsession}_${props.simsession}.json`
+
+    lapChartData.value = await getLapChartData(
+        props.subsession,
+        props.simsession
     );
-    lapChartData.value = await response.json();
 });
 
 const startGrid = computed(() => {

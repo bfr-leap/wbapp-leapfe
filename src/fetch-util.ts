@@ -12,6 +12,7 @@ import type {
     CuratedLeagueTeamsInfo,
     MembersData,
     DriverResults,
+    LapChartData,
 } from './iracing-endpoints';
 
 async function fetchObjects(urls: string[]): Promise<any[]> {
@@ -154,5 +155,14 @@ export async function getDriverResults(
 ): Promise<DriverResults> {
     return await fetchCachedObject<DriverResults>(
         `./data/derived/driverSessionResults_${sessionType}_${driverId}.json`
+    );
+}
+
+export async function getLapChartData(
+    subsession: string,
+    simsession: string
+): Promise<LapChartData> {
+    return await fetchCachedObject<LapChartData>(
+        `./data/scraped/lapChartData_${subsession}_${simsession}.json`
     );
 }
