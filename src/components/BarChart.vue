@@ -25,6 +25,7 @@ const xAxis = ref<SVGGElement | null>(null);
 const yAxis = ref<SVGGElement | null>(null);
 const height = ref(100);
 const width = ref(100);
+const renderData = ref<{ name: string; value: number }[]>([]);
 
 const margin = { top: 10, right: 10, bottom: 50, left: 50 };
 const innerHeight = computed(() => {
@@ -49,9 +50,25 @@ let scaleY = ref();
 
 watch(() => props.data, redrawAxis); // reset the d3 avg axis when the data changes.
 function redrawAxis() {
+    const data: { name: string; value: number }[] = JSON.parse(
+        JSON.stringify(props.data)
+    );
+    renderData.value = data;
+
     if (svgRoot.value /*&& props.data.length > 0*/) {
         height.value = svgRoot.value.clientWidth * aspectRatio;
         width.value = svgRoot.value.clientWidth;
+
+        const dataLength = data.length;
+        const n = 0.04 * width.value;
+        let nextB = ' ';
+
+        const xTicks = data.map((d, i) => {
+            const mod = Math.ceil(dataLength / n);
+            const r = i % mod === 0 ? d.name : (nextB += ' ');
+            data[i].name = r;
+            return r;
+        });
 
         // add x axis
         const xAxisSelection = d3.select(xAxis.value);
@@ -59,7 +76,7 @@ function redrawAxis() {
         scaleX.value = d3
             .scaleBand()
             .padding(0.1)
-            .domain(props.data.map((d) => d.name))
+            .domain(xTicks)
             .range([0, innerWidth.value]);
         const axisX = d3.axisBottom(scaleX.value);
         axisX(xAxisSelection);
@@ -79,7 +96,7 @@ function redrawAxis() {
         yAxisSelection.html('');
         scaleY.value = d3
             .scaleLinear()
-            .domain([0, Math.max(...props.data.map((d) => d.value))])
+            .domain([0, Math.max(...data.map((d) => d.value))])
             .range([innerHeight.value, 0]);
         yAxisSelection
             .call(d3.axisLeft(scaleY.value).ticks(3))
@@ -128,7 +145,7 @@ function getHeightAttr(seriesValue: number) {
                     ></g>
                     <g ref="yAxis"></g>
                     <rect
-                        v-for="series in data"
+                        v-for="series in renderData"
                         :x="getXAttr(series.name)"
                         :y="getYAttr(series.value)"
                         :width="scaleX?.bandwidth()"

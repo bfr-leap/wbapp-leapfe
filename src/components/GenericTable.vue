@@ -34,7 +34,7 @@ async function formatRows(
                     if (isNaN(v)) {
                         r[k] = '';
                     } else {
-                        let totalSec = Number.parseInt(v) / 10000;
+                        let totalSec = v / 10000;
                         let min = Math.floor(Math.floor(totalSec) / 60);
                         let sec = totalSec - 60 * min;
                         r[k] = `${min}:${sec.toPrecision(5)}`;

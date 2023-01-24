@@ -25,6 +25,7 @@ const xAxis = ref<SVGGElement | null>(null);
 const yAxis = ref<SVGGElement | null>(null);
 const height = ref(100);
 const width = ref(100);
+const renderData = ref<{ name: string; hi: number; lo: number }[]>([]);
 
 const margin = { top: 10, right: 10, bottom: 50, left: 50 };
 const innerHeight = computed(() => {
@@ -51,9 +52,27 @@ const minBarHeight = ref<number>(0.2);
 
 watch(() => props.data, redrawAxis); // reset the d3 avg axis when the data changes.
 function redrawAxis() {
+    const data: {
+        name: string;
+        hi: number;
+        lo: number;
+    }[] = JSON.parse(JSON.stringify(props.data));
+    renderData.value = data;
+
     if (svgRoot.value /*&& props.data.length > 0*/) {
         height.value = svgRoot.value.clientWidth * aspectRatio;
         width.value = svgRoot.value.clientWidth;
+
+        const dataLength = data.length;
+        const n = 0.04 * width.value;
+        let nextB = ' ';
+
+        const xTicks = data.map((d, i) => {
+            const mod = Math.ceil(dataLength / n);
+            const r = i % mod === 0 ? d.name : (nextB += ' ');
+            data[i].name = r;
+            return r;
+        });
 
         // add x axis
         const xAxisSelection = d3.select(xAxis.value);
@@ -61,7 +80,7 @@ function redrawAxis() {
         scaleX.value = d3
             .scaleBand()
             .padding(0.1)
-            .domain(props.data.map((d) => d.name))
+            .domain(xTicks)
             .range([0, innerWidth.value]);
         const axisX = d3.axisBottom(scaleX.value);
         axisX(xAxisSelection);
@@ -82,8 +101,8 @@ function redrawAxis() {
         scaleY.value = d3
             .scaleLinear()
             .domain([
-                Math.min(Math.min(...props.data.map((d) => d.hi)), 0),
-                Math.max(Math.max(...props.data.map((d) => d.hi)), 0),
+                Math.min(Math.min(...data.map((d) => Math.min(d.hi, d.lo))), 0),
+                Math.max(Math.max(...data.map((d) => Math.max(d.hi, d.lo))), 0),
             ])
             .range([innerHeight.value, 0]);
         yAxisSelection
@@ -94,12 +113,9 @@ function redrawAxis() {
     }
 
     minBarHeight.value = Math.abs(
-        Math.max(
-            ...props.data.map((d) => Math.max(Math.abs(d.hi), Math.abs(d.lo)))
-        ) / 150
+        Math.max(...data.map((d) => Math.max(Math.abs(d.hi), Math.abs(d.lo)))) /
+            150
     );
-
-    console.log(minBarHeight.value);
 }
 
 function getXAttr(seriesName: string) {
@@ -141,7 +157,7 @@ function getHeightAttr(seriesValue: number) {
                     ></g>
                     <g ref="yAxis"></g>
                     <rect
-                        v-for="series in data"
+                        v-for="series in renderData"
                         :x="getXAttr(series.name)"
                         :y="getYAttr(Math.max(series.hi, series.lo))"
                         :width="scaleX?.bandwidth()"

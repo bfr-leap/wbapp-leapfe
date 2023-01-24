@@ -3,16 +3,15 @@ import { RouterLink } from 'vue-router';
 import ResultsTable from './ResultsTable.vue';
 import type { DriverStats, DriverResults } from '../iracing-endpoints';
 import BarChart from './BarChart.vue';
-import { computed, ref, watchEffect } from 'vue';
+import HLBarChart from './HLBarChart.vue';
+import { ref, watchEffect } from 'vue';
 import type { Ref } from 'vue';
-import { stringifyExpression } from '@vue/compiler-core';
-import { getShortSubsessionName, getSubsessionName } from '../session-utils';
+import { getShortSubsessionName } from '../session-utils';
 
 const props = withDefaults(
     defineProps<{
         stats: DriverStats;
         results: DriverResults[];
-        barChartResults?: DriverResults;
         seasonName: string;
         leagueId: string;
         seasonId?: number;
@@ -23,13 +22,15 @@ const props = withDefaults(
 );
 
 const barChartData: Ref<{ name: string; value: number }[] | null> = ref(null);
+const startFinishChart: Ref<{ name: string; hi: number; lo: number }[] | null> =
+    ref(null);
 
 async function fectchJsonData() {
-    if (!props.barChartResults) {
+    if (!props.results[2]) {
         barChartData.value = null;
         return;
     }
-    const seasonRaceResults = props.barChartResults[props.seasonId];
+    const seasonRaceResults = props.results[2][props.seasonId];
 
     const names: { [name: string]: string } = {};
 
@@ -63,6 +64,38 @@ async function fectchJsonData() {
 
     const filteredData = data.filter((d) => d.value !== null);
     barChartData.value = filteredData;
+
+    startFinishChart.value = <{ name: string; hi: number; lo: number }[]>(
+        sessionKeys.flatMap((k) => {
+            const sprint = props.results?.[1]?.[props.seasonId]?.[k] || null;
+            const race = props.results?.[0]?.[props.seasonId]?.[k] || null;
+            return [
+                sprint
+                    ? {
+                          name:
+                              (names[k.toString()] || k.toString()) + ':Sprint',
+                          lo:
+                              -1 *
+                              (sprint.start_position === 0
+                                  ? sprint.position
+                                  : sprint.start_position),
+                          hi: -1 * sprint.position,
+                      }
+                    : null,
+                race
+                    ? {
+                          name: (names[k.toString()] || k.toString()) + ':Race',
+                          lo:
+                              -1 *
+                              (race.start_position === 0
+                                  ? race.position
+                                  : race.start_position),
+                          hi: -1 * race.position,
+                      }
+                    : null,
+            ].filter((a) => a !== null);
+        })
+    );
 }
 watchEffect(fectchJsonData);
 
@@ -111,7 +144,7 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
     </div>
 
     <ul class="nav nav-pills">
-        <li v-if="barChartData" class="nav-item">
+        <!-- <li v-if="barChartData" class="nav-item">
             <a
                 class="nav-link active"
                 data-bs-toggle="tab"
@@ -120,6 +153,38 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
                 href="#"
                 >Qualifying Performance</a
             >
+        </li> -->
+        <li v-if="results.length > 0" class="nav-item dropdown">
+            <a
+                class="nav-link dropdown-toggle active show"
+                data-bs-toggle="dropdown"
+                href="#"
+                role="button"
+                aria-expanded="false"
+                >Charts</a
+            >
+            <ul class="dropdown-menu">
+                <li>
+                    <a
+                        class="dropdown-item active"
+                        data-bs-toggle="tab"
+                        v-bind:data-bs-target="`#nav-qpchart-${seasonId}`"
+                        href="#"
+                    >
+                        Qualifying Performance
+                    </a>
+                </li>
+                <li>
+                    <a
+                        class="dropdown-item"
+                        data-bs-toggle="tab"
+                        v-bind:data-bs-target="`#nav-sechart-${seasonId}`"
+                        href="#"
+                    >
+                        Start / Finish
+                    </a>
+                </li>
+            </ul>
         </li>
         <li v-if="results.length > 0" class="nav-item dropdown">
             <a
@@ -157,8 +222,30 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
             tabindex="0"
         >
             <div class="row">
+                <div class="col-12 m-auto">Qualifying Performance</div>
+            </div>
+            <div class="row">
                 <div class="col-12 m-auto">
                     <BarChart v-if="barChartData" :data="barChartData" />
+                </div>
+            </div>
+        </div>
+        <div
+            class="tab-pane fade"
+            v-bind:id="`nav-sechart-${seasonId}`"
+            role="tabpanel"
+            aria-labelledby="nav-home-tab"
+            tabindex="0"
+        >
+            <div class="row">
+                <div class="col-12 m-auto">Start / Finish</div>
+            </div>
+            <div class="row">
+                <div class="col-12 m-auto">
+                    <HLBarChart
+                        v-if="startFinishChart"
+                        v-bind:data="startFinishChart"
+                    />
                 </div>
             </div>
         </div>

@@ -142,7 +142,6 @@ const memberView = computed(() => {
                     <Stats
                         :stats="_driverStatsMap?.[season.season_id]?.[driverId]"
                         :results="_driverResults"
-                        :bar-chart-results="_driverResults[2]"
                         :seasonName="season.season_name"
                         :seasonId="season.season_id"
                         v-bind:league-id="props.league"
@@ -156,8 +155,7 @@ const memberView = computed(() => {
             <Stats
                 v-if="_driverStatsMap?.[0]?.[driverId]"
                 :stats="_driverStatsMap[0][driverId]"
-                :results="[]"
-                :bar-chart-results="_allTimeResults[2]"
+                :results="_allTimeResults"
                 seasonName="All Time"
                 :seasonId="0"
                 v-bind:league-id="props.league"
