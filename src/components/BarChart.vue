@@ -137,7 +137,12 @@ function getHeightAttr(seriesValue: number) {
             {{ title }}
         </div>
         <div ref="divRoot">
-            <svg ref="svgRoot" class="w-100" :height="height">
+            <svg
+                ref="svgRoot"
+                class="w-100"
+                :height="height"
+                v-bind:viewBox="`0 0 ${width} ${height}`"
+            >
                 <g :transform="`translate(${margin.left},${margin.top})`">
                     <g
                         ref="xAxis"
