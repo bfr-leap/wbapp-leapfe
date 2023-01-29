@@ -134,7 +134,4 @@ watchEffect(fectchJsonData);
     /* background-color: #ad6c80;
     color: #373737; */
 }
-.table td {
-    /* white-space: nowrap; */
-}
 </style>
