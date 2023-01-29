@@ -99,7 +99,11 @@ async function fectchJsonData() {
     }
 
     for (let simsessionIt of selectedSubsession.simsessions) {
-        if (simsessionIt.type === 'race' || simsessionIt.type === 'sprint')
+        if (
+            simsessionIt.type === 'race' ||
+            simsessionIt.type === 'sprint' ||
+            simsessionIt.type === 'qualify'
+        )
             simsessionOptions.value.options.push({
                 display: simsessionIt.type,
                 href: `?m=results&league=${leagueId}&season=${selectedSeason.season_id}&subsession=${selectedSubsession.subsession_id}&simsession=${simsessionIt.simsession_id}`,

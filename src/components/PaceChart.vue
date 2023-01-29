@@ -2,11 +2,7 @@
 import { watchEffect, ref } from 'vue';
 import type { Ref } from 'vue';
 import BarChart from './BarChart.vue';
-import {
-    getLapChartData,
-    getSingleMemberData,
-    getSimsessionResults,
-} from '@/fetch-util';
+import { getSingleMemberData, getSimsessionResults } from '@/fetch-util';
 
 const props = defineProps<{
     subsession?: string;
