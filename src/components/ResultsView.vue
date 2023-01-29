@@ -3,6 +3,7 @@ import { useRoute } from 'vue-router';
 import LeagueIndex from '../components/LeagueIndex.vue';
 import CumulativeDeltaChart from '../components/CumulativeDeltaChart.vue';
 import StartFinishChart from './StartFinishChart.vue';
+import PaceChart from './PaceChart.vue';
 import GenericTable from './GenericTable.vue';
 import TrackBanner from './TrackBanner.vue';
 import type {
@@ -24,6 +25,7 @@ let props: Ref<{
     seasonId: string;
     subsessionId: string;
     simsessionId: string;
+    simsessionType: 'race' | 'sprint' | 'qualify' | 'practice';
     trackId: string;
     results: {
         [name: string]: string;
@@ -33,6 +35,7 @@ let props: Ref<{
     seasonId: '',
     subsessionId: '',
     simsessionId: '',
+    simsessionType: <'race' | 'sprint' | 'qualify' | 'practice'>'practice',
     trackId: '',
     results: [],
 });
@@ -99,6 +102,8 @@ async function fectchJsonData() {
         simsessionId = selectedSimsession?.simsession_id?.toString() || '';
     }
 
+    props.value.simsessionType = selectedSimsession.type;
+
     let leagueSeasonSessions = await getLeagueSeasonSessions(
         leagueId,
         seasonId
@@ -125,10 +130,9 @@ async function fectchJsonData() {
     );
 
     props.value.results = <any>simsessionResults.results.map((row) => {
-        return {
+        let r: { [name: string]: any } = {
             pos: row.position,
             cust_id: row.cust_id,
-            start: row.start_position,
             fastest_lap: row.fastest_lap_time,
             pace_percent:
                 row.pace_percent || row.pace_percent === 0
@@ -136,9 +140,18 @@ async function fectchJsonData() {
                     : '',
             fast_lap: row.fast_lap,
             laps: row.laps_completed,
-            pts: row.points,
             inc: row.incidents,
         };
+
+        if (
+            selectedSimsession?.type === 'race' ||
+            selectedSimsession?.type === 'sprint'
+        ) {
+            r['start'] = row.start_position;
+            r['pts'] = row.points;
+        }
+
+        return r;
     });
 }
 watchEffect(fectchJsonData);
@@ -158,58 +171,6 @@ watchEffect(fectchJsonData);
                 <TrackBanner v-bind:track-id="props.trackId" />
                 <div style="height: 2em"></div>
                 <div class="container">
-                    <!-- <nav>
-                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                            <button
-                                class="nav-link active"
-                                id="nav-home-tab"
-                                data-bs-toggle="tab"
-                                data-bs-target="#nav-home"
-                                type="button"
-                                role="tab"
-                                aria-controls="nav-home"
-                                aria-selected="true"
-                            >
-                                Cumulative Delta
-                            </button>
-                            <button
-                                class="nav-link"
-                                id="nav-profile-tab"
-                                data-bs-toggle="tab"
-                                data-bs-target="#nav-profile"
-                                type="button"
-                                role="tab"
-                                aria-controls="nav-profile"
-                                aria-selected="false"
-                            >
-                                Session Report
-                            </button>
-                        </div>
-                    </nav>
-                    <div class="tab-content" id="nav-tabContent">
-                        <div
-                            class="tab-pane fade show active"
-                            id="nav-home"
-                            role="tabpanel"
-                            aria-labelledby="nav-home-tab"
-                            tabindex="0"
-                        >
-                            <CumulativeDeltaChart
-                                v-bind:subsession="props.subsessionId"
-                                v-bind:simsession="props.simsessionId"
-                            />
-                        </div>
-                        <div
-                            class="tab-pane fade"
-                            id="nav-profile"
-                            role="tabpanel"
-                            aria-labelledby="nav-profile-tab"
-                            tabindex="0"
-                        >
-                            <GenericTable title="" :rows="props.results" />
-                        </div>
-                    </div> -->
-
                     <div class="row">
                         <GenericTable
                             title="Session Report"
@@ -222,7 +183,13 @@ watchEffect(fectchJsonData);
         </div>
         <div class="page-break"></div>
 
-        <div class="card bg-dark text-light m-2">
+        <div
+            v-if="
+                props.simsessionType === 'race' ||
+                props.simsessionType === 'sprint'
+            "
+            class="card bg-dark text-light m-2"
+        >
             <div class="card-body p-2">
                 <div class="container">
                     <div class="row"><div>Comulative Delta</div></div>
@@ -236,11 +203,33 @@ watchEffect(fectchJsonData);
             </div>
         </div>
 
-        <div class="card bg-dark text-light m-2">
+        <div
+            v-if="
+                props.simsessionType === 'race' ||
+                props.simsessionType === 'sprint'
+            "
+            class="card bg-dark text-light m-2"
+        >
             <div class="card-body p-2">
                 <div class="container">
                     <div class="row">
                         <StartFinishChart
+                            v-bind:subsession="props.subsessionId"
+                            v-bind:simsession="props.simsessionId"
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div
+            v-if="props.simsessionType === 'qualify'"
+            class="card bg-dark text-light m-2"
+        >
+            <div class="card-body p-2">
+                <div class="container">
+                    <div class="row">
+                        <PaceChart
                             v-bind:subsession="props.subsessionId"
                             v-bind:simsession="props.simsessionId"
                         />
