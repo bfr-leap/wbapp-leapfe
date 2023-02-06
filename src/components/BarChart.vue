@@ -48,6 +48,8 @@ onMounted(async () => {
 let scaleX = ref();
 let scaleY = ref();
 
+const minBarHeight = ref<number>(0.02);
+
 watch(() => props.data, redrawAxis); // reset the d3 avg axis when the data changes.
 function redrawAxis() {
     const data: { name: string; value: number }[] = JSON.parse(
@@ -96,7 +98,13 @@ function redrawAxis() {
         yAxisSelection.html('');
         scaleY.value = d3
             .scaleLinear()
-            .domain([0, Math.max(...data.map((d) => d.value))])
+            .domain([
+                0,
+                Math.max(
+                    minBarHeight.value * 100,
+                    Math.max(...data.map((d) => d.value))
+                ),
+            ])
             .range([innerHeight.value, 0]);
         yAxisSelection
             .call(d3.axisLeft(scaleY.value).ticks(3))
@@ -129,6 +137,71 @@ function getHeightAttr(seriesValue: number) {
 
     return scaleY.value(0) - scaleY.value(seriesValue);
 }
+
+function getDPathAttrAverage() {
+    if (!scaleX.value || !scaleY.value) {
+        return '';
+    }
+
+    let average =
+        renderData.value.map((v) => v.value).reduce((p, c) => p + c) /
+        renderData.value.length;
+
+    let stdev = Math.sqrt(
+        renderData.value
+            .map((v) => (v.value - average) * (v.value - average))
+            .reduce((p, c) => p + c) / renderData.value.length
+    );
+
+    let r = [];
+
+    r.push([
+        d3
+            .line()
+            .x(function (d: any) {
+                return (
+                    scaleX.value(renderData.value[d].name) +
+                    scaleX.value.bandwidth() * d
+                );
+            })
+            .y(function (d: any) {
+                return scaleY.value(average);
+            })([0, renderData.value.length - 1]),
+        '#aaaaff44',
+    ]);
+
+    r.push([
+        d3
+            .line()
+            .x(function (d: any) {
+                return (
+                    scaleX.value(renderData.value[d].name) +
+                    scaleX.value.bandwidth() * d
+                );
+            })
+            .y(function (d: any) {
+                return scaleY.value(average + stdev);
+            })([0, renderData.value.length - 1]),
+        '#aaaaaa55',
+    ]);
+
+    r.push([
+        d3
+            .line()
+            .x(function (d: any) {
+                return (
+                    scaleX.value(renderData.value[d].name) +
+                    scaleX.value.bandwidth() * d
+                );
+            })
+            .y(function (d: any) {
+                return scaleY.value(average - stdev);
+            })([0, renderData.value.length - 1]),
+        '#aaaaaa55',
+    ]);
+
+    return r;
+}
 </script>
 
 <template>
@@ -152,11 +225,22 @@ function getHeightAttr(seriesValue: number) {
                     <rect
                         v-for="series in renderData"
                         :x="getXAttr(series.name)"
-                        :y="getYAttr(series.value)"
+                        :y="getYAttr(Math.max(series.value, minBarHeight))"
                         :width="scaleX?.bandwidth()"
-                        :height="getHeightAttr(series.value)"
+                        :height="
+                            getHeightAttr(
+                                Math.abs(Math.max(series.value, minBarHeight))
+                            )
+                        "
                         style="fill: #1aa179"
                     ></rect>
+                    <path
+                        v-for="p in getDPathAttrAverage()"
+                        fill="none"
+                        :stroke="p[1]"
+                        stroke-width="1.5"
+                        :d="p[0]"
+                    ></path>
                 </g>
             </svg>
         </div>
