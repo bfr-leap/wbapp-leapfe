@@ -135,6 +135,18 @@ const memberView = computed(() => {
             </div>
         </div>
     </div>
+    <div class="card bg-dark text-light m-2">
+        <div class="card-body p-2">
+            <Stats
+                v-if="_driverStatsMap?.[0]?.[driverId]"
+                :stats="_driverStatsMap[0][driverId]"
+                :results="_allTimeResults"
+                seasonName="All Time"
+                :seasonId="0"
+                v-bind:league-id="props.league"
+            />
+        </div>
+    </div>
     <template v-for="season in _leagueSeasons?.seasons">
         <template v-if="_driverStatsMap?.[season.season_id]?.[driverId]">
             <div class="card bg-dark text-light m-2">
@@ -150,18 +162,6 @@ const memberView = computed(() => {
             </div>
         </template>
     </template>
-    <div class="card bg-dark text-light m-2">
-        <div class="card-body p-2">
-            <Stats
-                v-if="_driverStatsMap?.[0]?.[driverId]"
-                :stats="_driverStatsMap[0][driverId]"
-                :results="_allTimeResults"
-                seasonName="All Time"
-                :seasonId="0"
-                v-bind:league-id="props.league"
-            />
-        </div>
-    </div>
 </template>
 
 <style scoped>
