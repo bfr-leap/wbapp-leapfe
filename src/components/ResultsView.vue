@@ -232,6 +232,7 @@ watchEffect(fectchJsonData);
                         <PaceChart
                             v-bind:subsession="props.subsessionId"
                             v-bind:simsession="props.simsessionId"
+                            v-bind:league="props.leagueId"
                         />
                     </div>
                 </div>

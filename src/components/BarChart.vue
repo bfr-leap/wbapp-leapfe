@@ -4,9 +4,15 @@ import { ref, onMounted, nextTick, computed, watch } from 'vue';
 const d3: any = (<any>globalThis).d3;
 const aspectRatio = 0.37;
 
+type Datum = {
+    name: string;
+    value: number;
+    value2?: number;
+};
+
 const props = withDefaults(
     defineProps<{
-        data?: { name: string; value: number }[];
+        data?: Datum[];
         title?: string;
     }>(),
     {
@@ -25,7 +31,7 @@ const xAxis = ref<SVGGElement | null>(null);
 const yAxis = ref<SVGGElement | null>(null);
 const height = ref(100);
 const width = ref(100);
-const renderData = ref<{ name: string; value: number }[]>([]);
+const renderData = ref<Datum[]>([]);
 
 const margin = { top: 10, right: 10, bottom: 50, left: 50 };
 const innerHeight = computed(() => {
@@ -233,6 +239,24 @@ function getDPathAttrAverage() {
                             )
                         "
                         style="fill: #1aa179"
+                    ></rect>
+                    <rect
+                        v-for="series in renderData"
+                        :x="getXAttr(series.name)"
+                        :y="
+                            getYAttr(Math.max(series.value2 || 0, minBarHeight))
+                        "
+                        :width="scaleX?.bandwidth()"
+                        :height="
+                            getHeightAttr(
+                                Math.abs(
+                                    Math.max(series.value2 || 0, minBarHeight)
+                                )
+                            )
+                        "
+                        :style="
+                            series.value2 ? `fill: #1a79a1` : `fill: #1a79a100`
+                        "
                     ></rect>
                     <path
                         v-for="p in getDPathAttrAverage()"
