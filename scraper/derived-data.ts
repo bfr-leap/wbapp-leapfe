@@ -4,14 +4,12 @@ import { deriveDriverStats } from './derive/driver-stats.js';
 import { deriveSingleMemberInfo } from './derive/single-member-info.js';
 import { deriveSingleTrackInfo } from './derive/single-track-info.js';
 import { deriveTrackInfoDirectory } from './derive/track-info-directory.js';
+import { deriveLeagueLapTelemetry } from './derive/lap-telemetry.js';
 
-import { deriveLapTelemetry } from './derive/lap-telemetry.js';
-
-// deriveLeagueSimSessionIndex(6555);
-// deriveLeagueSimSessionResults(6555);
-// deriveDriverStats(6555);
-// deriveSingleMemberInfo(6555);
-// deriveSingleTrackInfo(6555);
-// deriveTrackInfoDirectory(6555);
-
-deriveLapTelemetry(59522192);
+deriveLeagueSimSessionIndex(6555);
+deriveLeagueSimSessionResults(6555);
+deriveDriverStats(6555);
+deriveSingleMemberInfo(6555);
+deriveSingleTrackInfo(6555);
+deriveTrackInfoDirectory(6555);
+deriveLeagueLapTelemetry(6555);

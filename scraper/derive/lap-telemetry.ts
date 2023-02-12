@@ -2,7 +2,8 @@ import { readFileSync } from 'fs';
 
 import { wf } from './file-writer.js';
 
-const MNT_PT = './public/data/scraped/telemetry/';
+const TELEMETRY_MNT_PT = './public/data/scraped/telemetry/';
+const CURATED_MNT_PT = './public/data/curated//';
 
 interface ST_TelemetryDatum {
     perc: number;
@@ -46,13 +47,37 @@ function rectifyLapEnds(subsession: SubsessionTelemetry) {
     }
 }
 
-export function deriveLapTelemetry(subssesionId: number) {
-    let telem = <SubsessionTelemetry>JSON.parse(
-        readFileSync(`${MNT_PT}${subssesionId}.json`, {
+function loadTelemetrySubsessionIds(leagueId: number): number[] {
+    let ids = <number[]>JSON.parse(
+        readFileSync(`${CURATED_MNT_PT}telemetrySubsessions_${leagueId}.json`, {
             encoding: 'utf8',
             flag: 'r',
         })
     );
+
+    return ids;
+}
+
+function loadSubsessionTelemetry(subsessionId: number): SubsessionTelemetry {
+    let telem = <SubsessionTelemetry>JSON.parse(
+        readFileSync(`${TELEMETRY_MNT_PT}${subsessionId}.json`, {
+            encoding: 'utf8',
+            flag: 'r',
+        })
+    );
+
+    return telem;
+}
+
+export function deriveLeagueLapTelemetry(leagueId: number) {
+    let subsessions = loadTelemetrySubsessionIds(leagueId);
+    for (let subsession of subsessions) {
+        deriveSubsessionLapTelemetry(subsession);
+    }
+}
+
+function deriveSubsessionLapTelemetry(subssesionId: number) {
+    let telem = loadSubsessionTelemetry(subssesionId);
 
     rectifyLapEnds(telem);
 

@@ -177,3 +177,11 @@ export async function getSimsessionDriverTelemetry(
         `./data/derived/simsessionDriverTelemetry_${subssesion}_${simsession}_${driver}.json`
     );
 }
+
+export async function getTelemetrySubsessionIds(
+    league: string
+): Promise<number[]> {
+    return await fetchCachedObject<number[]>(
+        `./data/curated/telemetrySubsessions_${league}.json`
+    );
+}
