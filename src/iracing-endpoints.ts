@@ -397,3 +397,26 @@ export interface ALS_EventInfo {
     track_id: number;
     time: string;
 }
+
+export interface ST_TelemetryDatum {
+    perc: number;
+    percD: number;
+    t: number;
+}
+
+export interface ST_LapTelemetry {
+    lapNumber: number;
+    telemetry: ST_TelemetryDatum[];
+}
+
+export interface ST_DriverTelemetry {
+    id: number;
+    laps: ST_LapTelemetry[];
+}
+
+export interface ST_SimsessionTelemetry {
+    id: number;
+    drivers: ST_DriverTelemetry[];
+}
+
+export type SubsessionTelemetry = ST_SimsessionTelemetry[];

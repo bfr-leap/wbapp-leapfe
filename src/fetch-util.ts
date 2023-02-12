@@ -13,6 +13,7 @@ import type {
     MembersData,
     DriverResults,
     LapChartData,
+    ST_DriverTelemetry,
 } from './iracing-endpoints';
 
 async function fetchObjects(urls: string[]): Promise<any[]> {
@@ -164,5 +165,15 @@ export async function getLapChartData(
 ): Promise<LapChartData> {
     return await fetchCachedObject<LapChartData>(
         `./data/scraped/lapChartData_${subsession}_${simsession}.json`
+    );
+}
+
+export async function getSimsessionDriverTelemetry(
+    subssesion: string,
+    simsession: string,
+    driver: string
+): Promise<ST_DriverTelemetry> {
+    return await fetchCachedObject<ST_DriverTelemetry>(
+        `./data/derived/simsessionDriverTelemetry_${subssesion}_${simsession}_${driver}.json`
     );
 }
