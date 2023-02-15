@@ -9,11 +9,9 @@ import {
     watch,
 } from 'vue';
 
-export interface SeriesXY<T> {
+export interface SeriesXY {
     name: string;
-    xProp: keyof PickNumericProps<T>;
-    yProp: keyof PickNumericProps<T>;
-    data: T[];
+    data: { x: number; y: number }[];
 }
 
 export type PickNumericProps<T> = {
@@ -24,7 +22,7 @@ const d3: any = (<any>globalThis).d3;
 const aspectRatio = 0.5;
 
 const props = defineProps<{
-    data: SeriesXY<any>[];
+    data: SeriesXY[];
     title?: string;
     yRange?: [number, number];
 }>();
@@ -70,13 +68,13 @@ function redrawAxis() {
             .scaleLinear()
             .domain(
                 d3.extent(props.data[0].data, (d: any) => {
-                    return d[props.data[0].xProp];
+                    return d.x;
                 })
             )
             .range([0, innerWidth.value]);
         const axisX = d3
             .axisBottom(scaleX.value)
-            .tickValues(props.data[0].data.map((d) => d[props.data[0].xProp]))
+            .tickValues(props.data[0].data.map((d) => d.x))
             .tickFormat(d3.format('d'));
         axisX(xAxisSelection);
         xAxisSelection
@@ -85,11 +83,11 @@ function redrawAxis() {
             .style('font-size', 16)
             .style('stroke', 'white');
 
-        let maxY = d3.max(props.data, (sXY: SeriesXY<any>) =>
-            d3.max(sXY.data, (d: any) => d[sXY.yProp])
+        let maxY = d3.max(props.data, (sXY: SeriesXY) =>
+            d3.max(sXY.data, (d: any) => d.y)
         );
-        let minY = d3.min(props.data, (sXY: SeriesXY<any>) =>
-            d3.min(sXY.data, (d: any) => d[sXY.yProp])
+        let minY = d3.min(props.data, (sXY: SeriesXY) =>
+            d3.min(sXY.data, (d: any) => d.y)
         );
 
         if (props.yRange) {
@@ -112,7 +110,7 @@ function redrawAxis() {
     }
 }
 
-function getDPathAttr(series: SeriesXY<any>) {
+function getDPathAttr(series: SeriesXY) {
     if (!scaleX.value || !scaleY.value) {
         return '';
     }
@@ -120,10 +118,10 @@ function getDPathAttr(series: SeriesXY<any>) {
     const linePath = d3
         .line()
         .x(function (d: any) {
-            return scaleX.value(d[series.xProp]);
+            return scaleX.value(d.x);
         })
         .y(function (d: any) {
-            return scaleY.value(d[series.yProp]);
+            return scaleY.value(d.y);
         })(series.data);
     return linePath;
 }
