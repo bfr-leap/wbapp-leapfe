@@ -190,8 +190,6 @@ function onToggleAll() {
         {{ title }}
     </div>
     <div ref="divRoot" style="overflow: hidden">
-        <!-- class="w-100"
-            :height="height" -->
         <svg ref="svgRoot" v-bind:viewBox="`0 0 ${width} ${height}`">
             <g :transform="`translate(${margin.left},${margin.top})`">
                 <g ref="xAxis" :transform="`translate(0,${innerHeight})`"></g>
