@@ -41,19 +41,8 @@ function getIdealLap(t: ST_DriverTelemetry): number {
         }
     }
 
-    // let fastestLap = Math.min(...completeLapTimes);
-    // console.log(t.id);
-    // console.log(`fastest lap time: ${fastestLap}`);
-    // console.log(
-    //     `sectors: ${Math.min(...s1Times)} ${Math.min(...s3Times)} ${Math.min(
-    //         ...s3Times
-    //     )}`
-    // );
     let optimalLap =
-        Math.min(...s1Times) + Math.min(...s3Times) + Math.min(...s3Times);
-    // console.log(`optimal: ${optimalLap}`);
-    // console.log(`optimal/fastest delta: ${fastestLap - optimalLap}`);
-    // console.log('\n\n\n\n\n\n');
+        Math.min(...s1Times) + Math.min(...s2Times) + Math.min(...s3Times);
 
     return optimalLap;
 }
@@ -91,6 +80,10 @@ function getBestLap(t: ST_DriverTelemetry): ST_LapTelemetry {
     }
 
     return r;
+}
+
+function getLapTime(t: ST_LapTelemetry): number {
+    return (t.telemetry[t.telemetry.length - 1].t - t.telemetry[0].t) / 60;
 }
 
 export async function getIdealLaps(
