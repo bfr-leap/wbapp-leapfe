@@ -174,7 +174,7 @@ watchEffect(() => {
 function getColor(seriesIndex: number) {
     const baseColor = baseColors[seriesIndex % baseColors.length];
     const dColor = d3.color(baseColor);
-    dColor.opacity = toggleState[seriesIndex] ? 1 : 0.2;
+    dColor.opacity = toggleState[seriesIndex] ? 1 : 0.03;
     return dColor.formatRgb();
 }
 function onToggle(seriesIndex: number) {

@@ -17,11 +17,13 @@ import {
     getLeagueSimsessionIndex,
     getLeagueSeasonSessions,
     getSimsessionResults,
+    getTelemetrySubsessionIds,
 } from '@/fetch-util';
 
 const route = useRoute();
 
 let props: Ref<{
+    hasTelemetry: boolean;
     leagueId: string;
     seasonId: string;
     subsessionId: string;
@@ -32,6 +34,7 @@ let props: Ref<{
         [name: string]: string;
     }[];
 }> = ref({
+    hasTelemetry: false,
     leagueId: '',
     seasonId: '',
     subsessionId: '',
@@ -154,6 +157,14 @@ async function fectchJsonData() {
 
         return r;
     });
+
+    let telemetrySubsessionIds = await getTelemetrySubsessionIds(
+        props.value.leagueId
+    );
+
+    props.value.hasTelemetry =
+        -1 !==
+        telemetrySubsessionIds.indexOf(parseInt(props.value.subsessionId, 10));
 }
 watchEffect(fectchJsonData);
 </script>
@@ -241,7 +252,7 @@ watchEffect(fectchJsonData);
         </div>
 
         <div
-            v-if="props.simsessionType === 'qualify'"
+            v-if="props.simsessionType === 'qualify' && props.hasTelemetry"
             class="card bg-dark text-light m-2"
         >
             <div class="card-body p-2">

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watchEffect, ref } from 'vue';
+import { watchEffect, ref, watch } from 'vue';
 import type { Ref } from 'vue';
 import ComulativeLineChart from './ComulativeLineChart.vue';
 import type { SeriesXY } from './LineChart.vue';
@@ -20,7 +20,7 @@ const props = defineProps<{
 
 const lapTimes: Ref<SeriesXY[]> = ref([]);
 
-watchEffect(async () => {
+async function fetchData() {
     let telemetrySubsessionIds = await getTelemetrySubsessionIds(props.league);
 
     let telemetryAvailable =
@@ -73,7 +73,10 @@ watchEffect(async () => {
             };
         });
     }
-});
+}
+
+watchEffect(fetchData);
+watch(props, fetchData);
 </script>
 
 <template>
