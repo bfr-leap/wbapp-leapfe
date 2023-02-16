@@ -1,4 +1,4 @@
-import type { ST_DriverTelemetry } from './iracing-endpoints';
+import type { ST_DriverTelemetry, ST_LapTelemetry } from './iracing-endpoints';
 import { getSimsessionDriverTelemetry } from '@/fetch-util';
 
 function getIdealLap(t: ST_DriverTelemetry): number {
@@ -41,7 +41,7 @@ function getIdealLap(t: ST_DriverTelemetry): number {
         }
     }
 
-    let fastestLap = Math.min(...completeLapTimes);
+    // let fastestLap = Math.min(...completeLapTimes);
     // console.log(t.id);
     // console.log(`fastest lap time: ${fastestLap}`);
     // console.log(
@@ -56,6 +56,41 @@ function getIdealLap(t: ST_DriverTelemetry): number {
     // console.log('\n\n\n\n\n\n');
 
     return optimalLap;
+}
+
+function getBestLap(t: ST_DriverTelemetry): ST_LapTelemetry {
+    let r: ST_LapTelemetry = {
+        lapNumber: 1,
+        telemetry: [],
+    };
+    let fastest = Infinity;
+
+    for (let lap of t.laps) {
+        let startT = lap.telemetry[0].t;
+        let endT = lap.telemetry[lap.telemetry.length - 1].t;
+
+        let isValidLapData = true;
+
+        for (let i = 0; i < lap.telemetry.length; ++i) {
+            let tel = lap.telemetry[i];
+            if (i !== Math.floor(tel.perc * 100)) {
+                isValidLapData = false;
+                break;
+            }
+        }
+
+        if (!isValidLapData || lap.telemetry.length !== 101) {
+            continue;
+        }
+
+        // return the first lap for now
+        if (fastest > endT - startT) {
+            r = lap;
+            fastest = endT - startT;
+        }
+    }
+
+    return r;
 }
 
 export async function getIdealLaps(
@@ -76,4 +111,24 @@ export async function getIdealLaps(
     }
 
     return telemetry.map((t) => getIdealLap(t));
+}
+
+export async function getBestLaps(
+    subsession: string,
+    simsession: string,
+    drivers: string[]
+): Promise<ST_LapTelemetry[]> {
+    let telemetry: ST_DriverTelemetry[] = [];
+
+    for (let driver of drivers) {
+        let t = await getSimsessionDriverTelemetry(
+            subsession,
+            simsession,
+            driver
+        );
+
+        telemetry.push(t);
+    }
+
+    return telemetry.map((t) => getBestLap(t));
 }

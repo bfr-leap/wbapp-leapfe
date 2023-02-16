@@ -1,0 +1,81 @@
+<script setup lang="ts">
+import { watchEffect, ref } from 'vue';
+import type { Ref } from 'vue';
+import ComulativeLineChart from './ComulativeLineChart.vue';
+import type { SeriesXY } from './LineChart.vue';
+import {
+    getSingleMemberData,
+    getSimsessionResults,
+    getTelemetrySubsessionIds,
+} from '@/fetch-util';
+import { getBestLaps } from '@/telemetry-util';
+import type { ST_LapTelemetry } from '@/iracing-endpoints';
+import { toTypeString } from '@vue/shared';
+
+const props = defineProps<{
+    subsession: string;
+    simsession: string;
+    league: string;
+}>();
+
+const lapTimes: Ref<SeriesXY[]> = ref([]);
+
+watchEffect(async () => {
+    let telemetrySubsessionIds = await getTelemetrySubsessionIds(props.league);
+
+    let telemetryAvailable =
+        -1 !== telemetrySubsessionIds.indexOf(parseInt(props.subsession, 10));
+
+    let simsessionResults = await getSimsessionResults(
+        props.subsession,
+        props.simsession
+    );
+
+    let driverNameMaps: { [name: number]: string } = {};
+
+    for (let r of simsessionResults.results) {
+        driverNameMaps[r.cust_id] = (
+            await getSingleMemberData(r.cust_id.toString())
+        ).display_name;
+    }
+
+    let fastestLaps: ST_LapTelemetry[] = [];
+
+    if (telemetryAvailable) {
+        fastestLaps = await getBestLaps(
+            props.subsession,
+            props.simsession,
+            simsessionResults.results.map((v) => v.cust_id.toString())
+        );
+
+        let uid2NameMap: { [name: number]: string } = {};
+
+        for (let res of simsessionResults.results) {
+            let custid = res.cust_id;
+            let mData = await getSingleMemberData(custid.toString());
+            uid2NameMap[custid] = mData.display_name;
+        }
+
+        lapTimes.value = fastestLaps.map((tLap, i) => {
+            let tp: number = -1;
+
+            let d = tLap.telemetry.map((t) => {
+                let y = -1 === tp ? 0 : t.t - tp;
+                tp = t.t;
+                return { x: t.perc, y: y / 60 };
+            });
+            d.shift();
+            return {
+                name: `P${i + 1}: ${
+                    uid2NameMap[simsessionResults.results[i].cust_id]
+                }`,
+                data: d,
+            };
+        });
+    }
+});
+</script>
+
+<template>
+    <ComulativeLineChart :series="lapTimes" />
+</template>

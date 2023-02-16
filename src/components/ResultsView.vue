@@ -4,6 +4,7 @@ import LeagueIndex from '../components/LeagueIndex.vue';
 import CumulativeDeltaChart from '../components/CumulativeDeltaChart.vue';
 import StartFinishChart from './StartFinishChart.vue';
 import PaceChart from './PaceChart.vue';
+import BestQualifyLapChart from './BestQualifyLapChart.vue';
 import GenericTable from './GenericTable.vue';
 import TrackBanner from './TrackBanner.vue';
 import type {
@@ -230,6 +231,26 @@ watchEffect(fectchJsonData);
                 <div class="container">
                     <div class="row">
                         <PaceChart
+                            v-bind:subsession="props.subsessionId"
+                            v-bind:simsession="props.simsessionId"
+                            v-bind:league="props.leagueId"
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div
+            v-if="props.simsessionType === 'qualify'"
+            class="card bg-dark text-light m-2"
+        >
+            <div class="card-body p-2">
+                <div class="container">
+                    <div class="row">
+                        <div>Fastest Lap Comulative Delta</div>
+                    </div>
+                    <div class="row">
+                        <BestQualifyLapChart
                             v-bind:subsession="props.subsessionId"
                             v-bind:simsession="props.simsessionId"
                             v-bind:league="props.leagueId"
