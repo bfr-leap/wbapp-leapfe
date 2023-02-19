@@ -40,6 +40,7 @@ export function getMemberViewFromM_Memeber(
             licenseLevel: '',
             safetyRating: '',
             teamName: '',
+            teamId: 0,
         };
     }
 
@@ -72,5 +73,6 @@ export function getMemberViewFromM_Memeber(
         licenseLevel: classLevel,
         safetyRating: rL.safety_rating.toString(),
         teamName: teamName,
+        teamId: teamId,
     };
 }

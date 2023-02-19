@@ -29,6 +29,17 @@ const props = withDefaults(
     { summary_mode: false }
 );
 
+interface TeamView {
+    position: number;
+    points: number;
+    teamName: string;
+    teamId: number;
+    drivers: {
+        name: string;
+        custId: string;
+    }[];
+}
+
 interface LocalView {
     drivers: {
         position: number;
@@ -40,6 +51,7 @@ interface LocalView {
         licenseLevel: string;
         safetyRating: string;
         teamName: string;
+        teamId: number;
         showStats: boolean;
         custId: string;
         stats: {
@@ -51,10 +63,12 @@ interface LocalView {
             top20: number;
         };
     }[];
+    teams: TeamView[];
 }
 
 let view: Ref<LocalView> = ref({
     drivers: [],
+    teams: [],
 });
 
 function populateTeamInfoMaps(
@@ -77,8 +91,6 @@ function populateTeamInfoMaps(
 }
 
 async function fectchJsonData() {
-    console.log('fetch standings');
-
     let [
         _driverStatsMap,
         _curatedLeagueTeamsInfo,
@@ -153,6 +165,37 @@ async function fectchJsonData() {
             break;
         }
     }
+
+    let teamViewMap: { [name: string]: TeamView } = {};
+    for (let driver of view.value.drivers) {
+        let team = teamViewMap[driver.teamName];
+        if (!team) {
+            teamViewMap[driver.teamName] = team = {
+                position: -1,
+                points: 0,
+                teamName: driver.teamName,
+                teamId: driver.teamId,
+                drivers: [],
+            };
+        }
+
+        team.drivers.push({
+            name: `${driver.lastName.toUpperCase}, ${driver.firstName}`,
+            custId: driver.custId,
+        });
+
+        team.points += driver.points;
+    }
+    let teamsA = Object.keys(teamViewMap)
+        .map((k) => teamViewMap[k])
+        .sort((a, b) => b.points - a.points);
+
+    teamsA.forEach((v, i) => {
+        v.position = i + 1;
+    });
+
+    console.log(teamsA);
+    view.value.teams = teamsA;
 }
 watchEffect(fectchJsonData);
 watch(props, fectchJsonData);
@@ -254,6 +297,90 @@ watch(props, fectchJsonData);
             </div>
         </div>
     </div>
+
+    <div v-if="view.teams.length > 1" class="card bg-dark text-light m-2">
+        <div class="card-body p-2">
+            <div class="container">
+                <div v-if="view.teams.length !== 0" class="row">
+                    <div class="col-2 d-flex d-sm-none text-center flex-column">
+                        <div class="mx-1 inline-block"><span>LEAP</span></div>
+                        <div class="inline-block"><span>R-P</span></div>
+                    </div>
+                    <div
+                        class="col-2 d-none d-sm-flex text-center justify-content-center"
+                    >
+                        <div>LEAP Ranking</div>
+                    </div>
+                    <div
+                        class="col-2 d-none d-sm-flex text-center justify-content-center"
+                    >
+                        <div>LEAP Points</div>
+                    </div>
+                    <div class="col-2 col-lg-1 text-center"></div>
+                    <div class="col-6 col-lg-7 text-left">Team</div>
+                </div>
+
+                <template
+                    v-if="view.teams.length !== 0"
+                    v-for="(team, i) in view.teams"
+                >
+                    <div class="row">
+                        <div
+                            class="col-2 justify-content-center d-flex d-sm-none text-center flex-column"
+                        >
+                            <div class="fs-2 mx-1">
+                                {{ team.position }}
+                            </div>
+                            <div class="d-flex fs-7 justify-content-center">
+                                <span>{{ team.points }}</span>
+                            </div>
+                        </div>
+                        <div
+                            class="col-2 d-none d-sm-flex justify-content-center fs-2"
+                        >
+                            <div>{{ team.position }}</div>
+                        </div>
+                        <div
+                            class="col-2 d-none d-sm-flex justify-content-center fs-4"
+                        >
+                            <div>{{ team.points }}</div>
+                        </div>
+                        <div class="col-2 col-lg-1 text-center">
+                            <div
+                                v-bind:class="`driver-img team-${team.teamId}`"
+                            ></div>
+                        </div>
+                        <div class="col-6 col-lg-7">
+                            <!-- <DriverTag
+                                v-bind:lastName="member.lastName"
+                                v-bind:firstName="member.firstName"
+                                v-bind:licenseLevel="member.licenseLevel"
+                                v-bind:iRating="member.iRating"
+                                v-bind:safetyRating="member.safetyRating"
+                                v-bind:teamName="member.teamName"
+                                v-bind:clubId="member.clubId"
+                                v-bind:driverId="member.custId"
+                                v-bind:leagueId="props.league"
+                            /> -->
+                            {{ team.teamName }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <!-- <div class="col text-center">&#x25BC;</div> -->
+                        <div class="col text-center" style="height: 1em"></div>
+                    </div>
+                </template>
+                <div class="row" v-if="view.teams.length !== 0 && summary_mode">
+                    <RouterLink
+                        class="dropdown-item"
+                        type="button"
+                        v-bind:to="`?m=standings&league=${props.league}&season=${props.season}`"
+                        >See all Standings</RouterLink
+                    >
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <style scoped>
@@ -335,5 +462,68 @@ watch(props, fectchJsonData);
 
 .club-42 {
     background-image: url(/flags/deatch.png);
+}
+
+.team-1 {
+    background-color: white;
+    background-image: url(/teams/nox.png);
+}
+
+.team-2 {
+    background-color: black;
+    background-image: url(/teams/lumos.png);
+}
+
+/* team_name: GitGud Racing, */
+.team-3 {
+    background-color: black;
+    background-image: url(/teams/gitgud.png);
+}
+
+/* team_name: Orion Legendary Racing, */
+.team-4 {
+    background-color: white;
+    background-image: url(/teams/orion.png);
+}
+
+/* team_name: Mercury Motorsports, */
+.team-8 {
+    background-color: black;
+    background-image: url(/teams/mercury.png);
+}
+
+/* team_name: Team Banana, */
+.team-11 {
+    background-image: url(/teams/banana.png);
+}
+
+/* team_name: Bieser Racing Team, */
+.team-19 {
+    background-color: black;
+    background-image: url(/teams/bieser.png);
+}
+
+/* team_name: Maxwell Racing Team, */
+.team-23 {
+    background-image: url(/teams/maxwell.png);
+}
+
+/* team_name: Wolf Pack Racing, */
+.team-24 {
+    background-color: rgba(255, 255, 255, 0.153);
+    background-image: url(/teams/wolfpack.png);
+}
+
+/* team_name: Intend Sim Racing, */
+.team-25 {
+    background-color: rgba(74, 0, 0, 0.267);
+}
+
+/* team_name: B Team, */
+.team-26 {
+}
+
+/* team_name: Alkentech NHR, */
+.team-27 {
 }
 </style>

@@ -17,7 +17,7 @@
                 {
                     "team_name": "GitGud Racing",
                     "team_id": 3,
-                    "team_members": [575753, 643236, 484369]
+                    "team_members": [575753, 643236, 484369, 422924]
                 },
                 {
                     "team_name": "Orion Legendary Racing",
@@ -58,6 +58,11 @@
                     "team_name": "B Team",
                     "team_id": 26,
                     "team_members": [584257, 810867]
+                },
+                {
+                    "team_name": "Alkentech NHR",
+                    "team_id": 27,
+                    "team_members": [615828]
                 }
             ]
         },
