@@ -463,12 +463,13 @@ watch(props, fectchJsonData);
 .club-42 {
     background-image: url(/flags/deatch.png);
 }
-
+/* team_name: Nox, */
 .team-1 {
     background-color: white;
     background-image: url(/teams/nox.png);
 }
 
+/* team_name: Lumos, */
 .team-2 {
     background-color: black;
     background-image: url(/teams/lumos.png);
