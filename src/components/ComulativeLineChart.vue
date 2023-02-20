@@ -37,18 +37,20 @@ function getSeriesDeltas(lapTimes: SeriesXY[]): {
     );
 
     // if rounding doesn't work try again
-    if (baselineTime === Infinity) {
+    if (baselineTime === Infinity || baselineTime === 1) {
+        console.log('here');
         baselineTime =
             lapTimes
-                .map((driverLaps: SeriesXY) =>
-                    driverLaps.data
-                        .map((lapTime) => lapTime.y)
-                        .reduce(function (min, value, _, { length }) {
-                            if (value <= 1 || isNaN(value)) {
-                                return min;
-                            }
-                            return Math.min(min, value);
-                        }, Infinity)
+                .map(
+                    (driverLaps: SeriesXY) =>
+                        driverLaps.data
+                            .map((lapTime) => lapTime.y)
+                            .reduce(function (p, value, _, { length }) {
+                                if (value <= 0 || isNaN(value)) {
+                                    return Infinity;
+                                }
+                                return p + value;
+                            }, 0) / driverLaps.data.length
                 )
                 .reduce(function (min, value, _, { length }) {
                     if (isNaN(value)) {
@@ -87,7 +89,7 @@ watchEffect(async () => {
     const seriesAndDelta = getSeriesDeltas(props.series);
 
     const baseLine = seriesAndDelta.baselineTime;
-    titleOut.value = `Baseline ${baseLine}s`;
+    titleOut.value = `Baseline ${Number(baseLine).toFixed(2)}s`;
 
     seriesOut.value = seriesAndDelta.data;
     // seriesOut.value = props.series;
