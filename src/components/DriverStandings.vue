@@ -39,30 +39,31 @@ interface TeamView {
         custId: string;
     }[];
 }
+interface DriverView {
+    position: number;
+    points: number;
+    clubId: number;
+    lastName: string;
+    firstName: string;
+    iRating: string;
+    licenseLevel: string;
+    safetyRating: string;
+    teamName: string;
+    teamId: number;
+    showStats: boolean;
+    custId: string;
+    stats: {
+        started: number;
+        poles: number;
+        wins: number;
+        podiums: number;
+        top10: number;
+        top20: number;
+    };
+}
 
 interface LocalView {
-    drivers: {
-        position: number;
-        points: number;
-        clubId: number;
-        lastName: string;
-        firstName: string;
-        iRating: string;
-        licenseLevel: string;
-        safetyRating: string;
-        teamName: string;
-        teamId: number;
-        showStats: boolean;
-        custId: string;
-        stats: {
-            started: number;
-            poles: number;
-            wins: number;
-            podiums: number;
-            top10: number;
-            top20: number;
-        };
-    }[];
+    drivers: DriverView[];
     teams: TeamView[];
 }
 
@@ -133,6 +134,7 @@ async function fectchJsonData() {
         : [];
 
     view.value.drivers = [];
+    let allDrivers: DriverView[] = [];
 
     let position = 1;
 
@@ -143,7 +145,7 @@ async function fectchJsonData() {
             _teamInfoMap
         );
 
-        view.value.drivers.push({
+        let dv: DriverView = {
             position: position,
             points: _driverStatsMap[_seasonId][member.cust_id].power_points,
             ...memberView,
@@ -157,17 +159,18 @@ async function fectchJsonData() {
                 top10: -1,
                 top20: -1,
             },
-        });
-
+        };
         ++position;
 
-        if (props.summary_mode && position > 3) {
-            break;
+        allDrivers.push(dv);
+
+        if (!props.summary_mode || position <= 4) {
+            view.value.drivers.push(dv);
         }
     }
 
     let teamViewMap: { [name: string]: TeamView } = {};
-    for (let driver of view.value.drivers) {
+    for (let driver of allDrivers) {
         let team = teamViewMap[driver.teamName];
         if (!team) {
             teamViewMap[driver.teamName] = team = {
@@ -193,6 +196,10 @@ async function fectchJsonData() {
     teamsA.forEach((v, i) => {
         v.position = i + 1;
     });
+
+    if (props.summary_mode) {
+        teamsA = teamsA.filter((v) => v.position <= 3);
+    }
 
     console.log(teamsA);
     view.value.teams = teamsA;
