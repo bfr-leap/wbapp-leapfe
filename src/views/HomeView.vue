@@ -5,6 +5,7 @@ import HomeView from '../components/HomeView.vue';
 import ResultsView from '../components/ResultsView.vue';
 import DriverStandingsView from '../components/DriverStandingsView.vue';
 import DriverView from '../components/DriverView.vue';
+import TeamView from '../components/TeamView.vue';
 import TrackResultsView from '../components/TrackResultsView.vue';
 import NextEventTimerEmbed from '@/components/NextEventTimerEmbed.vue';
 import { watch } from 'vue';
@@ -27,6 +28,7 @@ watch(() => route.params, track);
         v-if="route.query.m === 'standings'"
     ></DriverStandingsView>
     <DriverView v-if="route.query.m === 'driver'"></DriverView>
+    <TeamView v-if="route.query.m === 'team'"></TeamView>
     <TrackResultsView v-if="route.query.m === 'track'"></TrackResultsView>
     <NextEventTimerEmbed v-if="route.query.m === 'nextEventTimerEmbed'" />
 </template>

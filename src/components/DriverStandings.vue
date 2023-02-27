@@ -18,6 +18,7 @@ import {
     getSeasonSimsessionIndex,
 } from '@/fetch-util';
 import DriverTag from './DriverTag.vue';
+import TeamTag from './TeamTag.vue';
 import LeagueSeasonMenu from './LeagueSeasonMenu.vue';
 
 const props = withDefaults(
@@ -358,22 +359,20 @@ watch(props, fectchJsonData);
                             ></div>
                         </div>
                         <div class="col-6 col-lg-7">
-                            <!-- <DriverTag
-                                v-bind:lastName="member.lastName"
-                                v-bind:firstName="member.firstName"
-                                v-bind:licenseLevel="member.licenseLevel"
-                                v-bind:iRating="member.iRating"
-                                v-bind:safetyRating="member.safetyRating"
-                                v-bind:teamName="member.teamName"
-                                v-bind:clubId="member.clubId"
-                                v-bind:driverId="member.custId"
-                                v-bind:leagueId="props.league"
-                            /> -->
-                            {{ team.teamName }}
+                            <!-- <RouterLink
+                                class="dropdown-item"
+                                type="button"
+                                v-bind:to="`?m=team&league=${props.league}&team=${team.teamId}`"
+                            >
+                                {{ team.teamName }}</RouterLink
+                            > -->
+                            <TeamTag
+                                v-bind:league-id="props.league"
+                                v-bind:team-id="team.teamId"
+                            ></TeamTag>
                         </div>
                     </div>
                     <div class="row">
-                        <!-- <div class="col text-center">&#x25BC;</div> -->
                         <div class="col text-center" style="height: 1em"></div>
                     </div>
                 </template>

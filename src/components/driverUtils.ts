@@ -1,6 +1,6 @@
 import type { M_License, M_Member, CLTI_Team } from '../iracing-endpoints';
 
-function getFirstLastNames(display_name: string): {
+export function getFirstLastNames(display_name: string): {
     lastName: string;
     firstName: string;
 } {
