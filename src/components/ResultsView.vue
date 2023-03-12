@@ -90,9 +90,13 @@ async function fectchJsonData() {
         (s) => s.subsession_id.toString() === subsessionId
     );
 
-    if (!selectedSubsession) {
-        selectedSubsession =
-            selectedSeason?.sessions[selectedSeason.sessions.length - 1];
+    let i = selectedSeason.sessions.length - 1;
+
+    while (
+        (!selectedSubsession || selectedSubsession.simsessions.length == 0) &&
+        i >= 0
+    ) {
+        selectedSubsession = selectedSeason?.sessions[i--];
         subsessionId = selectedSubsession?.subsession_id?.toString() || '';
         simsessionId = '';
     }
@@ -104,6 +108,10 @@ async function fectchJsonData() {
     if (!selectedSimsession) {
         selectedSimsession = selectedSubsession?.simsessions[0];
         simsessionId = selectedSimsession?.simsession_id?.toString() || '';
+    }
+
+    if (!selectedSimsession) {
+        return;
     }
 
     props.value.simsessionType = selectedSimsession.type;
