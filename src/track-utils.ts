@@ -1,6 +1,7 @@
 import { getActiveLeagueSchedule, getTrackInfoDirectory } from './fetch-util';
 
 const _trackNames: { [name: string]: string } = {
+    '18': 'RA',
     '108': 'Watk', // retired
     '127': 'Atl',
     '149': 'Zand',

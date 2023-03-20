@@ -1,0 +1,72 @@
+{
+    "18": { "short_display": "RA", "display": "Road America" },
+    "108": {
+        "short_display": "WATK",
+        "display": "[Retired] Watkins Glen International"
+    },
+    "127": { "short_display": "RATL", "display": "Road Atlanta" },
+    "149": {
+        "short_display": "ZAND",
+        "display": "Circuit Park Zandvoort"
+    },
+    "163": {
+        "short_display": "SPA",
+        "display": "Circuit de Spa-Francorchamps"
+    },
+    "166": {
+        "short_display": "OKA",
+        "display": "Okayama International Circuit"
+    },
+    "168": {
+        "short_display": "SUZ",
+        "display": "Suzuka International Racing Course"
+    },
+    "179": {
+        "short_display": "LB",
+        "display": "Long Beach Street Circuit"
+    },
+    "195": { "short_display": "MOTE", "display": "Twin Ring Motegi" },
+    "212": {
+        "short_display": "INT",
+        "display": "Autódromo José Carlos Pace"
+    },
+    "218": {
+        "short_display": "CGV",
+        "display": "Circuit Gilles Villeneuve"
+    },
+    "229": {
+        "short_display": "COTA",
+        "display": "Circuit of the Americas"
+    },
+    "239": {
+        "short_display": "MONZ",
+        "display": "Autodromo Nazionale Monza"
+    },
+    "250": {
+        "short_display": "NUR",
+        "display": "Nürburgring Grand-Prix-Strecke"
+    },
+    "266": {
+        "short_display": "IMO",
+        "display": "Autodromo Internazionale Enzo e Dino Ferrari"
+    },
+    "341": { "short_display": "SLIV", "display": "Silverstone Circuit" },
+    "345": {
+        "short_display": "CAT",
+        "display": "Circuit de Barcelona Catalunya"
+    },
+    "390": {
+        "short_display": "HRNG",
+        "display": "Hockenheimring Baden-Württemberg"
+    },
+    "403": { "short_display": "RBR", "display": "Red Bull Ring" },
+    "413": { "short_display": "HUNG", "display": "Hungaroring" },
+    "434": {
+        "short_display": "WATK",
+        "display": "Watkins Glen International"
+    },
+    "448": {
+        "short_display": "INDI",
+        "display": "Indianapolis Motor Speedway"
+    }
+}
