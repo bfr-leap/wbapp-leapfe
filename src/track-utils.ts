@@ -25,6 +25,10 @@ const _trackNames: { [name: string]: string } = {
     '448': 'INDY',
 };
 
+const _longTrackNames: { [name: string]: string } = {
+    '18': 'Road America',
+};
+
 export function getshortTrackName(trackId: string): string {
     let ret = _trackNames[trackId];
 
@@ -46,6 +50,10 @@ export async function getTrackName(trackId: string): Promise<string> {
         if (name) {
             return name;
         }
+    }
+
+    if (_longTrackNames[trackId]) {
+        return _longTrackNames[trackId];
     }
 
     return `----`;

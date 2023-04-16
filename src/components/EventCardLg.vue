@@ -38,6 +38,8 @@ async function updateTimer() {
     sec %= 60;
     countdown.value = `${d} D  ${h} H  ${min} M  ${sec} S`;
 
+    console.log('here');
+
     trackName.value = await getTrackName(props.track_id);
 }
 watchEffect(fectchJsonData);
