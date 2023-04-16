@@ -4,6 +4,7 @@ import {
     scrapeLeague,
     scrapeMembersData,
     getEncounteredCustIds,
+    scrapeLapChartData,
 } from './iracing-scraper.js';
 
 (async () => {
@@ -12,4 +13,6 @@ import {
     await auth(username, password);
 
     await scrapeLeague(6555);
+
+    // await scrapeLapChartData(60701863, 0);
 })();

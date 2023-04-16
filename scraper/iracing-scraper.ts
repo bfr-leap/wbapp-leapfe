@@ -85,6 +85,7 @@ export async function scrapeLapChartData(
             _encounteredCustIds[c.cust_id] = c.cust_id;
         }
     } catch (e) {
+        console.log(e.response ? e.response.data : e);
         console.log(
             '            error on scrapeLapChartData: ',
             subsessionId,

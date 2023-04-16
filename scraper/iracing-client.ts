@@ -29,6 +29,8 @@ export async function clientGet(
     url: string,
     queryParams: { [name: string]: any } = {}
 ): Promise<any> {
+    // console.log('client request:: ', url, queryParams);
+
     await sleep(Math.random() * 1000);
 
     const params = new URLSearchParams();
@@ -40,14 +42,28 @@ export async function clientGet(
     let response: any = {};
 
     if (params.toString().length > 0) {
-        response = await client.get(`${url}?${params.toString()}`);
+        response = await client.get(`${url}?${params.toString()}`, {
+            headers: {
+                'Accept-Encoding': 'application/json',
+            },
+        });
     } else {
-        response = await client.get(url);
+        response = await client.get(url, {
+            headers: {
+                'Accept-Encoding': 'application/json',
+            },
+        });
     }
 
-    if (response.data && response.data.link) {
+    if (response.data && response.data.link !== undefined) {
         // lets go grab the cached result
-        return clientGet(response.data.link);
+
+        let sentinel = JSON.stringify(response.data.link, null, '    ');
+        if ('undefined' !== sentinel && undefined !== sentinel) {
+            // console.log(' lets go grab the cached result', sentinel);
+            let ret = await clientGet(response.data.link);
+            return ret;
+        }
     } else if (response.data && response.data.chunk_info) {
         // the bulk of the data is chucked, lets go get it
         let ci = response.data.chunk_info;
@@ -59,6 +75,7 @@ export async function clientGet(
             let newChunk: any[] = [];
 
             for (let chukName of response.data.chunk_info.chunk_file_names) {
+                // console.log('the bulk of the data is chucked, lets go get it');
                 let chunkFile = await clientGet(
                     response.data.chunk_info.base_download_url + chukName
                 );
