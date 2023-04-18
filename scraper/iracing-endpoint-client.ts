@@ -53,6 +53,7 @@ export async function getLapChartData(
     subsessionId: number,
     simsessionNumber: number
 ): Promise<LapChartData> {
+    // console.log('getting lap data from endpoint');
     let ret: LapChartData = <LapChartData>(
         await clientGet('/data/results/lap_chart_data', {
             subsession_id: subsessionId,

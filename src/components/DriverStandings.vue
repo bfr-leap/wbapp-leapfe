@@ -125,8 +125,13 @@ async function fectchJsonData() {
 
     let sortedM = _driverStatsMap
         ? _membersData?.members.sort((a, b) =>
-              _driverStatsMap[_seasonId][b.cust_id].power_points !==
-              _driverStatsMap[_seasonId][a.cust_id].power_points
+              !_driverStatsMap[_seasonId][b.cust_id] ||
+              !_driverStatsMap[_seasonId][a.cust_id]
+                  ? !_driverStatsMap[_seasonId][b.cust_id]
+                      ? -1
+                      : 1
+                  : _driverStatsMap[_seasonId][b.cust_id].power_points !==
+                    _driverStatsMap[_seasonId][a.cust_id].power_points
                   ? _driverStatsMap[_seasonId][b.cust_id].power_points -
                     _driverStatsMap[_seasonId][a.cust_id].power_points
                   : (getRoadLicense(b.licenses).irating | 0) -
@@ -148,7 +153,8 @@ async function fectchJsonData() {
 
         let dv: DriverView = {
             position: position,
-            points: _driverStatsMap[_seasonId][member.cust_id].power_points,
+            points: _driverStatsMap?.[_seasonId]?.[member.cust_id]
+                ?.power_points,
             ...memberView,
             showStats: false,
             custId: member.cust_id.toString(),

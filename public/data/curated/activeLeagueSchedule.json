@@ -54,17 +54,17 @@
                             "comment": "SUZUKA INTERNATIONAL RACING COURSE"
                         },
                         {
-                            "time": "April 23 2023 11:00:00 UTC-0500",
-                            "track_id": -1,
+                            "time": "April 23 2023 11:00:00 UTC-0400",
+                            "track_id": 18,
                             "comment": "ROAD AMERICA"
                         },
                         {
-                            "time": "April 30 2023 11:00:00 UTC-0500",
+                            "time": "April 30 2023 11:00:00 UTC-0400",
                             "track_id": 218,
                             "comment": "CIRCUIT GILLES VILLENEUVE"
                         },
                         {
-                            "time": "May 7 2023 11:00:00 UTC-0500",
+                            "time": "May 7 2023 11:00:00 UTC-0400",
                             "track_id": 212,
                             "comment": "AUTÓDROMO JOSÉ CARLOS PACE"
                         }
@@ -121,17 +121,17 @@
                             "comment": "SUZUKA INTERNATIONAL RACING COURSE"
                         },
                         {
-                            "time": "April 22 2023 11:00:00 UTC-0500",
-                            "track_id": -1,
+                            "time": "April 22 2023 11:00:00 UTC-0400",
+                            "track_id": 18,
                             "comment": "ROAD AMERICA"
                         },
                         {
-                            "time": "April 29 2023 11:00:00 UTC-0500",
+                            "time": "April 29 2023 11:00:00 UTC-0400",
                             "track_id": 218,
                             "comment": "CIRCUIT GILLES VILLENEUVE"
                         },
                         {
-                            "time": "May 6 2023 11:00:00 UTC-0500",
+                            "time": "May 6 2023 11:00:00 UTC-0400",
                             "track_id": 212,
                             "comment": "AUTÓDROMO JOSÉ CARLOS PACE"
                         }
