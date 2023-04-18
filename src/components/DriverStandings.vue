@@ -208,7 +208,6 @@ async function fectchJsonData() {
         teamsA = teamsA.filter((v) => v.position <= 3);
     }
 
-    console.log(teamsA);
     view.value.teams = teamsA;
 }
 watchEffect(fectchJsonData);
@@ -338,7 +337,7 @@ watch(props, fectchJsonData);
                     v-if="view.teams.length !== 0"
                     v-for="(team, i) in view.teams"
                 >
-                    <div class="row">
+                    <div v-if="team.teamId" class="row">
                         <div
                             class="col-2 justify-content-center d-flex d-sm-none text-center flex-column"
                         >

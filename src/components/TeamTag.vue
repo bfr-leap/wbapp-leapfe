@@ -2,7 +2,7 @@
 import { ref, watch, watchEffect } from 'vue';
 import type { Ref } from 'vue';
 import { getCuratedLeagueTeamsInfo, getSingleMemberData } from '@/fetch-util';
-import { getFirstLastNames } from './driverUtils';
+import { getFirstLastNames, getRoadLicense } from './driverUtils';
 
 const props = defineProps<{
     teamId: number;
@@ -19,21 +19,19 @@ interface TeamView {
 }
 
 let view: Ref<TeamView> = ref({
-    name: 'default name',
-    sof: '1.5k',
-    drivers: [
-        { lastname: 'Smith' },
-        { lastname: 'Miller' },
-        { lastname: 'Barry' },
-    ],
+    name: '----',
+    sof: '----',
+    drivers: [{ lastname: '----' }, { lastname: '----' }, { lastname: '----' }],
 });
 
 async function fetchData() {
+    // view.value.name = props.teamId + '';
+
+    console.log(props);
+
     if (!props.leagueId) return;
 
     let teams = await getCuratedLeagueTeamsInfo(props.leagueId);
-
-    let driverIds = [];
 
     for (let season of teams.seasons) {
         for (let team of season.teams) {
@@ -43,18 +41,31 @@ async function fetchData() {
                     sof: '',
                     drivers: [],
                 };
-                driverIds = team.team_members;
+                let driverIds = team.team_members;
+
+                let cumulativeIRating = 0;
 
                 for (let driverId of driverIds) {
                     let driver = await getSingleMemberData(driverId.toString());
+                    cumulativeIRating += getRoadLicense(
+                        driver.licenses
+                    ).irating;
                     view.value.drivers.push({
                         lastname: getFirstLastNames(driver.display_name)
                             .lastName,
                     });
                 }
-            }
 
-            return;
+                let averageRating = cumulativeIRating / driverIds.length;
+
+                view.value.sof =
+                    (averageRating / 1000).toFixed(0) +
+                    '.' +
+                    ((averageRating % 1000) / 100).toFixed(0) +
+                    'k';
+
+                return;
+            }
         }
     }
 }
@@ -67,17 +78,18 @@ watchEffect(fetchData);
                 <RouterLink
                     class="link-light"
                     v-if="leagueId && leagueId"
-                    v-bind:to="`?m=driver&league=${leagueId}&driver=${teamId}`"
+                    v-bind:to="`?m=team&league=${leagueId}&team=${teamId}`"
                     ><span class="last-name">{{ view.name }} </span></RouterLink
                 >
                 <template v-else>
                     <span class="last-name">{{ view.name }} </span>
                 </template>
-                <span>{{ view.sof }}</span>
+                <span>{{ ' ' + view.sof }}</span>
             </div>
             <div>
-                <span v-for="driver of view.drivers">{{
-                    driver.lastname + ' '
+                <span v-for="(driver, index) of view.drivers">{{
+                    driver.lastname +
+                    (index < view.drivers.length - 1 ? ',  ' : '')
                 }}</span>
             </div>
         </span>
