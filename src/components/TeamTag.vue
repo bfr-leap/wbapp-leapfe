@@ -32,6 +32,7 @@ async function fetchData() {
     if (!props.leagueId) return;
 
     let teams = await getCuratedLeagueTeamsInfo(props.leagueId);
+    let log = '';
 
     for (let season of teams.seasons) {
         for (let team of season.teams) {
@@ -47,19 +48,23 @@ async function fetchData() {
 
                 for (let driverId of driverIds) {
                     let driver = await getSingleMemberData(driverId.toString());
-                    cumulativeIRating += getRoadLicense(
-                        driver.licenses
-                    ).irating;
+                    let raiting = getRoadLicense(driver.licenses).irating;
+                    cumulativeIRating += raiting;
                     view.value.drivers.push({
                         lastname: getFirstLastNames(driver.display_name)
                             .lastName,
                     });
+
+                    log += `${driver.display_name} ${raiting}\n`;
                 }
 
                 let averageRating = cumulativeIRating / driverIds.length;
+                // console.log(log);
+                // console.log(averageRating);
+                // console.log('\n\n\n');
 
                 view.value.sof =
-                    (averageRating / 1000).toFixed(0) +
+                    Math.floor(averageRating / 1000).toFixed(0) +
                     '.' +
                     ((averageRating % 1000) / 100).toFixed(0) +
                     'k';
