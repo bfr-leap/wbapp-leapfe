@@ -25,10 +25,6 @@ let view: Ref<TeamView> = ref({
 });
 
 async function fetchData() {
-    // view.value.name = props.teamId + '';
-
-    console.log(props);
-
     if (!props.leagueId) return;
 
     let teams = await getCuratedLeagueTeamsInfo(props.leagueId);
