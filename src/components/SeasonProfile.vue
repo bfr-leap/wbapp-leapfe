@@ -1,8 +1,16 @@
 <script setup lang="ts">
 import { ref, watch, watchEffect } from 'vue';
 import type { Ref } from 'vue';
-import { getCuratedActiveLeagueSchedule } from '../fetch-util';
-import type { ActiveLeagueSchedule } from '@/iracing-endpoints';
+import {
+    getCuratedActiveLeagueSchedule,
+    getLeagueSimsessionIndex,
+    getLeagueSeasonSessions,
+} from '../fetch-util';
+import { getTrackName, guessTrackIdfromEventName } from '../track-utils';
+import type {
+    ActiveLeagueSchedule,
+    SeasonSimsessionIndex,
+} from '@/iracing-endpoints';
 import { useRoute } from 'vue-router';
 
 import EventCardLg from '../components/EventCardLg.vue';
@@ -14,16 +22,27 @@ const route = useRoute();
 
 interface ScheduleView {
     leagueName: string;
+    leagueId: string;
+    seasonId: string;
     nextRace: { trackId: string; date: string; isSelected: boolean };
     selectedRace: { trackId: string; date: string; isSelected: boolean };
     futureRaces: { trackId: string; date: string; isSelected: boolean }[];
+    pastRaces: {
+        sessionId: string;
+        trackId: string;
+        date: string;
+        isSelected: boolean;
+    }[];
 }
 
 let defaultVue: ScheduleView = {
     leagueName: '----',
+    leagueId: '0',
+    seasonId: '0',
     nextRace: { trackId: '0', date: '', isSelected: false },
     selectedRace: { trackId: '0', date: '', isSelected: false },
     futureRaces: [],
+    pastRaces: [],
 };
 
 let schedule: Ref<ScheduleView> = ref(JSON.parse(JSON.stringify(defaultVue)));
@@ -35,52 +54,81 @@ async function fectchJsonData() {
     schedule.value = JSON.parse(JSON.stringify(defaultVue));
     let now: number = new Date().getTime();
 
-    let s = await getCuratedActiveLeagueSchedule();
+    let curatedSchedule = await getCuratedActiveLeagueSchedule();
 
     leagueId.value = route.query.league as string;
     seasonId.value = route.query.season as string;
 
     if (!leagueId.value) {
-        leagueId.value = s.leagues[0].league_id.toString();
+        leagueId.value = curatedSchedule.leagues[0].league_id.toString();
     }
 
     if (!seasonId.value) {
-        seasonId.value = s.leagues[0].seasons[0].season_id.toString();
+        seasonId.value =
+            curatedSchedule.leagues[0].seasons[0].season_id.toString();
     }
 
-    let selectedLeague = s.leagues.find(
+    let curatedLeagueInfo = curatedSchedule.leagues.find(
         (l) => l.league_id.toString() === leagueId.value
     );
-    let selectedSeason = selectedLeague?.seasons.find(
+    let curatedSeasonInfo = curatedLeagueInfo?.seasons.find(
         (s) => s.season_id.toString() === seasonId.value
     );
 
-    if (!selectedLeague || !selectedSeason) {
-        schedule.value = JSON.parse(JSON.stringify(defaultVue));
-        return;
+    schedule.value.leagueId = seasonId.value;
+    schedule.value.seasonId = seasonId.value;
+
+    let leagueSeasonsSimsessionIndex = await getLeagueSimsessionIndex(
+        leagueId.value
+    );
+
+    let seasonSimsessions = leagueSeasonsSimsessionIndex.find(
+        (s) => s.season_id.toString() === seasonId.value
+    );
+
+    let leagueSeasonSessions = await getLeagueSeasonSessions(
+        leagueId.value,
+        seasonId.value
+    );
+
+    if (seasonSimsessions) {
+        for (let session of leagueSeasonSessions.sessions) {
+            session.track.track_id;
+            session.launch_at;
+
+            schedule.value.pastRaces.push({
+                trackId: session.track.track_id.toString(),
+                date: session.launch_at,
+                isSelected: false,
+                sessionId: session.subsession_id.toString(),
+            });
+        }
     }
 
-    carId.value = selectedSeason.car_id.toString();
+    if (curatedSeasonInfo) {
+        carId.value = curatedSeasonInfo.car_id.toString();
 
-    let events = selectedSeason.events
-        .filter((e) => new Date(e.time).getTime() > now)
-        .filter((v, i) => i < 4);
+        let events = curatedSeasonInfo.events
+            .filter((e) => new Date(e.time).getTime() > now)
+            .filter((v, i) => i < 4);
 
-    schedule.value.nextRace = schedule.value.selectedRace = {
-        trackId: events[0].track_id.toString(),
-        date: events[0].time,
-        isSelected: true,
-    };
+        schedule.value.nextRace = schedule.value.selectedRace = {
+            trackId: events[0].track_id.toString(),
+            date: events[0].time,
+            isSelected: true,
+        };
 
-    schedule.value.futureRaces = [];
-    for (let i = 1; i < events.length; ++i) {
-        schedule.value.futureRaces.push({
-            trackId: events[i].track_id.toString(),
-            date: events[i].time,
-            isSelected: false,
-        });
+        schedule.value.futureRaces = [];
+        for (let i = 1; i < events.length; ++i) {
+            schedule.value.futureRaces.push({
+                trackId: events[i].track_id.toString(),
+                date: events[i].time,
+                isSelected: false,
+            });
+        }
     }
 }
+
 watchEffect(fectchJsonData);
 watch(route, fectchJsonData);
 
@@ -115,12 +163,45 @@ function onClick(eventInfo: { trackId: string; date: string }) {
 
 <template>
     <LeagueSeasonMenu
-        target-page=""
+        target-page="season"
         v-bind:league="leagueId"
         v-bind:season="seasonId"
     />
 
     <div class="card bg-dark text-light m-2">
+        <div class="card-body p-2">
+            <div class="container">
+                <div class="row g-1">
+                    <div class="col-12">
+                        <!-- <div class="col-12 col-sm-3 col-lg-3"> -->
+                        <!-- asdf   row g-1 flex-sm-column h-100 -->
+                        <div class="row g-1 h-100">
+                            <div v-for="race in schedule.pastRaces" class="col">
+                                <RouterLink
+                                    style="text-decoration: none"
+                                    class="link-light"
+                                    v-bind:to="`?m=results&league=${schedule.leagueId}&season=${schedule.seasonId}&subsession=${race.sessionId}&simsession=0`"
+                                >
+                                    <EventCardSm
+                                        class="h-100"
+                                        v-bind:track_id="race.trackId"
+                                        v-bind:is_next="false"
+                                        v-bind:date="new Date(race.date)"
+                                        v-bind:is_selected="race.isSelected"
+                                    ></EventCardSm>
+                                </RouterLink>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div
+        v-if="schedule.nextRace.date !== ''"
+        class="card bg-dark text-light m-2"
+    >
         <div class="card-body p-2">
             <div class="container">
                 <div v-if="schedule.nextRace.date !== ''" class="row g-1">
@@ -178,18 +259,4 @@ function onClick(eventInfo: { trackId: string; date: string }) {
         v-bind:season="seasonId"
         v-bind:league="leagueId"
     />
-
-    <div class="card bg-dark text-light m-2">
-        <div class="card-body p-2">
-            <div class="container">
-                <div>
-                    <RouterLink
-                        class="link-light"
-                        v-bind:to="`?m=season&league=${leagueId}&season=${seasonId}`"
-                        >See More Season Details</RouterLink
-                    >
-                </div>
-            </div>
-        </div>
-    </div>
 </template>

@@ -2,7 +2,7 @@
 import { RouterLink } from 'vue-router';
 import { ref, watchEffect, watch } from 'vue';
 import type { Ref } from 'vue';
-import { getLeagueSeasons, getBlockedSeasons } from '@/fetch-util';
+import { getLeagueSeasons, getCuratedBlockedSeasons } from '@/fetch-util';
 
 const props = defineProps<{
     league: string;
@@ -21,7 +21,7 @@ let seasonOptions: Ref<{
 });
 
 async function fectchJsonData() {
-    let blockedSeasons = await getBlockedSeasons();
+    let blockedSeasons = await getCuratedBlockedSeasons();
     let leagueSeasons = await getLeagueSeasons(props.league);
 
     let currentSeason = leagueSeasons.seasons.find(

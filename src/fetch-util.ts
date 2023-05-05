@@ -105,13 +105,13 @@ export async function getLeagueSeasons(
     );
 }
 
-export async function getBlockedSeasons(): Promise<BlockedSeasons> {
+export async function getCuratedBlockedSeasons(): Promise<BlockedSeasons> {
     return await fetchCachedObject<BlockedSeasons>(
         `./data/curated/blockedSeasons.json`
     );
 }
 
-export async function getActiveLeagueSchedule(): Promise<ActiveLeagueSchedule> {
+export async function getCuratedActiveLeagueSchedule(): Promise<ActiveLeagueSchedule> {
     return await fetchCachedObject<ActiveLeagueSchedule>(
         `./data/curated/activeLeagueSchedule.json`
     );

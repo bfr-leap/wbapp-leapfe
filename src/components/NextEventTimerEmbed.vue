@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, watchEffect } from 'vue';
 import type { Ref } from 'vue';
-import { getActiveLeagueSchedule } from '../fetch-util';
+import { getCuratedActiveLeagueSchedule } from '../fetch-util';
 import { useRoute } from 'vue-router';
 
 import EventCardLg from '../components/EventCardLg.vue';
@@ -31,7 +31,7 @@ let carId: Ref<string> = ref('');
 async function fectchJsonData() {
     let now: number = new Date().getTime();
 
-    let s = await getActiveLeagueSchedule();
+    let s = await getCuratedActiveLeagueSchedule();
 
     leagueId.value = route.query.league as string;
     seasonId.value = route.query.season as string;

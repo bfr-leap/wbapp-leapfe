@@ -207,7 +207,6 @@ async function fectchJsonData() {
         teamsA = teamsA.filter((v) => v.position <= 3);
     }
 
-    console.log(teamsA);
     view.value.teams = teamsA;
 }
 watchEffect(fectchJsonData);

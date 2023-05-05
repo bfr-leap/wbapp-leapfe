@@ -7,6 +7,7 @@ import DriverStandingsView from '../components/DriverStandingsView.vue';
 import DriverView from '../components/DriverView.vue';
 import TrackResultsView from '../components/TrackResultsView.vue';
 import NextEventTimerEmbed from '@/components/NextEventTimerEmbed.vue';
+import SeasonProfile from '@/components/SeasonProfile.vue';
 import { watch } from 'vue';
 import mixpanel from 'mixpanel-browser';
 
@@ -28,5 +29,7 @@ watch(() => route.params, track);
     ></DriverStandingsView>
     <DriverView v-if="route.query.m === 'driver'"></DriverView>
     <TrackResultsView v-if="route.query.m === 'track'"></TrackResultsView>
+    <SeasonProfile v-if="route.query.m === 'season'" />
+
     <NextEventTimerEmbed v-if="route.query.m === 'nextEventTimerEmbed'" />
 </template>
