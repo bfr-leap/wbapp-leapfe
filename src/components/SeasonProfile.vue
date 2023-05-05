@@ -6,6 +6,7 @@ import {
     getLeagueSimsessionIndex,
     getLeagueSeasonSessions,
 } from '../fetch-util';
+import GenericTable from './GenericTable.vue';
 import { getTrackName, guessTrackIdfromEventName } from '../track-utils';
 import type {
     ActiveLeagueSchedule,
@@ -17,6 +18,7 @@ import EventCardLg from '../components/EventCardLg.vue';
 import EventCardSm from '../components/EventCardSm.vue';
 import DriverStandings from '../components/DriverStandings.vue';
 import LeagueSeasonMenu from '../components/LeagueSeasonMenu.vue';
+import { getSessionStats } from '@/results-util';
 
 const route = useRoute();
 
@@ -33,6 +35,9 @@ interface ScheduleView {
         date: string;
         isSelected: boolean;
     }[];
+    stats: {
+        [name: string]: string;
+    }[];
 }
 
 let defaultVue: ScheduleView = {
@@ -43,6 +48,7 @@ let defaultVue: ScheduleView = {
     selectedRace: { trackId: '0', date: '', isSelected: false },
     futureRaces: [],
     pastRaces: [],
+    stats: [],
 };
 
 let schedule: Ref<ScheduleView> = ref(JSON.parse(JSON.stringify(defaultVue)));
@@ -92,6 +98,11 @@ async function fectchJsonData() {
     );
 
     if (seasonSimsessions) {
+        let roundNum = 0;
+        let totalParticipation = 0;
+        let totalLaps = 0;
+        let totalIncidents = 0;
+        let totalIpL = 0;
         for (let session of leagueSeasonSessions.sessions) {
             session.track.track_id;
             session.launch_at;
@@ -102,7 +113,39 @@ async function fectchJsonData() {
                 isSelected: false,
                 sessionId: session.subsession_id.toString(),
             });
+
+            let sessionStats = await getSessionStats(
+                leagueId.value,
+                seasonId.value,
+                session.subsession_id.toString()
+            );
+
+            if (sessionStats.race_number_of_laps > 0) {
+                totalParticipation += sessionStats.race_participants;
+                totalLaps += sessionStats.race_number_of_laps;
+                totalIncidents += sessionStats.race_incident_count;
+                schedule.value.stats.push({
+                    session: `R${++roundNum}`,
+                    number_of_participants:
+                        sessionStats.race_participants.toString(),
+                    number_of_laps: sessionStats.race_number_of_laps.toString(),
+                    number_of_incidents:
+                        sessionStats.race_incident_count.toString(),
+                    incidents_per_lap: (
+                        sessionStats.race_incident_count /
+                        sessionStats.race_number_of_laps
+                    ).toFixed(2),
+                });
+            }
         }
+
+        schedule.value.stats.push({
+            session: `total/average`,
+            number_of_participants: (totalParticipation / roundNum).toFixed(2),
+            number_of_laps: totalLaps.toString(),
+            number_of_incidents: totalIncidents.toString(),
+            incidents_per_lap: (totalIncidents / totalLaps).toFixed(2),
+        });
     }
 
     if (curatedSeasonInfo) {
@@ -167,6 +210,19 @@ function onClick(eventInfo: { trackId: string; date: string }) {
         v-bind:league="leagueId"
         v-bind:season="seasonId"
     />
+
+    <div class="card bg-dark text-light m-2">
+        <div class="card-body p-2">
+            <!-- <TrackBanner v-bind:track-id="props.trackId" /> -->
+            <div style="height: 2em"></div>
+            <div class="container">
+                <div class="row">
+                    <GenericTable title="Season Stats" :rows="schedule.stats" />
+                </div>
+                <div style="height: 2em"></div>
+            </div>
+        </div>
+    </div>
 
     <div class="card bg-dark text-light m-2">
         <div class="card-body p-2">
