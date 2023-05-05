@@ -3,7 +3,10 @@ import { RouterLink } from 'vue-router';
 import { ref, watchEffect } from 'vue';
 import type { Ref } from 'vue';
 import type { SeasonSimsessionIndex } from '../iracing-endpoints';
-import { getBlockedSeasons, getLeagueSimsessionIndex } from '@/fetch-util';
+import {
+    getCuratedBlockedSeasons,
+    getLeagueSimsessionIndex,
+} from '@/fetch-util';
 
 const props = defineProps<{
     leagueId: string;
@@ -48,7 +51,7 @@ async function fectchJsonData() {
 
     let seasonSimsessionIndex: SeasonSimsessionIndex[];
 
-    let blockedSeasons = await getBlockedSeasons();
+    let blockedSeasons = await getCuratedBlockedSeasons();
 
     seasonSimsessionIndex = seasons.value = await getLeagueSimsessionIndex(
         leagueId

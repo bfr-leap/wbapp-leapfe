@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, watchEffect } from 'vue';
 import type { Ref } from 'vue';
-import { getActiveLeagueSchedule } from '../fetch-util';
+import { getCuratedActiveLeagueSchedule } from '../fetch-util';
 import type { ActiveLeagueSchedule } from '@/iracing-endpoints';
 import { useRoute } from 'vue-router';
 
@@ -19,7 +19,7 @@ interface ScheduleView {
     futureRaces: { trackId: string; date: string; isSelected: boolean }[];
 }
 
-let defaultVue = {
+let defaultVue: ScheduleView = {
     leagueName: '----',
     nextRace: { trackId: '0', date: '', isSelected: false },
     selectedRace: { trackId: '0', date: '', isSelected: false },
@@ -32,9 +32,10 @@ let seasonId: Ref<string> = ref('');
 let carId: Ref<string> = ref('');
 
 async function fectchJsonData() {
+    schedule.value = JSON.parse(JSON.stringify(defaultVue));
     let now: number = new Date().getTime();
 
-    let s = await getActiveLeagueSchedule();
+    let s = await getCuratedActiveLeagueSchedule();
 
     leagueId.value = route.query.league as string;
     seasonId.value = route.query.season as string;
@@ -177,4 +178,18 @@ function onClick(eventInfo: { trackId: string; date: string }) {
         v-bind:season="seasonId"
         v-bind:league="leagueId"
     />
+
+    <div class="card bg-dark text-light m-2">
+        <div class="card-body p-2">
+            <div class="container">
+                <div>
+                    <RouterLink
+                        class="link-light"
+                        v-bind:to="`?m=season&league=${leagueId}&season=${seasonId}`"
+                        >See More Season Details</RouterLink
+                    >
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
