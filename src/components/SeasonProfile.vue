@@ -14,6 +14,7 @@ import type {
 } from '@/iracing-endpoints';
 import { useRoute } from 'vue-router';
 
+import BarChart from './BarChart.vue';
 import EventCardLg from '../components/EventCardLg.vue';
 import EventCardSm from '../components/EventCardSm.vue';
 import DriverStandings from '../components/DriverStandings.vue';
@@ -55,6 +56,27 @@ let schedule: Ref<ScheduleView> = ref(JSON.parse(JSON.stringify(defaultVue)));
 let leagueId: Ref<string> = ref('');
 let seasonId: Ref<string> = ref('');
 let carId: Ref<string> = ref('');
+const barChartData: Ref<{ name: string; value: number }[] | null> = ref(null);
+
+function getChartDataFromStats(
+    stat: string
+): { name: string; value: number }[] {
+    let data: { name: string; value: number }[] = [];
+
+    let round = 1;
+
+    for (let row of schedule.value.stats) {
+        data.push({
+            name: `R${round++}`,
+            value: Number.parseFloat(row[stat]),
+        });
+    }
+
+    // the last data item is the total/average, remove it
+    data.pop();
+
+    return data;
+}
 
 async function fectchJsonData() {
     schedule.value = JSON.parse(JSON.stringify(defaultVue));
@@ -220,6 +242,41 @@ function onClick(eventInfo: { trackId: string; date: string }) {
                     <GenericTable title="Season Stats" :rows="schedule.stats" />
                 </div>
                 <div style="height: 2em"></div>
+                <div class="row"></div>
+                <div class="row">
+                    <div class="col-12 m-auto">
+                        {{ 'incidents_per_lap'.replaceAll('_', ' ') }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 m-auto">
+                        <BarChart
+                            v-if="
+                                getChartDataFromStats('incidents_per_lap')
+                                    .length
+                            "
+                            :data="getChartDataFromStats('incidents_per_lap')"
+                        />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 m-auto">
+                        {{ 'number_of_participants'.replaceAll('_', ' ') }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 m-auto">
+                        <BarChart
+                            v-if="
+                                getChartDataFromStats('number_of_participants')
+                                    .length
+                            "
+                            :data="
+                                getChartDataFromStats('number_of_participants')
+                            "
+                        />
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -227,10 +284,9 @@ function onClick(eventInfo: { trackId: string; date: string }) {
     <div class="card bg-dark text-light m-2">
         <div class="card-body p-2">
             <div class="container">
+                <div>Past Events:</div>
                 <div class="row g-1">
                     <div class="col-12">
-                        <!-- <div class="col-12 col-sm-3 col-lg-3"> -->
-                        <!-- asdf   row g-1 flex-sm-column h-100 -->
                         <div class="row g-1 h-100">
                             <div v-for="race in schedule.pastRaces" class="col">
                                 <RouterLink
@@ -260,6 +316,7 @@ function onClick(eventInfo: { trackId: string; date: string }) {
     >
         <div class="card-body p-2">
             <div class="container">
+                <div>Future Events:</div>
                 <div v-if="schedule.nextRace.date !== ''" class="row g-1">
                     <div class="col-12 col-sm-3 col-lg-2">
                         <div class="row g-1 flex-sm-column h-100">

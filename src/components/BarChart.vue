@@ -102,12 +102,13 @@ function redrawAxis() {
         // add y axis
         const yAxisSelection = d3.select(yAxis.value);
         yAxisSelection.html('');
+        minBarHeight.value = Math.max(...data.map((d) => d.value)) / 100;
         scaleY.value = d3
             .scaleLinear()
             .domain([
                 0,
                 Math.max(
-                    minBarHeight.value * 100,
+                    minBarHeight.value,
                     Math.max(...data.map((d) => d.value))
                 ),
             ])
