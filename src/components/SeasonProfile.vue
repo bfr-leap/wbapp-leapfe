@@ -136,12 +136,14 @@ async function fectchJsonData() {
                 session.track.track_id;
                 session.launch_at;
 
-                schedule.value.pastRaces.push({
-                    trackId: session.track.track_id.toString(),
-                    date: session.launch_at,
-                    isSelected: false,
-                    sessionId: session.subsession_id.toString(),
-                });
+                if (split === 'Overall') {
+                    schedule.value.pastRaces.push({
+                        trackId: session.track.track_id.toString(),
+                        date: session.launch_at,
+                        isSelected: false,
+                        sessionId: session.subsession_id.toString(),
+                    });
+                }
 
                 let sessionStats = await getSessionStats(
                     leagueId.value,
@@ -245,7 +247,6 @@ function onClick(eventInfo: { trackId: string; date: string }) {
         v-bind:season="seasonId"
     />
 
-    <!-- statSplit -->
     <template v-for="split in statSplit">
         <div class="card bg-dark text-light m-2">
             <div class="card-body p-2">
