@@ -37,8 +37,10 @@ interface ScheduleView {
         isSelected: boolean;
     }[];
     stats: {
-        [name: string]: string;
-    }[];
+        [name: string]: {
+            [name: string]: string;
+        }[];
+    };
 }
 
 let defaultVue: ScheduleView = {
@@ -49,23 +51,26 @@ let defaultVue: ScheduleView = {
     selectedRace: { trackId: '0', date: '', isSelected: false },
     futureRaces: [],
     pastRaces: [],
-    stats: [],
+    stats: { Overall: [], Race: [], Sprint: [] },
 };
 
 let schedule: Ref<ScheduleView> = ref(JSON.parse(JSON.stringify(defaultVue)));
 let leagueId: Ref<string> = ref('');
 let seasonId: Ref<string> = ref('');
 let carId: Ref<string> = ref('');
+const chartFields = ['incidents_per_lap', 'number_of_participants'];
+const statSplit = ['Overall', 'Race', 'Sprint'];
 const barChartData: Ref<{ name: string; value: number }[] | null> = ref(null);
 
 function getChartDataFromStats(
-    stat: string
+    stat: string,
+    split: string
 ): { name: string; value: number }[] {
     let data: { name: string; value: number }[] = [];
 
     let round = 1;
 
-    for (let row of schedule.value.stats) {
+    for (let row of schedule.value.stats[split]) {
         data.push({
             name: `R${round++}`,
             value: Number.parseFloat(row[stat]),
@@ -120,54 +125,61 @@ async function fectchJsonData() {
     );
 
     if (seasonSimsessions) {
-        let roundNum = 0;
-        let totalParticipation = 0;
-        let totalLaps = 0;
-        let totalIncidents = 0;
-        let totalIpL = 0;
-        for (let session of leagueSeasonSessions.sessions) {
-            session.track.track_id;
-            session.launch_at;
+        for (let split of statSplit) {
+            let roundNum = 0;
+            let totalParticipation = 0;
+            let totalLaps = 0;
+            let totalIncidents = 0;
+            let totalIpL = 0;
 
-            schedule.value.pastRaces.push({
-                trackId: session.track.track_id.toString(),
-                date: session.launch_at,
-                isSelected: false,
-                sessionId: session.subsession_id.toString(),
-            });
+            for (let session of leagueSeasonSessions.sessions) {
+                session.track.track_id;
+                session.launch_at;
 
-            let sessionStats = await getSessionStats(
-                leagueId.value,
-                seasonId.value,
-                session.subsession_id.toString()
-            );
-
-            if (sessionStats.race_number_of_laps > 0) {
-                totalParticipation += sessionStats.race_participants;
-                totalLaps += sessionStats.race_number_of_laps;
-                totalIncidents += sessionStats.race_incident_count;
-                schedule.value.stats.push({
-                    session: `R${++roundNum}`,
-                    number_of_participants:
-                        sessionStats.race_participants.toString(),
-                    number_of_laps: sessionStats.race_number_of_laps.toString(),
-                    number_of_incidents:
-                        sessionStats.race_incident_count.toString(),
-                    incidents_per_lap: (
-                        sessionStats.race_incident_count /
-                        sessionStats.race_number_of_laps
-                    ).toFixed(2),
+                schedule.value.pastRaces.push({
+                    trackId: session.track.track_id.toString(),
+                    date: session.launch_at,
+                    isSelected: false,
+                    sessionId: session.subsession_id.toString(),
                 });
-            }
-        }
 
-        schedule.value.stats.push({
-            session: `total/average`,
-            number_of_participants: (totalParticipation / roundNum).toFixed(2),
-            number_of_laps: totalLaps.toString(),
-            number_of_incidents: totalIncidents.toString(),
-            incidents_per_lap: (totalIncidents / totalLaps).toFixed(2),
-        });
+                let sessionStats = await getSessionStats(
+                    leagueId.value,
+                    seasonId.value,
+                    session.subsession_id.toString(),
+                    split
+                );
+
+                if (sessionStats.race_number_of_laps > 0) {
+                    totalParticipation += sessionStats.race_participants;
+                    totalLaps += sessionStats.race_number_of_laps;
+                    totalIncidents += sessionStats.race_incident_count;
+                    schedule.value.stats[split].push({
+                        session: `R${++roundNum}`,
+                        number_of_participants:
+                            sessionStats.race_participants.toString(),
+                        number_of_laps:
+                            sessionStats.race_number_of_laps.toString(),
+                        number_of_incidents:
+                            sessionStats.race_incident_count.toString(),
+                        incidents_per_lap: (
+                            sessionStats.race_incident_count /
+                            sessionStats.race_number_of_laps
+                        ).toFixed(2),
+                    });
+                }
+            }
+
+            schedule.value.stats[split].push({
+                session: `total/average`,
+                number_of_participants: (totalParticipation / roundNum).toFixed(
+                    2
+                ),
+                number_of_laps: totalLaps.toString(),
+                number_of_incidents: totalIncidents.toString(),
+                incidents_per_lap: (totalIncidents / totalLaps).toFixed(2),
+            });
+        }
     }
 
     if (curatedSeasonInfo) {
@@ -233,53 +245,41 @@ function onClick(eventInfo: { trackId: string; date: string }) {
         v-bind:season="seasonId"
     />
 
-    <div class="card bg-dark text-light m-2">
-        <div class="card-body p-2">
-            <!-- <TrackBanner v-bind:track-id="props.trackId" /> -->
-            <div style="height: 2em"></div>
-            <div class="container">
-                <div class="row">
-                    <GenericTable title="Season Stats" :rows="schedule.stats" />
-                </div>
+    <!-- statSplit -->
+    <template v-for="split in statSplit">
+        <div class="card bg-dark text-light m-2">
+            <div class="card-body p-2">
                 <div style="height: 2em"></div>
-                <div class="row"></div>
-                <div class="row">
-                    <div class="col-12 m-auto">
-                        {{ 'incidents_per_lap'.replaceAll('_', ' ') }}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-12 m-auto">
-                        <BarChart
-                            v-if="
-                                getChartDataFromStats('incidents_per_lap')
-                                    .length
-                            "
-                            :data="getChartDataFromStats('incidents_per_lap')"
+                <div class="container">
+                    <div class="row">
+                        <GenericTable
+                            :title="`Season Stats - ${split}`"
+                            :rows="schedule.stats[split]"
                         />
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-12 m-auto">
-                        {{ 'number_of_participants'.replaceAll('_', ' ') }}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-12 m-auto">
-                        <BarChart
-                            v-if="
-                                getChartDataFromStats('number_of_participants')
-                                    .length
-                            "
-                            :data="
-                                getChartDataFromStats('number_of_participants')
-                            "
-                        />
-                    </div>
+                    <div style="height: 2em"></div>
+                    <div class="row"></div>
+                    <template v-for="field in chartFields">
+                        <div class="row">
+                            <div class="col-12 m-auto">
+                                {{ field.replaceAll('_', ' ') }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 m-auto">
+                                <BarChart
+                                    v-if="
+                                        getChartDataFromStats(field, split)
+                                            .length
+                                    "
+                                    :data="getChartDataFromStats(field, split)"
+                                />
+                            </div></div
+                    ></template>
                 </div>
             </div>
         </div>
-    </div>
+    </template>
 
     <div class="card bg-dark text-light m-2">
         <div class="card-body p-2">
