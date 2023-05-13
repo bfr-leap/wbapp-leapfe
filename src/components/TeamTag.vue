@@ -10,6 +10,7 @@ const props = defineProps<{
 }>();
 interface DriverView {
     lastname: string;
+    driverId: string;
 }
 
 interface TeamView {
@@ -21,16 +22,39 @@ interface TeamView {
 let view: Ref<TeamView> = ref({
     name: '----',
     sof: '----',
-    drivers: [{ lastname: '----' }, { lastname: '----' }, { lastname: '----' }],
+    drivers: [
+        { lastname: '----', driverId: '' },
+        { lastname: '----', driverId: '' },
+        { lastname: '----', driverId: '' },
+    ],
 });
+
+async function sortDriverIdsByIRating(driverIds: string[]) {
+    let driverIRatings: { [name: string]: number } = {};
+
+    for (let driverId of driverIds) {
+        let driver = await getSingleMemberData(driverId.toString());
+        let raiting = getRoadLicense(driver.licenses).irating;
+        driverIRatings[driverId] = raiting;
+    }
+
+    let sortedDriverIds = driverIds.sort((a, b) => {
+        return driverIRatings[b] - driverIRatings[a];
+    });
+
+    return sortedDriverIds;
+}
 
 async function fetchData() {
     if (!props.leagueId) return;
 
     let teams = await getCuratedLeagueTeamsInfo(props.leagueId);
-    let log = '';
 
-    for (let season of teams.seasons) {
+    let sortedSeasons = teams.seasons.sort((a, b) => {
+        return b.season_id - a.season_id;
+    });
+
+    for (let season of sortedSeasons) {
         for (let team of season.teams) {
             if (team.team_id === props.teamId) {
                 view.value = {
@@ -38,7 +62,9 @@ async function fetchData() {
                     sof: '',
                     drivers: [],
                 };
-                let driverIds = team.team_members;
+                let driverIds = await sortDriverIdsByIRating(
+                    team.team_members.map((v) => v.toString())
+                );
 
                 let cumulativeIRating = 0;
 
@@ -49,15 +75,11 @@ async function fetchData() {
                     view.value.drivers.push({
                         lastname: getFirstLastNames(driver.display_name)
                             .lastName,
+                        driverId: driverId,
                     });
-
-                    log += `${driver.display_name} ${raiting}\n`;
                 }
 
                 let averageRating = cumulativeIRating / driverIds.length;
-                // console.log(log);
-                // console.log(averageRating);
-                // console.log('\n\n\n');
 
                 view.value.sof =
                     Math.floor(averageRating / 1000).toFixed(0) +
@@ -88,10 +110,16 @@ watchEffect(fetchData);
                 <span>{{ ' ' + view.sof }}</span>
             </div>
             <div>
-                <span v-for="(driver, index) of view.drivers">{{
-                    driver.lastname +
-                    (index < view.drivers.length - 1 ? ',  ' : '')
-                }}</span>
+                <span v-for="(driver, index) of view.drivers"
+                    ><RouterLink
+                        class="link-light text-decoration-none"
+                        v-bind:to="`?m=driver&league=${leagueId}&driver=${driver.driverId}`"
+                        >{{
+                            driver.lastname +
+                            (index < view.drivers.length - 1 ? ',  ' : '')
+                        }}</RouterLink
+                    ></span
+                >
             </div>
         </span>
     </div>

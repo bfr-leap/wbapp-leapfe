@@ -284,6 +284,7 @@ watch(props, fectchJsonData);
                                 v-bind:teamName="member.teamName"
                                 v-bind:clubId="member.clubId"
                                 v-bind:driverId="member.custId"
+                                v-bind:teamId="member.teamId?.toString()"
                                 v-bind:leagueId="props.league"
                             />
                         </div>

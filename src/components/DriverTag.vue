@@ -9,6 +9,7 @@ const props = defineProps<{
     teamName: string;
     driverId?: string;
     leagueId?: string;
+    teamId?: string;
 }>();
 </script>
 
@@ -39,7 +40,14 @@ const props = defineProps<{
                     {{ props.safetyRating }}</span
                 >
             </div>
-            <div>{{ props.teamName }}</div>
+            <div>
+                <RouterLink
+                    v-if="leagueId && teamId"
+                    class="link-light text-decoration-none"
+                    v-bind:to="`?m=team&league=${props.leagueId}&team=${props.teamId}`"
+                    >{{ props.teamName }}</RouterLink
+                ><span v-else>{{ props.teamName }}</span>
+            </div>
         </span>
     </div>
 </template>
