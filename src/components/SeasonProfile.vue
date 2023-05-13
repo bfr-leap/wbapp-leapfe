@@ -247,45 +247,10 @@ function onClick(eventInfo: { trackId: string; date: string }) {
         v-bind:season="seasonId"
     />
 
-    <template v-for="split in statSplit">
-        <div class="card bg-dark text-light m-2">
-            <div class="card-body p-2">
-                <div style="height: 2em"></div>
-                <div class="container">
-                    <div class="row">
-                        <GenericTable
-                            :title="`Season Stats - ${split}`"
-                            :rows="schedule.stats[split]"
-                        />
-                    </div>
-                    <div style="height: 2em"></div>
-                    <div class="row"></div>
-                    <template v-for="field in chartFields">
-                        <div class="row">
-                            <div class="col-12 m-auto">
-                                {{ field.replaceAll('_', ' ') }}
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12 m-auto">
-                                <BarChart
-                                    v-if="
-                                        getChartDataFromStats(field, split)
-                                            .length
-                                    "
-                                    :data="getChartDataFromStats(field, split)"
-                                />
-                            </div></div
-                    ></template>
-                </div>
-            </div>
-        </div>
-    </template>
-
     <div class="card bg-dark text-light m-2">
         <div class="card-body p-2">
             <div class="container">
-                <div>Past Events:</div>
+                <div>Past Events</div>
                 <div class="row g-1">
                     <div class="col-12">
                         <div class="row g-1 h-100">
@@ -311,13 +276,171 @@ function onClick(eventInfo: { trackId: string; date: string }) {
         </div>
     </div>
 
+    <template v-for="split in statSplit">
+        <div class="card bg-dark text-light m-2">
+            <div class="card-body p-2">
+                <div class="row">
+                    <div class="col-12 m-auto">{{ split }} Stats</div>
+                </div>
+                <div style="height: 1em"></div>
+                <ul class="nav nav-pills">
+                    <li class="nav-item dropdown">
+                        <a
+                            class="nav-link dropdown-toggle active show"
+                            data-bs-toggle="dropdown"
+                            href="#"
+                            role="button"
+                            aria-expanded="false"
+                            >Charts</a
+                        >
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a
+                                    class="dropdown-item active"
+                                    data-bs-toggle="tab"
+                                    v-bind:data-bs-target="`#nav-inc-chart-${split}`"
+                                    href="#"
+                                >
+                                    Incidents per Lap
+                                </a>
+                            </li>
+                            <li>
+                                <a
+                                    class="dropdown-item"
+                                    data-bs-toggle="tab"
+                                    v-bind:data-bs-target="`#nav-par-chart-${split}`"
+                                    href="#"
+                                >
+                                    Number of Participants
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a
+                            class="nav-link dropdown-toggle"
+                            data-bs-toggle="dropdown"
+                            href="#"
+                            role="button"
+                            aria-expanded="false"
+                            >Tables</a
+                        >
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a
+                                    class="dropdown-item"
+                                    data-bs-toggle="tab"
+                                    v-bind:data-bs-target="`#nav-sts-table-${split}`"
+                                    href="#"
+                                >
+                                    Season Stats
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <div style="height: 2em"></div>
+                <div class="container">
+                    <div class="tab-content" id="nav-tabContent">
+                        <div
+                            class="tab-pane fade show active"
+                            v-bind:id="`nav-inc-chart-${split}`"
+                            role="tabpanel"
+                            aria-labelledby="nav-home-tab"
+                            tabindex="0"
+                        >
+                            <div class="row">
+                                <div class="col-12 m-auto">
+                                    {{
+                                        'incidents_per_lap'.replaceAll('_', ' ')
+                                    }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 m-auto">
+                                    <BarChart
+                                        v-if="
+                                            getChartDataFromStats(
+                                                'incidents_per_lap',
+                                                split
+                                            ).length
+                                        "
+                                        :data="
+                                            getChartDataFromStats(
+                                                'incidents_per_lap',
+                                                split
+                                            )
+                                        "
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            class="tab-pane fade"
+                            v-bind:id="`nav-par-chart-${split}`"
+                            role="tabpanel"
+                            aria-labelledby="nav-home-tab"
+                            tabindex="0"
+                        >
+                            <div class="row">
+                                <div class="col-12 m-auto">
+                                    {{
+                                        'number_of_participants'.replaceAll(
+                                            '_',
+                                            ' '
+                                        )
+                                    }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 m-auto">
+                                    <BarChart
+                                        v-if="
+                                            getChartDataFromStats(
+                                                'number_of_participants',
+                                                split
+                                            ).length
+                                        "
+                                        :data="
+                                            getChartDataFromStats(
+                                                'number_of_participants',
+                                                split
+                                            )
+                                        "
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            class="tab-pane fade"
+                            v-bind:id="`nav-sts-table-${split}`"
+                            role="tabpanel"
+                            aria-labelledby="nav-home-tab"
+                            tabindex="0"
+                        >
+                            <div class="row">
+                                <GenericTable
+                                    :title="`Season Stats - ${split}`"
+                                    :rows="schedule.stats[split]"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
     <div
         v-if="schedule.nextRace.date !== ''"
         class="card bg-dark text-light m-2"
     >
         <div class="card-body p-2">
             <div class="container">
-                <div>Future Events:</div>
+                <div>Future Events</div>
                 <div v-if="schedule.nextRace.date !== ''" class="row g-1">
                     <div class="col-12 col-sm-3 col-lg-2">
                         <div class="row g-1 flex-sm-column h-100">
