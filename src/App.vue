@@ -14,14 +14,14 @@ const route = useRoute();
         class="navbar navbar-dark navbar-expand-lg bg-primary"
     >
         <div class="container-fluid">
-            <!-- <RouterLink class="navbar-brand" to="/">
+            <RouterLink class="navbar-brand" to="/">
                 <img class="icon" v-bind:src="`blue-frog-racing-s4-icon.png`" />
                 LEAP</RouterLink
-            > -->
-            <a class="navbar-brand" href="/">
+            >
+            <!-- <a class="navbar-brand" href="/">
                 <img class="icon" v-bind:src="`blue-frog-racing-s4-icon.png`" />
                 LEAP</a
-            >
+            > -->
             <button
                 class="navbar-toggler"
                 type="button"
