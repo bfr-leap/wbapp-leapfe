@@ -10,7 +10,8 @@ export interface SessionStats {
 export async function getSessionStats(
     leagueId: string,
     seasonId: string,
-    subsessionId: string
+    subsessionId: string,
+    statyType: string = 'Overall'
 ): Promise<SessionStats> {
     let simsessionId = 0;
 
@@ -19,9 +20,21 @@ export async function getSessionStats(
     let raceNumberOfLaps = 0;
     let raceIncidentCount = 0;
 
-    let simsessionIds = (
-        await getSimsessions(leagueId, seasonId, subsessionId, 'race')
-    ).concat(await getSimsessions(leagueId, seasonId, subsessionId, 'sprint'));
+    let simsessionIds: number[] = [];
+
+    let sessionTypes: string[] = [];
+    if (['Overall', 'Race'].indexOf(statyType) >= 0) {
+        sessionTypes.push('race');
+    }
+    if (['Overall', 'Sprint'].indexOf(statyType) >= 0) {
+        sessionTypes.push('sprint');
+    }
+
+    for (let sessionType of sessionTypes) {
+        simsessionIds = simsessionIds.concat(
+            await getSimsessions(leagueId, seasonId, subsessionId, sessionType)
+        );
+    }
 
     for (let simsessionId of simsessionIds) {
         let results = await getSimsessionResults(

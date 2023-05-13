@@ -14,6 +14,7 @@ import type {
 } from '@/iracing-endpoints';
 import { useRoute } from 'vue-router';
 
+import BarChart from './BarChart.vue';
 import EventCardLg from '../components/EventCardLg.vue';
 import EventCardSm from '../components/EventCardSm.vue';
 import DriverStandings from '../components/DriverStandings.vue';
@@ -36,8 +37,10 @@ interface ScheduleView {
         isSelected: boolean;
     }[];
     stats: {
-        [name: string]: string;
-    }[];
+        [name: string]: {
+            [name: string]: string;
+        }[];
+    };
 }
 
 let defaultVue: ScheduleView = {
@@ -48,13 +51,37 @@ let defaultVue: ScheduleView = {
     selectedRace: { trackId: '0', date: '', isSelected: false },
     futureRaces: [],
     pastRaces: [],
-    stats: [],
+    stats: { Overall: [], Race: [], Sprint: [] },
 };
 
 let schedule: Ref<ScheduleView> = ref(JSON.parse(JSON.stringify(defaultVue)));
 let leagueId: Ref<string> = ref('');
 let seasonId: Ref<string> = ref('');
 let carId: Ref<string> = ref('');
+const chartFields = ['incidents_per_lap', 'number_of_participants'];
+const statSplit = ['Overall', 'Race', 'Sprint'];
+const barChartData: Ref<{ name: string; value: number }[] | null> = ref(null);
+
+function getChartDataFromStats(
+    stat: string,
+    split: string
+): { name: string; value: number }[] {
+    let data: { name: string; value: number }[] = [];
+
+    let round = 1;
+
+    for (let row of schedule.value.stats[split]) {
+        data.push({
+            name: `R${round++}`,
+            value: Number.parseFloat(row[stat]),
+        });
+    }
+
+    // the last data item is the total/average, remove it
+    data.pop();
+
+    return data;
+}
 
 async function fectchJsonData() {
     schedule.value = JSON.parse(JSON.stringify(defaultVue));
@@ -98,54 +125,63 @@ async function fectchJsonData() {
     );
 
     if (seasonSimsessions) {
-        let roundNum = 0;
-        let totalParticipation = 0;
-        let totalLaps = 0;
-        let totalIncidents = 0;
-        let totalIpL = 0;
-        for (let session of leagueSeasonSessions.sessions) {
-            session.track.track_id;
-            session.launch_at;
+        for (let split of statSplit) {
+            let roundNum = 0;
+            let totalParticipation = 0;
+            let totalLaps = 0;
+            let totalIncidents = 0;
+            let totalIpL = 0;
 
-            schedule.value.pastRaces.push({
-                trackId: session.track.track_id.toString(),
-                date: session.launch_at,
-                isSelected: false,
-                sessionId: session.subsession_id.toString(),
-            });
+            for (let session of leagueSeasonSessions.sessions) {
+                session.track.track_id;
+                session.launch_at;
 
-            let sessionStats = await getSessionStats(
-                leagueId.value,
-                seasonId.value,
-                session.subsession_id.toString()
-            );
+                if (split === 'Overall') {
+                    schedule.value.pastRaces.push({
+                        trackId: session.track.track_id.toString(),
+                        date: session.launch_at,
+                        isSelected: false,
+                        sessionId: session.subsession_id.toString(),
+                    });
+                }
 
-            if (sessionStats.race_number_of_laps > 0) {
-                totalParticipation += sessionStats.race_participants;
-                totalLaps += sessionStats.race_number_of_laps;
-                totalIncidents += sessionStats.race_incident_count;
-                schedule.value.stats.push({
-                    session: `R${++roundNum}`,
-                    number_of_participants:
-                        sessionStats.race_participants.toString(),
-                    number_of_laps: sessionStats.race_number_of_laps.toString(),
-                    number_of_incidents:
-                        sessionStats.race_incident_count.toString(),
-                    incidents_per_lap: (
-                        sessionStats.race_incident_count /
-                        sessionStats.race_number_of_laps
-                    ).toFixed(2),
-                });
+                let sessionStats = await getSessionStats(
+                    leagueId.value,
+                    seasonId.value,
+                    session.subsession_id.toString(),
+                    split
+                );
+
+                if (sessionStats.race_number_of_laps > 0) {
+                    totalParticipation += sessionStats.race_participants;
+                    totalLaps += sessionStats.race_number_of_laps;
+                    totalIncidents += sessionStats.race_incident_count;
+                    schedule.value.stats[split].push({
+                        session: `R${++roundNum}`,
+                        number_of_participants:
+                            sessionStats.race_participants.toString(),
+                        number_of_laps:
+                            sessionStats.race_number_of_laps.toString(),
+                        number_of_incidents:
+                            sessionStats.race_incident_count.toString(),
+                        incidents_per_lap: (
+                            sessionStats.race_incident_count /
+                            sessionStats.race_number_of_laps
+                        ).toFixed(2),
+                    });
+                }
             }
-        }
 
-        schedule.value.stats.push({
-            session: `total/average`,
-            number_of_participants: (totalParticipation / roundNum).toFixed(2),
-            number_of_laps: totalLaps.toString(),
-            number_of_incidents: totalIncidents.toString(),
-            incidents_per_lap: (totalIncidents / totalLaps).toFixed(2),
-        });
+            schedule.value.stats[split].push({
+                session: `total/average`,
+                number_of_participants: (totalParticipation / roundNum).toFixed(
+                    2
+                ),
+                number_of_laps: totalLaps.toString(),
+                number_of_incidents: totalIncidents.toString(),
+                incidents_per_lap: (totalIncidents / totalLaps).toFixed(2),
+            });
+        }
     }
 
     if (curatedSeasonInfo) {
@@ -211,26 +247,47 @@ function onClick(eventInfo: { trackId: string; date: string }) {
         v-bind:season="seasonId"
     />
 
-    <div class="card bg-dark text-light m-2">
-        <div class="card-body p-2">
-            <!-- <TrackBanner v-bind:track-id="props.trackId" /> -->
-            <div style="height: 2em"></div>
-            <div class="container">
-                <div class="row">
-                    <GenericTable title="Season Stats" :rows="schedule.stats" />
-                </div>
+    <template v-for="split in statSplit">
+        <div class="card bg-dark text-light m-2">
+            <div class="card-body p-2">
                 <div style="height: 2em"></div>
+                <div class="container">
+                    <div class="row">
+                        <GenericTable
+                            :title="`Season Stats - ${split}`"
+                            :rows="schedule.stats[split]"
+                        />
+                    </div>
+                    <div style="height: 2em"></div>
+                    <div class="row"></div>
+                    <template v-for="field in chartFields">
+                        <div class="row">
+                            <div class="col-12 m-auto">
+                                {{ field.replaceAll('_', ' ') }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 m-auto">
+                                <BarChart
+                                    v-if="
+                                        getChartDataFromStats(field, split)
+                                            .length
+                                    "
+                                    :data="getChartDataFromStats(field, split)"
+                                />
+                            </div></div
+                    ></template>
+                </div>
             </div>
         </div>
-    </div>
+    </template>
 
     <div class="card bg-dark text-light m-2">
         <div class="card-body p-2">
             <div class="container">
+                <div>Past Events:</div>
                 <div class="row g-1">
                     <div class="col-12">
-                        <!-- <div class="col-12 col-sm-3 col-lg-3"> -->
-                        <!-- asdf   row g-1 flex-sm-column h-100 -->
                         <div class="row g-1 h-100">
                             <div v-for="race in schedule.pastRaces" class="col">
                                 <RouterLink
@@ -260,6 +317,7 @@ function onClick(eventInfo: { trackId: string; date: string }) {
     >
         <div class="card-body p-2">
             <div class="container">
+                <div>Future Events:</div>
                 <div v-if="schedule.nextRace.date !== ''" class="row g-1">
                     <div class="col-12 col-sm-3 col-lg-2">
                         <div class="row g-1 flex-sm-column h-100">
