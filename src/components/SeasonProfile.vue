@@ -7,11 +7,6 @@ import {
     getLeagueSeasonSessions,
 } from '../fetch-util';
 import GenericTable from './GenericTable.vue';
-import { getTrackName, guessTrackIdfromEventName } from '../track-utils';
-import type {
-    ActiveLeagueSchedule,
-    SeasonSimsessionIndex,
-} from '@/iracing-endpoints';
 import { useRoute } from 'vue-router';
 
 import BarChart from './BarChart.vue';
@@ -19,6 +14,7 @@ import EventCardLg from '../components/EventCardLg.vue';
 import EventCardSm from '../components/EventCardSm.vue';
 import DriverStandings from '../components/DriverStandings.vue';
 import LeagueSeasonMenu from '../components/LeagueSeasonMenu.vue';
+import PastEventCards from '../components/PastEventCards.vue';
 import { getSessionStats } from '@/results-util';
 
 const route = useRoute();
@@ -30,12 +26,6 @@ interface ScheduleView {
     nextRace: { trackId: string; date: string; isSelected: boolean };
     selectedRace: { trackId: string; date: string; isSelected: boolean };
     futureRaces: { trackId: string; date: string; isSelected: boolean }[];
-    pastRaces: {
-        sessionId: string;
-        trackId: string;
-        date: string;
-        isSelected: boolean;
-    }[];
     stats: {
         [name: string]: {
             [name: string]: string;
@@ -50,7 +40,6 @@ let defaultVue: ScheduleView = {
     nextRace: { trackId: '0', date: '', isSelected: false },
     selectedRace: { trackId: '0', date: '', isSelected: false },
     futureRaces: [],
-    pastRaces: [],
     stats: { Overall: [], Race: [], Sprint: [] },
 };
 
@@ -136,15 +125,6 @@ async function fectchJsonData() {
                 session.track.track_id;
                 session.launch_at;
 
-                if (split === 'Overall') {
-                    schedule.value.pastRaces.push({
-                        trackId: session.track.track_id.toString(),
-                        date: session.launch_at,
-                        isSelected: false,
-                        sessionId: session.subsession_id.toString(),
-                    });
-                }
-
                 let sessionStats = await getSessionStats(
                     leagueId.value,
                     seasonId.value,
@@ -191,11 +171,13 @@ async function fectchJsonData() {
             .filter((e) => new Date(e.time).getTime() > now)
             .filter((v, i) => i < 4);
 
-        schedule.value.nextRace = schedule.value.selectedRace = {
-            trackId: events[0].track_id.toString(),
-            date: events[0].time,
-            isSelected: true,
-        };
+        if (events.length > 0) {
+            schedule.value.nextRace = schedule.value.selectedRace = {
+                trackId: events[0].track_id.toString(),
+                date: events[0].time,
+                isSelected: true,
+            };
+        }
 
         schedule.value.futureRaces = [];
         for (let i = 1; i < events.length; ++i) {
@@ -252,27 +234,10 @@ function onClick(eventInfo: { trackId: string; date: string }) {
             <div>Past Events</div>
             <div style="height: 1em"></div>
             <div class="container">
-                <div class="row g-1">
-                    <div class="col-12">
-                        <div class="row g-1 h-100">
-                            <div v-for="race in schedule.pastRaces" class="col">
-                                <RouterLink
-                                    style="text-decoration: none"
-                                    class="link-light"
-                                    v-bind:to="`?m=results&league=${schedule.leagueId}&season=${schedule.seasonId}&subsession=${race.sessionId}&simsession=0`"
-                                >
-                                    <EventCardSm
-                                        class="h-100"
-                                        v-bind:track_id="race.trackId"
-                                        v-bind:is_next="false"
-                                        v-bind:date="new Date(race.date)"
-                                        v-bind:is_selected="race.isSelected"
-                                    ></EventCardSm>
-                                </RouterLink>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <PastEventCards
+                    v-bind:league="leagueId"
+                    v-bind:season="seasonId"
+                ></PastEventCards>
             </div>
             <div style="height: 1em"></div>
         </div>

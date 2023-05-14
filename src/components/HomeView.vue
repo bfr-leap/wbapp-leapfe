@@ -9,6 +9,7 @@ import EventCardLg from '../components/EventCardLg.vue';
 import EventCardSm from '../components/EventCardSm.vue';
 import DriverStandings from '../components/DriverStandings.vue';
 import LeagueSeasonMenu from '../components/LeagueSeasonMenu.vue';
+import PastEventCards from './PastEventCards.vue';
 
 const route = useRoute();
 
@@ -119,6 +120,21 @@ function onClick(eventInfo: { trackId: string; date: string }) {
         v-bind:league="leagueId"
         v-bind:season="seasonId"
     />
+
+    <div class="card bg-dark text-light m-2">
+        <div class="card-body p-2">
+            <div class="container">
+                Past Events
+                <div style="height: 1em"></div>
+                <PastEventCards
+                    v-bind:league="leagueId"
+                    v-bind:season="seasonId"
+                    v-bind:car="carId"
+                />
+                <div style="height: 1em"></div>
+            </div>
+        </div>
+    </div>
 
     <div class="card bg-dark text-light m-2">
         <div class="card-body p-2">
