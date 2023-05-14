@@ -249,8 +249,9 @@ function onClick(eventInfo: { trackId: string; date: string }) {
 
     <div class="card bg-dark text-light m-2">
         <div class="card-body p-2">
+            <div>Past Events</div>
+            <div style="height: 1em"></div>
             <div class="container">
-                <div>Past Events</div>
                 <div class="row g-1">
                     <div class="col-12">
                         <div class="row g-1 h-100">
@@ -273,6 +274,7 @@ function onClick(eventInfo: { trackId: string; date: string }) {
                     </div>
                 </div>
             </div>
+            <div style="height: 1em"></div>
         </div>
     </div>
 
@@ -341,92 +343,88 @@ function onClick(eventInfo: { trackId: string; date: string }) {
                 </ul>
 
                 <div style="height: 2em"></div>
-                <div class="container">
-                    <div class="tab-content" id="nav-tabContent">
-                        <div
-                            class="tab-pane fade show active"
-                            v-bind:id="`nav-inc-chart-${split}`"
-                            role="tabpanel"
-                            aria-labelledby="nav-home-tab"
-                            tabindex="0"
-                        >
-                            <div class="row">
-                                <div class="col-12 m-auto">
-                                    {{
-                                        'incidents_per_lap'.replaceAll('_', ' ')
-                                    }}
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-12 m-auto">
-                                    <BarChart
-                                        v-if="
-                                            getChartDataFromStats(
-                                                'incidents_per_lap',
-                                                split
-                                            ).length
-                                        "
-                                        :data="
-                                            getChartDataFromStats(
-                                                'incidents_per_lap',
-                                                split
-                                            )
-                                        "
-                                    />
-                                </div>
+                <div class="tab-content" id="nav-tabContent">
+                    <div
+                        class="tab-pane fade show active"
+                        v-bind:id="`nav-inc-chart-${split}`"
+                        role="tabpanel"
+                        aria-labelledby="nav-home-tab"
+                        tabindex="0"
+                    >
+                        <div class="row">
+                            <div class="col-12 m-auto">
+                                {{ 'incidents_per_lap'.replaceAll('_', ' ') }}
                             </div>
                         </div>
-
-                        <div
-                            class="tab-pane fade"
-                            v-bind:id="`nav-par-chart-${split}`"
-                            role="tabpanel"
-                            aria-labelledby="nav-home-tab"
-                            tabindex="0"
-                        >
-                            <div class="row">
-                                <div class="col-12 m-auto">
-                                    {{
-                                        'number_of_participants'.replaceAll(
-                                            '_',
-                                            ' '
+                        <div class="row">
+                            <div class="col-12 m-auto">
+                                <BarChart
+                                    v-if="
+                                        getChartDataFromStats(
+                                            'incidents_per_lap',
+                                            split
+                                        ).length
+                                    "
+                                    :data="
+                                        getChartDataFromStats(
+                                            'incidents_per_lap',
+                                            split
                                         )
-                                    }}
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-12 m-auto">
-                                    <BarChart
-                                        v-if="
-                                            getChartDataFromStats(
-                                                'number_of_participants',
-                                                split
-                                            ).length
-                                        "
-                                        :data="
-                                            getChartDataFromStats(
-                                                'number_of_participants',
-                                                split
-                                            )
-                                        "
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div
-                            class="tab-pane fade"
-                            v-bind:id="`nav-sts-table-${split}`"
-                            role="tabpanel"
-                            aria-labelledby="nav-home-tab"
-                            tabindex="0"
-                        >
-                            <div class="row">
-                                <GenericTable
-                                    :title="`Season Stats - ${split}`"
-                                    :rows="schedule.stats[split]"
+                                    "
                                 />
                             </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="tab-pane fade"
+                        v-bind:id="`nav-par-chart-${split}`"
+                        role="tabpanel"
+                        aria-labelledby="nav-home-tab"
+                        tabindex="0"
+                    >
+                        <div class="row">
+                            <div class="col-12 m-auto">
+                                {{
+                                    'number_of_participants'.replaceAll(
+                                        '_',
+                                        ' '
+                                    )
+                                }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 m-auto">
+                                <BarChart
+                                    v-if="
+                                        getChartDataFromStats(
+                                            'number_of_participants',
+                                            split
+                                        ).length
+                                    "
+                                    :data="
+                                        getChartDataFromStats(
+                                            'number_of_participants',
+                                            split
+                                        )
+                                    "
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="tab-pane fade"
+                        v-bind:id="`nav-sts-table-${split}`"
+                        role="tabpanel"
+                        aria-labelledby="nav-home-tab"
+                        tabindex="0"
+                    >
+                        <div class="row">
+                            <GenericTable
+                                :title="`Season Stats - ${split}`"
+                                :rows="schedule.stats[split]"
+                            />
                         </div>
                     </div>
                 </div>
