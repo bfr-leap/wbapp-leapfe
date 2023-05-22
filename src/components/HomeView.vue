@@ -136,7 +136,10 @@ function onClick(eventInfo: { trackId: string; date: string }) {
         </div>
     </div>
 
-    <div class="card bg-dark text-light m-2">
+    <div
+        v-if="schedule.nextRace.date !== ''"
+        class="card bg-dark text-light m-2"
+    >
         <div class="card-body p-2">
             <div class="container">
                 <div v-if="schedule.nextRace.date !== ''" class="row g-1">
