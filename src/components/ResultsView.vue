@@ -11,7 +11,7 @@ import type {
     SeasonSimsessionIndex,
     SSR_ResultsEntry,
 } from '../iracing-endpoints';
-import { ref, watchEffect } from 'vue';
+import { ref, watchEffect, watch } from 'vue';
 import type { Ref } from 'vue';
 import {
     getLeagueSimsessionIndex,
@@ -22,7 +22,7 @@ import {
 
 const route = useRoute();
 
-let props: Ref<{
+interface View {
     hasTelemetry: boolean;
     leagueId: string;
     seasonId: string;
@@ -33,18 +33,24 @@ let props: Ref<{
     results: {
         [name: string]: string;
     }[];
-}> = ref({
+}
+
+let defaultView: View = {
     hasTelemetry: false,
     leagueId: '',
     seasonId: '',
     subsessionId: '',
     simsessionId: '',
-    simsessionType: <'race' | 'sprint' | 'qualify' | 'practice'>'practice',
+    simsessionType: 'practice',
     trackId: '',
     results: [],
-});
+};
+
+let props: Ref<View> = ref(JSON.parse(JSON.stringify(defaultView)));
 
 async function fectchJsonData() {
+    props.value = JSON.parse(JSON.stringify(defaultView));
+
     let leagueId: string = '6555';
     let seasonId: string = (route.query.season as string) || '';
     let subsessionId: string = (route.query.subsession as string) || '';
@@ -175,6 +181,7 @@ async function fectchJsonData() {
         telemetrySubsessionIds.indexOf(parseInt(props.value.subsessionId, 10));
 }
 watchEffect(fectchJsonData);
+watch(props, fectchJsonData);
 </script>
 
 <template>

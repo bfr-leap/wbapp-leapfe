@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watchEffect, ref } from 'vue';
+import { watchEffect, ref, watch } from 'vue';
 import type { Ref } from 'vue';
 import BarChart from './BarChart.vue';
 import {
@@ -22,7 +22,9 @@ const barChartData: Ref<{ name: string; value: number }[]> = ref([
     { name: 'b', value: 2 },
 ]);
 
-watchEffect(async () => {
+async function fetchData() {
+    barChartData.value = [];
+
     if (
         props.simsession == undefined ||
         props.subsession == undefined ||
@@ -72,7 +74,10 @@ watchEffect(async () => {
                 : undefined,
         };
     });
-});
+}
+
+watchEffect(fetchData);
+watch(props, fetchData);
 </script>
 
 <template>

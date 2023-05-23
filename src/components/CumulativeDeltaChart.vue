@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watchEffect, ref } from 'vue';
+import { watchEffect, watch, ref } from 'vue';
 import type { Ref } from 'vue';
 import ComulativeLineChart from './ComulativeLineChart.vue';
 import type { SeriesXY } from './LineChart.vue';
@@ -129,7 +129,7 @@ function getStartGrid(chunks: LCD_Chunk[]): GridItem[] {
     return startgrid;
 }
 
-watchEffect(async () => {
+async function fectchJsonData() {
     if (props.simsession == undefined || props.subsession == undefined) {
         return;
     }
@@ -142,7 +142,10 @@ watchEffect(async () => {
     const startGrid = getStartGrid(lapChartData.chunk_info);
 
     lapTimes.value = getLapTimes(lapChartData, startGrid);
-});
+}
+
+watchEffect(fectchJsonData);
+watch(props, fectchJsonData);
 
 interface GridItem {
     custid: number;

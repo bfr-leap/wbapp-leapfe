@@ -21,6 +21,8 @@ const props = defineProps<{
 const lapTimes: Ref<SeriesXY[]> = ref([]);
 
 async function fetchData() {
+    lapTimes.value = [];
+
     let telemetrySubsessionIds = await getTelemetrySubsessionIds(props.league);
 
     let telemetryAvailable =
