@@ -21,7 +21,11 @@ export async function scrapeLeague(leagueId: number) {
 
     for (let season of seasons.seasons) {
         resetEncounteredCustIds();
-        if (season.season_name.toLocaleLowerCase().indexOf('practice') === -1) {
+        // season.season_id > 60000;
+        if (
+            season.season_id > 60000 &&
+            season.season_name.toLocaleLowerCase().indexOf('practice') === -1
+        ) {
             await scrapeLeagueSeasonSessions(leagueId, season.season_id, false);
             await scrapeMembersData(
                 getEncounteredCustIds(),
