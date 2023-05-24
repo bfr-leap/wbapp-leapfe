@@ -38,7 +38,6 @@ function getSeriesDeltas(lapTimes: SeriesXY[]): {
 
     // if rounding doesn't work try again
     if (baselineTime === Infinity || baselineTime === 1) {
-        console.log('here');
         baselineTime =
             lapTimes
                 .map(

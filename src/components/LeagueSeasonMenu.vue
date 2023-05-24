@@ -48,8 +48,6 @@ async function fectchJsonData() {
         (s) => s.season_id.toString() === pSeason
     );
 
-    console.log('here');
-
     let minSeasonId = <number>(<unknown>blockedSeasons['min_season_id']) || 0;
 
     leagueSeasons.seasons.sort((a, b) => b.season_id - a.season_id);

@@ -51,8 +51,7 @@ let props: Ref<View> = ref(JSON.parse(JSON.stringify(defaultView)));
 async function fectchJsonData() {
     props.value = JSON.parse(JSON.stringify(defaultView));
 
-    // let leagueId: string = '6555';
-    const leagueId = 637;
+    let leagueId: string = (route.query.league as string) || '';
     let seasonId: string = (route.query.season as string) || '';
     let subsessionId: string = (route.query.subsession as string) || '';
     let simsessionId: string = (route.query.simsession as string) || '';

@@ -6,6 +6,7 @@ import type { SeasonSimsessionIndex } from '../iracing-endpoints';
 import {
     getCuratedBlockedSeasons,
     getLeagueSimsessionIndex,
+    getCuratedActiveLeagueSchedule,
 } from '@/fetch-util';
 
 const props = defineProps<{
@@ -17,28 +18,27 @@ const props = defineProps<{
 
 let seasons: Ref<SeasonSimsessionIndex[]> = ref([]);
 
-let currentLeague: Ref<string> = ref('iFormula League');
-
-let seasonOptions: Ref<{
+interface DropdownView {
     selected: string;
     options: { display: string; href: string }[];
-}> = ref({
+}
+
+let leagueOptions: Ref<DropdownView> = ref({
     selected: '---',
     options: [{ display: '--', href: '#' }],
 });
 
-let subsessionOptions: Ref<{
-    selected: string;
-    options: { display: string; href: string }[];
-}> = ref({
+let seasonOptions: Ref<DropdownView> = ref({
+    selected: '---',
+    options: [{ display: '--', href: '#' }],
+});
+
+let subsessionOptions: Ref<DropdownView> = ref({
     selected: '----',
     options: [{ display: '---', href: '#' }],
 });
 
-let simsessionOptions: Ref<{
-    selected: string;
-    options: { display: string; href: string }[];
-}> = ref({
+let simsessionOptions: Ref<DropdownView> = ref({
     selected: '-----',
     options: [{ display: '----', href: '#' }],
 });
@@ -51,10 +51,15 @@ async function fectchJsonData() {
 
     let seasonSimsessionIndex: SeasonSimsessionIndex[];
 
+    let leagueSchedule = await getCuratedActiveLeagueSchedule();
     let blockedSeasons = await getCuratedBlockedSeasons();
 
-    seasonSimsessionIndex = seasons.value = await getLeagueSimsessionIndex(
-        leagueId
+    seasonSimsessionIndex = seasons.value = (
+        await getLeagueSimsessionIndex(leagueId)
+    ).sort((a, b) => b.season_id - a.season_id);
+
+    let selectedLeague = leagueSchedule.leagues.find(
+        (l) => l.league_id.toString() === leagueId
     );
 
     let selectedSeason = seasonSimsessionIndex.find(
@@ -69,17 +74,31 @@ async function fectchJsonData() {
         (s) => s.simsession_id.toString() === simsessionId
     );
 
+    leagueOptions.value.selected = selectedLeague?.name || '---';
     seasonOptions.value.selected = selectedSeason?.season_title || '---';
     subsessionOptions.value.selected =
         selectedSubsession?.session_title || '---';
     simsessionOptions.value.selected = selectedSimsession?.type || '---';
 
+    leagueOptions.value.options = [];
     seasonOptions.value.options = [];
     subsessionOptions.value.options = [];
     simsessionOptions.value.options = [];
 
-    if (!selectedSimsession || !selectedSubsession || !selectedSeason) {
+    if (
+        !selectedLeague ||
+        !selectedSimsession ||
+        !selectedSubsession ||
+        !selectedSeason
+    ) {
         return;
+    }
+
+    for (let leagueIt of leagueSchedule.leagues) {
+        leagueOptions.value.options.push({
+            display: leagueIt.name,
+            href: `?m=results&league=${leagueIt.league_id}`,
+        });
     }
 
     for (let seasonIt of seasonSimsessionIndex) {
@@ -120,9 +139,27 @@ watchEffect(fectchJsonData);
     <div class="card bg-dark text-light m-2">
         <div class="card-body p-2">
             <form class="row row-cols-auto g-3 align-items-center">
-                <span>
-                    {{ currentLeague }}
-                </span>
+                <div class="dropdown">
+                    <button
+                        class="btn btn-dark dropdown-toggle"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                    >
+                        {{ leagueOptions.selected }}
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark">
+                        <li v-for="leagueOption in leagueOptions.options">
+                            <RouterLink
+                                class="dropdown-item"
+                                type="button"
+                                v-bind:to="leagueOption.href"
+                            >
+                                {{ leagueOption.display }}
+                            </RouterLink>
+                        </li>
+                    </ul>
+                </div>
                 <div class="dropdown">
                     <button
                         class="btn btn-secondary dropdown-toggle"
