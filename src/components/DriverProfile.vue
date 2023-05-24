@@ -59,6 +59,8 @@ watchEffect(async () => {
         'quali'
     );
 
+    leagueSeasons.seasons.sort((a, b) => b.season_id - a.season_id);
+
     _driverResults.value = [
         driverSessionResultsRace,
         driverSessionResultsSprint,

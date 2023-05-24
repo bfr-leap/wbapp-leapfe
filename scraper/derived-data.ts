@@ -6,10 +6,15 @@ import { deriveSingleTrackInfo } from './derive/single-track-info.js';
 import { deriveTrackInfoDirectory } from './derive/track-info-directory.js';
 import { deriveLeagueLapTelemetry } from './derive/lap-telemetry.js';
 
-deriveLeagueSimSessionIndex(6555);
-deriveLeagueSimSessionResults(6555);
-deriveDriverStats(6555);
-deriveSingleMemberInfo(6555);
-deriveSingleTrackInfo(6555);
-deriveTrackInfoDirectory(6555);
-deriveLeagueLapTelemetry(6555);
+function deriveLeague(leagueId: number) {
+    deriveLeagueSimSessionIndex(leagueId);
+    deriveLeagueSimSessionResults(leagueId);
+    deriveDriverStats(leagueId);
+    deriveSingleMemberInfo(leagueId);
+    deriveSingleTrackInfo(leagueId);
+    deriveTrackInfoDirectory(leagueId);
+    deriveLeagueLapTelemetry(leagueId);
+}
+
+//deriveLeague(6555);
+deriveLeague(637);

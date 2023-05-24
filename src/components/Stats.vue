@@ -99,6 +99,9 @@ async function fectchJsonData() {
 }
 watchEffect(fectchJsonData);
 
+// const leagueId = 6555;
+const leagueId = 637;
+
 const statClasses = 'px-2 py-1 m-1 fs-5';
 </script>
 
@@ -107,7 +110,7 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
         <RouterLink
             class="link-light"
             v-if="seasonId"
-            :to="`/?m=standings&league=6555&season=${seasonId}`"
+            :to="`/?m=standings&league=${leagueId}&season=${seasonId}`"
             >{{ seasonName }}</RouterLink
         >
         <span v-else>{{ seasonName }}</span>

@@ -46,7 +46,10 @@ async function fectchJsonData() {
     }
 
     if (!seasonId.value) {
-        seasonId.value = s.leagues[0].seasons[0].season_id.toString();
+        seasonId.value =
+            s.leagues
+                .find((v) => v.league_id.toString() === leagueId.value)
+                ?.seasons[0].season_id.toString() || '???';
     }
 
     let selectedLeague = s.leagues.find(

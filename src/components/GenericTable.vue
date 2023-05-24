@@ -81,6 +81,9 @@ async function fectchJsonData() {
     }
 }
 watchEffect(fectchJsonData);
+
+// const leagueId = 6555;
+const leagueId = 637;
 </script>
 
 <template>
@@ -103,7 +106,7 @@ watchEffect(fectchJsonData);
                             <td v-if="key === 'cust_id'">
                                 <RouterLink
                                     class="link-light"
-                                    v-bind:to="`/?m=driver&league=6555&driver=${
+                                    v-bind:to="`/?m=driver&league=${leagueId}&driver=${
                                         _nameToIdMap[row[key]]
                                     }`"
                                     >{{ row[key] }}</RouterLink

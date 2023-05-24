@@ -376,7 +376,7 @@ export interface TrackInfoDirectory {
     car_2_track_map: { [name: string]: string[] }; // gets the track-id of track ran with the car by car-id
 }
 
-export type BlockedSeasons = { [name: string]: boolean }; // set of '${league_id}_${season_id}' keys
+export type BlockedSeasons = { [name: string]: boolean | number }; // set of '${league_id}_${season_id}' keys
 
 export interface ActiveLeagueSchedule {
     leagues: ALS_LeagueInfo[];
@@ -384,6 +384,7 @@ export interface ActiveLeagueSchedule {
 
 export interface ALS_LeagueInfo {
     league_id: number;
+    name: string;
     seasons: ALS_SeasonInfo[];
 }
 

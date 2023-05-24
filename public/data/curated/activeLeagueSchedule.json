@@ -2,6 +2,7 @@
     "leagues": [
         {
             "league_id": 6555,
+            "name": "iFormula League",
             "seasons": [
                 {
                     "season_id": 87365,
@@ -136,6 +137,18 @@
                             "comment": "AUTÓDROMO JOSÉ CARLOS PACE"
                         }
                     ]
+                }
+            ]
+        },
+        {
+            "league_id": 637,
+            "name": "iGP Fun",
+            "seasons": [
+                {
+                    "season_id": 90266,
+                    "car_id": 106,
+                    "comment": "igpfun 2023 s2 F3 << do not use this",
+                    "events": []
                 }
             ]
         }

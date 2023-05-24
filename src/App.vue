@@ -3,6 +3,9 @@ import { RouterLink, RouterView } from 'vue-router';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
+
+// const leagueId = 6555;;
+const leagueId = 637;
 </script>
 
 <template>
@@ -36,7 +39,9 @@ const route = useRoute();
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="navbar-nav">
                     <!-- <RouterLink class="nav-link" to="/">Home</RouterLink> -->
-                    <RouterLink class="nav-link" to="/?m=results&league=6555"
+                    <RouterLink
+                        class="nav-link"
+                        v-bind:to="`/?m=results&league=${leagueId}`"
                         >Results</RouterLink
                     >
                 </div>
