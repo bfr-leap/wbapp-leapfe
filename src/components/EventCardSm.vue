@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { getshortTrackName } from '../track-utils';
+import { ref, watchEffect } from 'vue';
+import type { Ref } from 'vue';
 const props = defineProps<{
     track_id: string;
     is_next: boolean;
@@ -21,6 +23,14 @@ const shortMonthNames = [
     'Nov',
     'Dec',
 ];
+
+let shortNames: Ref<{ [name: string]: string }> = ref({});
+
+async function fectchJsonData() {
+    shortNames.value[props.track_id] = await getshortTrackName(props.track_id);
+}
+
+watchEffect(fectchJsonData);
 </script>
 
 <template>
@@ -71,17 +81,17 @@ const shortMonthNames = [
             <div
                 class="fs-6 d-flex d-sm-none flex-grow-1 justify-content-center align-items-center"
             >
-                {{ getshortTrackName(track_id) }}
+                {{ shortNames[track_id] }}
             </div>
             <div
                 class="fs-3 d-none d-sm-flex d-md-none flex-grow-1 justify-content-center align-items-center"
             >
-                {{ getshortTrackName(track_id) }}
+                {{ shortNames[track_id] }}
             </div>
             <div
                 class="fs-2 d-none d-sm-none d-md-flex flex-grow-1 justify-content-center align-items-center"
             >
-                {{ getshortTrackName(track_id) }}
+                {{ shortNames[track_id] }}
             </div>
         </div>
     </div>

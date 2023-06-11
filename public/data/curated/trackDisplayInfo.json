@@ -1,7 +1,7 @@
 {
     "18": { "short_display": "RA", "display": "Road America" },
     "108": {
-        "short_display": "WATK",
+        "short_display": "GLEN",
         "display": "[Retired] Watkins Glen International"
     },
     "127": { "short_display": "RATL", "display": "Road Atlanta" },
@@ -62,11 +62,43 @@
     "403": { "short_display": "RBR", "display": "Red Bull Ring" },
     "413": { "short_display": "HUNG", "display": "Hungaroring" },
     "434": {
-        "short_display": "WATK",
+        "short_display": "GLEN",
         "display": "Watkins Glen International"
     },
     "448": {
         "short_display": "INDI",
         "display": "Indianapolis Motor Speedway"
+    },
+    "463": {
+        "short_display": "MAG",
+        "display": "Magny-Cours"
+    },
+    "145": {
+        "short_display": "BRAN",
+        "display": "Brands Hatch"
+    },
+    "164": {
+        "short_display": "SPA",
+        "display": "Circuit de Spa-Francorchamps"
+    },
+    "451": {
+        "short_display": "RUDS",
+        "display": "RudsKogen Motorsenter"
+    },
+    "435": {
+        "short_display": "GLEN",
+        "display": "Watkins Glen International"
+    },
+    "445": {
+        "short_display": "FUJI",
+        "display": "Fuji Speedway"
+    },
+    "397": {
+        "short_display": "SONO",
+        "display": "Sonoma Raceway"
+    },
+    "-1": {
+        "short_display": "",
+        "display": ""
     }
 }

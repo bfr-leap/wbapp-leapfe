@@ -14,6 +14,7 @@ import type {
     DriverResults,
     LapChartData,
     ST_DriverTelemetry,
+    CuratedTrackDisplayhInfo,
 } from './iracing-endpoints';
 
 async function fetchObjects(urls: string[]): Promise<any[]> {
@@ -183,5 +184,11 @@ export async function getTelemetrySubsessionIds(
 ): Promise<number[]> {
     return await fetchCachedObject<number[]>(
         `./data/curated/telemetrySubsessions_${league}.json`
+    );
+}
+
+export async function getCuratedTrackDisplayInfo(): Promise<CuratedTrackDisplayhInfo> {
+    return await fetchCachedObject<CuratedTrackDisplayhInfo>(
+        './data/curated/trackDisplayInfo.json'
     );
 }

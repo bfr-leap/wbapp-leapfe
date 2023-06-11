@@ -421,3 +421,7 @@ export interface ST_SimsessionTelemetry {
 }
 
 export type SubsessionTelemetry = ST_SimsessionTelemetry[];
+
+export type CuratedTrackDisplayhInfo = {
+    [name: string]: { short_display: string; long_display: string };
+};
