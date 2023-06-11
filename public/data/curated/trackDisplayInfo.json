@@ -97,6 +97,18 @@
         "short_display": "SONO",
         "display": "Sonoma Raceway"
     },
+    "144": {
+        "short_display": "MOTO",
+        "display": "Canadian Tire Motorsport Park"
+    },
+    "474": {
+        "short_display": "JER",
+        "display": "Circuito de Jerez"
+    },
+    "234": {
+        "short_display": "DON",
+        "display": "Donington Park"
+    },
     "-1": {
         "short_display": "",
         "display": ""
