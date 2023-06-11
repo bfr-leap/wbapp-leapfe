@@ -16,5 +16,5 @@ function deriveLeague(leagueId: number) {
     deriveLeagueLapTelemetry(leagueId);
 }
 
-//deriveLeague(6555);
+deriveLeague(6555);
 deriveLeague(637);

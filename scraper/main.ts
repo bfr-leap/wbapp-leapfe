@@ -12,9 +12,6 @@ import {
     const password = process.env.IWP_PASSWORD || 'test';
     await auth(username, password);
 
-    // await scrapeLeague(6555);
-
+    await scrapeLeague(6555);
     await scrapeLeague(637);
-
-    // await scrapeLapChartData(60701863, 0);
 })();
