@@ -18,3 +18,4 @@ function deriveLeague(leagueId: number) {
 
 deriveLeague(6555);
 deriveLeague(637);
+deriveLeague(5567);

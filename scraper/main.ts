@@ -14,4 +14,5 @@ import {
 
     await scrapeLeague(6555);
     await scrapeLeague(637);
+    await scrapeLeague(5567);
 })();

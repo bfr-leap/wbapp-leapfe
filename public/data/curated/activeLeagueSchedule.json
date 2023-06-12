@@ -151,6 +151,18 @@
                     "events": []
                 }
             ]
+        },
+        {
+            "league_id": 5567,
+            "name": "Dark Horse",
+            "seasons": [
+                {
+                    "season_id": 91286,
+                    "car_id": 106,
+                    "comment": "F.A.R.T. IR-01 << do not use this",
+                    "events": []
+                }
+            ]
         }
     ]
 }
