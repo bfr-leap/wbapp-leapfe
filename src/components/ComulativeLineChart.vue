@@ -16,25 +16,33 @@ function getSeriesDeltas(lapTimes: SeriesXY[]): {
     data: SeriesXY[];
     baselineTime: number;
 } {
-    let baselineTime = Math.round(
+    let baselineTime =
         lapTimes
             .map((driverLaps: SeriesXY) =>
-                driverLaps.data
-                    .map((lapTime) => lapTime.y)
-                    .reduce(function (min, value, _, { length }) {
-                        if (value <= 1 || isNaN(value)) {
-                            return min;
-                        }
-                        return Math.min(min, value);
-                    }, Infinity)
+                driverLaps.data.map((lapTime) => lapTime.y)
             )
-            .reduce(function (min, value, _, { length }) {
-                if (value <= 1 || isNaN(value)) {
-                    return min;
-                }
-                return Math.min(min, value);
-            }, Infinity) * 1.07
-    );
+            .map((tA) => tA.reduce((a, b) => a + b / tA.length, 0))[0] * 1.07;
+
+    // this is the old baseline calculation  TODO:: remove
+    // let baselineTime = Math.round(
+    //     lapTimes
+    //         .map((driverLaps: SeriesXY) =>
+    //             driverLaps.data
+    //                 .map((lapTime) => lapTime.y)
+    //                 .reduce(function (min, value, _, { length }) {
+    //                     if (value <= 1 || isNaN(value)) {
+    //                         return min;
+    //                     }
+    //                     return Math.min(min, value);
+    //                 }, Infinity)
+    //         )
+    //         .reduce(function (min, value, _, { length }) {
+    //             if (value <= 1 || isNaN(value)) {
+    //                 return min;
+    //             }
+    //             return Math.min(min, value);
+    //         }, Infinity) * 1.07
+    // );
 
     // if rounding doesn't work try again
     if (baselineTime === Infinity || baselineTime === 1) {
