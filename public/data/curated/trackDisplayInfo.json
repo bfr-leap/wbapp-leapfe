@@ -109,6 +109,22 @@
         "short_display": "DON",
         "display": "Donington Park"
     },
+    "277": {
+        "short_display": "POC",
+        "display": "Pocono Raceway"
+    },
+    "419": {
+        "short_display": "PHX",
+        "display": "Phoenix Raceway"
+    },
+    "131": {
+        "short_display": "NH",
+        "display": "New Hampshire Motor Speedway"
+    },
+    "276": {
+        "short_display": "MI",
+        "display": "Michigan International Speedway"
+    },
     "-1": {
         "short_display": "",
         "display": ""
