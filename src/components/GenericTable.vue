@@ -6,7 +6,7 @@ import { getSingleMemberData } from '@/fetch-util';
 
 const props = defineProps<{
     title: string;
-
+    leagueId: string;
     rows: { [name: string]: string }[];
 }>();
 
@@ -81,9 +81,6 @@ async function fectchJsonData() {
     }
 }
 watchEffect(fectchJsonData);
-
-// const leagueId = 6555;
-const leagueId = 637;
 </script>
 
 <template>
@@ -106,9 +103,9 @@ const leagueId = 637;
                             <td v-if="key === 'cust_id'">
                                 <RouterLink
                                     class="link-light"
-                                    v-bind:to="`/?m=driver&league=${leagueId}&driver=${
-                                        _nameToIdMap[row[key]]
-                                    }`"
+                                    v-bind:to="`/?m=driver&league=${
+                                        props.leagueId
+                                    }&driver=${_nameToIdMap[row[key]]}`"
                                     >{{ row[key] }}</RouterLink
                                 >
                             </td>

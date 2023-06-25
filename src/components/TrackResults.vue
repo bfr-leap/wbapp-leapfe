@@ -83,31 +83,38 @@ watchEffect(fectchJsonData);
             <div class="container d-flex flex-wrap">
                 <GenericTable
                     v-bind:title="trackResult.best_quali.title"
+                    v-bind:league-id="props.league"
                     v-bind:rows="trackResult.best_quali.rows"
                 />
                 <GenericTable
                     v-bind:title="trackResult.race_lap.title"
+                    v-bind:league-id="props.league"
                     v-bind:rows="trackResult.race_lap.rows"
                 />
                 <div class="col-12"></div>
                 <GenericTable
                     v-bind:title="trackResult.poles.title"
+                    v-bind:league-id="props.league"
                     v-bind:rows="trackResult.poles.rows"
                 />
                 <GenericTable
                     v-bind:title="trackResult.fastest_race_lap.title"
+                    v-bind:league-id="props.league"
                     v-bind:rows="trackResult.fastest_race_lap.rows"
                 />
                 <!-- <GenericTable
                     v-bind:title="trackResult.numb_entries.title"
+                    v-bind:league-id="props.league"
                     v-bind:rows="trackResult.numb_entries.rows"
                 /> -->
                 <GenericTable
                     v-bind:title="trackResult.wins.title"
+                    v-bind:league-id="props.league"
                     v-bind:rows="trackResult.wins.rows"
                 />
                 <GenericTable
                     v-bind:title="trackResult.podiums.title"
+                    v-bind:league-id="props.league"
                     v-bind:rows="trackResult.podiums.rows"
                 />
             </div>

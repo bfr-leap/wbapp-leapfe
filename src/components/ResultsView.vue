@@ -201,6 +201,7 @@ watch(props, fectchJsonData);
                     <div class="row">
                         <GenericTable
                             title="Session Report"
+                            :leagueId="props.leagueId"
                             :rows="props.results"
                         />
                     </div>

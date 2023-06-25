@@ -388,6 +388,7 @@ function onClick(eventInfo: { trackId: string; date: string }) {
                         <div class="row">
                             <GenericTable
                                 :title="`Season Stats - ${split}`"
+                                :league-id="schedule.leagueId"
                                 :rows="schedule.stats[split]"
                             />
                         </div>
