@@ -152,11 +152,12 @@ export async function getSeasonSimsessionIndex(
 }
 
 export async function getDriverResults(
+    leagueId: string,
     driverId: string,
     sessionType: 'race' | 'sprint' | 'quali'
 ): Promise<DriverResults> {
     return await fetchCachedObject<DriverResults>(
-        `./data/derived/driverSessionResults_${sessionType}_${driverId}.json`
+        `./data/derived/driverSessionResults_${leagueId}_${sessionType}_${driverId}.json`
     );
 }
 

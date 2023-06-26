@@ -8,31 +8,39 @@ import { ref, watchEffect } from 'vue';
 import type { Ref } from 'vue';
 import { getShortSubsessionName } from '../session-utils';
 
-const props = withDefaults(
-    defineProps<{
-        stats: DriverStats;
-        results: DriverResults[];
-        seasonName: string;
-        leagueId: string;
-        seasonId?: number;
-    }>(),
-    {
-        seasonId: 0,
-    }
-);
+export interface ResultsCollection {
+    race: DriverResults;
+    sprint: DriverResults;
+    quali: DriverResults;
+}
+
+const props = defineProps<{
+    stats: DriverStats;
+    results: {
+        race: DriverResults;
+        sprint: DriverResults;
+        quali: DriverResults;
+    };
+    seasonName: string;
+    leagueId: string;
+    seasonId: number;
+}>();
 
 const barChartData: Ref<{ name: string; value: number }[] | null> = ref(null);
 const startFinishChart: Ref<{ name: string; hi: number; lo: number }[] | null> =
     ref(null);
 
 async function fectchJsonData() {
-    if (!props.results[2]) {
+    if (!props.results.quali || !props.results.quali[props.seasonId]) {
+        console.log(props);
         barChartData.value = null;
         return;
     }
-    const seasonRaceResults = props.results[2][props.seasonId];
+    const seasonRaceResults = props.results.quali[props.seasonId];
 
     const names: { [name: string]: string } = {};
+
+    console.log(seasonRaceResults);
 
     let sessionKeys = Object.keys(seasonRaceResults)
         .map((v) => Number.parseInt(v, 10))
@@ -67,8 +75,8 @@ async function fectchJsonData() {
 
     startFinishChart.value = <{ name: string; hi: number; lo: number }[]>(
         sessionKeys.flatMap((k) => {
-            const sprint = props.results?.[1]?.[props.seasonId]?.[k] || null;
-            const race = props.results?.[0]?.[props.seasonId]?.[k] || null;
+            const sprint = props.results?.sprint?.[props.seasonId]?.[k] || null;
+            const race = props.results?.race?.[props.seasonId]?.[k] || null;
             return [
                 sprint
                     ? {
@@ -100,7 +108,7 @@ async function fectchJsonData() {
 watchEffect(fectchJsonData);
 
 // const leagueId = 6555;
-const leagueId = 637;
+// const leagueId = 637;
 
 const statClasses = 'px-2 py-1 m-1 fs-5';
 </script>
@@ -110,7 +118,7 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
         <RouterLink
             class="link-light"
             v-if="seasonId"
-            :to="`/?m=standings&league=${leagueId}&season=${seasonId}`"
+            :to="`/?m=standings&league=${props.leagueId}&season=${props.seasonId}`"
             >{{ seasonName }}</RouterLink
         >
         <span v-else>{{ seasonName }}</span>
@@ -157,7 +165,7 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
                 >Qualifying Performance</a
             >
         </li> -->
-        <li v-if="results.length > 0" class="nav-item dropdown">
+        <li class="nav-item dropdown">
             <a
                 class="nav-link dropdown-toggle active show"
                 data-bs-toggle="dropdown"
@@ -189,7 +197,7 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
                 </li>
             </ul>
         </li>
-        <li v-if="results.length > 0" class="nav-item dropdown">
+        <li class="nav-item dropdown">
             <a
                 class="nav-link dropdown-toggle"
                 data-bs-toggle="dropdown"
@@ -204,12 +212,10 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
                         <a
                             class="dropdown-item"
                             data-bs-toggle="tab"
-                            v-bind:data-bs-target="`#nav-${
-                                ['race', 'sprint', 'qualy'][i]
-                            }-${seasonId}`"
+                            v-bind:data-bs-target="`#nav-${i}-${seasonId}`"
                             href="#"
                         >
-                            {{ ['Race', 'Sprint', 'Qualy'][i] }}
+                            {{ i }}
                         </a>
                     </li>
                 </template>
@@ -255,7 +261,7 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
         <template v-for="(result, i) in results">
             <div
                 class="tab-pane fade"
-                v-bind:id="`nav-${['race', 'sprint', 'qualy'][i]}-${seasonId}`"
+                v-bind:id="`nav-${i}-${seasonId}`"
                 role="tabpanel"
                 aria-labelledby="nav-profile-tab"
                 tabindex="0"
@@ -265,7 +271,7 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
                     style="margin-top: 1em"
                     v-if="result && result[seasonId]"
                 >
-                    <div class="col">{{ ['Race', 'Sprint', 'Qualy'][i] }}</div>
+                    <div class="col">{{ i }}</div>
                 </div>
                 <ResultsTable
                     :seasonId="seasonId"

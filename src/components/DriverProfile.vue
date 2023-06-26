@@ -2,7 +2,7 @@
 import Stats from './Stats.vue';
 import DriverTag from './DriverTag.vue';
 import { getMemberViewFromM_Memeber } from './driverUtils';
-import { ref, watchEffect, computed, provide } from 'vue';
+import { ref, watchEffect, computed } from 'vue';
 import type { Ref } from 'vue';
 import type {
     CuratedLeagueTeamsInfo,
@@ -26,16 +26,22 @@ const props = defineProps<{
     driver: string;
 }>();
 
-provide('league', props.league);
-
 const _singleMemberData: Ref<M_Member | null> = ref(null);
 const _leagueSeasons: Ref<LeagueSeasons | null> = ref(null);
 const _teamsInfo: Ref<CuratedLeagueTeamsInfo | null> = ref(null);
 const _driverStatsMap: Ref<{ [name: number]: DriverStatsMap } | null> =
     ref(null);
-const _driverResults: Ref<DriverResults[]> = ref([]);
+const _driverResults: Ref<{
+    race: DriverResults;
+    sprint: DriverResults;
+    quali: DriverResults;
+}> = ref({ race: {}, sprint: {}, quali: {} });
 
-const _allTimeResults: Ref<DriverResults[]> = ref([]);
+const _allTimeResults: Ref<{
+    race: DriverResults;
+    sprint: DriverResults;
+    quali: DriverResults;
+}> = ref({ race: {}, sprint: {}, quali: {} });
 
 watchEffect(async () => {
     const driverStatsMap = await getLeagueDriverStats(props.league);
@@ -45,43 +51,41 @@ watchEffect(async () => {
     const leagueSeasons = await getLeagueSeasons(props.league);
 
     const driverSessionResultsRace = await getDriverResults(
+        props.league,
         props.driver,
         'race'
     );
 
     const driverSessionResultsSprint = await getDriverResults(
+        props.league,
         props.driver,
         'sprint'
     );
 
     const driverSessionResultsQuali = await getDriverResults(
+        props.league,
         props.driver,
         'quali'
     );
 
     leagueSeasons.seasons.sort((a, b) => b.season_id - a.season_id);
 
-    _driverResults.value = [
-        driverSessionResultsRace,
-        driverSessionResultsSprint,
-        driverSessionResultsQuali,
-    ];
+    _driverResults.value = {
+        race: driverSessionResultsRace,
+        sprint: driverSessionResultsSprint,
+        quali: driverSessionResultsQuali,
+    };
 
     _driverStatsMap.value = driverStatsMap;
     _teamsInfo.value = leagueTeamsInfo;
     _singleMemberData.value = singleMemberData;
     _leagueSeasons.value = leagueSeasons;
 
-    _allTimeResults.value = [];
-    _allTimeResults.value.push(
-        calculateAllTimeResults(driverSessionResultsRace)
-    );
-    _allTimeResults.value.push(
-        calculateAllTimeResults(driverSessionResultsSprint)
-    );
-    _allTimeResults.value.push(
-        calculateAllTimeResults(driverSessionResultsQuali)
-    );
+    _allTimeResults.value = {
+        race: calculateAllTimeResults(driverSessionResultsRace),
+        sprint: calculateAllTimeResults(driverSessionResultsSprint),
+        quali: calculateAllTimeResults(driverSessionResultsQuali),
+    };
 });
 
 function calculateAllTimeResults(
@@ -144,7 +148,7 @@ const memberView = computed(() => {
                 :stats="_driverStatsMap[0][driverId]"
                 :results="_allTimeResults"
                 seasonName="All Time"
-                :seasonId="0"
+                v-bind:seasonId="0"
                 v-bind:league-id="props.league"
             />
         </div>
@@ -154,10 +158,12 @@ const memberView = computed(() => {
             <div class="card bg-dark text-light m-2">
                 <div class="card-body p-2">
                     <Stats
-                        :stats="_driverStatsMap?.[season.season_id]?.[driverId]"
-                        :results="_driverResults"
-                        :seasonName="season.season_name"
-                        :seasonId="season.season_id"
+                        v-bind:stats="
+                            _driverStatsMap?.[season.season_id]?.[driverId]
+                        "
+                        v-bind:results="_driverResults"
+                        v-bind:seasonName="season.season_name"
+                        v-bind:seasonId="season.season_id"
                         v-bind:league-id="props.league"
                     />
                 </div>

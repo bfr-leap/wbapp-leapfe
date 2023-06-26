@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, type Ref } from 'vue';
+import { computed, type Ref } from 'vue';
 import type { DriverResults, SSR_ResultsEntry } from '../iracing-endpoints';
 import { getSubsessionName } from '../session-utils';
 
@@ -10,8 +10,6 @@ const props = defineProps<{
     seasonId: number;
     leagueId: string;
 }>();
-
-const league = inject<string>('league');
 
 const seasonRaceResults = computed(() => {
     return props?.results?.[props.seasonId];
@@ -119,7 +117,7 @@ watchEffect(fectchJsonData);
                     <td>
                         <RouterLink
                             class="link-light"
-                            :to="`/?m=results&league=${league}&season=${props.seasonId}&simsession=0&subsession=${result.sessionId}`"
+                            :to="`/?m=results&league=${props.leagueId}&season=${props.seasonId}&simsession=0&subsession=${result.sessionId}`"
                             >{{ result.sessionName }}</RouterLink
                         >
                     </td>

@@ -92,7 +92,7 @@ export function deriveLeagueSimSessionResults(leagueId: number) {
     for (let custId of driverIds) {
         wf(
             resultsStoreRace[Number.parseInt(custId)],
-            `driverSessionResults_race_${custId}.json`
+            `driverSessionResults_${leagueId}_race_${custId}.json`
         );
     }
 
@@ -100,7 +100,7 @@ export function deriveLeagueSimSessionResults(leagueId: number) {
     for (let custId of driverIds) {
         wf(
             resultsStoreSprint[Number.parseInt(custId)],
-            `driverSessionResults_sprint_${custId}.json`
+            `driverSessionResults_${leagueId}_sprint_${custId}.json`
         );
     }
 
@@ -108,7 +108,7 @@ export function deriveLeagueSimSessionResults(leagueId: number) {
     for (let custId of driverIds) {
         wf(
             resultsStoreQuali[Number.parseInt(custId)],
-            `driverSessionResults_quali_${custId}.json`
+            `driverSessionResults_${leagueId}_quali_${custId}.json`
         );
     }
 }
