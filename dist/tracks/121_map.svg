@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.4, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="629.568px" height="459.274px" viewBox="0 0 629.568 459.274" enable-background="new 0 0 629.568 459.274"
+	 xml:space="preserve">
+<g id="road_course">
+	<path fill="none" stroke="#BCBEC0" stroke-width="7" stroke-miterlimit="10" d="M345.887,76.953
+		c11.757,0,21.287,9.531,21.287,21.287c0,5.878-2.383,11.199-6.234,15.052"/>
+	<path fill="none" stroke="#BCBEC0" stroke-width="7" stroke-miterlimit="10" d="M273.178,113.654
+		c-4.07-3.877-6.606-9.35-6.606-15.415c0-11.756,9.53-21.287,21.287-21.287"/>
+	<path fill="none" stroke="#BCBEC0" stroke-width="7" stroke-miterlimit="10" d="M252.333,388.823c0,0,44.555-3.466,44.555-21.782
+		s-12.376-21.287-17.822-22.772s-55.941,0-70.297,0s-73.081-0.604-78.218-30.693c-3.465-20.297,10.892-30.692,27.228-31.683
+		s26.238,0.99,45.544,5.94s40.099,8.912,55.445,3.466s25.248-21.287,33.664-24.258s38.614-5.941,46.04,4.455s12.376,20.792,0,30.693
+		s-33.218,21.13-45.544,21.287"/>
+	<path fill="none" stroke="#BCBEC0" stroke-width="7" stroke-miterlimit="10" d="M491.938,264.24c0,0,24.256-0.171,29.702,13.691
+		s6.437,33.665-22.276,49.506s-78.218,27.723-95.545,28.218s-34.653-1.484-50-13.861s-22.772-19.803-60.891-18.317
+		s-35.036,24.509-80.199,20.768"/>
+	<path fill="none" stroke="#BCBEC0" stroke-width="7" stroke-miterlimit="10" d="M453.819,264.24c0,0-20.297-1.159-27.228,9.731
+		s-3.465,26.97-14.356,36.01s-23.268-2.347-38.119,6.069s-22.242,19.751-16.319,28.688"/>
+	<path fill="none" stroke="#BCBEC0" stroke-width="7" stroke-miterlimit="10" d="M132.761,295.935c0,0,18.112-31.695,44.325-31.695
+		c22.277,0,320.295,0,320.295,0"/>
+	<path fill="none" stroke="#BCBEC0" stroke-width="7" stroke-miterlimit="10" d="M387.548,355.142c0,0-35.215-5.291-44.126,0.581
+		s-8.909,33.1,19.803,33.1"/>
+</g>
+<g id="oval_track">
+	<path fill="none" stroke="#000000" stroke-width="10" stroke-miterlimit="10" d="M188.483,388.823
+		c-15.347,0-53.414-6.684-53.414-6.684C76.293,369.5,32.047,314.35,32.047,248.229c0-60.266,37.396-111.419,86.664-129.575
+		L224.6,81.892c0,0,13.387-4.951,31.704-4.951s103.455,0,121.772,0s31.704,4.951,31.704,4.951l105.889,36.762
+		c49.269,18.156,86.664,69.309,86.664,129.575c0,66.121-44.246,121.271-103.021,133.91c0,0-38.067,6.684-53.414,6.684
+		S203.83,388.823,188.483,388.823z"/>
+	<path fill="none" stroke="#000000" stroke-width="6" stroke-miterlimit="10" d="M188.483,388.823
+		c-15.347,0-53.414-6.684-53.414-6.684C76.293,369.5,32.047,314.35,32.047,248.229c0-60.266,37.396-111.419,86.664-129.575
+		c0,0,14.811-5.005,39.068-5.005s300.99,0,314.356,0s43.534,5.005,43.534,5.005c49.269,18.156,86.664,69.309,86.664,129.575
+		c0,66.121-44.246,121.271-103.021,133.91c0,0-38.067,6.684-53.414,6.684S203.83,388.823,188.483,388.823z"/>
+</g>
+<g id="grandstands">
+	<path fill="#FFFFFF" stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" d="M614.649,158.168
+		c-2.214-3.798-4.574-7.525-7.079-11.174c-19.775-28.808-35.001-48.709-79.494-70.041L415.985,34.481
+		c-4.193-1.506-15.188-3.049-37.908-3.049H256.304c-22.72,0-31.712,0.542-35.906,2.048L105.739,77.167l-0.649,0.232
+		c-31.349,11.552-59.504,39.786-79.279,68.594c-12.284,17.895-20.729,38.03-25.515,59.154l28.731,8.536
+		c4.187-17.825,11.63-34.733,22.106-49.994c16.349-23.817,39.489-42.144,65.158-51.603l0.125-0.044l105.837-36.744
+		c1.301-0.472,15.238-5.356,34.052-5.356h121.772c18.814,0,32.751,4.884,34.052,5.356l105.962,36.789
+		c25.668,9.459,48.809,27.785,65.158,51.603c2.487,3.624,4.804,7.34,6.945,11.139L614.649,158.168z"/>
+	<g>
+		<path fill="#FFFFFF" stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" d="M436.821,395.823H188.483
+			c-15.775,0-53.046-6.512-54.625-6.789l-0.261-0.051c-3.432-0.738-6.236-1.439-9.561-2.443l-5.883,17.875
+			c11.405,6.729,52.696,13.901,70.329,14.902l194.544,0.694l51.716-2.293l2.367-1.493L436.821,395.823z"/>
+		<path fill="#FFFFFF" stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" d="M509.725,386.722
+			c-2.938,0.856-5.92,1.611-8.941,2.261l-0.261,0.051c-1.579,0.277-38.85,6.789-54.625,6.789h-5.483l0.287,20.256l14.453,0.033
+			c16.831,0,32.716-9.845,55.887-24.694L509.725,386.722z"/>
+	</g>
+	<line fill="none" stroke="#000000" stroke-miterlimit="10" x1="317.19" y1="82.924" x2="317.19" y2="70.613"/>
+	<path fill="#ED1C24" d="M118.154,0"/>
+</g>
+<g id="labels">
+	<text transform="matrix(1 0 0 1 289.6196 137.5894)" font-family="'Times-Roman'" font-size="18">Pit Road</text>
+	<text transform="matrix(1 0 0 1 81.3906 181.8755)" font-family="'Times-Roman'" font-size="18">Turn 1</text>
+	<text transform="matrix(1 0 0 1 500.4282 181.8755)" font-family="'Times-Roman'" font-size="18">Turn 4</text>
+	<text transform="matrix(1 0 0 1 273.6279 15.8516)" font-family="'Times-Roman'" font-size="18">Front Stretch</text>
+	<text transform="matrix(1 0 0 1 274.6387 451.5649)" font-family="'Times-Roman'" font-size="18">Back Stretch</text>
+	<text transform="matrix(1 0 0 1 4.7241 377.1138)" font-family="'Times-Roman'" font-size="18">Turn 2</text>
+	<text transform="matrix(1 0 0 1 581.3911 377.1138)" font-family="'Times-Roman'" font-size="18">Turn 3</text>
+	
+		<text transform="matrix(0.9457 0.325 -0.325 0.9457 435.4575 67.8174)" fill="#939598" font-family="'Times-Roman'" font-size="14">Grandstands</text>
+	
+		<text transform="matrix(0.9309 -0.3653 0.3653 0.9309 107.2959 101.6387)" fill="#939598" font-family="'Times-Roman'" font-size="14">Grandstands</text>
+	<text transform="matrix(1 0 0 1 275.9282 412.7788)" fill="#939598" font-family="'Times-Roman'" font-size="14">Grandstands</text>
+	<text transform="matrix(1 0 0 1 15.9697 36.6348)" font-family="'Times-Roman'" font-size="36">N</text>
+	<polygon fill="#ED1C24" points="317.19,57.616 253.861,51.875 317.19,46.135 	"/>
+	<polyline fill="#8DCBE0" points="118.154,0 58.962,23.233 55.75,12.211 118.154,0 	"/>
+	<g>
+		<rect x="322.522" y="44.829" stroke="#000000" stroke-width="0.2242" stroke-miterlimit="10" width="4.697" height="4.698"/>
+		
+			<rect x="322.522" y="49.527" fill="#FFFFFF" stroke="#000000" stroke-width="0.2242" stroke-miterlimit="10" width="4.697" height="4.697"/>
+		<rect x="322.522" y="54.224" stroke="#000000" stroke-width="0.2242" stroke-miterlimit="10" width="4.697" height="4.698"/>
+		<rect x="341.313" y="44.829" stroke="#000000" stroke-width="0.2242" stroke-miterlimit="10" width="4.697" height="4.698"/>
+		
+			<rect x="341.313" y="49.527" fill="#FFFFFF" stroke="#000000" stroke-width="0.2242" stroke-miterlimit="10" width="4.697" height="4.697"/>
+		<rect x="341.313" y="54.224" stroke="#000000" stroke-width="0.2242" stroke-miterlimit="10" width="4.697" height="4.698"/>
+		
+			<rect x="327.219" y="44.829" fill="#FFFFFF" stroke="#000000" stroke-width="0.2242" stroke-miterlimit="10" width="4.698" height="4.698"/>
+		<rect x="327.219" y="49.527" stroke="#000000" stroke-width="0.2242" stroke-miterlimit="10" width="4.698" height="4.697"/>
+		
+			<rect x="327.219" y="54.224" fill="#FFFFFF" stroke="#000000" stroke-width="0.2242" stroke-miterlimit="10" width="4.698" height="4.698"/>
+		<rect x="331.917" y="44.829" stroke="#000000" stroke-width="0.2242" stroke-miterlimit="10" width="4.698" height="4.698"/>
+		
+			<rect x="331.917" y="49.527" fill="#FFFFFF" stroke="#000000" stroke-width="0.2242" stroke-miterlimit="10" width="4.698" height="4.697"/>
+		<rect x="331.917" y="54.224" stroke="#000000" stroke-width="0.2242" stroke-miterlimit="10" width="4.698" height="4.698"/>
+		
+			<rect x="336.616" y="44.829" fill="#FFFFFF" stroke="#000000" stroke-width="0.2242" stroke-miterlimit="10" width="4.697" height="4.698"/>
+		<rect x="336.616" y="49.527" stroke="#000000" stroke-width="0.2242" stroke-miterlimit="10" width="4.697" height="4.697"/>
+		
+			<rect x="336.616" y="54.224" fill="#FFFFFF" stroke="#000000" stroke-width="0.2242" stroke-miterlimit="10" width="4.697" height="4.698"/>
+	</g>
+</g>
+</svg>

@@ -67,7 +67,7 @@ function formatHeader(name: string): string {
         return 'driver';
     }
 
-    name = name.replaceAll('_', ' ');
+    name = <string>(<any>name).replaceAll('_', ' ');
 
     return name;
 }

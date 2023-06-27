@@ -13,7 +13,7 @@ const props = defineProps<{
 }>();
 
 let countdown: Ref<String> = ref('---');
-let timer: number = 0;
+let timer: any = 0;
 let trackName: Ref<string> = ref('---');
 
 async function fectchJsonData() {

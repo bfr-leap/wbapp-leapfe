@@ -5,19 +5,29 @@
             "season_id": 87365,
             "teams": [
                 {
-                    "team_name": "GitGud Racing",
-                    "team_id": 3,
-                    "team_members": [575753, 643236, 484369]
-                },
-                {
-                    "team_name": "Maxwell Racing Team",
-                    "team_id": 23,
-                    "team_members": [174470, 732815, 110512]
-                },
-                {
                     "team_name": "Nox eMotorsports",
                     "team_id": 1,
                     "team_members": [601143, 579320, 603501]
+                },
+                {
+                    "team_name": "Lumos eMotorsports",
+                    "team_id": 2,
+                    "team_members": [579268, 441592, 792156]
+                },
+                {
+                    "team_name": "GitGud Racing",
+                    "team_id": 3,
+                    "team_members": [575753, 643236, 484369, 422924]
+                },
+                {
+                    "team_name": "Orion Legendary Racing",
+                    "team_id": 4,
+                    "team_members": [402468, 278685, 805151]
+                },
+                {
+                    "team_name": "Mercury Motorsports",
+                    "team_id": 8,
+                    "team_members": [769475, 786392, 462155]
                 },
                 {
                     "team_name": "Team Banana",
@@ -25,19 +35,34 @@
                     "team_members": [493785, 493786, 590218]
                 },
                 {
+                    "team_name": "Bieser Racing Team",
+                    "team_id": 19,
+                    "team_members": [227791, 217326, 712262]
+                },
+                {
+                    "team_name": "Maxwell Racing Team",
+                    "team_id": 23,
+                    "team_members": [174470, 732815, 110512]
+                },
+                {
                     "team_name": "Wolf Pack Racing",
                     "team_id": 24,
                     "team_members": [522124, 489131, 822137]
                 },
                 {
-                    "team_name": "Bieser Racing Team",
-                    "team_id": 19,
-                    "team_members": [227791, 217326]
+                    "team_name": "Intend Sim Racing",
+                    "team_id": 25,
+                    "team_members": [115698, 204390, 638563]
                 },
                 {
-                    "team_name": "Mercury Motorsports",
-                    "team_id": 8,
-                    "team_members": [769475, 786392, 462155]
+                    "team_name": "B Team",
+                    "team_id": 26,
+                    "team_members": [584257, 810867]
+                },
+                {
+                    "team_name": "Alkentech NHR",
+                    "team_id": 27,
+                    "team_members": [615828]
                 }
             ]
         },
