@@ -18,6 +18,7 @@ import { wf } from './file-writer.js';
 const SimsessionTypes = {
     RACE: 6,
     QUALI: 5,
+    QUALI_LONE: 4,
 };
 
 function sortRowsByField(
@@ -223,7 +224,8 @@ export function deriveSingleTrackInfo(leagueId: number) {
                 r = calculateQualifyResults(lapChartData);
                 if (
                     lapChartData.session_info.simsession_type ===
-                    SimsessionTypes.QUALI
+                    SimsessionTypes.QUALI || lapChartData.session_info.simsession_type ===
+                    SimsessionTypes.QUALI_LONE
                 ) {
                     // poles
                     let currentPole = r.results[0];

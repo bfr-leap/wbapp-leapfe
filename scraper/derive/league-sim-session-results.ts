@@ -66,7 +66,10 @@ export function deriveLeagueSimSessionResults(leagueId: number) {
                 }
             } else {
                 r = calculateQualifyResults(lapChartData);
-                if (lapChartData.session_info.simsession_type === 5) {
+                if (
+                    lapChartData.session_info.simsession_type === 5 ||
+                    lapChartData.session_info.simsession_type === 4
+                ) {
                     activeStore = resultsStoreQuali;
                 }
             }

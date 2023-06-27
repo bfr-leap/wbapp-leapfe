@@ -52,7 +52,7 @@ export function deriveLeagueSimSessionIndex(leagueId: number) {
                             type:
                                 simtype === 6
                                     ? 'race'
-                                    : simtype === 5
+                                    : simtype === 5 || simtype === 4
                                     ? 'qualify'
                                     : 'practice',
                         };

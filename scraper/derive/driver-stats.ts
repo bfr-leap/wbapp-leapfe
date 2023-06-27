@@ -105,7 +105,10 @@ export function deriveDriverStats(leagueId: number) {
                         sStats.top_20 += 1;
                     }
                 }
-            } else if (lapChartData.session_info.simsession_type === 5) {
+            } else if (
+                lapChartData.session_info.simsession_type === 5 ||
+                lapChartData.session_info.simsession_type === 4
+            ) {
                 r = calculateQualifyResults(lapChartData);
                 let cStats = getStats(carrerStatsMap, r.results[0].cust_id);
                 let sStats = getStats(seasonStatsMap, r.results[0].cust_id);
