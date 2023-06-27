@@ -26,6 +26,7 @@
         "display": "Long Beach Street Circuit"
     },
     "195": { "short_display": "MOTE", "display": "Twin Ring Motegi" },
+    "198": { "short_display": "MOTE", "display": "Twin Ring Motegi" },
     "212": {
         "short_display": "INT",
         "display": "Autódromo José Carlos Pace"
@@ -65,7 +66,19 @@
         "short_display": "GLEN",
         "display": "Watkins Glen International"
     },
+    "109": {
+        "short_display": "GLEN",
+        "display": "Watkins Glen International"
+    },
     "448": {
+        "short_display": "INDI",
+        "display": "Indianapolis Motor Speedway"
+    },
+    "453": {
+        "short_display": "INDI",
+        "display": "Indianapolis Motor Speedway"
+    },
+    "178": {
         "short_display": "INDI",
         "display": "Indianapolis Motor Speedway"
     },
@@ -113,7 +126,15 @@
         "short_display": "POC",
         "display": "Pocono Raceway"
     },
+    "136": {
+        "short_display": "POC",
+        "display": "Pocono Raceway"
+    },
     "419": {
+        "short_display": "PHX",
+        "display": "Phoenix Raceway"
+    },
+    "236": {
         "short_display": "PHX",
         "display": "Phoenix Raceway"
     },
@@ -124,6 +145,66 @@
     "276": {
         "short_display": "MI",
         "display": "Michigan International Speedway"
+    },
+    "124": {
+        "short_display": "MI",
+        "display": "Michigan International Speedway"
+    },
+    "465": {
+        "short_display": "VIR",
+        "display": "Virginia International Raceway"
+    },
+    "225": {
+        "short_display": "ACS",
+        "display": "Auto Club Speedway"
+    },
+    "371": {
+        "short_display": "KY",
+        "display": "Kentucky Speedway"
+    },
+    "94": {
+        "short_display": "MM",
+        "display": "Milwakee Mile"
+    },
+    "214": {
+        "short_display": "KS",
+        "display": "Kansas Speedway"
+    },
+    "169": {
+        "short_display": "IA",
+        "display": "Iowa Speedway"
+    },
+    "237": {
+        "short_display": "WWT",
+        "display": "World Wide Technology Raceway"
+    },
+    "103": {
+        "short_display": "LV",
+        "display": "Las Vegas Motor Speedway"
+    },
+    "31": {
+        "short_display": "RR",
+        "display": "Richmond Raceway"
+    },
+    "123": {
+        "short_display": "CH",
+        "display": "Chicagoland Speedway"
+    },
+    "121": {
+        "short_display": "TX",
+        "display": "Texas Motor Speedway"
+    },
+    "53": {
+        "short_display": "ATL",
+        "display": "Atlanta Motor Speedway"
+    },
+    "20": {
+        "short_display": "MI",
+        "display": "Homestead Miami Speedway"
+    },
+    "191": {
+        "short_display": "DIS",
+        "display": "Daytona International Speedway"
     },
     "-1": {
         "short_display": "",
