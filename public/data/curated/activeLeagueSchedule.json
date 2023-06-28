@@ -10,27 +10,27 @@
                     "comment": "ifl F3 << do not use this",
                     "events": [
                         {
-                            "time": "July 16 2023 11:00:00 UTC-0500",
+                            "time": "July 16 2023 11:00:00 UTC-0400",
                             "track_id": 445,
                             "comment": "Fuji"
                         },
                         {
-                            "time": "July 30 2023 11:00:00 UTC-0500",
+                            "time": "July 30 2023 11:00:00 UTC-0400",
                             "track_id": 266,
                             "comment": "Emilia-Romagna"
                         },
                         {
-                            "time": "August 6 2023 11:00:00 UTC-0500",
+                            "time": "August 6 2023 11:00:00 UTC-0400",
                             "track_id": 341,
                             "comment": "Silverstone"
                         },
                         {
-                            "time": "August 20 2023 11:00:00 UTC-0500",
+                            "time": "August 20 2023 11:00:00 UTC-0400",
                             "track_id": 163,
                             "comment": "Spa"
                         },
                         {
-                            "time": "August 27 2023 11:00:00 UTC-0500",
+                            "time": "August 27 2023 11:00:00 UTC-0400",
                             "track_id": 463,
                             "comment": "Magny Cours"
                         }
@@ -173,32 +173,32 @@
                     "comment": "F.A.R.T. IR-01 << do not use this",
                     "events": [
                         {
-                            "time": "July 2 2023 19:00:00 UTC-0400",
+                            "time": "July 9 2023 19:00:00 UTC-0400",
                             "track_id": 20,
                             "comment": "Homestead Miami Speedway"
                         },
                         {
-                            "time": "July 9 2023 19:00:00 UTC-0400",
+                            "time": "July 16 2023 19:00:00 UTC-0400",
                             "track_id": 121,
                             "comment": "Texas"
                         },
                         {
-                            "time": "July 16 2023 19:00:00 UTC-0400",
+                            "time": "July 23 2023 19:00:00 UTC-0400",
                             "track_id": 237,
                             "comment": "gateway"
                         },
                         {
-                            "time": "July 23 2023 19:00:00 UTC-0400",
+                            "time": "July 30 2023 19:00:00 UTC-0400",
                             "track_id": 191,
                             "comment": "daytona"
                         },
                         {
-                            "time": "July 30 2023 19:00:00 UTC-0400",
+                            "time": "August 6 2023 19:00:00 UTC-0400",
                             "track_id": 371,
                             "comment": "kentucky"
                         },
                         {
-                            "time": "August 6 2023 19:00:00 UTC-0400",
+                            "time": "August 13 2023 19:00:00 UTC-0400",
                             "track_id": 448,
                             "comment": "indy"
                         }
