@@ -68,9 +68,13 @@ async function fetchData() {
     barChartData.value = simsessionResults.results.map((v, i) => {
         return {
             name: driverNameMaps[v.cust_id] + ' : P' + (i + 1),
-            value: v.pace_percent,
+            value: v.pace_percent > 7 ? 0 : Math.min(v.pace_percent, 7),
             value2: telemetryAvailable
-                ? Math.min(v.pace_percent, 100 * (idealLaps[i] / fastest) - 100)
+                ? Math.min(
+                      v.pace_percent,
+                      100 * (idealLaps[i] / fastest) - 100,
+                      7
+                  )
                 : undefined,
         };
     });

@@ -150,13 +150,13 @@ watchEffect(fectchJsonData);
                     </button>
                     <ul class="dropdown-menu dropdown-menu-dark">
                         <li v-for="leagueOption in leagueOptions.options">
-                            <RouterLink
+                            <a
                                 class="dropdown-item"
                                 type="button"
-                                v-bind:to="leagueOption.href"
+                                v-bind:href="leagueOption.href"
                             >
                                 {{ leagueOption.display }}
-                            </RouterLink>
+                            </a>
                         </li>
                     </ul>
                 </div>
@@ -171,13 +171,13 @@ watchEffect(fectchJsonData);
                     </button>
                     <ul class="dropdown-menu">
                         <li v-for="seasonOption in seasonOptions.options">
-                            <RouterLink
+                            <a
                                 class="dropdown-item"
                                 type="button"
-                                v-bind:to="seasonOption.href"
+                                v-bind:href="seasonOption.href"
                             >
                                 {{ seasonOption.display }}
-                            </RouterLink>
+                            </a>
                         </li>
                     </ul>
                 </div>
@@ -195,13 +195,13 @@ watchEffect(fectchJsonData);
                         <li
                             v-for="subsessionOption in subsessionOptions.options"
                         >
-                            <RouterLink
+                            <a
                                 class="dropdown-item"
                                 type="button"
-                                v-bind:to="subsessionOption.href"
+                                v-bind:href="subsessionOption.href"
                             >
                                 {{ subsessionOption.display }}
-                            </RouterLink>
+                            </a>
                         </li>
                     </ul>
                 </div>
@@ -219,13 +219,13 @@ watchEffect(fectchJsonData);
                         <li
                             v-for="simsessionOption in simsessionOptions.options"
                         >
-                            <RouterLink
+                            <a
                                 class="dropdown-item"
                                 type="button"
-                                v-bind:to="simsessionOption.href"
+                                v-bind:href="simsessionOption.href"
                             >
                                 {{ simsessionOption.display }}
-                            </RouterLink>
+                            </a>
                         </li>
                     </ul>
                 </div>

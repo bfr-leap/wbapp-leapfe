@@ -146,7 +146,7 @@ function getHeightAttr(seriesValue: number) {
 }
 
 function getDPathAttrAverage() {
-    if (!scaleX.value || !scaleY.value) {
+    if (!scaleX.value || !scaleY.value || renderData.value.length === 0) {
         return '';
     }
 
