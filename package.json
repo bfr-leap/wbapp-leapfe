@@ -9,6 +9,7 @@
     "start": "webpack serve",
     "scrape": "ts-node scraper/main.ts",
     "derive": "ts-node scraper/derived-data.ts",
+    "gpt": "ts-node scraper/generate.ts",
     "dev": "vite",
     "buildVite": "run-p type-check build-only",
     "preview": "vite preview",
@@ -58,6 +59,7 @@
   },
   "dependencies": {
     "mixpanel-browser": "^2.45.0",
+    "openai": "^3.3.0",
     "pinia": "^2.0.28",
     "vue": "^3.2.45",
     "vue-router": "^4.1.6"
