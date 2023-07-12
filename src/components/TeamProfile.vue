@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watchEffect } from 'vue';
 import type { Ref } from 'vue';
-import TeamTag from './TeamTag.vue';
+import TeamTag from './team-tag.vue';
 import {
     getCuratedLeagueTeamsInfo,
     getLeagueDriverStats,

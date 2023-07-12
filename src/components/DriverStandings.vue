@@ -18,7 +18,7 @@ import {
     getSeasonSimsessionIndex,
 } from '@/fetch-util';
 import DriverTag from './DriverTag.vue';
-import TeamTag from './TeamTag.vue';
+import TeamTag from './team-tag.vue';
 import LeagueSeasonMenu from './LeagueSeasonMenu.vue';
 
 const props = withDefaults(
