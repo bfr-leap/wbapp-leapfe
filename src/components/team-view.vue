@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-import TeamProfile from '../components/TeamProfile.vue';
+import TeamProfile from '../components/team-profile.vue';
 
 const route = useRoute();
 </script>

@@ -2,88 +2,27 @@
 import { ref, watchEffect } from 'vue';
 import type { Ref } from 'vue';
 import TeamTag from './team-tag.vue';
+import type { TeamProfileModel } from '@/models/team-profile-model';
 import {
-    getCuratedLeagueTeamsInfo,
-    getLeagueDriverStats,
-    getSingleMemberData,
-} from '@/fetch-util';
-import type { DriverStats, DriverStatsMap } from '@/iracing-endpoints';
-import { getFirstLastNames, getRoadLicense } from './driverUtils';
+    getDefaultTeamProfileModel,
+    getTeamProfileModel,
+} from '@/models/team-profile-model';
 
 const props = defineProps<{
     league: string;
     team: string;
 }>();
 
-interface TeamView {
-    stats: DriverStats;
+let teamProfileModel: Ref<TeamProfileModel> = ref(getDefaultTeamProfileModel());
+
+async function fetchModel() {
+    teamProfileModel.value = await getTeamProfileModel(
+        props.league,
+        props.team
+    );
 }
 
-let defaultTeamView: TeamView = {
-    stats: {
-        cust_id: 0,
-        started: 0,
-        finished: 0,
-        wins: 0,
-        podiums: 0,
-        top_10: 0,
-        top_20: 0,
-        fast_laps: 0,
-        hard_charger: 0,
-        poles: 0,
-        power_points: 0,
-        incidents: 0,
-    },
-};
-
-let view: Ref<TeamView> = ref(JSON.parse(JSON.stringify(defaultTeamView)));
-
-const _driverStatsMap: Ref<{ [name: number]: DriverStatsMap } | null> =
-    ref(null);
-
-async function fetchData() {
-    const driverStatsMap = await getLeagueDriverStats(props.league);
-
-    _driverStatsMap.value = driverStatsMap;
-
-    let teams = await getCuratedLeagueTeamsInfo(props.league);
-
-    let driverIdsBySeason: { [name: string]: string[] } = {};
-
-    for (let season of teams.seasons) {
-        for (let team of season.teams) {
-            if (team.team_id.toString() === props.team) {
-                let driversList: string[] =
-                    driverIdsBySeason[season.season_id] || [];
-
-                team.team_members
-                    .map((v) => v.toString())
-                    .forEach((v) => driversList.push(v));
-
-                driverIdsBySeason[season.season_id] = driversList;
-            }
-        }
-    }
-
-    let allDrivers: { [name: string]: boolean } = {};
-
-    for (let season in driverIdsBySeason) {
-        let teamList = driverIdsBySeason[season];
-        for (let driverId of teamList) {
-            allDrivers[driverId] = true;
-
-            let statRow =
-                driverStatsMap[parseInt(season)]?.[parseInt(driverId)];
-
-            for (let statKey of Object.keys(view.value.stats)) {
-                (<any>view.value.stats)[statKey] +=
-                    (<any>statRow)?.[statKey] || 0;
-            }
-        }
-    }
-}
-
-watchEffect(fetchData);
+watchEffect(fetchModel);
 
 const statClasses = 'px-2 py-1 m-1 fs-5';
 </script>
@@ -107,31 +46,37 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
         <div class="d-flex flex-wrap">
             <div :class="statClasses">
                 <span class="name">Starts: </span
-                ><span class="value"> {{ view.stats.started }}</span>
+                ><span class="value">
+                    {{ teamProfileModel.stats.started }}</span
+                >
             </div>
             <div :class="statClasses">
                 <span class="name">Poles: </span
-                ><span class="value"> {{ view.stats.poles }}</span>
+                ><span class="value"> {{ teamProfileModel.stats.poles }}</span>
             </div>
             <div :class="statClasses">
                 <span class="name">Wins: </span
-                ><span class="value"> {{ view.stats.wins }}</span>
+                ><span class="value"> {{ teamProfileModel.stats.wins }}</span>
             </div>
             <div :class="statClasses">
                 <span class="name">Podiums: </span
-                ><span class="value"> {{ view.stats.podiums }}</span>
+                ><span class="value">
+                    {{ teamProfileModel.stats.podiums }}</span
+                >
             </div>
             <div :class="statClasses">
                 <span class="name">Top 10: </span
-                ><span class="value"> {{ view.stats.top_10 }}</span>
+                ><span class="value"> {{ teamProfileModel.stats.top_10 }}</span>
             </div>
             <div :class="statClasses">
                 <span class="name">Top 20: </span
-                ><span class="value"> {{ view.stats.top_20 }}</span>
+                ><span class="value"> {{ teamProfileModel.stats.top_20 }}</span>
             </div>
             <div :class="statClasses">
                 <span class="name">LEAP Points: </span
-                ><span class="value"> {{ view.stats.power_points }}</span>
+                ><span class="value">
+                    {{ teamProfileModel.stats.power_points }}</span
+                >
             </div>
         </div>
     </div>
