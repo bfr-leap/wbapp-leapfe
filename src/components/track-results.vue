@@ -5,7 +5,7 @@ import type { TrackStats } from '../iracing-endpoints';
 import { getTrackStats } from '@/fetch-util';
 import GenericTable from './GenericTable.vue';
 import TrackResultsMenu from './track-results-menu.vue';
-import TrackBanner from './TrackBanner.vue';
+import TrackBanner from './track-banner.vue';
 
 const props = defineProps<{
     league: string;

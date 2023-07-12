@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-import TrackResults from '../components/TrackResults.vue';
+import TrackResults from '../components/track-results.vue';
 
 const route = useRoute();
 </script>

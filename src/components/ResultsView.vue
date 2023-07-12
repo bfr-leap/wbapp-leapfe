@@ -6,7 +6,7 @@ import StartFinishChart from './StartFinishChart.vue';
 import PaceChart from './PaceChart.vue';
 import BestQualifyLapChart from './BestQualifyLapChart.vue';
 import GenericTable from './GenericTable.vue';
-import TrackBanner from './TrackBanner.vue';
+import TrackBanner from './track-banner.vue';
 import type {
     SeasonSimsessionIndex,
     SSR_ResultsEntry,
