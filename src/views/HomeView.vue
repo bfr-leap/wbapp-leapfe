@@ -6,7 +6,7 @@ import ResultsView from '../components/ResultsView.vue';
 import DriverStandingsView from '../components/DriverStandingsView.vue';
 import DriverView from '../components/DriverView.vue';
 import TeamView from '../components/TeamView.vue';
-import TrackResultsView from '../components/TrackResultsView.vue';
+import TrackResultsView from '../components/track-results-view.vue';
 import NextEventTimerEmbed from '@/components/NextEventTimerEmbed.vue';
 import SeasonProfile from '@/components/SeasonProfile.vue';
 import { watch } from 'vue';

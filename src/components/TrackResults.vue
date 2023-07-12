@@ -4,7 +4,7 @@ import type { Ref } from 'vue';
 import type { TrackStats } from '../iracing-endpoints';
 import { getTrackStats } from '@/fetch-util';
 import GenericTable from './GenericTable.vue';
-import TrackResultsMenu from './TrackResultsMenu.vue';
+import TrackResultsMenu from './track-results-menu.vue';
 import TrackBanner from './TrackBanner.vue';
 
 const props = defineProps<{
