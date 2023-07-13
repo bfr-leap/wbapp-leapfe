@@ -2,7 +2,7 @@
 import { useRoute } from 'vue-router';
 import LeagueIndex from '../components/LeagueIndex.vue';
 import CumulativeDeltaChart from '../components/CumulativeDeltaChart.vue';
-import StartFinishChart from './StartFinishChart.vue';
+import StartFinishChart from './start-finish-chart.vue';
 import PaceChart from './PaceChart.vue';
 import BestQualifyLapChart from './BestQualifyLapChart.vue';
 import GenericTable from './GenericTable.vue';

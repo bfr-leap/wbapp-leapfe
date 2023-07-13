@@ -1,33 +1,15 @@
-<script setup lang="ts">
-import { watchEffect, ref, computed } from 'vue';
-import type { Ref } from 'vue';
-// import LineChart from './LineChart.vue';
-// import type { SeriesXY } from './LineChart.vue';
-import type { LapChartData, LCD_Chunk } from '../iracing-endpoints';
-import BarChart from './HLBarChart.vue';
+import type { HLBarChartDatum } from '@/models/hl-bar-chart-model';
 import { getLapChartData, getSingleMemberData } from '@/fetch-util';
 
-const props = defineProps<{
-    subsession?: string;
-    simsession?: string;
-}>();
-
-const title = ref<string>('Start Finish');
-
-const barChartData: Ref<{ name: string; hi: number; lo: number }[]> = ref([
-    { name: 'a', hi: 1, lo: 0 },
-    { name: 'b', hi: 2, lo: 0 },
-]);
-
-watchEffect(async () => {
-    if (props.simsession == undefined || props.subsession == undefined) {
-        return;
+export async function getStartFinishData(
+    subsession: string,
+    simsession: string
+): Promise<HLBarChartDatum[]> {
+    if (!simsession || !subsession) {
+        return [];
     }
 
-    let lapChartData = await getLapChartData(
-        props.subsession,
-        props.simsession
-    );
+    let lapChartData = await getLapChartData(subsession, simsession);
 
     let startFinishDriverMap: {
         [name: string]: {
@@ -69,7 +51,7 @@ watchEffect(async () => {
         driver.time = chunk.session_time;
     }
 
-    barChartData.value = Object.keys(startFinishDriverMap)
+    let ret = Object.keys(startFinishDriverMap)
         .map((k) => startFinishDriverMap[k])
         .sort((a, b) => {
             return a.laps === b.laps ? a.time - b.time : b.laps - a.laps;
@@ -77,9 +59,6 @@ watchEffect(async () => {
         .map((v, i) => {
             return { name: v.display, hi: i * -1, lo: v.start * -1 };
         });
-});
-</script>
 
-<template>
-    <BarChart :title="title" :data="barChartData" />
-</template>
+    return ret;
+}
