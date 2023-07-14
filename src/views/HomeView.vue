@@ -2,7 +2,7 @@
 import { useRoute } from 'vue-router';
 
 import HomeView from '../components/HomeView.vue';
-import ResultsView from '../components/ResultsView.vue';
+import ResultsView from '../components/results-view.vue';
 import DriverStandingsView from '../components/DriverStandingsView.vue';
 import DriverView from '../components/DriverView.vue';
 import TeamView from '../components/team-view.vue';
