@@ -1,18 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick, computed, watch } from 'vue';
+import type { BarChartDatum } from '@/models/bar-chart-model';
 
 const d3: any = (<any>globalThis).d3;
 const aspectRatio = 0.37;
 
-type Datum = {
-    name: string;
-    value: number;
-    value2?: number;
-};
-
 const props = withDefaults(
     defineProps<{
-        data?: Datum[];
+        data?: BarChartDatum[];
         title?: string;
     }>(),
     {
@@ -31,7 +26,7 @@ const xAxis = ref<SVGGElement | null>(null);
 const yAxis = ref<SVGGElement | null>(null);
 const height = ref(100);
 const width = ref(100);
-const renderData = ref<Datum[]>([]);
+const renderData = ref<BarChartDatum[]>([]);
 
 const margin = { top: 10, right: 10, bottom: 50, left: 50 };
 const innerHeight = computed(() => {

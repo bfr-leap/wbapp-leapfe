@@ -2,13 +2,13 @@
 import { useRoute } from 'vue-router';
 
 import HomeView from '../components/HomeView.vue';
-import ResultsView from '../components/ResultsView.vue';
+import ResultsView from '../components/results-view.vue';
 import DriverStandingsView from '../components/DriverStandingsView.vue';
 import DriverView from '../components/DriverView.vue';
-import TeamView from '../components/TeamView.vue';
-import TrackResultsView from '../components/TrackResultsView.vue';
+import TeamView from '../components/team-view.vue';
+import TrackResultsView from '../components/track-results-view.vue';
 import NextEventTimerEmbed from '@/components/NextEventTimerEmbed.vue';
-import SeasonProfile from '@/components/SeasonProfile.vue';
+import SeasonProfile from '@/components/season-profile.vue';
 import { watch } from 'vue';
 import mixpanel from 'mixpanel-browser';
 

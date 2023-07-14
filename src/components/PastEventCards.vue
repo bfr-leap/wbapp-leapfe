@@ -58,7 +58,7 @@ watch(route, fectchJsonData);
 <template>
     <div class="row g-1">
         <div class="col-12">
-            <div class="row g-1 h-100">
+            <div v-if="view.pastRaces.length" class="row g-1 h-100">
                 <div v-for="race in view.pastRaces" class="col">
                     <RouterLink
                         style="text-decoration: none"
@@ -74,6 +74,9 @@ watch(route, fectchJsonData);
                         ></EventCardSm>
                     </RouterLink>
                 </div>
+            </div>
+            <div v-else class="row g-1 h-100">
+                <div class="col">No events yet</div>
             </div>
         </div>
     </div>

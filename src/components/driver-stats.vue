@@ -6,7 +6,10 @@ import BarChart from './BarChart.vue';
 import HLBarChart from './HLBarChart.vue';
 import { ref, watchEffect } from 'vue';
 import type { Ref } from 'vue';
-import { getShortSubsessionName } from '../session-utils';
+import {
+    getQualifyingChartData,
+    getStartFinishChartData,
+} from '@/models/driver-stats-model';
 
 export interface ResultsCollection {
     race: DriverResults;
@@ -26,89 +29,28 @@ const props = defineProps<{
     seasonId: number;
 }>();
 
-const barChartData: Ref<{ name: string; value: number }[] | null> = ref(null);
-const startFinishChart: Ref<{ name: string; hi: number; lo: number }[] | null> =
+const qualifyingChartData: Ref<{ name: string; value: number }[] | null> =
     ref(null);
+const startFinishChartData: Ref<
+    { name: string; hi: number; lo: number }[] | null
+> = ref(null);
 
 async function fectchJsonData() {
-    if (!props.results.quali || !props.results.quali[props.seasonId]) {
-        console.log(props);
-        barChartData.value = null;
-        return;
-    }
-    const seasonRaceResults = props.results.quali[props.seasonId];
+    qualifyingChartData.value = await getQualifyingChartData(
+        props.results.quali,
+        props.seasonId,
+        props.leagueId
+    );
 
-    const names: { [name: string]: string } = {};
-
-    console.log(seasonRaceResults);
-
-    let sessionKeys = Object.keys(seasonRaceResults)
-        .map((v) => Number.parseInt(v, 10))
-        .sort((a, b) => a - b);
-
-    let usedNames: { [name: string]: boolean } = {};
-
-    for (let subsessionIt of sessionKeys) {
-        let shortName = await getShortSubsessionName(
-            props.leagueId,
-            subsessionIt.toString()
-        );
-
-        while (usedNames[shortName]) {
-            shortName += ' ';
-        }
-
-        usedNames[shortName] = true;
-        names[subsessionIt] = shortName;
-    }
-
-    const data = sessionKeys.map((k) => {
-        const entry = seasonRaceResults[k];
-        return {
-            name: names[k.toString()] || k.toString(),
-            value: entry.pace_percent,
-        };
-    });
-
-    const filteredData = data.filter((d) => d.value !== null);
-    barChartData.value = filteredData;
-
-    startFinishChart.value = <{ name: string; hi: number; lo: number }[]>(
-        sessionKeys.flatMap((k) => {
-            const sprint = props.results?.sprint?.[props.seasonId]?.[k] || null;
-            const race = props.results?.race?.[props.seasonId]?.[k] || null;
-            return [
-                sprint
-                    ? {
-                          name:
-                              (names[k.toString()] || k.toString()) + ':Sprint',
-                          lo:
-                              -1 *
-                              (sprint.start_position === 0
-                                  ? sprint.position
-                                  : sprint.start_position),
-                          hi: -1 * sprint.position,
-                      }
-                    : null,
-                race
-                    ? {
-                          name: (names[k.toString()] || k.toString()) + ':Race',
-                          lo:
-                              -1 *
-                              (race.start_position === 0
-                                  ? race.position
-                                  : race.start_position),
-                          hi: -1 * race.position,
-                      }
-                    : null,
-            ].filter((a) => a !== null);
-        })
+    startFinishChartData.value = await getStartFinishChartData(
+        props.results.quali,
+        props.results?.race,
+        props.results?.sprint,
+        props.seasonId,
+        props.leagueId
     );
 }
 watchEffect(fectchJsonData);
-
-// const leagueId = 6555;
-// const leagueId = 637;
 
 const statClasses = 'px-2 py-1 m-1 fs-5';
 </script>
@@ -235,7 +177,10 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
             </div>
             <div class="row">
                 <div class="col-12 m-auto">
-                    <BarChart v-if="barChartData" :data="barChartData" />
+                    <BarChart
+                        v-if="qualifyingChartData"
+                        :data="qualifyingChartData"
+                    />
                 </div>
             </div>
         </div>
@@ -252,8 +197,8 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
             <div class="row">
                 <div class="col-12 m-auto">
                     <HLBarChart
-                        v-if="startFinishChart"
-                        v-bind:data="startFinishChart"
+                        v-if="startFinishChartData"
+                        v-bind:data="startFinishChartData"
                     />
                 </div>
             </div>
