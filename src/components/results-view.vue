@@ -78,6 +78,21 @@ watch(routeObserver, fectchModelData);
         <div class="card bg-dark text-light m-2">
             <div class="card-body p-2">
                 <TrackBanner v-bind:track-id="resultsModel.trackId" />
+            </div>
+        </div>
+
+        <div
+            v-if="resultsModel.summary.length > 0"
+            class="card bg-dark text-light m-2"
+        >
+            <div class="card-body p-2">
+                <p v-for="p of resultsModel.summary">
+                    {{ p }}
+                </p>
+            </div>
+        </div>
+        <div class="card bg-dark text-light m-2">
+            <div class="card-body p-2">
                 <div style="height: 2em"></div>
                 <div class="container">
                     <div class="row">

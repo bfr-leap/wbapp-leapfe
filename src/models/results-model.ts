@@ -4,6 +4,7 @@ import {
     getLeagueSeasonSessions,
     getSimsessionResults,
     getTelemetrySubsessionIds,
+    getGeneratedSimsessionSummary,
 } from '@/fetch-util';
 
 export interface ResultsModel {
@@ -17,6 +18,7 @@ export interface ResultsModel {
     results: {
         [name: string]: string;
     }[];
+    summary: string[];
 }
 
 export function getDefaultResultsModel(): ResultsModel {
@@ -29,6 +31,7 @@ export function getDefaultResultsModel(): ResultsModel {
         simsessionType: 'practice',
         trackId: '',
         results: [],
+        summary: [],
     };
 }
 
@@ -110,6 +113,18 @@ export async function getResultsModel(
         leagueId,
         seasonId
     );
+
+    let simsessionSummary = await getGeneratedSimsessionSummary(
+        selectedSubsession?.subsession_id || 0,
+        selectedSimsession.simsession_id
+    );
+
+    if (simsessionSummary) {
+        let texta = simsessionSummary.text.split('\n');
+        for (let t of texta) {
+            ret.summary.push(t);
+        }
+    }
 
     let trackId: string = '-1';
 

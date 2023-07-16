@@ -15,6 +15,7 @@ import type {
     LapChartData,
     ST_DriverTelemetry,
     CuratedTrackDisplayhInfo,
+    GeneratedSimsessionSummary,
 } from './iracing-endpoints';
 
 async function fetchObjects(urls: string[]): Promise<any[]> {
@@ -191,5 +192,14 @@ export async function getTelemetrySubsessionIds(
 export async function getCuratedTrackDisplayInfo(): Promise<CuratedTrackDisplayhInfo> {
     return await fetchCachedObject<CuratedTrackDisplayhInfo>(
         './data/curated/trackDisplayInfo.json'
+    );
+}
+
+export async function getGeneratedSimsessionSummary(
+    subsessionId: number,
+    simsessionNumber: number
+): Promise<GeneratedSimsessionSummary> {
+    return await fetchCachedObject<GeneratedSimsessionSummary>(
+        `./data/generated/simsessionSummary_${subsessionId}_${simsessionNumber}.json`
     );
 }
