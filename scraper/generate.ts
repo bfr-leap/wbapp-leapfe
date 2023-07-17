@@ -36,8 +36,8 @@ async function chat(prompt: string) {
 }
 
 function simsessionPrompt() {
-    const fileContents = getLapChartData(59522192, -3);
-    const results = getSimSessionResults(59522192, -3);
+    const fileContents = getLapChartData(62651783, 0);
+    const results = getSimSessionResults(62651783, 0);
 
     let simplifiedChunks = fileContents.chunk_info.map((chunk) => {
         let ret: any = {
