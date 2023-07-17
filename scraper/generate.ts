@@ -35,6 +35,13 @@ async function chat(prompt: string) {
     console.log('done');
 }
 
+function place(n: number): string {
+    if (n === 1) return '1st';
+    if (n === 2) return '2nd';
+    if (n === 3) return '3rd';
+    return `${n}th`;
+}
+
 function simsessionPrompt() {
     const fileContents = getLapChartData(62651783, 0);
     const results = getSimSessionResults(62651783, 0);
@@ -107,7 +114,9 @@ function simsessionPrompt() {
             } else {
                 pushKeyEvent(
                     chunk.cust_id,
-                    `Lap ${chunk.lap_number} - ${chunk.display_name} :: ${chunk.lap_position}th place`
+                    `Lap ${chunk.lap_number} - ${chunk.display_name} :: ${place(
+                        chunk.lap_position
+                    )} place`
                 );
             }
         } else if (chunk.lap_number === totalLaps) {
@@ -119,7 +128,9 @@ function simsessionPrompt() {
             } else {
                 pushKeyEvent(
                     chunk.cust_id,
-                    `Lap ${chunk.lap_number} - ${chunk.display_name} :: finishes ${chunk.lap_position}th place`
+                    `Lap ${chunk.lap_number} - ${
+                        chunk.display_name
+                    } :: finishes ${place(chunk.lap_position)} place`
                 );
             }
         } else {
@@ -129,9 +140,11 @@ function simsessionPrompt() {
             ) {
                 pushKeyEvent(
                     chunk.cust_id,
-                    `Lap ${chunk.lap_number} - ${chunk.display_name} :: ${
+                    `Lap ${chunk.lap_number} - ${
+                        chunk.display_name
+                    } :: start ${place(
                         positionById[chunk.cust_id]
-                    }th to ${chunk.lap_position}th`
+                    )} finish ${place(chunk.lap_position)}`
                 );
             }
             positionById[chunk.cust_id] = chunk.lap_position;
