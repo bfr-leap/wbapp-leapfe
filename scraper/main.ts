@@ -12,7 +12,7 @@ import {
     const password = process.env.IWP_PASSWORD || 'test';
     await auth(username, password);
 
-    // await scrapeLeague(6555); // temporary with no access
+    await scrapeLeague(6555); // temporary with no access
     await scrapeLeague(637);
     await scrapeLeague(5567);
 })();
