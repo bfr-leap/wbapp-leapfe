@@ -1,0 +1,951 @@
+
+> irl_stats@1.0.0 highlights
+> ts-node scraper/highlights.ts
+
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+The following is session information for a wheel to wheel motorsports event:
+    {
+    "event_type_name": "Race",
+    "session_name": "iFormula League",
+    "simsession_name": "HEAT 1",
+    "start_time": "2023-01-29T16:00:42Z",
+    "track": {
+        "track_id": 349,
+        "track_name": "Circuit de Barcelona Catalunya",
+        "config_name": "Historic"
+    }
+}
+    
+    Create a broadcast style 40 word intro including session information for the event.  Be sure to start with phrases like: "It's lights out and we are off", "We are going green", etc.
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+{
+    "id": "cmpl-7g036SC8gmUDOqnpIv8vslNaEAFqM",
+    "object": "text_completion",
+    "created": 1690244320,
+    "model": "text-davinci-003",
+    "choices": [
+        {
+            "text": "\n\nIt's lights out and we are off! The iFormula League is in session at the Circuit de Barcelona Catalunya Historic track. The clock strikes 4PM UTC and the HEAT 1 of the race begins! Get ready for a thrilling ride that you wouldn't want to miss!",
+            "index": 0,
+            "logprobs": null,
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 170,
+        "completion_tokens": 60,
+        "total_tokens": 230
+    }
+}
+
+
+It's lights out and we are off! The iFormula League is in session at the Circuit de Barcelona Catalunya Historic track. The clock strikes 4PM UTC and the HEAT 1 of the race begins! Get ready for a thrilling ride that you wouldn't want to miss!
+------------------------------------
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+We are creating a broadcast style play by play of a wheel to wheel motorsports event.  We want to create interesting narratives as race events unfold but note that we don't know where in the track these events happend.
+    So far this is what has happened during the race:
+    <race>
+    
+
+It's lights out and we are off! The iFormula League is in session at the Circuit de Barcelona Catalunya Historic track. The clock strikes 4PM UTC and the HEAT 1 of the race begins! Get ready for a thrilling ride that you wouldn't want to miss!
+    </race>
+    
+    This is what just happened:
+    lap 1 - Joakim Flodman overtakes Andy Ray Miller as they have a moment for p10
+    
+    Generate very succinct comentary in present tense about what just happened.
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+{
+    "id": "cmpl-7g039PII0qmckirmeVj70L7t4KzI1",
+    "object": "text_completion",
+    "created": 1690244323,
+    "model": "text-davinci-003",
+    "choices": [
+        {
+            "text": "\n\nJoakim Flodman powers ahead of Andy Ray Miller, pushing his way to P10!",
+            "index": 0,
+            "logprobs": null,
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 182,
+        "completion_tokens": 22,
+        "total_tokens": 204
+    }
+}
+
+
+Joakim Flodman powers ahead of Andy Ray Miller, pushing his way to P10!
+------------------------------------
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+We are creating a broadcast style play by play of a wheel to wheel motorsports event.  We want to create interesting narratives as race events unfold but note that we don't know where in the track these events happend.
+    So far this is what has happened during the race:
+    <race>
+    
+
+It's lights out and we are off! The iFormula League is in session at the Circuit de Barcelona Catalunya Historic track. The clock strikes 4PM UTC and the HEAT 1 of the race begins! Get ready for a thrilling ride that you wouldn't want to miss!
+
+
+Joakim Flodman powers ahead of Andy Ray Miller, pushing his way to P10!
+    </race>
+    
+    This is what just happened:
+    lap 1 - Andy Ray Miller overtakes Joakim Flodman as they have a moment for p10
+    
+    Generate very succinct comentary in present tense about what just happened.
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+{
+    "id": "cmpl-7g03AGDP3TFH4y3JDRXGFaUkTNSak",
+    "object": "text_completion",
+    "created": 1690244324,
+    "model": "text-davinci-003",
+    "choices": [
+        {
+            "text": "\n\nAndy Ray Miller powers ahead and overtakes Joakim Flodman for P10!",
+            "index": 0,
+            "logprobs": null,
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 204,
+        "completion_tokens": 20,
+        "total_tokens": 224
+    }
+}
+
+
+Andy Ray Miller powers ahead and overtakes Joakim Flodman for P10!
+------------------------------------
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+We are creating a broadcast style play by play of a wheel to wheel motorsports event.  We want to create interesting narratives as race events unfold but note that we don't know where in the track these events happend.
+    So far this is what has happened during the race:
+    <race>
+    
+
+It's lights out and we are off! The iFormula League is in session at the Circuit de Barcelona Catalunya Historic track. The clock strikes 4PM UTC and the HEAT 1 of the race begins! Get ready for a thrilling ride that you wouldn't want to miss!
+
+
+Joakim Flodman powers ahead of Andy Ray Miller, pushing his way to P10!
+
+
+Andy Ray Miller powers ahead and overtakes Joakim Flodman for P10!
+    </race>
+    
+    This is what just happened:
+    lap 3 - Andy Ray Miller looses several positions
+    
+    Generate very succinct comentary in present tense about what just happened.
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+{
+    "id": "cmpl-7g03BmDfnVqBYp6YTNU44ykCgkG07",
+    "object": "text_completion",
+    "created": 1690244325,
+    "model": "text-davinci-003",
+    "choices": [
+        {
+            "text": "\n\nAndy Ray Miller falls back on lap 3, losing multiple positions in the process!",
+            "index": 0,
+            "logprobs": null,
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 212,
+        "completion_tokens": 18,
+        "total_tokens": 230
+    }
+}
+
+
+Andy Ray Miller falls back on lap 3, losing multiple positions in the process!
+------------------------------------
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+We are creating a broadcast style play by play of a wheel to wheel motorsports event.  We want to create interesting narratives as race events unfold but note that we don't know where in the track these events happend.
+    So far this is what has happened during the race:
+    <race>
+    
+
+It's lights out and we are off! The iFormula League is in session at the Circuit de Barcelona Catalunya Historic track. The clock strikes 4PM UTC and the HEAT 1 of the race begins! Get ready for a thrilling ride that you wouldn't want to miss!
+
+
+Joakim Flodman powers ahead of Andy Ray Miller, pushing his way to P10!
+
+
+Andy Ray Miller powers ahead and overtakes Joakim Flodman for P10!
+
+
+Andy Ray Miller falls back on lap 3, losing multiple positions in the process!
+    </race>
+    
+    This is what just happened:
+    lap 3 - Andy Ray Miller overtakes Ian Rood as they have a moment for p10
+    
+    Generate very succinct comentary in present tense about what just happened.
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+{
+    "id": "cmpl-7g03BpWBQWWn8sReVao6GCJCCVEG2",
+    "object": "text_completion",
+    "created": 1690244325,
+    "model": "text-davinci-003",
+    "choices": [
+        {
+            "text": "\n\nAndy Ray Miller overtakes Ian Rood to take P10 on lap 3!",
+            "index": 0,
+            "logprobs": null,
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 239,
+        "completion_tokens": 18,
+        "total_tokens": 257
+    }
+}
+
+
+Andy Ray Miller overtakes Ian Rood to take P10 on lap 3!
+------------------------------------
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+We are creating a broadcast style play by play of a wheel to wheel motorsports event.  We want to create interesting narratives as race events unfold but note that we don't know where in the track these events happend.
+    So far this is what has happened during the race:
+    <race>
+    
+
+It's lights out and we are off! The iFormula League is in session at the Circuit de Barcelona Catalunya Historic track. The clock strikes 4PM UTC and the HEAT 1 of the race begins! Get ready for a thrilling ride that you wouldn't want to miss!
+
+
+Joakim Flodman powers ahead of Andy Ray Miller, pushing his way to P10!
+
+
+Andy Ray Miller powers ahead and overtakes Joakim Flodman for P10!
+
+
+Andy Ray Miller falls back on lap 3, losing multiple positions in the process!
+
+
+Andy Ray Miller overtakes Ian Rood to take P10 on lap 3!
+    </race>
+    
+    This is what just happened:
+    lap 4 - Marian Barbieru overtakes Frederik Høygaard Larsen for p4
+    
+    Generate very succinct comentary in present tense about what just happened.
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+{
+    "id": "cmpl-7g03DW3zVrYsMLvgjKC9dd69xnVqs",
+    "object": "text_completion",
+    "created": 1690244327,
+    "model": "text-davinci-003",
+    "choices": [
+        {
+            "text": "\n\nMarian Barbieru surges forward and snatches P4 away from Frederik Høygaard Larsen!",
+            "index": 0,
+            "logprobs": null,
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 258,
+        "completion_tokens": 25,
+        "total_tokens": 283
+    }
+}
+
+
+Marian Barbieru surges forward and snatches P4 away from Frederik Høygaard Larsen!
+------------------------------------
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+We are creating a broadcast style play by play of a wheel to wheel motorsports event.  We want to create interesting narratives as race events unfold but note that we don't know where in the track these events happend.
+    So far this is what has happened during the race:
+    <race>
+    
+
+It's lights out and we are off! The iFormula League is in session at the Circuit de Barcelona Catalunya Historic track. The clock strikes 4PM UTC and the HEAT 1 of the race begins! Get ready for a thrilling ride that you wouldn't want to miss!
+
+
+Joakim Flodman powers ahead of Andy Ray Miller, pushing his way to P10!
+
+
+Andy Ray Miller powers ahead and overtakes Joakim Flodman for P10!
+
+
+Andy Ray Miller falls back on lap 3, losing multiple positions in the process!
+
+
+Andy Ray Miller overtakes Ian Rood to take P10 on lap 3!
+
+
+Marian Barbieru surges forward and snatches P4 away from Frederik Høygaard Larsen!
+    </race>
+    
+    This is what just happened:
+    lap 4 - Frederik Høygaard Larsen overtakes Marian Barbieru for p4
+    
+    Generate very succinct comentary in present tense about what just happened.
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+{
+    "id": "cmpl-7g03EpLVG6L1bNuD4rdT4RmyOpwWO",
+    "object": "text_completion",
+    "created": 1690244328,
+    "model": "text-davinci-003",
+    "choices": [
+        {
+            "text": "\n\nFrederik Høygaard Larsen fights back, reclaiming P4 from Marian Barbieru on lap 4!",
+            "index": 0,
+            "logprobs": null,
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 283,
+        "completion_tokens": 27,
+        "total_tokens": 310
+    }
+}
+
+
+Frederik Høygaard Larsen fights back, reclaiming P4 from Marian Barbieru on lap 4!
+------------------------------------
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+We are creating a broadcast style play by play of a wheel to wheel motorsports event.  We want to create interesting narratives as race events unfold but note that we don't know where in the track these events happend.
+    So far this is what has happened during the race:
+    <race>
+    
+
+It's lights out and we are off! The iFormula League is in session at the Circuit de Barcelona Catalunya Historic track. The clock strikes 4PM UTC and the HEAT 1 of the race begins! Get ready for a thrilling ride that you wouldn't want to miss!
+
+
+Joakim Flodman powers ahead of Andy Ray Miller, pushing his way to P10!
+
+
+Andy Ray Miller powers ahead and overtakes Joakim Flodman for P10!
+
+
+Andy Ray Miller falls back on lap 3, losing multiple positions in the process!
+
+
+Andy Ray Miller overtakes Ian Rood to take P10 on lap 3!
+
+
+Marian Barbieru surges forward and snatches P4 away from Frederik Høygaard Larsen!
+
+
+Frederik Høygaard Larsen fights back, reclaiming P4 from Marian Barbieru on lap 4!
+    </race>
+    
+    This is what just happened:
+    lap 8 - Marian Barbieru overtakes Frederik Høygaard Larsen for p4
+    
+    Generate very succinct comentary in present tense about what just happened.
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+{
+    "id": "cmpl-7g03FEZs5ryKpp0scY1mnAmou861y",
+    "object": "text_completion",
+    "created": 1690244329,
+    "model": "text-davinci-003",
+    "choices": [
+        {
+            "text": "\n\nMarian Barbieru dives down the inside, snatching P4 from Frederik Høygaard Larsen on lap 8!",
+            "index": 0,
+            "logprobs": null,
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 310,
+        "completion_tokens": 29,
+        "total_tokens": 339
+    }
+}
+
+
+Marian Barbieru dives down the inside, snatching P4 from Frederik Høygaard Larsen on lap 8!
+------------------------------------
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+We are creating a broadcast style play by play of a wheel to wheel motorsports event.  We want to create interesting narratives as race events unfold but note that we don't know where in the track these events happend.
+    So far this is what has happened during the race:
+    <race>
+    
+
+It's lights out and we are off! The iFormula League is in session at the Circuit de Barcelona Catalunya Historic track. The clock strikes 4PM UTC and the HEAT 1 of the race begins! Get ready for a thrilling ride that you wouldn't want to miss!
+
+
+Joakim Flodman powers ahead of Andy Ray Miller, pushing his way to P10!
+
+
+Andy Ray Miller powers ahead and overtakes Joakim Flodman for P10!
+
+
+Andy Ray Miller falls back on lap 3, losing multiple positions in the process!
+
+
+Andy Ray Miller overtakes Ian Rood to take P10 on lap 3!
+
+
+Marian Barbieru surges forward and snatches P4 away from Frederik Høygaard Larsen!
+
+
+Frederik Høygaard Larsen fights back, reclaiming P4 from Marian Barbieru on lap 4!
+
+
+Marian Barbieru dives down the inside, snatching P4 from Frederik Høygaard Larsen on lap 8!
+    </race>
+    
+    This is what just happened:
+    lap 8 - Frederik Høygaard Larsen overtakes Marian Barbieru for p4
+    
+    Generate very succinct comentary in present tense about what just happened.
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+{
+    "id": "cmpl-7g03GuZzfsvvI6WNDFkKRTbQbWTtE",
+    "object": "text_completion",
+    "created": 1690244330,
+    "model": "text-davinci-003",
+    "choices": [
+        {
+            "text": "\n\nFrederik Høygaard Larsen takes back P4 as Marian Barbieru loses out in the battle.",
+            "index": 0,
+            "logprobs": null,
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 339,
+        "completion_tokens": 26,
+        "total_tokens": 365
+    }
+}
+
+
+Frederik Høygaard Larsen takes back P4 as Marian Barbieru loses out in the battle.
+------------------------------------
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+We are creating a broadcast style play by play of a wheel to wheel motorsports event.  We want to create interesting narratives as race events unfold but note that we don't know where in the track these events happend.
+    So far this is what has happened during the race:
+    <race>
+    
+
+It's lights out and we are off! The iFormula League is in session at the Circuit de Barcelona Catalunya Historic track. The clock strikes 4PM UTC and the HEAT 1 of the race begins! Get ready for a thrilling ride that you wouldn't want to miss!
+
+
+Joakim Flodman powers ahead of Andy Ray Miller, pushing his way to P10!
+
+
+Andy Ray Miller powers ahead and overtakes Joakim Flodman for P10!
+
+
+Andy Ray Miller falls back on lap 3, losing multiple positions in the process!
+
+
+Andy Ray Miller overtakes Ian Rood to take P10 on lap 3!
+
+
+Marian Barbieru surges forward and snatches P4 away from Frederik Høygaard Larsen!
+
+
+Frederik Høygaard Larsen fights back, reclaiming P4 from Marian Barbieru on lap 4!
+
+
+Marian Barbieru dives down the inside, snatching P4 from Frederik Høygaard Larsen on lap 8!
+
+
+Frederik Høygaard Larsen takes back P4 as Marian Barbieru loses out in the battle.
+    </race>
+    
+    This is what just happened:
+    lap 8 - Marian Barbieru overtakes Frederik Høygaard Larsen for p4
+    
+    Generate very succinct comentary in present tense about what just happened.
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+{
+    "id": "cmpl-7g03H2cKFtLOZW53Z3DsdpNirnFGs",
+    "object": "text_completion",
+    "created": 1690244331,
+    "model": "text-davinci-003",
+    "choices": [
+        {
+            "text": "\n\nMarian Barbieru goes wheel-to-wheel with Frederik Høygaard Larsen and snatches P4 away!",
+            "index": 0,
+            "logprobs": null,
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 365,
+        "completion_tokens": 29,
+        "total_tokens": 394
+    }
+}
+
+
+Marian Barbieru goes wheel-to-wheel with Frederik Høygaard Larsen and snatches P4 away!
+------------------------------------
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+We are creating a broadcast style play by play of a wheel to wheel motorsports event.  We want to create interesting narratives as race events unfold but note that we don't know where in the track these events happend.
+    So far this is what has happened during the race:
+    <race>
+    
+
+It's lights out and we are off! The iFormula League is in session at the Circuit de Barcelona Catalunya Historic track. The clock strikes 4PM UTC and the HEAT 1 of the race begins! Get ready for a thrilling ride that you wouldn't want to miss!
+
+
+Joakim Flodman powers ahead of Andy Ray Miller, pushing his way to P10!
+
+
+Andy Ray Miller powers ahead and overtakes Joakim Flodman for P10!
+
+
+Andy Ray Miller falls back on lap 3, losing multiple positions in the process!
+
+
+Andy Ray Miller overtakes Ian Rood to take P10 on lap 3!
+
+
+Marian Barbieru surges forward and snatches P4 away from Frederik Høygaard Larsen!
+
+
+Frederik Høygaard Larsen fights back, reclaiming P4 from Marian Barbieru on lap 4!
+
+
+Marian Barbieru dives down the inside, snatching P4 from Frederik Høygaard Larsen on lap 8!
+
+
+Frederik Høygaard Larsen takes back P4 as Marian Barbieru loses out in the battle.
+
+
+Marian Barbieru goes wheel-to-wheel with Frederik Høygaard Larsen and snatches P4 away!
+    </race>
+    
+    This is what just happened:
+    lap 9 - Frederik Høygaard Larsen overtakes Marian Barbieru for p4
+    
+    Generate very succinct comentary in present tense about what just happened.
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+{
+    "id": "cmpl-7g03Iy2bWKIfmNZgHEMpMYwZkX4ba",
+    "object": "text_completion",
+    "created": 1690244332,
+    "model": "text-davinci-003",
+    "choices": [
+        {
+            "text": "\n\nFrederik Høygaard Larsen powers ahead of Marian Barbieru, regaining P4!",
+            "index": 0,
+            "logprobs": null,
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 394,
+        "completion_tokens": 24,
+        "total_tokens": 418
+    }
+}
+
+
+Frederik Høygaard Larsen powers ahead of Marian Barbieru, regaining P4!
+------------------------------------
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+We are creating a broadcast style play by play of a wheel to wheel motorsports event.  We want to create interesting narratives as race events unfold but note that we don't know where in the track these events happend.
+    So far this is what has happened during the race:
+    <race>
+    
+
+It's lights out and we are off! The iFormula League is in session at the Circuit de Barcelona Catalunya Historic track. The clock strikes 4PM UTC and the HEAT 1 of the race begins! Get ready for a thrilling ride that you wouldn't want to miss!
+
+
+Joakim Flodman powers ahead of Andy Ray Miller, pushing his way to P10!
+
+
+Andy Ray Miller powers ahead and overtakes Joakim Flodman for P10!
+
+
+Andy Ray Miller falls back on lap 3, losing multiple positions in the process!
+
+
+Andy Ray Miller overtakes Ian Rood to take P10 on lap 3!
+
+
+Marian Barbieru surges forward and snatches P4 away from Frederik Høygaard Larsen!
+
+
+Frederik Høygaard Larsen fights back, reclaiming P4 from Marian Barbieru on lap 4!
+
+
+Marian Barbieru dives down the inside, snatching P4 from Frederik Høygaard Larsen on lap 8!
+
+
+Frederik Høygaard Larsen takes back P4 as Marian Barbieru loses out in the battle.
+
+
+Marian Barbieru goes wheel-to-wheel with Frederik Høygaard Larsen and snatches P4 away!
+
+
+Frederik Høygaard Larsen powers ahead of Marian Barbieru, regaining P4!
+    </race>
+    
+    This is what just happened:
+    lap 11 - Patrik Olsson looses several positions
+    
+    Generate very succinct comentary in present tense about what just happened.
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+{
+    "id": "cmpl-7g03KJF70spIn1N2OyJEHAacgQPQb",
+    "object": "text_completion",
+    "created": 1690244334,
+    "model": "text-davinci-003",
+    "choices": [
+        {
+            "text": "\n\nPatrik Olsson drops several spots on Lap 11, losing valuable ground in the race!",
+            "index": 0,
+            "logprobs": null,
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 409,
+        "completion_tokens": 20,
+        "total_tokens": 429
+    }
+}
+
+
+Patrik Olsson drops several spots on Lap 11, losing valuable ground in the race!
+------------------------------------
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+We are creating a broadcast style play by play of a wheel to wheel motorsports event.  We want to create interesting narratives as race events unfold but note that we don't know where in the track these events happend.
+    So far this is what has happened during the race:
+    <race>
+    
+
+It's lights out and we are off! The iFormula League is in session at the Circuit de Barcelona Catalunya Historic track. The clock strikes 4PM UTC and the HEAT 1 of the race begins! Get ready for a thrilling ride that you wouldn't want to miss!
+
+
+Joakim Flodman powers ahead of Andy Ray Miller, pushing his way to P10!
+
+
+Andy Ray Miller powers ahead and overtakes Joakim Flodman for P10!
+
+
+Andy Ray Miller falls back on lap 3, losing multiple positions in the process!
+
+
+Andy Ray Miller overtakes Ian Rood to take P10 on lap 3!
+
+
+Marian Barbieru surges forward and snatches P4 away from Frederik Høygaard Larsen!
+
+
+Frederik Høygaard Larsen fights back, reclaiming P4 from Marian Barbieru on lap 4!
+
+
+Marian Barbieru dives down the inside, snatching P4 from Frederik Høygaard Larsen on lap 8!
+
+
+Frederik Høygaard Larsen takes back P4 as Marian Barbieru loses out in the battle.
+
+
+Marian Barbieru goes wheel-to-wheel with Frederik Høygaard Larsen and snatches P4 away!
+
+
+Frederik Høygaard Larsen powers ahead of Marian Barbieru, regaining P4!
+
+
+Patrik Olsson drops several spots on Lap 11, losing valuable ground in the race!
+    </race>
+    
+    This is what just happened:
+    lap 11 - Patrik Olsson overtakes Joakim Flodman for p7
+    
+    Generate very succinct comentary in present tense about what just happened.
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+{
+    "id": "cmpl-7g03Kej1MmOrUrGaVwJhUsZVlTyx8",
+    "object": "text_completion",
+    "created": 1690244334,
+    "model": "text-davinci-003",
+    "choices": [
+        {
+            "text": "\n\nPatrik Olsson passes Joakim Flodman and advances to P7!",
+            "index": 0,
+            "logprobs": null,
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 436,
+        "completion_tokens": 19,
+        "total_tokens": 455
+    }
+}
+
+
+Patrik Olsson passes Joakim Flodman and advances to P7!
+------------------------------------
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+We are creating a broadcast style play by play of a wheel to wheel motorsports event.  We want to create interesting narratives as race events unfold but note that we don't know where in the track these events happend.
+    So far this is what has happened during the race:
+    <race>
+    
+
+It's lights out and we are off! The iFormula League is in session at the Circuit de Barcelona Catalunya Historic track. The clock strikes 4PM UTC and the HEAT 1 of the race begins! Get ready for a thrilling ride that you wouldn't want to miss!
+
+
+Joakim Flodman powers ahead of Andy Ray Miller, pushing his way to P10!
+
+
+Andy Ray Miller powers ahead and overtakes Joakim Flodman for P10!
+
+
+Andy Ray Miller falls back on lap 3, losing multiple positions in the process!
+
+
+Andy Ray Miller overtakes Ian Rood to take P10 on lap 3!
+
+
+Marian Barbieru surges forward and snatches P4 away from Frederik Høygaard Larsen!
+
+
+Frederik Høygaard Larsen fights back, reclaiming P4 from Marian Barbieru on lap 4!
+
+
+Marian Barbieru dives down the inside, snatching P4 from Frederik Høygaard Larsen on lap 8!
+
+
+Frederik Høygaard Larsen takes back P4 as Marian Barbieru loses out in the battle.
+
+
+Marian Barbieru goes wheel-to-wheel with Frederik Høygaard Larsen and snatches P4 away!
+
+
+Frederik Høygaard Larsen powers ahead of Marian Barbieru, regaining P4!
+
+
+Patrik Olsson drops several spots on Lap 11, losing valuable ground in the race!
+
+
+Patrik Olsson passes Joakim Flodman and advances to P7!
+    </race>
+    
+    This is what just happened:
+    lap 18 - Frederik Høygaard Larsen overtakes Marian Barbieru for p4
+    
+    Generate very succinct comentary in present tense about what just happened.
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+{
+    "id": "cmpl-7g03LjeQH9V3rWsTtSiyL1WompVch",
+    "object": "text_completion",
+    "created": 1690244335,
+    "model": "text-davinci-003",
+    "choices": [
+        {
+            "text": "\n\nFrederik Høygaard Larsen charges forward and reclaims P4 from Marian Barbieru on lap 18!",
+            "index": 0,
+            "logprobs": null,
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 457,
+        "completion_tokens": 27,
+        "total_tokens": 484
+    }
+}
+
+
+Frederik Høygaard Larsen charges forward and reclaims P4 from Marian Barbieru on lap 18!
+------------------------------------
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+We are creating a broadcast style play by play of a wheel to wheel motorsports event.  We want to create interesting narratives as race events unfold but note that we don't know where in the track these events happend.
+    So far this is what has happened during the race:
+    <race>
+    
+
+It's lights out and away we go! The iFormula League is in session at the Circuit de Barcelona Catalunya Historic track. The clock strikes 4PM UTC and the HEAT 1 of the race begins! Get ready for a thrilling ride that you wouldn't want to miss!
+
+
+Joakim Flodman powers ahead of Andy Ray Miller, pushing his way to P10!
+
+
+Andy Ray Miller powers ahead and overtakes Joakim Flodman for P10!
+
+
+Andy Ray Miller falls back on lap 3, losing multiple positions in the process!
+
+
+Andy Ray Miller overtakes Ian Rood to take P10 on lap 3!
+
+
+Marian Barbieru surges forward and snatches P4 away from Frederik Høygaard Larsen!
+
+
+Frederik Høygaard Larsen fights back, reclaiming P4 from Marian Barbieru on lap 4!
+
+
+Marian Barbieru dives down the inside, snatching P4 from Frederik Høygaard Larsen on lap 8!
+
+
+Frederik Høygaard Larsen takes back P4 as Marian Barbieru loses out in the battle.
+
+
+Marian Barbieru goes wheel-to-wheel with Frederik Høygaard Larsen and snatches P4 away!
+
+
+Frederik Høygaard Larsen powers ahead of Marian Barbieru, regaining P4!
+
+
+Patrik Olsson drops several spots on Lap 11, losing valuable ground in the race!
+
+
+Patrik Olsson passes Joakim Flodman and advances to P7!
+
+
+Frederik Høygaard Larsen charges forward and reclaims P4 from Marian Barbieru on lap 18!
+    </race>
+    
+    This is what just happened:
+    lap 19 - Ian Rood looses several positions
+    
+    Generate very succinct comentary in present tense about what just happened.
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+{
+    "id": "cmpl-7g03NBAKypPB8H23VuShcWVETNLJR",
+    "object": "text_completion",
+    "created": 1690244337,
+    "model": "text-davinci-003",
+    "choices": [
+        {
+            "text": "\n\nIan Rood accelerates out of a corner only to lose multiple positions in the blink of an eye.",
+            "index": 0,
+            "logprobs": null,
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 474,
+        "completion_tokens": 23,
+        "total_tokens": 497
+    }
+}
+
+
+Ian Rood accelerates out of a corner only to lose multiple positions in the blink of an eye.
+------------------------------------
+[
+    {
+        "time": 299732,
+        "lookAt": 493786,
+        "note": "\n\nJoakim Flodman powers ahead of Andy Ray Miller, pushing his way to P10!"
+    },
+    {
+        "time": 299770,
+        "lookAt": 110512,
+        "note": "\n\nAndy Ray Miller powers ahead and overtakes Joakim Flodman for P10!"
+    },
+    {
+        "time": 306996,
+        "lookAt": 110512,
+        "note": "\n\nAndy Ray Miller falls back on lap 3, losing multiple positions in the process!"
+    },
+    {
+        "time": 306953,
+        "lookAt": 110512,
+        "note": "\n\nAndy Ray Miller overtakes Ian Rood to take P10 on lap 3!"
+    },
+    {
+        "time": 312888,
+        "lookAt": 643236,
+        "note": "\n\nMarian Barbieru surges forward and snatches P4 away from Frederik Høygaard Larsen!"
+    },
+    {
+        "time": 312970,
+        "lookAt": 402468,
+        "note": "\n\nFrederik Høygaard Larsen fights back, reclaiming P4 from Marian Barbieru on lap 4!"
+    },
+    {
+        "time": 338950,
+        "lookAt": 643236,
+        "note": "\n\nMarian Barbieru dives down the inside, snatching P4 from Frederik Høygaard Larsen on lap 8!"
+    },
+    {
+        "time": 339085,
+        "lookAt": 402468,
+        "note": "\n\nFrederik Høygaard Larsen takes back P4 as Marian Barbieru loses out in the battle."
+    },
+    {
+        "time": 339392,
+        "lookAt": 643236,
+        "note": "\n\nMarian Barbieru goes wheel-to-wheel with Frederik Høygaard Larsen and snatches P4 away!"
+    },
+    {
+        "time": 341010,
+        "lookAt": 402468,
+        "note": "\n\nFrederik Høygaard Larsen powers ahead of Marian Barbieru, regaining P4!"
+    },
+    {
+        "time": 353270,
+        "lookAt": 590218,
+        "note": "\n\nPatrik Olsson drops several spots on Lap 11, losing valuable ground in the race!"
+    },
+    {
+        "time": 353254,
+        "lookAt": 590218,
+        "note": "\n\nPatrik Olsson passes Joakim Flodman and advances to P7!"
+    },
+    {
+        "time": 393527,
+        "lookAt": 402468,
+        "note": "\n\nFrederik Høygaard Larsen charges forward and reclaims P4 from Marian Barbieru on lap 18!"
+    },
+    {
+        "time": 399698,
+        "lookAt": 584257,
+        "note": "\n\nIan Rood accelerates out of a corner only to lose multiple positions in the blink of an eye."
+    }
+]

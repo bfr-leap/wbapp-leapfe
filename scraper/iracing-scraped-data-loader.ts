@@ -6,6 +6,7 @@ import type {
     LeagueSeasonSessions,
     LapChartData,
     MembersData,
+    SubsessionTelemetry,
 } from '../src/iracing-endpoints';
 
 const MNT_PT = './public/data/scraped/';
@@ -72,6 +73,19 @@ export function getMembersData(
 ): MembersData {
     let ret: MembersData = <MembersData>JSON.parse(
         readFileSync(`${MNT_PT}membersData_${leagueId}_${seasonId}.json`, {
+            encoding: 'utf8',
+            flag: 'r',
+        })
+    );
+
+    return ret;
+}
+
+export function getSubsessionTelemetry(
+    subsessionId: number
+): SubsessionTelemetry {
+    let ret: SubsessionTelemetry = <SubsessionTelemetry>JSON.parse(
+        readFileSync(`${MNT_PT}telemetry/${subsessionId}.json`, {
             encoding: 'utf8',
             flag: 'r',
         })
