@@ -32,7 +32,9 @@ async function chat(prompt: string) {
         console.log(JSON.stringify(error, null, '    '));
     }
 
-    console.log('done');
+    console.log(
+        'done ========================================\n========================================\n========================================\n========================================\n'
+    );
 }
 
 function place(n: number): string {
@@ -43,8 +45,8 @@ function place(n: number): string {
 }
 
 function simsessionPrompt() {
-    const fileContents = getLapChartData(62651783, 0);
-    const results = getSimSessionResults(62651783, 0);
+    const fileContents = getLapChartData(62630734, -3);
+    const results = getSimSessionResults(62630734, -3);
 
     let simplifiedChunks = fileContents.chunk_info.map((chunk) => {
         let ret: any = {
@@ -182,6 +184,7 @@ function simsessionPrompt() {
 
 console.log(simsessionPrompt());
 
+// make it more interesting by weaving interesting narratives:
 // chat(simsessionPrompt());
 
 // chat(

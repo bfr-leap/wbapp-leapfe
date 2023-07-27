@@ -1,0 +1,43 @@
+
+> irl_stats@1.0.0 gpt
+> ts-node scraper/generate.ts
+
+{
+    "id": "cmpl-7goW1JgIIrfEj2gc61cddjnYQUVSH",
+    "object": "text_completion",
+    "created": 1690438313,
+    "model": "text-davinci-003",
+    "choices": [
+        {
+            "text": "\nWelcome to Fuji International Speedway, the site of an exciting race in the iFormula League! Drivers are making their way to the grid and the anticipation for the start of the race is high. Oivind Haugland will start on the pole position, with Gianluca Illiano next to him in second place. Iestyn Chiapelone and Roli Schilter look poised to challenge for the lead after qualifying in third and fourth.\n\nThe lights go out for the first lap and Oivind Haugland gets a good start, maintaining his pole position. Gianluca Illiano has shot into first place as they head into turn one! Contact between Jacob Bieser and another car has caused him to drop back to sixth, while Alexander Schanna’s race is over already after a crash. At the end of the first lap, Gianluca Illiano leads the pack, followed by Oivind Haugland in second, Iestyn Chiapelone in third, Roli Schilter in fourth, Jacob Bieser in sixth, Frederik Høygaard Larsen in eighth, Franky Franchicha in tenth, and Grigor Georgiev in twelfth.\n\nStarting Lap 2, we saw some substantial changes at the front of the field. Iestyn Chiapelone managed to overtake Oivind Haugland and take the second place spot. Oivind Haugland slipped back to fourth. Jacob Bieser was able to make up some positions, climbing from 6th to 5th. However, he'll have to do more work to fight his way further up the field. He soon pitted for a black flag penalty and dropped down the order again. Meanwhile, Fabian Bouwmeester had contact with another car which sent him to the back of the field and Roli Schilter also encountered trouble, spinning off the track and dropping to 13th.\n\nThe excitement continues with the the start of Lap 3 - Oivind Haugland looks to be fighting his way back through the field, making it back to third place, while Frederik Høygaard Larsen jumped up from 8th to 4th. Unfortunately it was not all good news as Jacob Bieser got a black flag penalty and dropped back to 9th. Grigor Georgiev was also able to get back to 11th place after starting 12th. \n\nThe middle part of the race saw some close battles between Alexander Schanna and Grigor Georgiev for the lower placings but most of the action was happening up at the front. Oivind Haugland was still pressing hard and made it back to second place by the end of Lap 6, with Gianluca Illiano leading the pack. Franky Franchicha had a strong showing and made it to 5th place, and then 4th toward the end of Lap 9.\n\nGianluca Illiano pitted on Lap 19, handing the lead to Frederik Høygaard Larsen. It looked like he was going to take the checkered flag but fate had other ideas. On the last lap, Iestyn Chiapelone passed him on the inside and Frederik Høygaard Larsen spun off the track, allowing Iestyn Chiapelone to grab the win! Oivind Haugland managed to make his way back up to second, while Gianluca Illiano finished third. Frederik Høygaard Larsen managed to recover to fourth, and Franky Franchicha rounded out the top five. Jacob Bieser finished sixth, Roli Schilter seventh, and Alexander Schanna eighth. Congratulations to Iestyn Chiapelone on taking the checkered flag!",
+            "index": 0,
+            "logprobs": null,
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 3077,
+        "completion_tokens": 774,
+        "total_tokens": 3851
+    }
+}
+undefined
+done ========================================
+========================================
+========================================
+========================================
+
+
+make it more interesting by weaving interesting narratives:
+
+As the drivers lined up on the starting grid of the prestigious Fuji International Speedway, the atmosphere was alive with excitement. Oivind Haugland was on Pole Position, with Gianluca Illiano hot on his heels in second place. Roli Schilter and Iestyn Chiapelone followed in third and fourth respectively, with Jacob Bieser and Alexander Schanna rounding out the top six.
+
+The lights went out and the race began in a flurry of excitement. Oivind Haugland had made a clean start and managed to keep his pole position. At the same time, Gianluca Illiano had made an incredible maneuver and shot into the lead. However, Jacob Bieser had been caught up in an unfortunate accident and dropped to sixth, while Alexander Schanna’s race had been ended prematurely due to a crash. At the end of the first lap, Gianluca Illiano still maintained the lead, with Oivind Haugland and Iestyn Chiapelone chasing him down in second and third.
+
+In the following lap, the drivers were in for a surprise. Iestyn Chiapelone pulled off a daring move and overtook Oivind Haugland, claiming the second place spot! Oivind Haugland slipped back to fourth, but the story of the lap was undoubtedly Jacob Bieser. After a disastrous start to the race, the racer seemed to have finally found his groove and surged up to fifth on the grid. But, his luck quickly ran out as he received a black flag penalty and was forced to pit, dropping him far down in the standings. Meanwhile, the luck of Fabian Bouwmeester and Roli Schilter quickly ran out, as both suffered contact with other drivers and dropped to the back of the field.
+
+The drama continued into Lap 3, with Oivind Haugland seemingly determined to make his way back to the top. With a startling display of skill and grit, Oivind managed to fight back to third place on the grid. Jacob Bieser was also in a much healthier spot now, after recovering from his earlier penalty and starting in ninth. Grigor Georgiev made an unfortunate start, but also worked his way up nicely, sneaking back into eleventh by the end of Lap 3.
+
+The middle portion of the race was just as electric as the start. There were several close calls and duels between Alexander Schanna and Grigor Georgiev for the lower placings. But everyone’s focus was on the fight at the front of the field. Oivind Haugland was still pushing forward, and made it back to second place by the end of Lap 6. Gianluca Illiano maintained a strong lead, as he seemed poised to take the checkered flag. Franky Franchicha also had a commendable showing, climbing to fifth by the end of Lap 9. 
+
+But the lead was snatched away from Gianluca Illiano on Lap 19 when he was forced to pit, handing the lead to Frederik Høygaard Larsen. It seemed he was going to take the checkered flag and the victory, but on the last lap Iestyn Chiapelone managed to pull off yet another incredible move and pass him on the inside, taking the win! Oivind Haugland kept pushing and made it back to second, while Gianluca Illiano managed to snag third place. Frederik Høygaard Larsen made a remarkable recovery and finished fourth, and Franky Franchicha rounded out the top five. It had been an exhilarating race, and congratulations were in order for Iestyn Chiapelone on taking the checkered flag!

@@ -179,12 +179,21 @@ function getReplayNotes(
                 }${indirectModifier} for p${ev.position}`,
             };
         } else if (ev.actionType === 'incident') {
+            let incidentMap: { [key: string]: boolean } = {};
+            for (let n of ev.notes) {
+                if (n !== 'invalid') {
+                    incidentMap[n] = true;
+                }
+            }
+
             return {
                 time: ev.time,
                 lookAt: ev.diretDriverId,
                 note: `lap ${ev.lapNumber} - ${
                     driverNames[ev.diretDriverId]
-                } looses several positions`,
+                } looses several positions: ${Object.keys(incidentMap).join(
+                    ', '
+                )}`,
             };
         }
 
@@ -199,7 +208,7 @@ function getReplayNotes(
 function filterEarlyChaos(
     events: PositionChangeEvent[]
 ): PositionChangeEvent[] {
-    return events.filter((v) => v.lapNumber > 2 || v.perc > 0.5);
+    return events.filter((v) => v.lapNumber > 1 || v.perc > 0.5);
 }
 
 function detectIncidents(events: PositionChangeEvent[]): PositionChangeEvent[] {
@@ -328,10 +337,12 @@ function checkOvertake(
 }
 
 async function main() {
-    const subsessionId = 59522192;
+    const subsessionId = 62630734;
     const simsessionId = -3;
 
     let notes = await getRawReplayNotes(subsessionId, simsessionId);
+
+    console.log(JSON.stringify(notes, null, '    '));
 
     const lapChartData = getLapChartData(subsessionId, simsessionId);
 
@@ -352,7 +363,7 @@ async function main() {
     let generatedCommentary = await createCompletion(introPrompt);
 
     for (let i = 0; i < notes.length && generatedCommentary !== 'error'; ++i) {
-        let eventPrompt = `We are creating a broadcast style play by play of a wheel to wheel motorsports event.  We want to create interesting narratives as race events unfold but note that we don't know where in the track these events happend.
+        let eventPrompt = `We are creating a broadcast style play by play of a wheel to wheel motorsports event using colorful and exciting language.  Note the interesting narratives as race events unfold but note that we don't know where in the track these events happend.
     So far this is what has happened during the race:
     <race>
     ${generatedCommentary}
