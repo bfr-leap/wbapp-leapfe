@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "scrape": "ts-node scraper/main.ts",
     "highlights": "ts-node scraper/highlights.ts",
+    "comentary": "ts-node scraper/race-comentary.ts",
     "derive": "ts-node scraper/derived-data.ts",
     "gpt": "ts-node scraper/generate.ts",
     "dev": "vite",
