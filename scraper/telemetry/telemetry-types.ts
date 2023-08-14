@@ -26,7 +26,7 @@ export interface PositionChangeEvent {
     indirectNotes: string[];
 }
 
-interface ReplayNote {
+export interface ReplayNote {
     time: number;
     lookAt: number;
     note: string;

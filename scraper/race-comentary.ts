@@ -1,22 +1,10 @@
 import { reconstructEpochTelemetry } from './telemetry/epoch-reconstruction.js';
-
-import {
-    getLeagueSeasons,
-    getLeagueSeasonSessions,
-    getLapChartData,
-    getSubsessionTelemetry,
-} from './iracing-scraped-data-loader.js';
-
+import { getLapChartData } from './iracing-scraped-data-loader.js';
 import { getSimSessionResults } from './iracing-derived-data-loader.js';
-import {
-    ST_SimsessionTelemetry,
-    SimsessionResults,
-    LapChartData,
-    ST_TelemetryDatum,
-} from '../src/iracing-endpoints.js';
+import { LapChartData } from '../src/iracing-endpoints.js';
 import { createCompletion } from './openai/openai-endpoints.js';
-
 import { detectOvertakes } from './telemetry/overtake-detection.js';
+import { getCameraScript } from './telemetry/camera-direction.js';
 
 async function main() {
     const subsessionId = 62630734;
@@ -26,6 +14,7 @@ async function main() {
         subsessionId,
         simsessionId
     );
+
     let driverNames: { [key: number]: string } = {};
     for (let r of lapChartData.chunk_info) {
         const na = r.display_name.split(' ');
@@ -38,13 +27,13 @@ async function main() {
         driverNames
     );
 
-    // console.log(JSON.stringify(telemetry, null, '    '));
-
     let overtakes = detectOvertakes(telemetry, driverNames);
+    // console.log('number of events: ', overtakes.length);
+    // console.log(JSON.stringify(overtakes, null, '    '));
 
-    console.log('number of events: ', overtakes.length);
-
-    console.log(JSON.stringify(overtakes, null, '    '));
+    let camScript = getCameraScript(telemetry);
+    console.log(camScript.length);
+    console.log(JSON.stringify(camScript, null, '    '));
 }
 
 main();

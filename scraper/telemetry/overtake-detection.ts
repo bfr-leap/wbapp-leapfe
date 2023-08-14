@@ -78,7 +78,7 @@ export function detectOvertakes(
     let nextEpoch = epochList[1];
 
     let i = 1;
-    console.log(epochList.length);
+    // console.log(epochList.length);
     while (i < epochList.length) {
         let sp = JSON.stringify(prevEpoch.data.map((v) => v.driverId));
         let sn = JSON.stringify(nextEpoch.data.map((v) => v.driverId));
