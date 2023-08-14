@@ -25,7 +25,9 @@ let completionCallCount = 0;
 function createCompletion_test(prompt: string): string {
     ++completionCallCount;
 
-    return `completion-token-${completionCallCount}`;
+    return `completion-token-${completionCallCount}:${
+        prompt.split(' ').length
+    }`;
 }
 
 async function createCompletion_live(prompt: string): Promise<string> {

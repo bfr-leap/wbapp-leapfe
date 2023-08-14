@@ -29,7 +29,7 @@ export interface PositionChangeEvent {
 export interface ReplayNote {
     time: number;
     lookAt: number;
-    note: string;
+    note: string[];
 }
 
 interface ExtendedTelemetry {

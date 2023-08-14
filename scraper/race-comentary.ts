@@ -1,10 +1,11 @@
 import { reconstructEpochTelemetry } from './telemetry/epoch-reconstruction.js';
 import { getLapChartData } from './iracing-scraped-data-loader.js';
 import { getSimSessionResults } from './iracing-derived-data-loader.js';
-import { LapChartData } from '../src/iracing-endpoints.js';
+import { LapChartData, SimsessionResults } from '../src/iracing-endpoints.js';
 import { createCompletion } from './openai/openai-endpoints.js';
 import { detectOvertakes } from './telemetry/overtake-detection.js';
 import { getCameraScript } from './telemetry/camera-direction.js';
+import { generateNoteText } from './telemetry/note-generation.js';
 
 async function main() {
     const subsessionId = 62630734;
@@ -27,13 +28,39 @@ async function main() {
         driverNames
     );
 
+    const simsessionResults: SimsessionResults = getSimSessionResults(
+        subsessionId,
+        simsessionId
+    );
+
     let overtakes = detectOvertakes(telemetry, driverNames);
     // console.log('number of events: ', overtakes.length);
     // console.log(JSON.stringify(overtakes, null, '    '));
 
-    let camScript = getCameraScript(telemetry);
-    console.log(camScript.length);
+    let camScript = getCameraScript(telemetry, overtakes);
+    // console.log(camScript.length);
+    // console.log(JSON.stringify(camScript, null, '    '));
+
+    await generateNoteText(
+        camScript,
+        overtakes,
+        lapChartData,
+        telemetry,
+        driverNames,
+        simsessionResults
+    );
+
+    console.log('\n\n\n\n');
+
     console.log(JSON.stringify(camScript, null, '    '));
+
+    // let sign = 1;
+    // console.log(camScript.length);
+    // for (let s of camScript) {
+    //     console.log(s.time * sign);
+    //     console.log(s.lookAt);
+    //     sign = -1;
+    // }
 }
 
 main();
