@@ -13,3 +13,7 @@ npm run build-only
 git add .
 git commit -m "build"
 
+git push origin master
+
+git checkout dev
+
