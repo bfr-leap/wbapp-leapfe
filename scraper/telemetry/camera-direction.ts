@@ -69,33 +69,39 @@ function findMostActiveDriver(
     time: number
 ): number {
     let filteredOvertakes = overtakes.filter(
-        (o) => o.time > time && o.time < time + 12 * 60
+        (o) => o.time >= time && o.time <= time + 12 * 60
     );
-    let visibilityMap: { [name: string]: { id: number; count: number } } = {};
+
+    // console.log(filteredOvertakes);
+
+    let visibilityMap: { [name: string]: { id: number; perc: number } } = {};
     for (let o of filteredOvertakes) {
         let v = visibilityMap[o.directDriverId];
         if (!v) {
             v = visibilityMap[o.directDriverId] = {
                 id: o.directDriverId,
-                count: 0,
+                perc: 0,
             };
         }
-        v.count += 1;
+        v.perc = Math.max(v.perc, o.perc);
 
-        v = visibilityMap[o.indirectDriverId];
-        if (!v) {
-            v = visibilityMap[o.indirectDriverId] = {
-                id: o.indirectDriverId,
-                count: 0,
-            };
-        }
-        v.count -= 1;
+        // v = visibilityMap[o.indirectDriverId];
+        // if (!v) {
+        //     v = visibilityMap[o.indirectDriverId] = {
+        //         id: o.indirectDriverId,
+        //         count: 0,
+        //     };
+        // }
+        // v.count -= 1;
     }
+
+    // console.log(visibilityMap);
+
     let keys = Object.keys(visibilityMap);
     if (keys.length) {
         let targetId: number = keys
             .map((k) => visibilityMap[k])
-            .sort((a, b) => b.count - a.count)[0].id;
+            .sort((a, b) => b.perc - a.perc)[0].id;
 
         // console.log(
         //     'visibility',
@@ -219,8 +225,14 @@ export function getCameraScript(
             continue;
         }
         if (camStartTime === -1) {
-            startTime = camStartTime = epoch.time - 20 * 60;
+            startTime = camStartTime = epoch.time; // - 20 * 60;
             camTarget = epoch.data[0].driverId;
+
+            notes.push({
+                time: epoch.time,
+                lookAt: camTarget,
+                note: [],
+            });
         }
 
         for (let i = 0; i < numCars; ++i) {

@@ -10,6 +10,28 @@ import {
 } from '../../src/iracing-endpoints.js';
 import { createCompletion } from '../openai/openai-endpoints.js';
 
+// this is a prompt to try later:::
+// The following broadcast notes:
+//     We are looking at Alexander Schanna running P 15
+//     On lap 0, Alexander Schanna lost position to Jacob Bieser
+//     On lap 0, Alexander Schanna lost position to Matthew Walters2
+//     On lap 0, Alexander Schanna lost position to Jesus Altuve
+//     On lap 0, Alexander Schanna lost position to Franky Franchicha
+//     On lap 0, Alexander Schanna lost position to Grigor Georgiev
+//     On lap 0, Alexander Schanna lost position to Frank Bieser
+//     On lap 0, Alexander Schanna lost position to Yair Montiel
+//     On lap 0, Alexander Schanna lost position to David Robson2
+//     On lap 1, Alexander Schanna lost position to Fabian Bouwmeester
+//     On lap 2, Alexander Schanna lost position to Yair Montiel
+//     On lap 0, Alexander Schanna overtook Matthew Walters2
+//     On lap 0, Alexander Schanna overtook Jesus Altuve
+//     On lap 1, Alexander Schanna overtook Jesus Altuve
+//     On lap 1, Alexander Schanna overtook David Robson2
+//     On lap 1, Alexander Schanna overtook Yair Montiel
+//     Currently, Alexander Schanna is bringing the fight to Troy Banks from position 15
+
+// This is what Jeremy Clarkson would say in 200 characters skipping details for brevity but keeping his particular style:
+
 async function narrate(notes: ReplayNote[], lapChartData: LapChartData) {
     for (let n of notes) {
         let eventPrompt = [
@@ -64,7 +86,7 @@ export async function generateNoteText(
             liveTelemetry.data.find((d, i) => {
                 p = i + 1;
                 return d.driverId === n.lookAt;
-            }).perc
+            }).perc + 1
         );
 
         if (currentLap !== lastLap) {
@@ -95,20 +117,20 @@ export async function generateNoteText(
 
         let currentOvertakes = overtakes.filter(
             (o) =>
-                o.time > n.time &&
-                o.time < n.time + 60 * 12 &&
+                o.time >= n.time &&
+                o.time <= n.time + 60 * 12 &&
                 o.directDriverId === n.lookAt
         );
 
         let currentNegativeMoves = overtakes.filter(
             (o) =>
-                o.time > n.time &&
-                o.time < n.time + 60 * 12 &&
+                o.time >= n.time &&
+                o.time <= n.time + 60 * 12 &&
                 o.indirectDriverId === n.lookAt
         );
 
         for (let o of pastNegativeMoves) {
-            let lap = Math.floor(o.perc);
+            let lap = Math.floor(o.perc) + 1;
             n.note.push(
                 `On lap ${lap}, ${
                     driverNames[o.indirectDriverId]
@@ -117,7 +139,7 @@ export async function generateNoteText(
         }
 
         for (let o of pastPositiveMoves) {
-            let lap = Math.floor(o.perc);
+            let lap = Math.floor(o.perc) + 1;
             n.note.push(
                 `On lap ${lap}, ${driverNames[o.directDriverId]} overtook ${
                     driverNames[o.indirectDriverId]
