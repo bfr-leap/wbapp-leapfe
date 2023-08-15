@@ -10,7 +10,7 @@
 
 import { readFileSync } from 'fs';
 
-import type { SimsessionResults } from '../src/iracing-endpoints';
+import type { SimsessionResults } from '../../src/iracing-endpoints';
 
 const MNT_PT = './public/data/derived/';
 
