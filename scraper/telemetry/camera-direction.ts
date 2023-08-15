@@ -1,3 +1,14 @@
+/**
+ *
+ * The provided code defines a collection of functions for analyzing telemetry data from a racing simulation.
+ * The code calculates various metrics like driver points and visibility percentages, identifies the most
+ * active driver based on overtaking events, determines camera targets for replay notes, and generates
+ * finishing notes based on changes in driver positions. The primary purpose of this code is to process
+ * telemetry data and generate a camera script for replaying the race with a focus on important moments and
+ * drivers.
+ *
+ */
+
 import {
     EpochTelemetry,
     DriverTelemetryDatum,

@@ -1,3 +1,14 @@
+/**
+ *
+ * This TypeScript module defines a function acceptLapChartDataVisitor that iterates through league
+ * seasons, sessions, and lap chart data, allowing a visitor function to be applied to each combination
+ * of these data points. The code retrieves league season information and session details using imported
+ * functions, and attempts to fetch lap chart data for each session, retrying several times if necessary.
+ * Any encountered errors during data retrieval are caught and logged. The purpose of this module appears
+ * to be facilitating the traversal and processing of lap chart data for different league seasons and sessions.
+ *
+ */
+
 import {
     LapChartData,
     LeagueSeasons,

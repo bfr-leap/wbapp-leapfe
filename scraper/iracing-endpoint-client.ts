@@ -1,3 +1,12 @@
+/**
+ *
+ * This TypeScript module contains functions to interact with the iRacing API for retrieving various data
+ * related to leagues and racing sessions. It includes functions to fetch league directories, league
+ * seasons, season sessions, lap chart data, and member information. The functions use the provided
+ * parameters to make API requests and return the corresponding data structures as promises.
+ *
+ */
+
 import { clientGet, auth } from './iracing-client.js';
 import type {
     LeagueDirectory,

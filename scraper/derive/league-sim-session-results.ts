@@ -1,3 +1,14 @@
+/**
+ *
+ * This TypeScript file contains a module that processes iRacing simulation session results for a given
+ * league. It imports various data types and utility functions related to race and qualification results, as
+ * well as lap chart data. It defines a function "deriveLeagueSimSessionResults" that iterates through the
+ * lap chart data, calculates race and qualification results based on session types, and organizes and stores
+ * the results for different drivers, seasons, and sessions. Finally, the module writes the calculated results
+ * to JSON files, categorized by session type and driver, using the provided data writer function "wf".
+ *
+ */
+
 import {
     LapChartData,
     LeagueSeasons,

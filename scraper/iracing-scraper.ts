@@ -1,3 +1,14 @@
+/**
+ *
+ * This JavaScript file defines a set of functions used for scraping and processing data related to iRacing
+ * leagues and session information. The code imports various functions from different modules to retrieve
+ * league details, season sessions, lap chart data, and member information. The main function, scrapeLeague,
+ * iterates through league seasons, retrieving session data and lap charts while excluding certain conditions.
+ * The code also manages encountered customer IDs, writes scraped data to JSON files, and handles potential
+ * errors during the scraping process.
+ *
+ */
+
 import {
     getLeagueDirectory,
     getLeagueSeasons,

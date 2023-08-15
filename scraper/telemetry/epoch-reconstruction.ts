@@ -1,3 +1,13 @@
+/**
+ *
+ * This TypeScript file contains a function named reconstructEpochTelemetry that takes input data related
+ * to iRacing telemetry and session results. It processes the telemetry data to reconstruct driver positions
+ * and metrics over time during a race session, using a series of calculations and sorting operations.
+ * The function ultimately returns an object representing epoch-based telemetry, including lap counts, flag
+ * time, and sorted driver data.
+ *
+ */
+
 import { EpochTelemetry, DriverTelemetryDatum } from './telemetry-types.js';
 import { getSubsessionTelemetry } from '../iracing-scraped-data-loader.js';
 import { getSimSessionResults } from '../iracing-derived-data-loader.js';

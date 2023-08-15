@@ -1,3 +1,15 @@
+/**
+ *
+ * This TypeScript file contains functions for detecting overtaking events in telemetry data from a
+ * simulated race. The main function, detectOvertakes, takes in telemetry data for different epochs and a
+ * mapping of driver names, and it identifies overtaking maneuvers by comparing the positions of drivers
+ * between consecutive epochs. The singleEpochOvertake function analyzes individual epoch data to identify
+ * overtaking events based on position changes and percentage progress while considering the presence of
+ * other cars. The code focuses on processing telemetry data and generating overtaking event descriptions
+ * for further analysis.
+ *
+ */
+
 import {
     EpochTelemetry,
     PositionChangeEvent,

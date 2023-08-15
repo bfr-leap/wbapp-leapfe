@@ -1,3 +1,14 @@
+/**
+ *
+ * The provided code defines a TypeScript module that interacts with the OpenAI API to generate text
+ * completions based on a given prompt. It includes functions for both live and test environments.
+ * The createCompletion function processes a text prompt, using the live or test completion functions based
+ * on the value of isLive. The live function utilizes the OpenAI API with specific configuration settings
+ * to generate text completions, while the test function generates mock completion tokens using the word
+ * count of the prompt. The code also logs various debugging information during the process.
+ *
+ */
+
 import { Configuration, OpenAIApi } from 'openai';
 
 const isLive = true;

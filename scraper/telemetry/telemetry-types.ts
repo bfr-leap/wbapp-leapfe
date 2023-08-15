@@ -1,3 +1,13 @@
+/**
+ *
+ * This TypeScript file defines a set of interfaces for handling telemetry data related to driver behavior
+ * and race events in a simulation or game. It includes structures to represent driver telemetry data,
+ * epoch-based telemetry information including lap data, position change events with associated details, and
+ * replay notes with time-based annotations. Additionally, an "ExtendedTelemetry" interface is provided to
+ * capture extended telemetry data such as driver identification, lap number, percentages, and time.
+ *
+ */
+
 export interface DriverTelemetryDatum {
     driverId: number;
     perc: number;

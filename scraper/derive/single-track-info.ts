@@ -1,3 +1,14 @@
+/**
+ *
+ * This code defines a JavaScript module responsible for processing and deriving various statistics related
+ * to iRacing sim racing sessions. It imports functions and data structures from other modules to calculate
+ * race and qualifying results, organize lap chart data, and manage track-specific statistics. The primary
+ * function, deriveSingleTrackInfo, iterates through sim racing sessions, collecting information such as
+ * wins, poles, podiums, and lap records, and then sorts and outputs the derived statistics into separate
+ * JSON files for each track and car combination.
+ *
+ */
+
 import {
     LapChartData,
     LeagueSeasons,
@@ -224,8 +235,9 @@ export function deriveSingleTrackInfo(leagueId: number) {
                 r = calculateQualifyResults(lapChartData);
                 if (
                     lapChartData.session_info.simsession_type ===
-                    SimsessionTypes.QUALI || lapChartData.session_info.simsession_type ===
-                    SimsessionTypes.QUALI_LONE
+                        SimsessionTypes.QUALI ||
+                    lapChartData.session_info.simsession_type ===
+                        SimsessionTypes.QUALI_LONE
                 ) {
                     // poles
                     let currentPole = r.results[0];

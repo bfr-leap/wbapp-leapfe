@@ -1,3 +1,14 @@
+/**
+ *
+ * The provided code defines TypeScript interfaces representing telemetry data for simulated racing sessions.
+ * It includes functions to load and manipulate telemetry data, rectifying lap ends, and calculating lap
+ * times for different sectors. The main function, deriveLeagueLapTelemetry, processes telemetry data for a
+ * given racing league, analyzing lap times and sector durations to identify optimal laps and compare them
+ * to the fastest lap times. There are also commented-out debugging lines to output specific lap and sector
+ * details for a particular driver in a specific simulation session.
+ *
+ */
+
 import { readFileSync } from 'fs';
 
 import { wf } from './file-writer.js';

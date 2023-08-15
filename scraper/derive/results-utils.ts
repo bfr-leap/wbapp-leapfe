@@ -1,3 +1,12 @@
+/**
+ *
+ * This TypeScript file defines scoring rules and functions for processing iRacing simsession results. It
+ * contains implementations for calculating race and qualifying results based on given lap data. The code
+ * assigns points to drivers based on their positions, fastest lap times, and safety performance, and then
+ * sorts and arranges the results accordingly.
+ *
+ */
+
 import {
     LapChartData,
     LCD_Chunk,

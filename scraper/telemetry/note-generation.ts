@@ -1,3 +1,13 @@
+/**
+ *
+ * This TypeScript file contains functions related to generating and narrating race event notes based on telemetry
+ * data from a simulated racing session. The generateNoteText function processes telemetry data, overtaking
+ * events, and lap information to create concise broadcast-style notes about the race events and driver
+ * positions. The narrate function takes these notes and augments them with opinionated commentary in the
+ * style of a bold and brash broadcaster, adding colorful remarks to the race narrative.
+ *
+ */
+
 import {
     ReplayNote,
     PositionChangeEvent,

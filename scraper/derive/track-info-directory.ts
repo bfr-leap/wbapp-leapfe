@@ -1,3 +1,14 @@
+/**
+ *
+ * This JavaScript file imports various modules related to iRacing league data, lap chart information, and
+ * file writing utilities. It defines a function deriveTrackInfoDirectory(leagueId) that processes lap chart
+ * data for a specific iRacing league and constructs a TrackInfoDirectory object. This object contains
+ * organized information about the league's name, track and car displays, and a mapping of cars to the tracks
+ * they were used on. The resulting data is then written to a JSON file named
+ * trackInfoDirectory_{leagueId}.json.
+ *
+ */
+
 import {
     LeagueSeasons,
     LS_SeasonSummary,

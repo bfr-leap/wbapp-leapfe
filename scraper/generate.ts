@@ -1,3 +1,12 @@
+/**
+ *
+ * This JavaScript file imports functions related to iRacing data loading and processing. It defines an
+ * async function named chat that uses the OpenAI API to generate text completions based on a given prompt.
+ * The code also includes functions to process simulation session data, extract relevant lap and result
+ * information, and create a summary of the racing event.
+ *
+ */
+
 import { Configuration, OpenAIApi } from 'openai';
 import {
     getLeagueSeasons,

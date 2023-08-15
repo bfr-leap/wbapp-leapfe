@@ -1,3 +1,14 @@
+/**
+ *
+ * This code defines a TypeScript module that exports a function called deriveSingleMemberInfo, which takes
+ * a leagueId as input. It utilizes imported functions from other modules to retrieve league seasons and
+ * member data for each season associated with the given leagueId. It then creates a mapping of member
+ * information using the member's custom ID and writes individual JSON files containing the data of each
+ * member using the wf function from the file-writer.js module. If an error occurs while fetching member
+ * data for a particular season, a corresponding error message is logged.
+ *
+ */
+
 import { M_Member } from '../../src/iracing-endpoints.js';
 import {
     getLeagueSeasons,

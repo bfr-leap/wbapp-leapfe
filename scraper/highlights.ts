@@ -1,3 +1,13 @@
+/**
+ *
+ * This file contains TypeScript code that processes telemetry and race data from iRacing simulations.
+ * It defines functions to analyze race events such as overtakes, incidents, and pit stops, and generates
+ * detailed commentary for a motorsports broadcast-style description of the race. The code extracts
+ * telemetry, lap data, and session information, then combines them to produce engaging narrative
+ * descriptions of race events, enhancing the viewing experience for the audience.
+ *
+ */
+
 import {
     getLeagueSeasons,
     getLeagueSeasonSessions,

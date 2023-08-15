@@ -1,3 +1,13 @@
+/**
+ *
+ * This file defines a Node.js module that facilitates interactions with the iRacing API. It uses Axios
+ * for making HTTP requests, manages cookies using the Tough Cookie library, and implements a custom HTTP
+ * cookie agent for maintaining session state. The module supports authentication, GET requests with query
+ * parameters, and handling of chunked data responses. It also includes functionality to hash passwords,
+ * send authentication requests, and save cookies to a file.
+ *
+ */
+
 import FileCookieStore from '@root/file-cookie-store';
 import { CookieJar } from 'tough-cookie';
 import axios from 'axios';

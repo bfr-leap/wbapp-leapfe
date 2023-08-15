@@ -1,3 +1,14 @@
+/**
+ *
+ * This JavaScript file defines a function named deriveLeagueSimSessionIndex that generates and organizes
+ * simulation session data for a given iRacing league. It fetches information about league seasons and their
+ * respective sessions, creates an index structure containing season and session details, and determines the
+ * session type (race, qualify, practice, or sprint) based on lap data. The resulting index is written to a
+ * JSON file named leagueSimsessionIndex_{leagueId}.json. The code demonstrates data retrieval, organization,
+ * and classification logic within the context of iRacing league simulation sessions.
+ *
+ */
+
 import {
     SeasonSimsessionIndex,
     SSI_Session,

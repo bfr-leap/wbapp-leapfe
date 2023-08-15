@@ -1,3 +1,15 @@
+/**
+ *
+ * The provided code is a TypeScript module that calculates and derives statistical data for drivers
+ * participating in an iRacing league. It imports various data structures and utility functions from other
+ * modules. The deriveDriverStats function processes lap chart data for different racing sessions within
+ * the league, such as races and qualifying sessions. It computes and accumulates statistics like race
+ * wins, podium finishes, top 10 placements, poles, power points, and incidents for both a driver's career
+ * and individual seasons, storing this information in data maps. Finally, the calculated statistics
+ * are written to a JSON file named based on the league ID.
+ *
+ */
+
 import {
     LapChartData,
     LeagueSeasons,
