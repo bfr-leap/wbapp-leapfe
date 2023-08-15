@@ -11,38 +11,15 @@ import {
 import { createCompletion } from '../openai/openai-endpoints.js';
 
 async function narrate(notes: ReplayNote[], lapChartData: LapChartData) {
-    let introPrompt = `The following is session information for a wheel to wheel motorsports event:
-    ${JSON.stringify(lapChartData.session_info, null, '    ')}
-    
-    Create a broadcast style 40 word intro including session information for the event.  Be sure to start with phrases like: "It's lights out and away we go", "We are going green", etc.`;
-
-    let intro = await createCompletion(introPrompt);
-
-    let generatedCommentary = [intro];
-
     for (let n of notes) {
-        let eventPrompt = `We are creating a broadcast style play by play of a wheel to wheel motorsports event using colorful and exciting language.  Note the interesting narratives as race events unfold but note that we don't know where in the track these events happend.
-    So far this are some of the last things we have said about the race:
-    <race>
-    ${generatedCommentary.join('\n')}
-    </race>
+        let eventPrompt = [
+            `The following broadcast notes:`,
+            ...n.note.map((t) => `    ${t}`),
+            ``,
+            `This is what a succinct, opinionated, bold, brash, and often controversial broadcaster can say in 3 seconds skipping details for brevity:`,
+        ];
 
-    The camera just pointed to look at a new car
-    
-    This is a combination of what has happened to this driver since we last saw them on the broadcast as well as what's happening right now:
-    ${JSON.stringify(n.note, null, '    ')}
-
-    Note that events happening while the camera is pointing at them are labeled with "live event" all other events happened while we were looking at other cars.
-    
-    Generate very succinct commentary in present tense about what just happened.  If there is nothing to say at the moment make a nice comment about the driver or their team and sponsors.  Avoid using the same kind of phrasing multiple times.`;
-
-        let newComment = await createCompletion(eventPrompt);
-
-        generatedCommentary.push(newComment);
-
-        while (generatedCommentary.length > 20) {
-            generatedCommentary.shift();
-        }
+        let newComment = await createCompletion(eventPrompt.join('\n'));
 
         n.note.push(newComment);
     }
@@ -59,6 +36,7 @@ export async function generateNoteText(
     let driverLastLookAtMap: { [name: string]: number } = {};
 
     let first = true;
+    let lastLap = 0;
 
     for (let n of notes) {
         let lastLookAt = driverLastLookAtMap[n.lookAt] || 0;
@@ -89,7 +67,17 @@ export async function generateNoteText(
             }).perc
         );
 
-        n.note.push(`looking at - ${driverNames[n.lookAt]} lap: ${currentLap}`);
+        if (currentLap !== lastLap) {
+            n.note.push(
+                `We are on lap ${currentLap} looking at ${
+                    driverNames[n.lookAt]
+                } running P ${p}`
+            );
+        } else {
+            n.note.push(
+                `We are looking at ${driverNames[n.lookAt]} running P ${p}`
+            );
+        }
 
         let pastPositiveMoves = overtakes.filter(
             (o) =>
@@ -122,38 +110,47 @@ export async function generateNoteText(
         for (let o of pastNegativeMoves) {
             let lap = Math.floor(o.perc);
             n.note.push(
-                `past event :: lap: ${lap} - looses position to ${
-                    driverNames[o.directDriverId]
-                }`
+                `On lap ${lap}, ${
+                    driverNames[o.indirectDriverId]
+                } lost position to ${driverNames[o.directDriverId]}`
             );
         }
 
         for (let o of pastPositiveMoves) {
             let lap = Math.floor(o.perc);
             n.note.push(
-                `past event :: lap: ${lap} - ${driverNames[o.directDriverId]} ${
-                    o.actionType
-                } ${driverNames[o.indirectDriverId]}`
+                `On lap ${lap}, ${driverNames[o.directDriverId]} overtook ${
+                    driverNames[o.indirectDriverId]
+                }`
             );
         }
 
         for (let o of currentOvertakes) {
             n.note.push(
-                `live event :: ${driverNames[o.directDriverId]} ${
-                    o.actionType
-                } ${driverNames[o.indirectDriverId]}`
+                `Currently, ${
+                    driverNames[o.directDriverId]
+                } is bringing the fight to ${
+                    driverNames[o.indirectDriverId]
+                } from position ${p}`
             );
         }
 
         for (let o of currentNegativeMoves) {
             n.note.push(
-                `live event :: looses position to ${
+                `Currently, ${driverNames[o.indirectDriverId]} struggles with ${
                     driverNames[o.directDriverId]
                 }`
             );
         }
 
+        if (n.note.length < 2) {
+            n.note.push(
+                `${driverNames[n.lookAt]} is holding on to position ${p}`
+            );
+        }
+
         driverLastLookAtMap[n.lookAt] = n.time;
+        lastLap = currentLap;
     }
 
     await narrate(notes, lapChartData);

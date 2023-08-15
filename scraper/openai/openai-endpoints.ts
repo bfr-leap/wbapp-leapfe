@@ -18,7 +18,10 @@ export async function createCompletion(prompt: string): Promise<string> {
     console.log(ret);
     console.log('------------------------------------');
 
-    return ret || 'error';
+    return (ret || 'error')
+        .replace(/[\n\r]/g, '')
+        .split('"')
+        .join('');
 }
 
 let completionCallCount = 0;
