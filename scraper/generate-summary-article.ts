@@ -12,9 +12,9 @@ import {
     getLeagueSeasons,
     getLeagueSeasonSessions,
     getLapChartData,
-} from './iracing-scraped-data-loader.js';
+} from './iracing/iracing-scraped-data-loader.js';
 
-import { getSimSessionResults } from './iracing-derived-data-loader.js';
+import { getSimSessionResults } from './iracing/iracing-derived-data-loader.js';
 
 async function chat(prompt: string) {
     const configuration = new Configuration({

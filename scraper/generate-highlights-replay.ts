@@ -13,9 +13,9 @@ import {
     getLeagueSeasonSessions,
     getLapChartData,
     getSubsessionTelemetry,
-} from './iracing-scraped-data-loader.js';
+} from './iracing/iracing-scraped-data-loader.js';
 
-import { getSimSessionResults } from './iracing-derived-data-loader.js';
+import { getSimSessionResults } from './iracing/iracing-derived-data-loader.js';
 import {
     ST_SimsessionTelemetry,
     SimsessionResults,

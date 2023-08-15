@@ -18,7 +18,7 @@ import {
     getLapChartData,
     getLeagueSeasons,
     getLeagueSeasonSessions,
-} from '../iracing-scraped-data-loader.js';
+} from '../iracing/iracing-scraped-data-loader.js';
 
 import { wf } from './file-writer.js';
 import { RACE_SPRINT_THRESHOLD } from './results-utils.js';

@@ -13,7 +13,7 @@ import { M_Member } from '../../src/iracing-endpoints.js';
 import {
     getLeagueSeasons,
     getMembersData,
-} from '../iracing-scraped-data-loader.js';
+} from '../iracing/iracing-scraped-data-loader.js';
 import { wf } from './file-writer.js';
 
 export function deriveSingleMemberInfo(leagueId: number) {

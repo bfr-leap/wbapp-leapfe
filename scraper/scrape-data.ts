@@ -8,14 +8,14 @@
  *
  */
 
-import { auth } from './iracing-client.js';
+import { auth } from './iracing/iracing-client.js';
 
 import {
     scrapeLeague,
     scrapeMembersData,
     getEncounteredCustIds,
     scrapeLapChartData,
-} from './iracing-scraper.js';
+} from './iracing/iracing-scraper.js';
 
 (async () => {
     const username = process.env.IWP_USERNAME || 'test';

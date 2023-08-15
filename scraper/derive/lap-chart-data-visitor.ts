@@ -21,7 +21,7 @@ import {
     getLeagueSeasons,
     getLeagueSeasonSessions,
     getLapChartData,
-} from '../iracing-scraped-data-loader.js';
+} from '../iracing/iracing-scraped-data-loader.js';
 
 export type LapChartDataVisitor = (
     leagueSeasons: LeagueSeasons,

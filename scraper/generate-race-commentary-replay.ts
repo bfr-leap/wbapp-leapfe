@@ -1,6 +1,17 @@
+/**
+ *
+ * This code is a JavaScript file that orchestrates various functions to analyze telemetry data from an
+ * iRacing simulation session. It imports functions for reconstructing telemetry, loading lap chart data,
+ * session results, overtaking detection, camera direction, and note generation. The main() function utilizes
+ * these imported functions to process the telemetry data, detect overtakes, generate camera scripts, and
+ * create note text based on the simulation session. The final output includes formatted camera scripts and
+ * related information.
+ *
+ */
+
 import { reconstructEpochTelemetry } from './telemetry/epoch-reconstruction.js';
-import { getLapChartData } from './iracing-scraped-data-loader.js';
-import { getSimSessionResults } from './iracing-derived-data-loader.js';
+import { getLapChartData } from './iracing/iracing-scraped-data-loader.js';
+import { getSimSessionResults } from './iracing/iracing-derived-data-loader.js';
 import { LapChartData, SimsessionResults } from '../src/iracing-endpoints.js';
 import { createCompletion } from './openai/openai-endpoints.js';
 import { detectOvertakes } from './telemetry/overtake-detection.js';
