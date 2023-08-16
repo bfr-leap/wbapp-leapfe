@@ -2,14 +2,13 @@
 import { ref, watch, watchEffect } from 'vue';
 import type { Ref } from 'vue';
 import { getCuratedActiveLeagueSchedule } from '../fetch-util';
-import type { ActiveLeagueSchedule } from '@/iracing-endpoints';
 import { useRoute } from 'vue-router';
 
 import EventCardLg from '../components/EventCardLg.vue';
 import EventCardSm from '../components/EventCardSm.vue';
 import DriverStandings from '../components/DriverStandings.vue';
 import LeagueSeasonMenu from '../components/LeagueSeasonMenu.vue';
-import PastEventCards from './PastEventCards.vue';
+import PastEventCards from './past-event-cards.vue';
 
 const route = useRoute();
 

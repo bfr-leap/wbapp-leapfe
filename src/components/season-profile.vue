@@ -9,7 +9,7 @@ import EventCardLg from '../components/EventCardLg.vue';
 import EventCardSm from '../components/EventCardSm.vue';
 import DriverStandings from '../components/DriverStandings.vue';
 import LeagueSeasonMenu from '../components/LeagueSeasonMenu.vue';
-import PastEventCards from '../components/PastEventCards.vue';
+import PastEventCards from '../components/past-event-cards.vue';
 import {
     getChartDataFromStats,
     getDefaultSeasonProfileModel,

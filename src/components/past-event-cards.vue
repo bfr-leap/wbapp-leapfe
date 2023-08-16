@@ -2,10 +2,12 @@
 import { ref, watch, watchEffect } from 'vue';
 import type { Ref } from 'vue';
 import { useRoute } from 'vue-router';
-
-import { getLeagueSeasonSessions } from '@/fetch-util';
-
 import EventCardSm from '../components/EventCardSm.vue';
+import type { PastEventCardsModel } from '../models/past-events-cards-model';
+import {
+    getPastEventCardsModel,
+    getDefaultPastEventCardsModel,
+} from '../models/past-events-cards-model';
 
 const route = useRoute();
 
@@ -14,52 +16,29 @@ const props = defineProps<{
     season: string;
 }>();
 
-interface View {
-    pastRaces: {
-        sessionId: string;
-        trackId: string;
-        date: string;
-        isSelected: boolean;
-    }[];
-}
+let pastEventCardsModel: Ref<PastEventCardsModel> = ref(
+    getDefaultPastEventCardsModel()
+);
 
-let defaultView: View = {
-    pastRaces: [],
-};
-
-let view: Ref<View> = ref(JSON.parse(JSON.stringify(defaultView)));
-
-async function fectchJsonData() {
-    view.value = JSON.parse(JSON.stringify(defaultView));
-
-    if (!props.league || !props.season) {
-        return;
-    }
-
-    let leagueSeasonSessions = await getLeagueSeasonSessions(
+async function fetchModel() {
+    pastEventCardsModel.value = await getPastEventCardsModel(
         props.league,
         props.season
     );
-
-    for (let session of leagueSeasonSessions?.sessions) {
-        view.value.pastRaces.push({
-            trackId: session.track.track_id.toString(),
-            date: session.launch_at,
-            isSelected: false,
-            sessionId: session.subsession_id.toString(),
-        });
-    }
 }
 
-watchEffect(fectchJsonData);
-watch(route, fectchJsonData);
+watchEffect(fetchModel);
+watch(route, fetchModel);
 </script>
 
 <template>
     <div class="row g-1">
         <div class="col-12">
-            <div v-if="view.pastRaces.length" class="row g-1 h-100">
-                <div v-for="race in view.pastRaces" class="col">
+            <div
+                v-if="pastEventCardsModel.pastRaces.length"
+                class="row g-1 h-100"
+            >
+                <div v-for="race in pastEventCardsModel.pastRaces" class="col">
                     <RouterLink
                         style="text-decoration: none"
                         class="link-light"
