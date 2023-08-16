@@ -93,7 +93,7 @@ watchEffect(fetchModel);
     </div>
 </template>
 
-<style scoepd>
+<style scoped>
 .table {
     /* background: #ee99a0; */
     border-radius: 0.2rem;
@@ -108,8 +108,5 @@ watchEffect(fetchModel);
     left: 0;
     /* background-color: #ad6c80;
     color: #373737; */
-}
-.table td {
-    /* white-space: nowrap; */
 }
 </style>

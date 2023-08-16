@@ -35,7 +35,7 @@ const startFinishChartData: Ref<
     { name: string; hi: number; lo: number }[] | null
 > = ref(null);
 
-async function fectchJsonData() {
+async function fetchJsonData() {
     qualifyingChartData.value = await getQualifyingChartData(
         props.results.quali,
         props.seasonId,
@@ -50,7 +50,7 @@ async function fectchJsonData() {
         props.leagueId
     );
 }
-watchEffect(fectchJsonData);
+watchEffect(fetchJsonData);
 
 const statClasses = 'px-2 py-1 m-1 fs-5';
 </script>

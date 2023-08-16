@@ -27,12 +27,12 @@ interface ExtendedTelemetry {
     driverId: number;
     lapNumber: number;
     perc: number;
-    perdD: number;
+    percD: number;
     t: number;
 }
 
 interface PositionChangeEvent {
-    diretDriverId: number;
+    directDriverId: number;
     indirectDriverId?: number;
     time: number;
     perc: number;
@@ -181,9 +181,9 @@ function getReplayNotes(
 
             return {
                 time: ev.time,
-                lookAt: ev.diretDriverId,
+                lookAt: ev.directDriverId,
                 note: `lap ${ev.lapNumber} - ${
-                    driverNames[ev.diretDriverId]
+                    driverNames[ev.directDriverId]
                 }${directModifier} overtakes ${
                     driverNames[ev.indirectDriverId]
                 }${indirectModifier} for p${ev.position}`,
@@ -198,9 +198,9 @@ function getReplayNotes(
 
             return {
                 time: ev.time,
-                lookAt: ev.diretDriverId,
+                lookAt: ev.directDriverId,
                 note: `lap ${ev.lapNumber} - ${
-                    driverNames[ev.diretDriverId]
+                    driverNames[ev.directDriverId]
                 } looses several positions: ${Object.keys(incidentMap).join(
                     ', '
                 )}`,
@@ -209,8 +209,8 @@ function getReplayNotes(
 
         return {
             time: ev.time,
-            lookAt: ev.diretDriverId,
-            note: `${ev.diretDriverId} ${ev.actionType} ${ev.indirectDriverId}`,
+            lookAt: ev.directDriverId,
+            note: `${ev.directDriverId} ${ev.actionType} ${ev.indirectDriverId}`,
         };
     });
 }
@@ -239,7 +239,7 @@ function detectIncidents(events: PositionChangeEvent[]): PositionChangeEvent[] {
             ret.push(events[i]);
         } else {
             ret.push({
-                diretDriverId: events[i].indirectDriverId,
+                directDriverId: events[i].indirectDriverId,
                 time: events[i].time,
                 perc: events[i].perc,
                 actionType: 'incident',
@@ -259,7 +259,8 @@ function detectIncidents(events: PositionChangeEvent[]): PositionChangeEvent[] {
 function addNotes(lapChartData: LapChartData, events: PositionChangeEvent[]) {
     for (let e of events) {
         let lap = lapChartData.chunk_info.find(
-            (v) => v.cust_id === e.diretDriverId && v.lap_number === e.lapNumber
+            (v) =>
+                v.cust_id === e.directDriverId && v.lap_number === e.lapNumber
         );
         if (lap) {
             e.notes.push(...lap.lap_events);
@@ -327,7 +328,7 @@ function checkOvertake(
                 relevantDrivers.indexOf(passedCar) >= 0
             ) {
                 ret.push({
-                    diretDriverId: n.driverId,
+                    directDriverId: n.driverId,
                     indirectDriverId: passedCar,
                     time: n.t,
                     perc: n.perc,
@@ -373,7 +374,7 @@ async function main() {
     let generatedCommentary = await createCompletion(introPrompt);
 
     for (let i = 0; i < notes.length && generatedCommentary !== 'error'; ++i) {
-        let eventPrompt = `We are creating a broadcast style play by play of a wheel to wheel motorsports event using colorful and exciting language.  Note the interesting narratives as race events unfold but note that we don't know where in the track these events happend.
+        let eventPrompt = `We are creating a broadcast style play by play of a wheel to wheel motorsports event using colorful and exciting language.  Note the interesting narratives as race events unfold but note that we don't know where in the track these events happened.
     So far this is what has happened during the race:
     <race>
     ${generatedCommentary}
@@ -382,7 +383,7 @@ async function main() {
     This is what just happened:
     ${notes[i].note}
     
-    Generate very succinct comentary in present tense about what just happened.`;
+    Generate very succinct commentary in present tense about what just happened.`;
 
         let newComment = await createCompletion(eventPrompt);
 
