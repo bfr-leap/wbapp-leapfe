@@ -5,7 +5,7 @@ import { useRoute } from 'vue-router';
 import LeagueIndex from '../components/LeagueIndex.vue';
 import CumulativeDeltaChart from '../components/CumulativeDeltaChart.vue';
 import StartFinishChart from './start-finish-chart.vue';
-import PaceChart from './PaceChart.vue';
+import PaceChart from './pace-chart.vue';
 import BestQualifyLapChart from './BestQualifyLapChart.vue';
 import GenericTable from './GenericTable.vue';
 import TrackBanner from './track-banner.vue';
@@ -31,7 +31,7 @@ let routeObserver: Ref<{
     simsessionId: '',
 });
 
-async function fectchModelData() {
+async function fetchModelData() {
     let leagueId: string = (route.query.league as string) || '';
     let seasonId: string = (route.query.season as string) || '';
     let subsessionId: string = (route.query.subsession as string) || '';
@@ -56,8 +56,8 @@ async function fectchModelData() {
         simsessionId
     );
 }
-watchEffect(fectchModelData);
-watch(routeObserver, fectchModelData);
+watchEffect(fetchModelData);
+watch(routeObserver, fetchModelData);
 </script>
 
 <template>
