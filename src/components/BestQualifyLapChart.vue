@@ -2,7 +2,7 @@
 import { watchEffect, ref, watch } from 'vue';
 import type { Ref } from 'vue';
 import ComulativeLineChart from './ComulativeLineChart.vue';
-import type { SeriesXY } from './LineChart.vue';
+import type { SeriesXY } from './line-chart.vue';
 import {
     getSingleMemberData,
     getSimsessionResults,

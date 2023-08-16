@@ -7,7 +7,7 @@ import { useRoute } from 'vue-router';
 import EventCardLg from '../components/EventCardLg.vue';
 import EventCardSm from '../components/EventCardSm.vue';
 import DriverStandings from '../components/DriverStandings.vue';
-import LeagueSeasonMenu from '../components/LeagueSeasonMenu.vue';
+import LeagueSeasonMenu from '@/components/league-season-menu.vue';
 import PastEventCards from './past-event-cards.vue';
 
 const route = useRoute();

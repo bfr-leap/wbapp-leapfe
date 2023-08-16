@@ -2,7 +2,7 @@
 import { watchEffect, watch, ref } from 'vue';
 import type { Ref } from 'vue';
 import ComulativeLineChart from './ComulativeLineChart.vue';
-import type { SeriesXY } from './LineChart.vue';
+import type { SeriesXY } from './line-chart.vue';
 import type { LapChartData, LCD_Chunk } from '../iracing-endpoints';
 import { getLapChartData } from '@/fetch-util';
 

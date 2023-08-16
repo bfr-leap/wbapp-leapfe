@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { watchEffect, ref } from 'vue';
 import type { Ref } from 'vue';
-import LineChart from './LineChart.vue';
-import type { SeriesXY } from './LineChart.vue';
+import LineChart from './line-chart.vue';
+import type { SeriesXY } from './line-chart.vue';
 
 const props = defineProps<{
     series: SeriesXY[];

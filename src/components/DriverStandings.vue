@@ -19,7 +19,7 @@ import {
 } from '@/fetch-util';
 import DriverTag from './DriverTag.vue';
 import TeamTag from './team-tag.vue';
-import LeagueSeasonMenu from './LeagueSeasonMenu.vue';
+import LeagueSeasonMenu from '@/components/league-season-menu.vue';
 
 const props = withDefaults(
     defineProps<{
