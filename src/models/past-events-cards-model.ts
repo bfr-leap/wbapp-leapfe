@@ -34,12 +34,14 @@ export async function getPastEventCardsModel(
     let leagueSeasonSessions = await getLeagueSeasonSessions(league, season);
 
     for (let session of leagueSeasonSessions?.sessions) {
-        ret.pastRaces.push({
-            trackId: session.track.track_id.toString(),
-            date: session.launch_at,
-            isSelected: false,
-            sessionId: session.subsession_id.toString(),
-        });
+        if (session?.subsession_id) {
+            ret.pastRaces.push({
+                trackId: session.track.track_id.toString(),
+                date: session.launch_at,
+                isSelected: false,
+                sessionId: session?.subsession_id?.toString() || '',
+            });
+        }
     }
 
     return ret;

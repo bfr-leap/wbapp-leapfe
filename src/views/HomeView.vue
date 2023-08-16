@@ -7,7 +7,7 @@ import DriverStandingsView from '../components/DriverStandingsView.vue';
 import DriverView from '../components/DriverView.vue';
 import TeamView from '../components/team-view.vue';
 import TrackResultsView from '../components/track-results-view.vue';
-import NextEventTimerEmbed from '@/components/NextEventTimerEmbed.vue';
+import NextEventTimerEmbed from '@/components/next-event-timer-embed.vue';
 import SeasonProfile from '@/components/season-profile.vue';
 import { watch } from 'vue';
 import mixpanel from 'mixpanel-browser';
