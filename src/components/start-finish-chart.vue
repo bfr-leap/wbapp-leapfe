@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { watchEffect, ref } from 'vue';
 import type { Ref } from 'vue';
-import BarChart from './HLBarChart.vue';
+import BarChart from './hl-bar-chart.vue';
 import type { HLBarChartDatum } from '@/models/hl-bar-chart-model';
 import { getStartFinishData } from '@/models/start-finish-chart-model';
 

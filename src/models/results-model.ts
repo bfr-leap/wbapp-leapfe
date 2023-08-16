@@ -58,7 +58,7 @@ export async function getResultsModel(
     let seasonSimsessionIndex: SeasonSimsessionIndex[] =
         await getLeagueSimsessionIndex(leagueId);
 
-    let selectedSeason = seasonSimsessionIndex.find(
+    let selectedSeason = seasonSimsessionIndex?.find(
         (s) => s.season_id.toString() === seasonId
     );
 
@@ -66,7 +66,7 @@ export async function getResultsModel(
         // find the first seasson with sessions
         // ...and do the same for other props
         let seasonIndex: number = 0;
-        for (let i = 0; i < seasonSimsessionIndex.length; ++i) {
+        for (let i = 0; i < seasonSimsessionIndex?.length || 0; ++i) {
             if (seasonSimsessionIndex[i].sessions.length > 0) {
                 seasonIndex = i;
                 break;

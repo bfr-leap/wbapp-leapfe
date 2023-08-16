@@ -3,7 +3,7 @@ import { RouterLink } from 'vue-router';
 import ResultsTable from './results-table.vue';
 import type { DriverStats, DriverResults } from '../iracing-endpoints';
 import BarChart from './BarChart.vue';
-import HLBarChart from './HLBarChart.vue';
+import HLBarChart from './hl-bar-chart.vue';
 import { ref, watchEffect } from 'vue';
 import type { Ref } from 'vue';
 import {

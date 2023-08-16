@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
 
-import HomeView from '../components/HomeView.vue';
+import HomeView from '../components/home-view.vue';
 import ResultsView from '../components/results-view.vue';
 import DriverStandingsView from '../components/DriverStandingsView.vue';
 import DriverView from '../components/DriverView.vue';
