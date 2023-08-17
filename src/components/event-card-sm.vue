@@ -26,11 +26,11 @@ const shortMonthNames = [
 
 let shortNames: Ref<{ [name: string]: string }> = ref({});
 
-async function fectchJsonData() {
+async function fetchModel() {
     shortNames.value[props.track_id] = await getshortTrackName(props.track_id);
 }
 
-watchEffect(fectchJsonData);
+watchEffect(fetchModel);
 </script>
 
 <template>

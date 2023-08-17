@@ -2,7 +2,7 @@
 import { ref, watch, watchEffect } from 'vue';
 import type { Ref } from 'vue';
 import { useRoute } from 'vue-router';
-import EventCardSm from '../components/EventCardSm.vue';
+import EventCardSm from '@/components/event-card-sm.vue';
 import type { PastEventCardsModel } from '../models/past-events-cards-model';
 import {
     getPastEventCardsModel,
