@@ -17,7 +17,7 @@ import {
     getMembersData,
     getSeasonSimsessionIndex,
 } from '@/fetch-util';
-import DriverTag from './DriverTag.vue';
+import DriverTag from './driver-tag.vue';
 import TeamTag from './team-tag.vue';
 import LeagueSeasonMenu from '@/components/league-season-menu.vue';
 

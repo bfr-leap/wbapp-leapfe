@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Stats from './driver-stats.vue';
-import DriverTag from './DriverTag.vue';
+import DriverTag from './driver-tag.vue';
 import { getMemberViewFromM_Memeber } from './driverUtils';
 import { ref, watchEffect, computed } from 'vue';
 import type { Ref } from 'vue';

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-import LeagueIndex from '../components/LeagueIndex.vue';
 import DriverStandings from '../components/DriverStandings.vue';
 
 const route = useRoute();
