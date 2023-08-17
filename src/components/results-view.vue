@@ -3,7 +3,7 @@ import { ref, watchEffect, watch } from 'vue';
 import type { Ref } from 'vue';
 import { useRoute } from 'vue-router';
 import LeagueIndex from '@/components/league-index.vue';
-import CumulativeDeltaChart from '../components/CumulativeDeltaChart.vue';
+import CumulativeDeltaChart from '@/components/cumulative-delta-chart.vue';
 import StartFinishChart from './start-finish-chart.vue';
 import PaceChart from './pace-chart.vue';
 import BestQualifyLapChart from './BestQualifyLapChart.vue';

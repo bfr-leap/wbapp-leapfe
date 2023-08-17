@@ -9,10 +9,7 @@ import {
     watch,
 } from 'vue';
 
-export interface SeriesXY {
-    name: string;
-    data: { x: number; y: number }[];
-}
+import type { SeriesXY } from '@/models/line-chart-model';
 
 export type PickNumericProps<T> = {
     [P in keyof T as T[P] extends number ? P : never]: T[P];
