@@ -4,7 +4,7 @@ import { useRoute } from 'vue-router';
 import HomeView from '../components/home-view.vue';
 import ResultsView from '../components/results-view.vue';
 import DriverStandingsView from '../components/DriverStandingsView.vue';
-import DriverView from '../components/DriverView.vue';
+import DriverView from '@/components/driver-view.vue';
 import TeamView from '../components/team-view.vue';
 import TrackResultsView from '../components/track-results-view.vue';
 import NextEventTimerEmbed from '@/components/next-event-timer-embed.vue';
