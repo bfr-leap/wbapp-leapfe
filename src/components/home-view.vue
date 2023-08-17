@@ -3,7 +3,7 @@ import { ref, watch, watchEffect } from 'vue';
 import type { Ref } from 'vue';
 import { useRoute } from 'vue-router';
 
-import EventCardLg from '../components/EventCardLg.vue';
+import EventCardLg from '@/components/event-card-lg.vue';
 import EventCardSm from '@/components/event-card-sm.vue';
 import DriverStandings from '../components/DriverStandings.vue';
 import LeagueSeasonMenu from '@/components/league-season-menu.vue';

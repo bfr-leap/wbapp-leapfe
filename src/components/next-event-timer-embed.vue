@@ -9,7 +9,7 @@ import {
     getNextEventTimerEmbedModel,
 } from '@/models/next-event-timer-embed-model';
 import type { NextEventTimerEmbedModel } from '@/models/next-event-timer-embed-model';
-import EventCardLg from '../components/EventCardLg.vue';
+import EventCardLg from '@/components/event-card-lg.vue';
 import EventCardSm from '@/components/event-card-sm.vue';
 
 const route = useRoute();

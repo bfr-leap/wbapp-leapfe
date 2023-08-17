@@ -16,7 +16,7 @@ let countdown: Ref<String> = ref('---');
 let timer: any = 0;
 let trackName: Ref<string> = ref('---');
 
-async function fectchJsonData() {
+async function fetchModel() {
     updateTimer();
 }
 
@@ -40,7 +40,7 @@ async function updateTimer() {
 
     trackName.value = await getTrackName(props.track_id);
 }
-watchEffect(fectchJsonData);
+watchEffect(fetchModel);
 </script>
 
 <template>

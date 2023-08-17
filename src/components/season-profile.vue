@@ -5,7 +5,7 @@ import GenericTable from './generic-table.vue';
 import { useRoute } from 'vue-router';
 
 import BarChart from './BarChart.vue';
-import EventCardLg from '../components/EventCardLg.vue';
+import EventCardLg from '@/components/event-card-lg.vue';
 import EventCardSm from '@/components/event-card-sm.vue';
 import DriverStandings from '../components/DriverStandings.vue';
 import LeagueSeasonMenu from '@/components/league-season-menu.vue';
