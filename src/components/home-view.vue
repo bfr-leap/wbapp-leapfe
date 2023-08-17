@@ -5,7 +5,7 @@ import { useRoute } from 'vue-router';
 
 import EventCardLg from '@/components/event-card-lg.vue';
 import EventCardSm from '@/components/event-card-sm.vue';
-import DriverStandings from '../components/DriverStandings.vue';
+import DriverStandings from '@/components/driver-standings.vue';
 import LeagueSeasonMenu from '@/components/league-season-menu.vue';
 import PastEventCards from './past-event-cards.vue';
 import type { HomeModel } from '@/models/home-model';

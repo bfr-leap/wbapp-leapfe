@@ -1,25 +1,15 @@
 <script setup lang="ts">
-import { getMemberViewFromM_Memeber, getRoadLicense } from './driverUtils';
 import { RouterLink } from 'vue-router';
 import { ref, watch, watchEffect } from 'vue';
 import type { Ref } from 'vue';
-import type {
-    MembersData,
-    M_License,
-    SeasonSimsessionIndex,
-    CuratedLeagueTeamsInfo,
-    CLTI_Team,
-    DriverStatsMap,
-} from '../iracing-endpoints';
-import {
-    getCuratedLeagueTeamsInfo,
-    getLeagueDriverStats,
-    getMembersData,
-    getSeasonSimsessionIndex,
-} from '@/fetch-util';
 import DriverTag from './driver-tag.vue';
 import TeamTag from './team-tag.vue';
 import LeagueSeasonMenu from '@/components/league-season-menu.vue';
+import type { DriverStandingsModel } from '@/models/driver-standings-model';
+import {
+    getDriverStandingsModel,
+    getDefaultStandingsModel,
+} from '@/models/driver-standings-model';
 
 const props = withDefaults(
     defineProps<{
@@ -30,188 +20,17 @@ const props = withDefaults(
     { summary_mode: false }
 );
 
-interface TeamView {
-    position: number;
-    points: number;
-    teamName: string;
-    teamId: number;
-    drivers: {
-        name: string;
-        custId: string;
-    }[];
-}
-interface DriverView {
-    position: number;
-    points: number;
-    clubId: number;
-    lastName: string;
-    firstName: string;
-    iRating: string;
-    licenseLevel: string;
-    safetyRating: string;
-    teamName: string;
-    teamId: number;
-    showStats: boolean;
-    custId: string;
-    stats: {
-        started: number;
-        poles: number;
-        wins: number;
-        podiums: number;
-        top10: number;
-        top20: number;
-    };
-}
+let view: Ref<DriverStandingsModel> = ref(getDefaultStandingsModel());
 
-interface LocalView {
-    drivers: DriverView[];
-    teams: TeamView[];
-}
-
-let view: Ref<LocalView> = ref({
-    drivers: [],
-    teams: [],
-});
-
-function populateTeamInfoMaps(
-    leagueTeamsInfo: CuratedLeagueTeamsInfo,
-    seasonId: number,
-    userTeamIdMap: { [name: number]: number },
-    teamInfoMap: { [name: number]: CLTI_Team }
-) {
-    let season = leagueTeamsInfo?.seasons.find((s) => s.season_id === seasonId);
-    if (!season) {
-        return {};
-    }
-
-    for (let team of season.teams) {
-        teamInfoMap[team.team_id] = team;
-        for (let member of team.team_members) {
-            userTeamIdMap[member] = team.team_id;
-        }
-    }
-}
-
-async function fectchJsonData() {
-    let [
-        _driverStatsMap,
-        _curatedLeagueTeamsInfo,
-        _membersData,
-        _seasonSimsessionIndex,
-    ] = <
-        [
-            { [name: number]: DriverStatsMap },
-            CuratedLeagueTeamsInfo,
-            MembersData,
-            SeasonSimsessionIndex[]
-        ]
-    >[
-        await getLeagueDriverStats(props.league),
-        await getCuratedLeagueTeamsInfo(props.league),
-        await getMembersData(props.league, props.season),
-        await getSeasonSimsessionIndex(props.league),
-    ];
-
-    let _seasonId = Number.parseInt(props.season);
-
-    let _userTeamIdMap: { [name: number]: number } = {};
-    let _teamInfoMap: { [name: number]: CLTI_Team } = {};
-    populateTeamInfoMaps(
-        _curatedLeagueTeamsInfo,
-        _seasonId,
-        _userTeamIdMap,
-        _teamInfoMap
+async function fetchModel() {
+    view.value = await getDriverStandingsModel(
+        props.league,
+        props.season,
+        props.summary_mode
     );
-
-    let sortedM = _driverStatsMap
-        ? _membersData?.members.sort((a, b) =>
-              !_driverStatsMap[_seasonId][b.cust_id] ||
-              !_driverStatsMap[_seasonId][a.cust_id]
-                  ? !_driverStatsMap[_seasonId][b.cust_id]
-                      ? -1
-                      : 1
-                  : _driverStatsMap[_seasonId][b.cust_id].power_points !==
-                    _driverStatsMap[_seasonId][a.cust_id].power_points
-                  ? _driverStatsMap[_seasonId][b.cust_id].power_points -
-                    _driverStatsMap[_seasonId][a.cust_id].power_points
-                  : (getRoadLicense(b.licenses).irating | 0) -
-                    (getRoadLicense(a.licenses).irating | 0)
-          )
-        : [];
-
-    view.value.drivers = [];
-    let allDrivers: DriverView[] = [];
-
-    let position = 1;
-
-    for (let member of sortedM) {
-        const memberView = getMemberViewFromM_Memeber(
-            member,
-            _userTeamIdMap,
-            _teamInfoMap
-        );
-
-        let dv: DriverView = {
-            position: position,
-            points: _driverStatsMap?.[_seasonId]?.[member.cust_id]
-                ?.power_points,
-            ...memberView,
-            showStats: false,
-            custId: member.cust_id.toString(),
-            stats: {
-                started: -1,
-                poles: -1,
-                wins: -1,
-                podiums: -1,
-                top10: -1,
-                top20: -1,
-            },
-        };
-        ++position;
-
-        allDrivers.push(dv);
-
-        if (!props.summary_mode || position <= 4) {
-            view.value.drivers.push(dv);
-        }
-    }
-
-    let teamViewMap: { [name: string]: TeamView } = {};
-    for (let driver of allDrivers) {
-        let team = teamViewMap[driver.teamName];
-        if (!team) {
-            teamViewMap[driver.teamName] = team = {
-                position: -1,
-                points: 0,
-                teamName: driver.teamName,
-                teamId: driver.teamId,
-                drivers: [],
-            };
-        }
-
-        team.drivers.push({
-            name: `${driver.lastName.toUpperCase}, ${driver.firstName}`,
-            custId: driver.custId,
-        });
-
-        team.points += driver.points;
-    }
-    let teamsA = Object.keys(teamViewMap)
-        .map((k) => teamViewMap[k])
-        .sort((a, b) => b.points - a.points);
-
-    teamsA.forEach((v, i) => {
-        v.position = i + 1;
-    });
-
-    if (props.summary_mode) {
-        teamsA = teamsA.filter((v) => v.position <= 3);
-    }
-
-    view.value.teams = teamsA;
 }
-watchEffect(fectchJsonData);
-watch(props, fectchJsonData);
+watchEffect(fetchModel);
+watch(props, fetchModel);
 </script>
 
 <template>
