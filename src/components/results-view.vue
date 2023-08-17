@@ -7,7 +7,7 @@ import CumulativeDeltaChart from '../components/CumulativeDeltaChart.vue';
 import StartFinishChart from './start-finish-chart.vue';
 import PaceChart from './pace-chart.vue';
 import BestQualifyLapChart from './BestQualifyLapChart.vue';
-import GenericTable from './GenericTable.vue';
+import GenericTable from './generic-table.vue';
 import TrackBanner from './track-banner.vue';
 import type { ResultsModel } from '@/models/results-model';
 import {

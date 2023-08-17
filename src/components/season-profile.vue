@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, watchEffect } from 'vue';
 import type { Ref } from 'vue';
-import GenericTable from './GenericTable.vue';
+import GenericTable from './generic-table.vue';
 import { useRoute } from 'vue-router';
 
 import BarChart from './BarChart.vue';
