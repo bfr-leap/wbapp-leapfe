@@ -4,118 +4,35 @@ import DriverTag from './driver-tag.vue';
 import { getMemberViewFromM_Memeber } from './driverUtils';
 import { ref, watchEffect, computed } from 'vue';
 import type { Ref } from 'vue';
-import type {
-    CuratedLeagueTeamsInfo,
-    DriverStatsMap,
-    DriverStats,
-    M_Member,
-    LeagueSeasons,
-    DriverResults,
-    SSR_ResultsEntry,
-} from '../iracing-endpoints';
+import type { DriverProfileModel } from '@/models/driver-profile-model';
 import {
-    getCuratedLeagueTeamsInfo,
-    getDriverResults,
-    getLeagueDriverStats,
-    getLeagueSeasons,
-    getSingleMemberData,
-} from '@/fetch-util';
+    getDefaultDriverProfileModel,
+    getDriverProfileModel,
+} from '@/models/driver-profile-model';
 
 const props = defineProps<{
     league: string;
     driver: string;
 }>();
 
-const _singleMemberData: Ref<M_Member | null> = ref(null);
-const _leagueSeasons: Ref<LeagueSeasons | null> = ref(null);
-const _teamsInfo: Ref<CuratedLeagueTeamsInfo | null> = ref(null);
-const _driverStatsMap: Ref<{ [name: number]: DriverStatsMap } | null> =
-    ref(null);
-const _driverResults: Ref<{
-    race: DriverResults;
-    sprint: DriverResults;
-    quali: DriverResults;
-}> = ref({ race: {}, sprint: {}, quali: {} });
-
-const _allTimeResults: Ref<{
-    race: DriverResults;
-    sprint: DriverResults;
-    quali: DriverResults;
-}> = ref({ race: {}, sprint: {}, quali: {} });
+let driverProfileModel: Ref<DriverProfileModel> = ref(
+    getDefaultDriverProfileModel()
+);
 
 watchEffect(async () => {
-    const driverStatsMap = await getLeagueDriverStats(props.league);
-    const leagueTeamsInfo = await getCuratedLeagueTeamsInfo(props.league);
-    const singleMemberData = await getSingleMemberData(props.driver);
-
-    const leagueSeasons = await getLeagueSeasons(props.league);
-
-    const driverSessionResultsRace = await getDriverResults(
+    driverProfileModel.value = await getDriverProfileModel(
         props.league,
-        props.driver,
-        'race'
+        props.driver
     );
-
-    const driverSessionResultsSprint = await getDriverResults(
-        props.league,
-        props.driver,
-        'sprint'
-    );
-
-    const driverSessionResultsQuali = await getDriverResults(
-        props.league,
-        props.driver,
-        'quali'
-    );
-
-    leagueSeasons.seasons.sort((a, b) => b.season_id - a.season_id);
-
-    _driverResults.value = {
-        race: driverSessionResultsRace,
-        sprint: driverSessionResultsSprint,
-        quali: driverSessionResultsQuali,
-    };
-
-    _driverStatsMap.value = driverStatsMap;
-    _teamsInfo.value = leagueTeamsInfo;
-    _singleMemberData.value = singleMemberData;
-    _leagueSeasons.value = leagueSeasons;
-
-    _allTimeResults.value = {
-        race: calculateAllTimeResults(driverSessionResultsRace),
-        sprint: calculateAllTimeResults(driverSessionResultsSprint),
-        quali: calculateAllTimeResults(driverSessionResultsQuali),
-    };
 });
-
-function calculateAllTimeResults(
-    inDriverResults: DriverResults
-): DriverResults {
-    let ret: DriverResults = {};
-    if (!inDriverResults) {
-        return ret;
-    }
-    let allTime: { [name: number]: SSR_ResultsEntry } = {};
-
-    let inSeasonKeys = Object.keys(inDriverResults);
-
-    for (let seasonKey of inSeasonKeys) {
-        let season = inDriverResults[Number.parseInt(seasonKey)];
-        let eventKeys = Object.keys(season);
-        for (let eventKey of eventKeys) {
-            let eventKeyNum = Number.parseInt(eventKey);
-            allTime[eventKeyNum] = season[eventKeyNum];
-        }
-    }
-
-    ret[0] = allTime;
-
-    return ret;
-}
 
 const driverId = computed(() => Number.parseInt(props.driver));
 const memberView = computed(() => {
-    return getMemberViewFromM_Memeber(_singleMemberData.value, {}, {});
+    return getMemberViewFromM_Memeber(
+        driverProfileModel.value.singleMemberData,
+        {},
+        {}
+    );
 });
 </script>
 
@@ -144,24 +61,32 @@ const memberView = computed(() => {
     <div class="card bg-dark text-light m-2">
         <div class="card-body p-2">
             <Stats
-                v-if="_driverStatsMap?.[0]?.[driverId]"
-                :stats="_driverStatsMap[0][driverId]"
-                :results="_allTimeResults"
+                v-if="driverProfileModel.driverStatsMap?.[0]?.[driverId]"
+                :stats="driverProfileModel.driverStatsMap[0][driverId]"
+                :results="driverProfileModel.allTimeResults"
                 seasonName="All Time"
                 v-bind:seasonId="0"
                 v-bind:league-id="props.league"
             />
         </div>
     </div>
-    <template v-for="season in _leagueSeasons?.seasons">
-        <template v-if="_driverStatsMap?.[season.season_id]?.[driverId]">
+    <template v-for="season in driverProfileModel.leagueSeasons?.seasons">
+        <template
+            v-if="
+                driverProfileModel.driverStatsMap?.[season.season_id]?.[
+                    driverId
+                ]
+            "
+        >
             <div class="card bg-dark text-light m-2">
                 <div class="card-body p-2">
                     <Stats
                         v-bind:stats="
-                            _driverStatsMap?.[season.season_id]?.[driverId]
+                            driverProfileModel.driverStatsMap?.[
+                                season.season_id
+                            ]?.[driverId]
                         "
-                        v-bind:results="_driverResults"
+                        v-bind:results="driverProfileModel.driverResults"
                         v-bind:seasonName="season.season_name"
                         v-bind:seasonId="season.season_id"
                         v-bind:league-id="props.league"
