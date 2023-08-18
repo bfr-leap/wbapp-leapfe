@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { watchEffect, ref, watch } from 'vue';
-import type { Ref } from 'vue';
-import CumulativeLineChart from '@/components/cumulative-line-chart.vue';
 import type { SeriesXY } from '@/models/line-chart-model';
 import {
     getSingleMemberData,
@@ -10,28 +6,29 @@ import {
 } from '@/fetch-util';
 import { getBestLaps } from '@/telemetry-util';
 import type { ST_LapTelemetry } from '@/iracing-endpoints';
-import { toTypeString } from '@vue/shared';
 
-const props = defineProps<{
-    subsession: string;
-    simsession: string;
-    league: string;
-}>();
+export interface BestQualifyLapChartModel {
+    lapTimes: SeriesXY[];
+}
 
-const lapTimes: Ref<SeriesXY[]> = ref([]);
+export function getDefaultBestQualifyLapChartModel(): BestQualifyLapChartModel {
+    return JSON.parse(JSON.stringify({ lapTimes: [] }));
+}
 
-async function fetchData() {
-    lapTimes.value = [];
+export async function getBestQualifyLapChartModel(
+    subsession: string,
+    simsession: string,
+    league: string
+): Promise<BestQualifyLapChartModel> {
+    let ret = getDefaultBestQualifyLapChartModel();
+    ret.lapTimes = [];
 
-    let telemetrySubsessionIds = await getTelemetrySubsessionIds(props.league);
+    let telemetrySubsessionIds = await getTelemetrySubsessionIds(league);
 
     let telemetryAvailable =
-        -1 !== telemetrySubsessionIds.indexOf(parseInt(props.subsession, 10));
+        -1 !== telemetrySubsessionIds.indexOf(parseInt(subsession, 10));
 
-    let simsessionResults = await getSimsessionResults(
-        props.subsession,
-        props.simsession
-    );
+    let simsessionResults = await getSimsessionResults(subsession, simsession);
 
     let driverNameMaps: { [name: number]: string } = {};
 
@@ -45,8 +42,8 @@ async function fetchData() {
 
     if (telemetryAvailable) {
         fastestLaps = await getBestLaps(
-            props.subsession,
-            props.simsession,
+            subsession,
+            simsession,
             simsessionResults.results.map((v) => v.cust_id.toString())
         );
 
@@ -58,7 +55,7 @@ async function fetchData() {
             uid2NameMap[custid] = mData.display_name;
         }
 
-        lapTimes.value = fastestLaps.map((tLap, i) => {
+        ret.lapTimes = fastestLaps.map((tLap, i) => {
             let tp: number = -1;
 
             let d = tLap.telemetry.map((t) => {
@@ -75,12 +72,6 @@ async function fetchData() {
             };
         });
     }
+
+    return ret;
 }
-
-watchEffect(fetchData);
-watch(props, fetchData);
-</script>
-
-<template>
-    <CumulativeLineChart :series="lapTimes" />
-</template>

@@ -6,7 +6,7 @@ import LeagueIndex from '@/components/league-index.vue';
 import CumulativeDeltaChart from '@/components/cumulative-delta-chart.vue';
 import StartFinishChart from './start-finish-chart.vue';
 import PaceChart from './pace-chart.vue';
-import BestQualifyLapChart from './BestQualifyLapChart.vue';
+import BestQualifyLapChart from '@/components/best-qualify-lap-chart.vue';
 import GenericTable from './generic-table.vue';
 import TrackBanner from './track-banner.vue';
 import type { ResultsModel } from '@/models/results-model';
