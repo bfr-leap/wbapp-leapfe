@@ -14,7 +14,7 @@ import {
     getLeagueDriverStats,
     getLeagueSeasons,
     getSingleMemberData,
-} from '@/fetch-util';
+} from '@/utils/fetch-util';
 
 interface DriverResultsModel {
     race: DriverResults;

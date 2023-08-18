@@ -3,8 +3,8 @@ import {
     getSingleMemberData,
     getSimsessionResults,
     getTelemetrySubsessionIds,
-} from '@/fetch-util';
-import { getBestLaps } from '@/telemetry-util';
+} from '@/utils/fetch-util';
+import { getBestLaps } from '@/utils/telemetry-util';
 import type { ST_LapTelemetry } from '@/iracing-endpoints';
 
 export interface BestQualifyLapChartModel {

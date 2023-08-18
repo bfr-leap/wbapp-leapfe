@@ -1,5 +1,5 @@
 import type { LapChartData, LCD_Chunk } from '../iracing-endpoints';
-import { getLapChartData } from '@/fetch-util';
+import { getLapChartData } from '@/utils/fetch-util';
 import type { SeriesXY } from '@/models/line-chart-model';
 
 interface GridItem {

@@ -2,9 +2,9 @@ import {
     getSingleMemberData,
     getSimsessionResults,
     getTelemetrySubsessionIds,
-} from '@/fetch-util';
+} from '@/utils/fetch-util';
 
-import { getIdealLaps } from '@/telemetry-util';
+import { getIdealLaps } from '@/utils/telemetry-util';
 
 export interface PaceChartModel {
     title: string;

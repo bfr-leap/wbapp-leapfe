@@ -7,14 +7,17 @@ import type {
     DriverStatsMap,
 } from '../iracing-endpoints';
 
-import { getMemberViewFromM_Memeber, getRoadLicense } from '@/driver-utils';
+import {
+    getMemberViewFromM_Memeber,
+    getRoadLicense,
+} from '@/utils/driver-utils';
 
 import {
     getCuratedLeagueTeamsInfo,
     getLeagueDriverStats,
     getMembersData,
     getSeasonSimsessionIndex,
-} from '@/fetch-util';
+} from '@/utils/fetch-util';
 
 export interface TeamModel {
     position: number;

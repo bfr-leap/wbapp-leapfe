@@ -1,5 +1,5 @@
-import type { ST_DriverTelemetry, ST_LapTelemetry } from './iracing-endpoints';
-import { getSimsessionDriverTelemetry } from '@/fetch-util';
+import type { ST_DriverTelemetry, ST_LapTelemetry } from '@/iracing-endpoints';
+import { getSimsessionDriverTelemetry } from '@/utils/fetch-util';
 
 function getIdealLap(t: ST_DriverTelemetry): number {
     let completeLapTimes: number[] = [];

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getshortTrackName } from '../track-utils';
+import { getshortTrackName } from '@/utils/track-utils';
 import { ref, watchEffect } from 'vue';
 import type { Ref } from 'vue';
 const props = defineProps<{

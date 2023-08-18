@@ -2,7 +2,7 @@ import {
     getLeagueSeasons,
     getCuratedBlockedSeasons,
     getCuratedActiveLeagueSchedule,
-} from '@/fetch-util';
+} from '@/utils/fetch-util';
 import type { DropdownModel } from '@/models/dropdown-model';
 import { getDefaultDropdownModel } from '@/models/dropdown-model';
 

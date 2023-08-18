@@ -2,12 +2,6 @@
 import { RouterLink } from 'vue-router';
 import { ref, watchEffect } from 'vue';
 import type { Ref } from 'vue';
-import type { SeasonSimsessionIndex } from '../iracing-endpoints';
-import {
-    getCuratedBlockedSeasons,
-    getLeagueSimsessionIndex,
-    getCuratedActiveLeagueSchedule,
-} from '@/fetch-util';
 import type { LeagueIndexModel } from '@/models/league-index-model';
 import { getLeagueIndexModel } from '@/models/league-index-model';
 import { getDefaultLeagueIndexModel } from '@/models/league-index-model';

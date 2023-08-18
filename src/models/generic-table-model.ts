@@ -1,5 +1,5 @@
-import type { TS_RecordTable } from '../iracing-endpoints';
-import { getSingleMemberData } from '@/fetch-util';
+import type { TS_RecordTable } from '@/iracing-endpoints';
+import { getSingleMemberData } from '@/utils/fetch-util';
 
 export type GenericTableModel = {
     columnNames: { [name: string]: string };

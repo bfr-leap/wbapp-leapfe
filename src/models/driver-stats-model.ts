@@ -1,5 +1,5 @@
 import type { DriverResults, SSR_ResultsEntry } from '../iracing-endpoints';
-import { getShortSubsessionName } from '../session-utils';
+import { getShortSubsessionName } from '@/utils/session-utils';
 
 async function getNames(
     leagueId: string,

@@ -4,7 +4,7 @@ import {
     getCuratedBlockedSeasons,
     getLeagueSimsessionIndex,
     getCuratedActiveLeagueSchedule,
-} from '@/fetch-util';
+} from '@/utils/fetch-util';
 import type { SeasonSimsessionIndex } from '../iracing-endpoints';
 
 export interface LeagueIndexModel {

@@ -1,4 +1,4 @@
-import { getCuratedActiveLeagueSchedule } from '../fetch-util';
+import { getCuratedActiveLeagueSchedule } from '@/utils/fetch-util';
 
 interface RaceInfoModel {
     trackId: string;

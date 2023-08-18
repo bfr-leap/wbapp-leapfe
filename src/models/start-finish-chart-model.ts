@@ -1,5 +1,5 @@
 import type { HLBarChartDatum } from '@/models/hl-bar-chart-model';
-import { getLapChartData, getSingleMemberData } from '@/fetch-util';
+import { getLapChartData, getSingleMemberData } from '@/utils/fetch-util';
 
 export async function getStartFinishData(
     subsession: string,

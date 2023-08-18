@@ -5,7 +5,7 @@ import {
     getSimsessionResults,
     getTelemetrySubsessionIds,
     getGeneratedSimsessionSummary,
-} from '@/fetch-util';
+} from '@/utils/fetch-util';
 
 export interface ResultsModel {
     hasTelemetry: boolean;

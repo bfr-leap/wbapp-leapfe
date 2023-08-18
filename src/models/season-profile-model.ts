@@ -2,8 +2,8 @@ import {
     getCuratedActiveLeagueSchedule,
     getLeagueSimsessionIndex,
     getLeagueSeasonSessions,
-} from '../fetch-util';
-import { getSessionStats } from '@/results-util';
+} from '@/utils/fetch-util';
+import { getSessionStats } from '@/utils/results-util';
 
 export interface SeasonProfileModel {
     leagueName: string;

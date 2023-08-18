@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watchEffect } from 'vue';
 import type { Ref } from 'vue';
-import { getTrackName } from '../track-utils';
+import { getTrackName } from '@/utils/track-utils';
 
 const props = defineProps<{
     track_id: string;

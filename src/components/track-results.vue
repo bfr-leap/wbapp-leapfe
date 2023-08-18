@@ -2,7 +2,7 @@
 import { ref, watchEffect } from 'vue';
 import type { Ref } from 'vue';
 import type { TrackStats } from '../iracing-endpoints';
-import { getTrackStats } from '@/fetch-util';
+import { getTrackStats } from '@/utils/fetch-util';
 import GenericTable from './generic-table.vue';
 import TrackResultsMenu from './track-results-menu.vue';
 import TrackBanner from './track-banner.vue';
