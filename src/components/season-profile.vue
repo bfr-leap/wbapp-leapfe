@@ -4,7 +4,7 @@ import type { Ref } from 'vue';
 import GenericTable from './generic-table.vue';
 import { useRoute } from 'vue-router';
 
-import BarChart from './BarChart.vue';
+import BarChart from '@/components/bar-chart.vue';
 import EventCardLg from '@/components/event-card-lg.vue';
 import EventCardSm from '@/components/event-card-sm.vue';
 import DriverStandings from '@/components/driver-standings.vue';

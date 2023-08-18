@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { watchEffect, ref, watch } from 'vue';
 import type { Ref } from 'vue';
-import BarChart from './BarChart.vue';
+import BarChart from '@/components/bar-chart.vue';
 
 import type { PaceChartModel } from '../models/pace-chart-model';
 import {
