@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { watchEffect, ref, watch } from 'vue';
 import type { Ref } from 'vue';
-import ComulativeLineChart from './ComulativeLineChart.vue';
-import type { SeriesXY } from './line-chart.vue';
+import CumulativeLineChart from '@/components/cumulative-line-chart.vue';
+import type { SeriesXY } from '@/models/line-chart-model';
 import {
     getSingleMemberData,
     getSimsessionResults,
@@ -82,5 +82,5 @@ watch(props, fetchData);
 </script>
 
 <template>
-    <ComulativeLineChart :series="lapTimes" />
+    <CumulativeLineChart :series="lapTimes" />
 </template>

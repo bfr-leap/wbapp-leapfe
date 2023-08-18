@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { watchEffect, watch, ref } from 'vue';
 import type { Ref } from 'vue';
-import ComulativeLineChart from './ComulativeLineChart.vue';
+import ComulativeLineChart from '@/components/cumulative-line-chart.vue';
 import type { SeriesXY } from '@/models/line-chart-model';
 import { getCumulativeDeltaachartModel as getCumulativeDeltaChartModel } from '@/models/cumulative-delta-chart-model';
 
