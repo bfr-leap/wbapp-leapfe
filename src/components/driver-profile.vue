@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Stats from './driver-stats.vue';
 import DriverTag from './driver-tag.vue';
-import { getMemberViewFromM_Memeber } from './driverUtils';
+import { getMemberViewFromM_Memeber } from '@/driver-utils';
 import { ref, watchEffect, computed } from 'vue';
 import type { Ref } from 'vue';
 import type { DriverProfileModel } from '@/models/driver-profile-model';

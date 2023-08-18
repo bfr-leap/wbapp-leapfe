@@ -77,7 +77,7 @@ export async function getLeagueIndexModel(
         !selectedSubsession ||
         !selectedSeason
     ) {
-        return;
+        return ret;
     }
 
     for (let leagueIt of leagueSchedule.leagues) {

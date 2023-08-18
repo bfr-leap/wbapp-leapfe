@@ -7,10 +7,7 @@ import type {
     DriverStatsMap,
 } from '../iracing-endpoints';
 
-import {
-    getMemberViewFromM_Memeber,
-    getRoadLicense,
-} from '@/components/driverUtils';
+import { getMemberViewFromM_Memeber, getRoadLicense } from '@/driver-utils';
 
 import {
     getCuratedLeagueTeamsInfo,
