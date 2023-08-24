@@ -20,27 +20,48 @@ import {
 } from '../../src/iracing-endpoints.js';
 import { createCompletion } from '../openai/openai-endpoints.js';
 
-// this is a prompt to try later:::
-// The following broadcast notes:
-//     We are looking at Alexander Schanna running P 15
-//     On lap 0, Alexander Schanna lost position to Jacob Bieser
-//     On lap 0, Alexander Schanna lost position to Matthew Walters2
-//     On lap 0, Alexander Schanna lost position to Jesus Altuve
-//     On lap 0, Alexander Schanna lost position to Franky Franchicha
-//     On lap 0, Alexander Schanna lost position to Grigor Georgiev
-//     On lap 0, Alexander Schanna lost position to Frank Bieser
-//     On lap 0, Alexander Schanna lost position to Yair Montiel
-//     On lap 0, Alexander Schanna lost position to David Robson2
-//     On lap 1, Alexander Schanna lost position to Fabian Bouwmeester
-//     On lap 2, Alexander Schanna lost position to Yair Montiel
-//     On lap 0, Alexander Schanna overtook Matthew Walters2
-//     On lap 0, Alexander Schanna overtook Jesus Altuve
-//     On lap 1, Alexander Schanna overtook Jesus Altuve
-//     On lap 1, Alexander Schanna overtook David Robson2
-//     On lap 1, Alexander Schanna overtook Yair Montiel
-//     Currently, Alexander Schanna is bringing the fight to Troy Banks from position 15
+async function shortenNarrative(notes: ReplayNote[]) {
+    const estimatedWordsPerSecond = 3;
 
-// This is what Jeremy Clarkson would say in 200 characters skipping details for brevity but keeping his particular style:
+    for (let i = 0; i < notes.length - 1; ++i) {
+        const currentNote = notes[i];
+        const nextNote = notes[i + 1];
+        const secondsToNextNote = (nextNote.time - currentNote.time) / 60; // frames to seconds to minutes
+
+        const numTokens =
+            currentNote.note[currentNote.note.length - 1].split(' ').length;
+
+        // console.log(
+        //     `we have ${secondsToNextNote} seconds to say "${
+        //         currentNote.note[currentNote.note.length - 1]
+        //     }"`
+        // );
+        // console.log(
+        //     numTokens,
+        //     estimatedWordsPerSecond * secondsToNextNote,
+        //     estimatedWordsPerSecond,
+        //     secondsToNextNote
+        // );
+
+        if (numTokens > estimatedWordsPerSecond * secondsToNextNote) {
+            // console.log('shortening');
+            const prompt = [
+                `shorten the following statement to fit in ${Math.max(
+                    secondsToNextNote,
+                    3
+                )} seconds but keep as much of the voice as possible:`,
+                '',
+                `${currentNote.note[currentNote.note.length - 1]}`,
+            ];
+
+            const newComment = await createCompletion(prompt.join('\n'));
+
+            currentNote.note.push(newComment);
+        } else {
+            // console.log('leaving as is');
+        }
+    }
+}
 
 async function narrate(notes: ReplayNote[], lapChartData: LapChartData) {
     for (let n of notes) {
@@ -56,6 +77,8 @@ async function narrate(notes: ReplayNote[], lapChartData: LapChartData) {
 
         n.note.push(newComment);
     }
+
+    await shortenNarrative(notes);
 }
 
 export async function generateNoteText(
