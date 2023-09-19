@@ -348,7 +348,7 @@ function checkOvertake(
 }
 
 async function main() {
-    const subsessionId = 62630734;
+    const subsessionId = 63763387;
     const simsessionId = -3;
 
     let notes = await getRawReplayNotes(subsessionId, simsessionId);
@@ -383,7 +383,7 @@ async function main() {
     This is what just happened:
     ${notes[i].note}
     
-    Generate very succinct commentary in present tense about what just happened.`;
+    Generate very succinct commentary in present tense about what just happened in the style of Jeremy Clarkson.`;
 
         let newComment = await createCompletion(eventPrompt);
 
