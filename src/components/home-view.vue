@@ -55,12 +55,16 @@ function onClick(eventInfo: { trackId: string; date: string }) {
 
 <template>
     <LeagueSeasonMenu
+        v-if="homeModel.leagueId && homeModel.seasonId"
         target-page=""
         v-bind:league="homeModel.leagueId"
         v-bind:season="homeModel.seasonId"
     />
 
-    <div class="card bg-dark text-light m-2">
+    <div
+        class="card bg-dark text-light m-2"
+        v-if="homeModel.leagueId && homeModel.seasonId"
+    >
         <div class="card-body p-2">
             <div class="container">
                 Past Events
@@ -75,10 +79,7 @@ function onClick(eventInfo: { trackId: string; date: string }) {
         </div>
     </div>
 
-    <div
-        v-if="homeModel.nextRace.date !== ''"
-        class="card bg-dark text-light m-2"
-    >
+    <div v-if="homeModel.nextRace.date" class="card bg-dark text-light m-2">
         <div class="card-body p-2">
             <div class="container">
                 <div v-if="homeModel.nextRace.date !== ''" class="row g-1">
@@ -118,7 +119,7 @@ function onClick(eventInfo: { trackId: string; date: string }) {
                     <div class="col-12 col-sm-9 col-lg-10">
                         <EventCardLg
                             v-bind:track_id="
-                                homeModel.selectedRace.trackId.toString()
+                                homeModel.selectedRace?.trackId?.toString()
                             "
                             v-bind:car_id="homeModel.carId"
                             v-bind:league_id="homeModel.leagueId"
@@ -132,6 +133,7 @@ function onClick(eventInfo: { trackId: string; date: string }) {
         </div>
     </div>
     <DriverStandings
+        v-if="homeModel.seasonId && homeModel.leagueId"
         summary_mode
         v-bind:season="homeModel.seasonId"
         v-bind:league="homeModel.leagueId"
@@ -142,6 +144,7 @@ function onClick(eventInfo: { trackId: string; date: string }) {
             <div class="container">
                 <div>
                     <RouterLink
+                        v-if="homeModel.seasonId && homeModel.leagueId"
                         class="link-light"
                         v-bind:to="`?m=season&league=${homeModel.leagueId}&season=${homeModel.seasonId}`"
                         >See More Season Details</RouterLink

@@ -65,8 +65,8 @@ export async function getHomeModel(
         .filter((v, i) => i < 4);
 
     ret.nextRace = ret.selectedRace = {
-        trackId: events[0].track_id.toString(),
-        date: events[0].time,
+        trackId: events[0]?.track_id.toString(),
+        date: events[0]?.time,
         isSelected: true,
     };
 
