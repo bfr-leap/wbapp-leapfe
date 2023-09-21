@@ -61,7 +61,7 @@ function singleEpochOvertake(
                     perc: nextE[i].perc,
                     actionType: 'overtakes',
                     lapNumber: Math.floor(nextE[i].perc),
-                    position: i,
+                    position: i + 1,
                     notes: [
                         `${driverNames[currentDriver]} overtakes ${driverNames[frontP]}`,
                     ],

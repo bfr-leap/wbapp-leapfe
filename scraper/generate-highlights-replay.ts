@@ -16,41 +16,68 @@ import {
 } from './iracing/iracing-scraped-data-loader.js';
 
 import { getSimSessionResults } from './iracing/iracing-derived-data-loader.js';
-import {
-    ST_SimsessionTelemetry,
-    SimsessionResults,
-    LapChartData,
-} from '../src/iracing-endpoints.js';
+import { SimsessionResults, LapChartData } from '../src/iracing-endpoints.js';
+import type {
+    EpochTelemetry,
+    ReplayNote,
+    PositionChangeEvent,
+} from './telemetry/telemetry-types.js';
 import { createCompletion } from './openai/openai-endpoints.js';
+import { detectOvertakes } from './telemetry/overtake-detection.js';
+import { reconstructEpochTelemetry } from './telemetry/epoch-reconstruction.js';
 
-interface ExtendedTelemetry {
-    driverId: number;
-    lapNumber: number;
-    perc: number;
-    percD: number;
-    t: number;
-}
+function getFinishingNotes(
+    tel: EpochTelemetry,
+    simsessionResults: SimsessionResults
+): PositionChangeEvent[] {
+    let nextP = 1;
+    let finishedSet = new Set<number>();
+    let ret: PositionChangeEvent[] = [];
 
-interface PositionChangeEvent {
-    directDriverId: number;
-    indirectDriverId?: number;
-    time: number;
-    perc: number;
-    actionType: string;
-    lapNumber: number;
-    position: number;
-    notes: string[];
-    indirectNotes: string[];
-}
+    let data = tel.epochList.filter(
+        (v) => v.time >= tel.checkeredFlag - 3 * 60
+    );
 
-interface ReplayNote {
-    time: number;
-    lookAt: number;
-    note: string;
-}
+    for (let i = 0; i < data.length - 1; ++i) {
+        let c = data[i];
+        let n = data[i + 1];
+        let ids = n.data.map((v) => v.driverId);
 
-function clone(obj: any): any {
-    return JSON.parse(JSON.stringify(obj));
+        for (let id of ids) {
+            let percA = c.data.find((v) => v.driverId === id).perc;
+            let percB = n.data.find((v) => v.driverId === id).perc;
+
+            // console.log(c.time, id, Math.floor(percA), Math.floor(percB));
+
+            if (
+                !finishedSet.has(id) &&
+                Math.floor(percA) !== Math.floor(percB)
+            ) {
+                ret.push({
+                    time: c.time,
+                    directDriverId: id,
+                    actionType: 'finished',
+                    position: simsessionResults.results.find(
+                        (r) => r.cust_id === id
+                    ).position,
+                    notes: ['finished'],
+                    perc: percA,
+                    lapNumber: Math.floor(percA),
+                    indirectNotes: [],
+                });
+                finishedSet.add(id);
+            }
+        }
+    }
+
+    let nextT = tel.checkeredFlag - 8 * 60;
+    for (let n of ret) {
+        let t = n.time;
+        n.time = nextT + 3 * 60;
+        nextT = t;
+    }
+
+    return ret;
 }
 
 async function getRawReplayNotes(
@@ -61,41 +88,6 @@ async function getRawReplayNotes(
         subsessionId,
         simsessionId
     );
-    const simsessionResults: SimsessionResults = getSimSessionResults(
-        subsessionId,
-        simsessionId
-    );
-    const sTelemetry: ST_SimsessionTelemetry = getSubsessionTelemetry(
-        subsessionId
-    ).find((v) => v.id === simsessionId);
-
-    let tel: ExtendedTelemetry[] = [];
-
-    let driverIdSet: { [key: string]: boolean } = {};
-
-    for (let driver of sTelemetry.drivers) {
-        const driverId = driver.id;
-        driverIdSet[driverId] = true;
-        for (let lap of driver.laps) {
-            const lapNumber = lap.lapNumber;
-            for (let t of lap.telemetry) {
-                const v = clone(t);
-                v.driverId = driverId;
-                v.lapNumber = lapNumber;
-                tel.push(v);
-            }
-        }
-    }
-
-    let totalLaps = Math.max(
-        ...simsessionResults.results.map((v) => v.laps_completed)
-    );
-    let relevantDrivers: number[] = [];
-    for (let r of simsessionResults.results) {
-        if (r.position <= 12) {
-            relevantDrivers.push(r.cust_id);
-        }
-    }
 
     let driverNames: { [key: number]: string } = {};
     for (let r of lapChartData.chunk_info) {
@@ -103,59 +95,102 @@ async function getRawReplayNotes(
         driverNames[r.cust_id] = r.display_name; // na[na.length - 1].substring(0, 3);
     }
 
-    let driverIds = Object.keys(driverIdSet).map((v) => Number.parseInt(v));
+    let telemetry = await reconstructEpochTelemetry(
+        subsessionId,
+        simsessionId,
+        driverNames
+    );
 
-    let telemetryByLap: { [key: number]: ExtendedTelemetry[] } = {};
+    const simsessionResults: SimsessionResults = getSimSessionResults(
+        subsessionId,
+        simsessionId
+    );
 
-    for (let t of tel) {
-        let k = t.lapNumber * 100 + Math.floor(t.perc * 100);
-        let bucket = telemetryByLap[k];
-        if (!bucket) {
-            bucket = [];
-            telemetryByLap[k] = bucket;
-        }
-        bucket.push(t);
-    }
+    let events: PositionChangeEvent[] = detectOvertakes(telemetry, driverNames);
 
-    for (let k in telemetryByLap) {
-        telemetryByLap[k].sort((a, b) => a.t - b.t);
-    }
-
-    let keys = Object.keys(telemetryByLap)
-        .map((v) => Number.parseInt(v))
-        .sort((a, b) => a - b);
-
-    let last: ExtendedTelemetry[] = telemetryByLap[keys[0]];
-    let next: ExtendedTelemetry[] = telemetryByLap[keys[1]];
-
-    let events: PositionChangeEvent[] = [];
-
-    for (let i = 1; i < keys.length; i++) {
-        last = telemetryByLap[keys[i - 1]];
-        next = telemetryByLap[keys[i]];
-
-        events.push(
-            ...checkOvertake(
-                last,
-                next,
-                relevantDrivers,
-                totalLaps,
-                driverNames
-            )
-        );
-    }
+    events = filterPostRaceEvents(events, simsessionResults);
 
     addNotes(lapChartData, events);
 
-    events = filterPitStops(events);
+    //events = filterPitStops(events);
 
     events = detectIncidents(events);
 
     events = filterEarlyChaos(events);
 
+    let finishE = getFinishingNotes(telemetry, simsessionResults);
+
+    for (let f of finishE) {
+        events.push(f);
+    }
+
+    events = limitEventCount(
+        events,
+        (8 * 60) / 3 /** 160 */, // 8 min video
+        simsessionResults
+    );
+
     let notes = getReplayNotes(events, driverNames);
 
     return notes;
+}
+
+function filterPostRaceEvents(
+    events: PositionChangeEvent[],
+    simsessionResults: SimsessionResults
+): PositionChangeEvent[] {
+    let totalLaps = Math.max(
+        ...simsessionResults.results.map((v) => v.laps_completed)
+    );
+
+    return events.filter((v) => v.lapNumber < totalLaps);
+}
+
+function limitEventCount(
+    events: PositionChangeEvent[],
+    maxEventCount: number,
+    simsessionResults: SimsessionResults
+): PositionChangeEvent[] {
+    if (events.length <= maxEventCount) {
+        return events;
+    }
+
+    let lBound = 1;
+    let uBound = simsessionResults.results.length;
+    let done: boolean = false;
+
+    let ret: PositionChangeEvent[] = [];
+
+    while (!done) {
+        let mid = Math.floor((lBound + uBound) / 2);
+
+        console.log(mid);
+
+        let relevantDrivers: number[] = [];
+        for (let r of simsessionResults.results) {
+            if (r.position <= mid) {
+                relevantDrivers.push(r.cust_id);
+            }
+        }
+
+        ret = events.filter(
+            (v) =>
+                relevantDrivers.indexOf(v.indirectDriverId) >= 0 ||
+                relevantDrivers.indexOf(v.directDriverId) >= 0
+        );
+
+        if (ret.length === maxEventCount) {
+            done = true;
+        } else if (mid === uBound - 1) {
+            done = true;
+        } else if (ret.length > maxEventCount) {
+            uBound = mid;
+        } else {
+            lBound = mid;
+        }
+    }
+
+    return ret;
 }
 
 function getReplayNotes(
@@ -163,7 +198,7 @@ function getReplayNotes(
     driverNames: { [key: number]: string }
 ): ReplayNote[] {
     return events.map((ev) => {
-        if (ev.actionType === 'overtake') {
+        if (ev.actionType === 'overtakes') {
             let directModifier = '';
             let indirectModifier = '';
 
@@ -174,19 +209,33 @@ function getReplayNotes(
             }
 
             if (ev.indirectNotes.length > 0) {
+                let and = '';
                 if (ev.indirectNotes.indexOf('off track') > -1) {
-                    indirectModifier = ' as they have a moment';
+                    indirectModifier = ' has an off track moment';
+                    and = ' and';
                 }
+
+                if (ev.indirectNotes.indexOf('pitted') > -1) {
+                    indirectModifier += and + ' makes a pit stop';
+                }
+
+                indirectModifier = `${
+                    driverNames[ev.indirectDriverId]
+                }${indirectModifier}. `;
             }
 
             return {
                 time: ev.time,
                 lookAt: ev.directDriverId,
-                note: `lap ${ev.lapNumber} - ${
-                    driverNames[ev.directDriverId]
-                }${directModifier} overtakes ${
-                    driverNames[ev.indirectDriverId]
-                }${indirectModifier} for p${ev.position}`,
+                note: [
+                    `lap ${ev.lapNumber + 1} - ${
+                        indirectModifier.length > 0 ? indirectModifier : ''
+                    }${
+                        driverNames[ev.directDriverId]
+                    }${directModifier} overtakes ${
+                        driverNames[ev.indirectDriverId]
+                    } for p${ev.position}`,
+                ],
             };
         } else if (ev.actionType === 'incident') {
             let incidentMap: { [key: string]: boolean } = {};
@@ -199,18 +248,31 @@ function getReplayNotes(
             return {
                 time: ev.time,
                 lookAt: ev.directDriverId,
-                note: `lap ${ev.lapNumber} - ${
-                    driverNames[ev.directDriverId]
-                } looses several positions: ${Object.keys(incidentMap).join(
-                    ', '
-                )}`,
+                note: [
+                    `lap ${ev.lapNumber + 1} - ${
+                        driverNames[ev.directDriverId]
+                    } looses several positions: ${Object.keys(incidentMap).join(
+                        ', '
+                    )}`,
+                ],
+            };
+        } else if (ev.actionType === 'finished') {
+            return {
+                time: ev.time,
+                lookAt: ev.directDriverId,
+                note: [
+                    `lap ${ev.lapNumber + 1} - ${
+                        driverNames[ev.directDriverId]
+                    } finishes in p${ev.position}`,
+                ],
             };
         }
-
         return {
             time: ev.time,
             lookAt: ev.directDriverId,
-            note: `${ev.directDriverId} ${ev.actionType} ${ev.indirectDriverId}`,
+            note: [
+                `${ev.directDriverId} ${ev.actionType} ${ev.indirectDriverId}`,
+            ],
         };
     });
 }
@@ -276,84 +338,15 @@ function addNotes(lapChartData: LapChartData, events: PositionChangeEvent[]) {
     }
 }
 
-function filterPitStops(events: PositionChangeEvent[]): PositionChangeEvent[] {
-    return events.filter(
-        (v) =>
-            v.notes.indexOf('pitted') < 0 &&
-            v.indirectNotes.indexOf('pitted') < 0
-    );
-}
-
-function checkOvertake(
-    last: ExtendedTelemetry[],
-    next: ExtendedTelemetry[],
-    relevantDrivers: number[],
-    totalLaps: number,
-    driverNames: { [key: number]: string }
-): PositionChangeEvent[] {
-    const ret: PositionChangeEvent[] = [];
-
-    let c = Math.min(last.length, next.length);
-
-    let hasChanges: boolean = false;
-
-    const seenNewDrivers: number[] = [];
-    const seenLastDrivers: number[] = [];
-
-    for (let i = 0; i < c; i++) {
-        let l = last[i];
-        let n = next[i];
-
-        seenNewDrivers.push(n.driverId);
-        seenLastDrivers.push(l.driverId);
-
-        if (
-            seenLastDrivers.indexOf(n.driverId) < 0 &&
-            n.lapNumber <= totalLaps &&
-            l.lapNumber > 0
-        ) {
-            let passedCar = -1;
-            for (let ld of seenLastDrivers) {
-                if (
-                    seenNewDrivers.indexOf(ld) < 0 &&
-                    relevantDrivers.indexOf(ld) >= 0
-                ) {
-                    passedCar = ld;
-                    break;
-                }
-            }
-
-            if (
-                relevantDrivers.indexOf(n.driverId) >= 0 &&
-                relevantDrivers.indexOf(passedCar) >= 0
-            ) {
-                ret.push({
-                    directDriverId: n.driverId,
-                    indirectDriverId: passedCar,
-                    time: n.t,
-                    perc: n.perc,
-                    actionType: 'overtake',
-                    lapNumber: n.lapNumber,
-                    position: i + 1,
-                    notes: [],
-                    indirectNotes: [],
-                });
-
-                hasChanges = true;
-            }
-        }
-    }
-
-    return ret;
-}
-
 async function main() {
-    const subsessionId = 63763387;
+    const subsessionId = 63744248;
     const simsessionId = -3;
 
     let notes = await getRawReplayNotes(subsessionId, simsessionId);
 
     console.log(JSON.stringify(notes, null, '    '));
+
+    console.log((notes.length * 3) / 60, notes.length);
 
     const lapChartData = getLapChartData(subsessionId, simsessionId);
 
@@ -368,34 +361,30 @@ async function main() {
 
     let introPrompt = `The following is session information for a wheel to wheel motorsports event:
     ${JSON.stringify(sessionInfo, null, '    ')}
-    
-    Create a broadcast style 40 word intro including session information for the event.  Be sure to start with phrases like: "It's lights out and away we go", "We are going green", etc.`;
 
-    let generatedCommentary = await createCompletion(introPrompt);
+    Create a broadcast style 40 word poetic intro including session information for the event in the style of Jeremy Clarkson.`;
 
-    for (let i = 0; i < notes.length && generatedCommentary !== 'error'; ++i) {
+    let intro = await createCompletion(introPrompt);
+
+    for (let i = 0; i < notes.length && intro !== 'error'; ++i) {
         let eventPrompt = `We are creating a broadcast style play by play of a wheel to wheel motorsports event using colorful and exciting language.  Note the interesting narratives as race events unfold but note that we don't know where in the track these events happened.
-    So far this is what has happened during the race:
-    <race>
-    ${generatedCommentary}
-    </race>
     
     This is what just happened:
-    ${notes[i].note}
-    
+    ${notes[i].note[notes[i].note.length - 1]}
+
     Generate very succinct commentary in present tense about what just happened in the style of Jeremy Clarkson.`;
 
         let newComment = await createCompletion(eventPrompt);
 
-        notes[i].note = newComment;
-
-        generatedCommentary += '\n' + newComment;
+        notes[i].note.push(newComment);
 
         if (newComment === 'error') {
             console.log('exiting after generation error');
             break;
         }
     }
+
+    (<any>notes[0]).intro = intro;
 
     // tel = tel.filter((v) => v.driverId === 115698);
     console.log(JSON.stringify(notes, null, '    '));

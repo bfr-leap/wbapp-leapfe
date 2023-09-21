@@ -1,258 +1,843 @@
 [
     {
-        "intro": " It's lights out and away we go here at the Red Bull Ring for a thrilling race in the iFormula League - HEAT 1! Drivers will be challenging the Grand Prix configuration at 3:00 PM UTC on September 17th. Let's get ready to witness some amazing on-track action!",
-        "time": 256080,
+        "intro": "The chequered flag awaits, as iFormula League descends on Red Bull Ring's Grand Prix. Thrill seekers ready to race, the track ablaze under the sun's rays. HEAT 1, starting at fifteen-hundred-and-one-eight, will determine this day's fate! Get ready for an epic race!",
+        "time": 256020,
         "lookAt": 149258,
-        "note": "Silas Krag-Vrolijk is off the track in a hurry and there's some car contact! He's already lost several positions!"
+        "note": [
+            "lap 1 - Silas Krag-Vrolijk looses several positions: ",
+            "Silas Krag-Vrolijk struggling out of the gate, dropping easily down the standings in the opening laps."
+        ]
     },
     {
-        "time": 256664,
+        "time": 256680,
         "lookAt": 149258,
-        "note": " Silas Krag-Vrolijk makes a daring move - taking p4 off Mackenzie Rune in spectacular fashion!"
+        "note": [
+            "lap 1 - Silas Krag-Vrolijk overtakes Mackenzie Rune for p5",
+            "Silas Krag-Vrolijk delivers a bold move, outfoxing Mackenzie Rune to take the fifth position!"
+        ]
     },
     {
-        "time": 257926,
+        "time": 257940,
         "lookAt": 582569,
-        "note": "Darius Rackauskas makes a bold move to snatch p6 away from Kévin Viémont!"
+        "note": [
+            "lap 1 - Darius Rackauskas overtakes Kévin Viémont for p7",
+            "Kévin Viémont just got caught up in the blink of an eye as Darius Rackauskas roars past him to take position 7!"
+        ]
     },
     {
-        "time": 258249,
+        "time": 258000,
+        "lookAt": 602477,
+        "note": [
+            "lap 1 - Vytautas Jasiulevicius overtakes Victor Solano for p12",
+            "Vytautas Jasiulevicius powers ahead, leaping past Victor Solano to take p12!"
+        ]
+    },
+    {
+        "time": 258240,
         "lookAt": 411665,
-        "note": "Kévin Viémont powers past Darius Rackauskas, taking p6 in an adrenaline-packed move!"
+        "note": [
+            "lap 1 - Kévin Viémont overtakes Darius Rackauskas for p7",
+            "Kévin Viémont powers ahead as Darius Rackauskas can do nothing but watch and marvel!"
+        ]
     },
     {
-        "time": 259612,
+        "time": 258300,
+        "lookAt": 732815,
+        "note": [
+            "lap 1 - Randolph Smith overtakes Victor Solano for p13",
+            "Randolph Smith blasts past Victor Solano to claim position 13!"
+        ]
+    },
+    {
+        "time": 258480,
+        "lookAt": 821040,
+        "note": [
+            "lap 2 - Carlos Navarro2 looses several positions: off track",
+            "Carlos Navarro2 spins off the track, losing several positions with a costly error!"
+        ]
+    },
+    {
+        "time": 258480,
+        "lookAt": 422924,
+        "note": [
+            "lap 1 - Victor Solano overtakes Randolph Smith for p13",
+            "Victor Solano takes the lead with a daring overtake of Randolph Smith - an electrifying start for the iFormula League!"
+        ]
+    },
+    {
+        "time": 258540,
+        "lookAt": 582569,
+        "note": [
+            "lap 1 - Darius Rackauskas overtakes Kévin Viémont for p7",
+            "Darius Rackauskas pulls off an incredible overtake, roaring past Kévin Viémont to take the 7th spot!"
+        ]
+    },
+    {
+        "time": 258540,
+        "lookAt": 422924,
+        "note": [
+            "lap 1 - Victor Solano overtakes Vytautas Jasiulevicius for p12",
+            "Victor Solano pulls off a daring move, zooming past Vytautas Jasiulevicius to take the checkered flag!"
+        ]
+    },
+    {
+        "time": 258600,
+        "lookAt": 821040,
+        "note": [
+            "lap 2 - Carlos Navarro2 looses several positions: off track",
+            "Carlos Navarro2 spins off the track, gifting positions to his rivals as he bids farewell to a promising start!"
+        ]
+    },
+    {
+        "time": 258660,
+        "lookAt": 602477,
+        "note": [
+            "lap 1 - Vytautas Jasiulevicius overtakes Victor Solano for p12",
+            "Vytautas Jasiulevicius makes a daring move, storming past Victor Solano to take p12!"
+        ]
+    },
+    {
+        "time": 258720,
+        "lookAt": 411665,
+        "note": [
+            "lap 2 - Carlos Navarro2 has an off track moment. Kévin Viémont overtakes Carlos Navarro2 for p6",
+            "Carlos Navarro2 loses his grip on the track, and Kévin Viémont takes advantage with a spectacular overtake!"
+        ]
+    },
+    {
+        "time": 258720,
+        "lookAt": 411665,
+        "note": [
+            "lap 2 - Darius Rackauskas has an off track moment. Kévin Viémont overtakes Darius Rackauskas for p6",
+            "Kev Viémont makes an awe-inspiring move, swooping past Darius Rackauskas to take the 6th position!"
+        ]
+    },
+    {
+        "time": 258720,
+        "lookAt": 821040,
+        "note": [
+            "lap 2 - Carlos Navarro2 looses several positions: off track",
+            "Silas Krag-Vrolijk slips back, and Mackenzie Rune takes advantage with a smart overtake! Vytautas Jasiulevicius is on the move, taking position 12 from Victor Solano. Randolph Smith follows suit and rallies to 13th. Carlos Navarro2 spins off the track, turning a promising start into a costly error. Victor Solano regains the lead with an incredible overtake of Randolph Smith. Darius Rackauskas pulls off another stunning overtake, racing past Kévin Viémont for the 7th spot. Kev Viémont retaliates with a spectacular overtake of his own, taking the 6th position from Darius Rackauskas. Unfortunately Carlos Navarro2's joyride ends in disaster as he spins off again."
+        ]
+    },
+    {
+        "time": 258780,
+        "lookAt": 732815,
+        "note": [
+            "lap 1 - Randolph Smith overtakes Victor Solano for p13",
+            "Randolph Smith bursts ahead of Victor Solano to claim 13th place!"
+        ]
+    },
+    {
+        "time": 258840,
+        "lookAt": 821040,
+        "note": [
+            "lap 2 - Carlos Navarro2 looses several positions: off track",
+            "Carlos Navarro2's race takes a turn for the worse as he spins off the track, losing several positions."
+        ]
+    },
+    {
+        "time": 258840,
+        "lookAt": 768649,
+        "note": [
+            "lap 1 - Tomas Urbonas overtakes Victor Solano for p14",
+            "Tomas Urbonas roars past Victor Solano for 14th position!"
+        ]
+    },
+    {
+        "time": 258900,
+        "lookAt": 768649,
+        "note": [
+            "lap 2 - Carlos Navarro2 has an off track moment. Tomas Urbonas overtakes Carlos Navarro2 for p13",
+            "Tomas Urbonas muscles past Carlos Navarro2, claiming p13 with an incredible manoeuvre!"
+        ]
+    },
+    {
+        "time": 258900,
+        "lookAt": 115698,
+        "note": [
+            "lap 1 - Alex Jönsson overtakes Victor Solano for p15",
+            "Alex Jönsson masterfully overtakes Victor Solano, rocketing into 15th place with a show-stopping move!"
+        ]
+    },
+    {
+        "time": 258960,
+        "lookAt": 115698,
+        "note": [
+            "lap 2 - Carlos Navarro2 has an off track moment. Alex Jönsson overtakes Carlos Navarro2 for p14",
+            "Carlos Navarro2 spins off the track, Alex Jönsson zooms past for 14th place!"
+        ]
+    },
+    {
+        "time": 259740,
         "lookAt": 779031,
-        "note": "Thomas Siros takes p9 from Alexander Schanna with a daring move on lap 2!"
+        "note": [
+            "lap 2 - Thomas Siros overtakes Alexander Schanna for p9",
+            "Thomas Siros puts the pedal to the metal, charging past Alexander Schanna to take 9th place!"
+        ]
     },
     {
-        "time": 259658,
+        "time": 260040,
+        "lookAt": 582569,
+        "note": [
+            "lap 2 - Kévin Viémont has an off track moment. Darius Rackauskas overtakes Kévin Viémont for p6",
+            "    Darius Rackauskas squeezes past Kévin Viémont for position 6!"
+        ]
+    },
+    {
+        "time": 260040,
         "lookAt": 524828,
-        "note": "Silas Krag-Vrolijk makes a dramatic move to take p4 off Mackenzie Rune, while Kévin Viémont snatches p6 from Darius Rackauskas! Thomas Siros powers past Alexander Schanna and takes p9 with a brilliant overtake."
+        "note": [
+            "lap 2 - Thomas Siros has an off track moment. Alexander Schanna overtakes Thomas Siros for p9",
+            "    Alexander Schanna powers past Thomas Siros as the latter makes an off-track error, taking away a promising position in the race!"
+        ]
     },
     {
-        "time": 259704,
+        "time": 260100,
         "lookAt": 779031,
-        "note": "Thomas Siros takes p9 with an impressive overtake on Alexander Schanna!"
+        "note": [
+            "lap 2 - Thomas Siros overtakes Alexander Schanna for p9",
+            " Siros rockets past Schanna to grab 9th place in a beautiful move!"
+        ]
     },
     {
-        "time": 260136,
+        "time": 260220,
         "lookAt": 582569,
-        "note": "Darius Rackauskas makes a daring move and overtakes Kévin Viémont, flying up to p6!"
+        "note": [
+            "lap 2 - Darius Rackauskas looses several positions: off track, car contact",
+            "Darius Rackauskas takes a spin off the track and loses ground due to contact, slipping several positions down!"
+        ]
     },
     {
-        "time": 260188,
+        "time": 261060,
         "lookAt": 582569,
-        "note": "Darius Rackauskas spins and loses multiple positions in a single moment of misfortune."
+        "note": [
+            "lap 2 - Rachel Jimenez. Darius Rackauskas overtakes Rachel Jimenez for p7",
+            "Darius Rackauskas charges past Rachel Jimenez, roaring into seventh place to the delight of the crowd!"
+        ]
     },
     {
-        "time": 260897,
-        "lookAt": 582569,
-        "note": "Darius Rackauskas pulls off an incredible overtake on Rachel Jimenez to grab 7th position!"
-    },
-    {
-        "time": 261256,
+        "time": 261360,
         "lookAt": 524828,
-        "note": "Thomas Siros makes a valiant effort but is outdone as Alexander Schanna rises to take p9!"
+        "note": [
+            "lap 2 - Thomas Siros has an off track moment. Alexander Schanna overtakes Thomas Siros for p9",
+            "Thomas Siros slips up and Alexander Schanna takes advantage, surging ahead to grab ninth place!"
+        ]
     },
     {
-        "time": 261315,
-        "lookAt": 779031,
-        "note": "Thomas Siros pulls off an audacious move, darting past Alexander Schanna to take p9!"
+        "time": 261540,
+        "lookAt": 717204,
+        "note": [
+            "lap 2 - Darius Rackauskas has an off track moment. Rachel Jimenez overtakes Darius Rackauskas for p7",
+            "Darius Rackauskas makes a crucial error, allowing Rachel Jimenez to slip past and grab seventh place!"
+        ]
     },
     {
-        "time": 261399,
+        "time": 261540,
+        "lookAt": 115698,
+        "note": [
+            "lap 2 - Alex Jönsson overtakes Tomas Urbonas for p13",
+            "    Alex Jönsson blazes past Tomas Urbonas with an incredible manoeuvre to take 13th place!"
+        ]
+    },
+    {
+        "time": 262920,
         "lookAt": 524828,
-        "note": "Thomas Siros takes his chances, but Alexander Schanna outguns him and grabs p9!"
+        "note": [
+            "lap 2 - Darius Rackauskas has an off track moment. Alexander Schanna overtakes Darius Rackauskas for p8",
+            "    Darius Rackauskas takes a spin and Alexander Schanna zooms past for 8th!"
+        ]
     },
     {
-        "time": 261541,
-        "lookAt": 582569,
-        "note": "Darius Rackauskas loses multiple positions in an instant as he goes off the track."
-    },
-    {
-        "time": 263054,
+        "time": 263040,
         "lookAt": 115698,
-        "note": "    Alex Jönsson swoops past Randolph Smith to grab 12th place!"
+        "note": [
+            "lap 2 - Alex Jönsson overtakes Randolph Smith for p12",
+            "Alex Jönsson rockets past Randolph Smith, stealing 12th place in a thrilling overtake!"
+        ]
     },
     {
-        "time": 263063,
+        "time": 263100,
         "lookAt": 582569,
-        "note": "Darius Rackauskas suffers, spinning off the track in a moment of misfortune and losing multiple positions!"
+        "note": [
+            "lap 2 - Darius Rackauskas looses several positions: off track, car contact",
+            "Darius Rackauskas spins off the track and loses ground due to contact, slipping several positions!"
+        ]
     },
     {
-        "time": 265347,
+        "time": 265440,
         "lookAt": 582569,
-        "note": "Darius Rackauskas powers past Alex Jönsson, snatching 11th place in an implausible move!"
+        "note": [
+            "lap 3 - Darius Rackauskas overtakes Alex Jönsson for p11",
+            "    Darius Rackauskas makes a daring move, rocketing past Alex Jönsson to snag 11th position!"
+        ]
     },
     {
-        "time": 265386,
+        "time": 266160,
         "lookAt": 115698,
-        "note": "    Alex Jönsson overtakes Darius Rackauskas in a daring display of skill, grabbing the eleventh spot!"
+        "note": [
+            "lap 3 - Darius Rackauskas has an off track moment. Alex Jönsson overtakes Darius Rackauskas for p11",
+            "A costly mistake for Darius Rackauskas as Alex Jönsson steals 11th place with an incredible manoeuvre!"
+        ]
     },
     {
-        "time": 265428,
+        "time": 266520,
         "lookAt": 582569,
-        "note": "Darius Rackauskas roars past Alex Jönsson with a stunning overtake, snatching 11th place in an instant!"
+        "note": [
+            "lap 3 - Darius Rackauskas overtakes Alex Jönsson for p11",
+            "    Darius Rackauskas pulls off an impressive move, taking 11th place from Alex Jönsson with a daring overtake!"
+        ]
     },
     {
-        "time": 266183,
+        "time": 266700,
         "lookAt": 115698,
-        "note": "Darius Rackauskas roars past Alex Jönsson with a stunning move to grab 11th place!"
+        "note": [
+            "lap 3 - Darius Rackauskas has an off track moment. Alex Jönsson overtakes Darius Rackauskas for p11",
+            " Darius Rackauskas takes a spin and Alex Jönsson pounces, snatching 11th place in an incredible move!"
+        ]
     },
     {
-        "time": 266312,
+        "time": 268080,
+        "lookAt": 821040,
+        "note": [
+            "lap 3 - Carlos Navarro2 overtakes Tomas Urbonas for p14",
+            "Carlos Navarro2 pulls off an impressive overtake, blazing past Tomas Urbonas to take 14th position!"
+        ]
+    },
+    {
+        "time": 268320,
+        "lookAt": 602477,
+        "note": [
+            "lap 3 - Vytautas Jasiulevicius looses several positions: off track",
+            "Vytautas Jasiulevicius takes a detour off the track, losing several positions in the process!"
+        ]
+    },
+    {
+        "time": 268920,
         "lookAt": 582569,
-        "note": "Darius Rackauskas is on fire as he powers past Alex Jönsson for 11th position in a daring overtake!"
+        "note": [
+            "lap 3 - Darius Rackauskas looses several positions: off track, car contact",
+            " Darius Rackauskas has a costly mistake at lap 3, spinning off the track and losing several positions due to contact!"
+        ]
     },
     {
-        "time": 266352,
-        "lookAt": 115698,
-        "note": "    Darius Rackauskas gets outdone by Alex Jönsson as they battle for 11th place!"
+        "time": 269700,
+        "lookAt": 821040,
+        "note": [
+            "lap 4 - Vytautas Jasiulevicius has an off track moment. Carlos Navarro2 overtakes Vytautas Jasiulevicius for p12",
+            "    Carlos Navarro2 storms past Vytautas Jasiulevicius for an electrifying move, claiming the twelfth spot with flair!"
+        ]
     },
     {
-        "time": 266433,
+        "time": 269700,
         "lookAt": 582569,
-        "note": "    Darius Rackauskas makes an incredible overtake on Alex Jönsson, rocketing up to position 11 in a flash!"
-    },
-    {
-        "time": 266472,
-        "lookAt": 115698,
-        "note": "Darius Rackauskas goes for glory, but Alex Jönsson beats him to it and grabs 11th place."
-    },
-    {
-        "time": 266514,
-        "lookAt": 582569,
-        "note": "    Darius Rackauskas pulls off an unbelievable move, zooming past Alex Jönsson to snag 11th place!"
-    },
-    {
-        "time": 266733,
-        "lookAt": 582569,
-        "note": "Darius Rackauskas experiences a major setback as he spins off track, losing multiple positions in an instant!"
+        "note": [
+            "lap 4 - Darius Rackauskas looses several positions: off track, car contact",
+            "Darius Rackauskas spins off the track and takes a costly hit, losing several positions!"
+        ]
     },
     {
         "time": 271560,
         "lookAt": 524828,
-        "note": "Darius Rackauskas takes a wild spin off the track, losing multiple positions in a single moment of misfortune! Alexander Schanna zips past Rachel Jimenez to grab an impressive 7th place!"
+        "note": [
+            "lap 4 - Alexander Schanna overtakes Rachel Jimenez for p7",
+            "Alexander Schanna powers ahead of Rachel Jimenez, snatching seventh place with an awe-inspiring overtake!"
+        ]
     },
     {
-        "time": 274655,
+        "time": 274620,
         "lookAt": 115698,
-        "note": "Alex Jönsson swoops past Thomas Siros into 9th place!"
+        "note": [
+            "lap 5 - Thomas Siros has an off track moment. Alex Jönsson overtakes Thomas Siros for p9",
+            "Siros makes a costly error as Jönsson rockets past and takes ninth place!"
+        ]
     },
     {
-        "time": 275033,
+        "time": 275040,
         "lookAt": 149258,
-        "note": "Silas Krag-Vrolijk goes absolutely wild, taking p3 with a brilliant overtake on André Selander!"
+        "note": [
+            "lap 5 - André Selander has an off track moment. Silas Krag-Vrolijk overtakes André Selander for p3",
+            "Silas Krag-Vrolijk executes an incredible overtake, blazing past André Selander for position 3!"
+        ]
     },
     {
-        "time": 275433,
-        "lookAt": 524828,
-        "note": "Darius Rackauskas spins off the track and loses multiple positions in a single moment of misfortune, while Alexander Schanna zooms past Rachel Jimenez to grab 7th place!"
+        "time": 275460,
+        "lookAt": 717204,
+        "note": [
+            "lap 5 - Alexander Schanna has an off track moment. Rachel Jimenez overtakes Alexander Schanna for p7",
+            "Alexander Schanna's off-track error costs him dearly; Rachel Jimenez makes quick work of the opportunity, seizing seventh place!"
+        ]
     },
     {
-        "time": 280493,
+        "time": 276180,
+        "lookAt": 582569,
+        "note": [
+            "lap 5 - Tomas Urbonas has an off track moment. Darius Rackauskas overtakes Tomas Urbonas for p14",
+            "Darius Rackauskas zooms past Tomas Urbonas to take 14th place in an explosive move!"
+        ]
+    },
+    {
+        "time": 276780,
         "lookAt": 115698,
-        "note": "Alex Jönsson takes a daring overtaking move around Rachel Jimenez to snatch 7th place in an impressive display!"
+        "note": [
+            "lap 5 - Alexander Schanna has an off track moment. Alex Jönsson overtakes Alexander Schanna for p8",
+            "Alex Jönsson rockets past Alexander Schanna for eighth place with a show-stopping manoeuvre!"
+        ]
     },
     {
-        "time": 288376,
+        "time": 280560,
+        "lookAt": 115698,
+        "note": [
+            "lap 6 - Alex Jönsson overtakes Rachel Jimenez for p7",
+            "Alex Jönsson powers ahead of Rachel Jimenez with a spectacular overtake, snatching the seventh spot in an instant!"
+        ]
+    },
+    {
+        "time": 281220,
+        "lookAt": 582569,
+        "note": [
+            "lap 6 - Vytautas Jasiulevicius has an off track moment. Darius Rackauskas overtakes Vytautas Jasiulevicius for p13",
+            " Darius Rackauskas pulls off an incredible overtake, flying past Vytautas Jasiulevicius to snatch 13th place!"
+        ]
+    },
+    {
+        "time": 285300,
+        "lookAt": 582569,
+        "note": [
+            "lap 7 - Darius Rackauskas overtakes Carlos Navarro2 for p12",
+            "Darius Rackauskas powers ahead, flying past Carlos Navarro2 to take 12th position!"
+        ]
+    },
+    {
+        "time": 288360,
+        "lookAt": 779031,
+        "note": [
+            "lap 7 - Alexander Schanna has an off track moment. Thomas Siros overtakes Alexander Schanna for p9",
+            "Alexander Schanna is caught slipping, allowing Thomas Siros to power past for 9th place!"
+        ]
+    },
+    {
+        "time": 288420,
+        "lookAt": 602477,
+        "note": [
+            "lap 7 - Vytautas Jasiulevicius overtakes Carlos Navarro2 for p13",
+            "Daring move by Vytautas Jasiulevicius! He overtakes Carlos Navarro2 to secure 13th place!"
+        ]
+    },
+    {
+        "time": 288480,
+        "lookAt": 768649,
+        "note": [
+            "lap 7 - Tomas Urbonas overtakes Vytautas Jasiulevicius for p13",
+            "Tomas Urbonas pulls off a daring move, charging past Vytautas Jasiulevicius to snatch 13th place!"
+        ]
+    },
+    {
+        "time": 288480,
+        "lookAt": 768649,
+        "note": [
+            "lap 7 - Tomas Urbonas overtakes Carlos Navarro2 for p13",
+            "Tomas Urbonas rockets past Carlos Navarro2 in a daring overtake, taking 13th place!"
+        ]
+    },
+    {
+        "time": 288660,
         "lookAt": 524828,
-        "note": "Darius Rackauskas spins off track in a moment of misfortune, losing multiple positions in the blink of an eye! Alexander Schanna also slips and loses several positions."
+        "note": [
+            "lap 7 - Alexander Schanna looses several positions: off track",
+            "Alexander Schanna makes an ill-fated mistake, spinning off the track and taking a costly hit to his race!"
+        ]
     },
     {
-        "time": 289204,
+        "time": 289200,
         "lookAt": 454721,
-        "note": "Silas Krag-Vrolijk drops to fourth as André Selander takes a nail-biting overtake to snatch third position!"
+        "note": [
+            "lap 8 - Silas Krag-Vrolijk has an off track moment. André Selander overtakes Silas Krag-Vrolijk for p3",
+            " Silas Krag-Vrolijk continues to struggle, losing a position on the track to André Selander with an off-track error."
+        ]
     },
     {
-        "time": 292817,
+        "time": 292740,
         "lookAt": 732815,
-        "note": "Randolph Smith spins off the track, losing control and several positions!"
+        "note": [
+            "lap 8 - Randolph Smith looses several positions: off track",
+            "Randolph Smith spins off the track, making the mistake that costs him several positions!"
+        ]
     },
     {
-        "time": 294318,
-        "lookAt": 779031,
-        "note": "Thomas Siros loses his grip on the race as he spins off, dropping several positions in an instant!"
-    },
-    {
-        "time": 293864,
-        "lookAt": 779031,
-        "note": "Thomas Siros zooms past Darius Rackauskas, snatching 9th place in an incredible display of skill!"
-    },
-    {
-        "time": 300318,
+        "time": 300360,
         "lookAt": 149258,
-        "note": "Silas Krag-Vrolijk makes an impressive move, snatching p3 away from André Selander in spectacular fashion!"
+        "note": [
+            "lap 10 - Silas Krag-Vrolijk overtakes André Selander for p3",
+            "Silas Krag-Vrolijk makes a daring move, zooming past André Selander to snatch the third spot!"
+        ]
     },
     {
-        "time": 300930,
+        "time": 300900,
+        "lookAt": 732815,
+        "note": [
+            "lap 10 - Alexander Schanna has an off track moment and makes a pit stop. Randolph Smith overtakes Alexander Schanna for p12",
+            "Randolph Smith roars forward and takes 12th place with a daring overtake of Alexander Schanna!"
+        ]
+    },
+    {
+        "time": 300960,
         "lookAt": 115698,
-        "note": "    Alex Jönsson rockets past Kévin Viémont to snatch 6th place in an epic overtake!"
+        "note": [
+            "lap 10 - Alex Jönsson overtakes Kévin Viémont for p6",
+            "    Alex Jönsson shows incredible skill, zooming ahead of Kévin Viémont for 6th position in a thrilling overtake!"
+        ]
     },
     {
-        "time": 304910,
+        "time": 301200,
+        "lookAt": 602477,
+        "note": [
+            "lap 10 - Alexander Schanna has an off track moment and makes a pit stop. Vytautas Jasiulevicius overtakes Alexander Schanna for p13",
+            "Vytautas Jasiulevicius storms past Alexander Schanna, snatching the 13th spot in a daring move!"
+        ]
+    },
+    {
+        "time": 304860,
         "lookAt": 149258,
-        "note": "Silas Krag-Vrolijk loses control and goes off the track, dropping several positions!"
+        "note": [
+            "lap 11 - Silas Krag-Vrolijk looses several positions: ",
+            "Silas Krag-Vrolijk slips back, losing multiple positions to his rivals in a matter of seconds!"
+        ]
     },
     {
-        "time": 310739,
+        "time": 310740,
         "lookAt": 747083,
-        "note": "    Mackenzie Rune rockets to P3, as André Selander is outdone in an impressive overtake!"
+        "note": [
+            "lap 12 - Mackenzie Rune overtakes André Selander for p3",
+            "Mackenzie Rune bolts past André Selander to take third place in a thrilling overtake!"
+        ]
     },
     {
-        "time": 310962,
+        "time": 311820,
         "lookAt": 454721,
-        "note": "Silas Krag-Vrolijk spins off track in a moment of misfortune, while André Selander rockets past Mackenzie Rune with an incredible overtake, claiming third place!"
+        "note": [
+            "lap 12 - Mackenzie Rune has an off track moment. André Selander overtakes Mackenzie Rune for p3",
+            "Mackenzie Rune slips up, and André Selander takes advantage with a lightning-fast overtake to claim third place!"
+        ]
     },
     {
-        "time": 311047,
+        "time": 311880,
         "lookAt": 747083,
-        "note": "Mackenzie Rune swoops past André Selander with an expert display of driving, taking third position!"
+        "note": [
+            "lap 12 - Mackenzie Rune overtakes André Selander for p3",
+            "Mackenzie Rune rockets ahead of André Selander with a spectacular overtake, taking third position in an instant!"
+        ]
     },
     {
-        "time": 311755,
+        "time": 316020,
+        "lookAt": 582569,
+        "note": [
+            "lap 13 - Darius Rackauskas looses several positions: pitted",
+            "Darius Rackauskas slips back as his pit stop costs him several positions!"
+        ]
+    },
+    {
+        "time": 317760,
+        "lookAt": 524828,
+        "note": [
+            "lap 13 - Vytautas Jasiulevicius makes a pit stop. Alexander Schanna overtakes Vytautas Jasiulevicius for p13",
+            "    Vytautas Jasiulevicius barrels into the pits as Alexander Schanna zooms past, snatching 13th place in an exhilarating overtake!"
+        ]
+    },
+    {
+        "time": 321660,
+        "lookAt": 149258,
+        "note": [
+            "lap 14 - Silas Krag-Vrolijk overtakes Rachel Jimenez for p7",
+            "Silas Krag-Vrolijk's daring move pays off as he overtakes Rachel Jimenez in a heart-thumping overtake, claiming seventh place!"
+        ]
+    },
+    {
+        "time": 324060,
         "lookAt": 454721,
-        "note": "André Selander pulls off an epic overtake, snatching third place from Mackenzie Rune!"
+        "note": [
+            "lap 14 - André Selander overtakes Mackenzie Rune for p3",
+            "André Selander zips past Mackenzie Rune with an incredible overtake, snatching 3rd place in a thrilling move!"
+        ]
     },
     {
-        "time": 311892,
+        "time": 324180,
         "lookAt": 747083,
-        "note": "Mackenzie Rune rockets to third place with a stunning overtake on André Selander in an exciting race at the Red Bull Ring!"
+        "note": [
+            "lap 14 - André Selander has an off track moment. Mackenzie Rune overtakes André Selander for p3",
+            " Mackenzie Rune flies past André Selander with pace, taking 3rd place in a thrilling overtake!"
+        ]
     },
     {
-        "time": 321659,
-        "lookAt": 149258,
-        "note": "     Silas Krag-Vrolijk rockets to seventh place with a daring overtake on Rachel Jimenez!"
-    },
-    {
-        "time": 387998,
+        "time": 324480,
         "lookAt": 747083,
-        "note": "Mackenzie Rune spins off the track, losing control and several positions in a single moment of misfortune!"
+        "note": [
+            "lap 14 - Mackenzie Rune looses several positions: pitted",
+            "Mackenzie Rune's race takes a hit as they enter the pits, losing positions in the process."
+        ]
     },
     {
-        "time": 389717,
-        "lookAt": 149258,
-        "note": "Silas Krag-Vrolijk charges past Kévin Viémont to take fifth place in a thrilling moment at the Red Bull Ring!"
+        "time": 330960,
+        "lookAt": 717204,
+        "note": [
+            "lap 16 - Rachel Jimenez looses several positions: pitted",
+            "Rachel Jimenez slips up as they enter the pits, losing ground and positions in the process!"
+        ]
     },
     {
-        "time": 389895,
+        "time": 335100,
+        "lookAt": 115698,
+        "note": [
+            "lap 17 - Alex Jönsson looses several positions: pitted",
+            "Alex Jönsson takes a pit stop, losing several positions in the process."
+        ]
+    },
+    {
+        "time": 336240,
+        "lookAt": 779031,
+        "note": [
+            "lap 17 - Thomas Siros looses several positions: pitted",
+            "Thomas Siros slips up and takes a pit stop, costing him valuable positions in the race!"
+        ]
+    },
+    {
+        "time": 342480,
+        "lookAt": 732815,
+        "note": [
+            "lap 18 - Randolph Smith overtakes Tomas Urbonas for p8",
+            "Randolph Smith takes 8th place from Tomas Urbonas with an electrifying overtake!"
+        ]
+    },
+    {
+        "time": 345300,
         "lookAt": 411665,
-        "note": "Kévin Viémont goes for glory, charging past Silas Krag-Vrolijk to grab fifth place in an adrenaline-packed move!"
+        "note": [
+            "lap 19 - Kévin Viémont looses several positions: pitted, off track",
+            "Kev Viémont's race takes a hit as they pit and lose positions on the track!"
+        ]
     },
     {
-        "time": 390385,
+        "time": 347100,
+        "lookAt": 732815,
+        "note": [
+            "lap 18 - Randolph Smith looses several positions: pitted",
+            "Randolph Smith spins off the track, losing precious positions in the process!"
+        ]
+    },
+    {
+        "time": 351540,
         "lookAt": 149258,
-        "note": "Silas Krag-Vrolijk puts on an impressive show, overtaking Kévin Viémont and rocketing up to fifth place in an adrenaline-filled move!"
+        "note": [
+            "lap 20 - Silas Krag-Vrolijk looses several positions: pitted",
+            "Silas Krag-Vrolijk heads to the pits, relinquishing several positions in the process."
+        ]
     },
     {
-        "time": 390693,
+        "time": 351900,
+        "lookAt": 717204,
+        "note": [
+            "lap 19 - Tomas Urbonas has an off track moment. Rachel Jimenez overtakes Tomas Urbonas for p8",
+            "Tomas Urbonas fluffs it, and Rachel Jimenez pounces to take 8th position!"
+        ]
+    },
+    {
+        "time": 351960,
+        "lookAt": 768649,
+        "note": [
+            "lap 19 - Tomas Urbonas overtakes Rachel Jimenez for p8",
+            "Tomas Urbonas charges ahead of Rachel Jimenez with a daring overtake, snatching 8th place in spectacular fashion!"
+        ]
+    },
+    {
+        "time": 352080,
+        "lookAt": 768649,
+        "note": [
+            "lap 19 - Tomas Urbonas looses several positions: pitted",
+            "Tomas Urbonas concedes several positions as he pits, costing him valuable time in the race."
+        ]
+    },
+    {
+        "time": 355560,
+        "lookAt": 115698,
+        "note": [
+            "lap 20 - André Selander makes a pit stop. Alex Jönsson overtakes André Selander for p3",
+            "André Selander pits, and Alex Jönsson roars ahead with an incredible overtake to snatch 3rd place!"
+        ]
+    },
+    {
+        "time": 355560,
+        "lookAt": 602477,
+        "note": [
+            "lap 20 - Tomas Urbonas makes a pit stop. Vytautas Jasiulevicius overtakes Tomas Urbonas for p13",
+            "Tomas Urbonas pits, and Vytautas Jasiulevicius zooms past for a thrilling overtake of 13th place!"
+        ]
+    },
+    {
+        "time": 364320,
+        "lookAt": 602477,
+        "note": [
+            "lap 21 - Vytautas Jasiulevicius looses several positions: pitted, off track, black flag",
+            "Vytautas Jasiulevicius takes a costly hit in lap 21 after he pits, spins off the track, and is black flagged!"
+        ]
+    },
+    {
+        "time": 387960,
+        "lookAt": 747083,
+        "note": [
+            "lap 27 - Mackenzie Rune looses several positions: off track",
+            "Mackenzie Rune takes a costly detour off the track, losing multiple positions in the process!"
+        ]
+    },
+    {
+        "time": 389700,
+        "lookAt": 149258,
+        "note": [
+            "lap 27 - Silas Krag-Vrolijk overtakes Kévin Viémont for p5",
+            "Silas Krag-Vrolijk blazes past Kévin Viémont in a show-stopping overtake, taking the fifth spot with style!"
+        ]
+    },
+    {
+        "time": 389880,
         "lookAt": 411665,
-        "note": "Kévin Viémont rockets past Silas Krag-Vrolijk in a spectacular display of speed, snatching fifth place!"
+        "note": [
+            "lap 27 - Silas Krag-Vrolijk has an off track moment. Kévin Viémont overtakes Silas Krag-Vrolijk for p5",
+            "Silas Krag-Vrolijk slips up and Kévin Viémont capitalizes with a thrilling overtake for 5th place!"
+        ]
     },
     {
-        "time": 390899,
+        "time": 390420,
         "lookAt": 149258,
-        "note": "Silas Krag-Vrolijk pulls off an incredible overtake on Kévin Viémont, zooming up to fifth place with an awe-inspiring move!"
+        "note": [
+            "lap 27 - Silas Krag-Vrolijk overtakes Kévin Viémont for p5",
+            "Silas Krag-Vrolijk pulls off an electrifying overtake, rocketing past Kévin Viémont for a thrilling fifth place finish!"
+        ]
+    },
+    {
+        "time": 390720,
+        "lookAt": 411665,
+        "note": [
+            "lap 27 - Silas Krag-Vrolijk has an off track moment. Kévin Viémont overtakes Silas Krag-Vrolijk for p5",
+            "Silas Krag-Vrolijk slips up, and Kévin Viémont seizes the opportunity with a stunning overtake for fifth place!"
+        ]
+    },
+    {
+        "time": 390900,
+        "lookAt": 149258,
+        "note": [
+            "lap 27 - Silas Krag-Vrolijk overtakes Kévin Viémont for p5",
+            "Silas Krag-Vrolijk dashes ahead of Kévin Viémont with a sensational overtake, taking the 5th position in style!"
+        ]
+    },
+    {
+        "time": 395460,
+        "lookAt": 493175,
+        "note": [
+            "lap 28 - Leigh Aberdeen finishes in p1",
+            "Leigh Aberdeen powers to victory with a sensational overtake of Victor Solano on the final lap!"
+        ]
+    },
+    {
+        "time": 395880,
+        "lookAt": 821040,
+        "note": [
+            "lap 27 - Carlos Navarro2 finishes in p14",
+            "Carlos Navarro2 powers to the checkered flag, clinching 14th place in an electrifying finish!"
+        ]
+    },
+    {
+        "time": 396300,
+        "lookAt": 383295,
+        "note": [
+            "lap 28 - Kevin Zwemstra finishes in p2",
+            "Leigh Aberdeen roars to victory with a sensational last-lap overtake of Victor Solano, while Kevin Zwemstra secures second place!"
+        ]
+    },
+    {
+        "time": 396360,
+        "lookAt": 115698,
+        "note": [
+            "lap 28 - Alex Jönsson finishes in p3",
+            "    Alex Jönsson seizes victory with a sensational last-lap overtake, snatching third place in an electrifying finish!"
+        ]
+    },
+    {
+        "time": 396840,
+        "lookAt": 454721,
+        "note": [
+            "lap 28 - André Selander finishes in p4",
+            "André Selander pulls off a stunning finish in fourth place!"
+        ]
+    },
+    {
+        "time": 397020,
+        "lookAt": 149258,
+        "note": [
+            "lap 28 - Silas Krag-Vrolijk finishes in p5",
+            "Silas Krag-Vrolijk pulls off an incredible move, snatching fifth place with a brilliant overtake!"
+        ]
+    },
+    {
+        "time": 397560,
+        "lookAt": 411665,
+        "note": [
+            "lap 28 - Kévin Viémont finishes in p6",
+            "Kévin Viémont steals the show with an incredible overtake, rocketing past Silas Krag-Vrolijk to take the sixth position in a thrilling finish!"
+        ]
+    },
+    {
+        "time": 397560,
+        "lookAt": 747083,
+        "note": [
+            "lap 28 - Mackenzie Rune finishes in p7",
+            " Mackenzie Rune storms past the finish line in seventh place, clinching a hard-fought victory!"
+        ]
+    },
+    {
+        "time": 397680,
+        "lookAt": 717204,
+        "note": [
+            "lap 28 - Rachel Jimenez finishes in p8",
+            " Rachel Jimenez takes 8th place with a frantic finish!"
+        ]
+    },
+    {
+        "time": 398340,
+        "lookAt": 779031,
+        "note": [
+            "lap 28 - Thomas Siros finishes in p9",
+            " Thomas Siros fights his way through the pack, clinching an impressive ninth position in a tense finish!"
+        ]
+    },
+    {
+        "time": 398820,
+        "lookAt": 582569,
+        "note": [
+            "lap 28 - Darius Rackauskas finishes in p10",
+            "    Darius Rackauskas roars to the finish and claims 10th place with a thrilling overtake!"
+        ]
+    },
+    {
+        "time": 398880,
+        "lookAt": 524828,
+        "note": [
+            "lap 28 - Alexander Schanna finishes in p11",
+            "Alexander Schanna blasts past the finish line, snatching 11th place in a heart-stopping last-lap overtake!"
+        ]
+    },
+    {
+        "time": 400260,
+        "lookAt": 732815,
+        "note": [
+            "lap 28 - Randolph Smith finishes in p12",
+            "Randolph Smith storms past the finish line in 12th place - a thrilling finish for the iFormula league!"
+        ]
+    },
+    {
+        "time": 400320,
+        "lookAt": 768649,
+        "note": [
+            "lap 28 - Tomas Urbonas finishes in p13",
+            "Tomas Urbonas rockets past the finish line, thundering into 13th place in a thrilling conclusion!"
+        ]
     }
 ]
