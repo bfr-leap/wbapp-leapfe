@@ -112,7 +112,7 @@ async function getRawReplayNotes(
 
     addNotes(lapChartData, events);
 
-    //events = filterPitStops(events);
+    events = filterPitStops(events);
 
     events = detectIncidents(events);
 
@@ -144,6 +144,14 @@ function filterPostRaceEvents(
     );
 
     return events.filter((v) => v.lapNumber < totalLaps);
+}
+
+function filterPitStops(events: PositionChangeEvent[]): PositionChangeEvent[] {
+    return events.filter(
+        (v) =>
+            v.notes.indexOf('pitted') < 0 &&
+            v.indirectNotes.indexOf('pitted') < 0
+    );
 }
 
 function limitEventCount(
@@ -339,7 +347,7 @@ function addNotes(lapChartData: LapChartData, events: PositionChangeEvent[]) {
 }
 
 async function main() {
-    const subsessionId = 63744248;
+    const subsessionId = 63744248; // 63763387; // 63744248;
     const simsessionId = -3;
 
     let notes = await getRawReplayNotes(subsessionId, simsessionId);
