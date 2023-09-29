@@ -26,6 +26,16 @@ import { createCompletion } from './openai/openai-endpoints.js';
 import { detectOvertakes } from './telemetry/overtake-detection.js';
 import { reconstructEpochTelemetry } from './telemetry/epoch-reconstruction.js';
 
+import {
+    overtakeComments,
+    crashComments,
+    getFinishingCommentTemplates,
+} from './telemetry/narrative-comments.js';
+
+let _overtakeComments = JSON.parse(JSON.stringify(overtakeComments));
+let _crashComments = JSON.parse(JSON.stringify(crashComments));
+let _finishingCommentTemplates = getFinishingCommentTemplates();
+
 function getFinishingNotes(
     tel: EpochTelemetry,
     simsessionResults: SimsessionResults
@@ -232,6 +242,12 @@ function getReplayNotes(
                 }${indirectModifier}. `;
             }
 
+            let randomCommentIndex = Math.floor(
+                Math.random() * (_overtakeComments.length - 1)
+            );
+            let spicyComment = _overtakeComments[randomCommentIndex];
+            _overtakeComments.splice(randomCommentIndex, 1);
+
             return {
                 time: ev.time,
                 lookAt: ev.directDriverId,
@@ -243,6 +259,7 @@ function getReplayNotes(
                     }${directModifier} overtakes ${
                         driverNames[ev.indirectDriverId]
                     } for p${ev.position}`,
+                    spicyComment,
                 ],
             };
         } else if (ev.actionType === 'incident') {
@@ -253,6 +270,14 @@ function getReplayNotes(
                 }
             }
 
+            let _crashComments = JSON.parse(JSON.stringify(crashComments));
+
+            let randomCommentIndex = Math.floor(
+                Math.random() * (_crashComments.length - 1)
+            );
+            let spicyComment = _crashComments[randomCommentIndex];
+            _crashComments.splice(randomCommentIndex, 1);
+
             return {
                 time: ev.time,
                 lookAt: ev.directDriverId,
@@ -262,9 +287,20 @@ function getReplayNotes(
                     } looses several positions: ${Object.keys(incidentMap).join(
                         ', '
                     )}`,
+                    spicyComment,
                 ],
             };
         } else if (ev.actionType === 'finished') {
+            let randomCommentIndex = Math.floor(
+                Math.random() * (_finishingCommentTemplates.length - 1)
+            );
+            let templateFn = _finishingCommentTemplates[randomCommentIndex];
+            let spicyComment = templateFn(
+                driverNames[ev.directDriverId],
+                ev.position
+            );
+            _finishingCommentTemplates.splice(randomCommentIndex, 1);
+
             return {
                 time: ev.time,
                 lookAt: ev.directDriverId,
@@ -272,6 +308,7 @@ function getReplayNotes(
                     `lap ${ev.lapNumber + 1} - ${
                         driverNames[ev.directDriverId]
                     } finishes in p${ev.position}`,
+                    spicyComment,
                 ],
             };
         }
@@ -288,7 +325,7 @@ function getReplayNotes(
 function filterEarlyChaos(
     events: PositionChangeEvent[]
 ): PositionChangeEvent[] {
-    return events.filter((v) => v.lapNumber > 1 || v.perc > 0.5);
+    return events.filter((v) => v.lapNumber > 1);
 }
 
 function detectIncidents(events: PositionChangeEvent[]): PositionChangeEvent[] {
@@ -347,8 +384,8 @@ function addNotes(lapChartData: LapChartData, events: PositionChangeEvent[]) {
 }
 
 async function main() {
-    const subsessionId = 63744248; // 63763387; // 63744248;
-    const simsessionId = -3;
+    const subsessionId = 63904624; // 63763387; // 63744248;
+    const simsessionId = 0;
 
     let notes = await getRawReplayNotes(subsessionId, simsessionId);
 
@@ -370,17 +407,14 @@ async function main() {
     let introPrompt = `The following is session information for a wheel to wheel motorsports event:
     ${JSON.stringify(sessionInfo, null, '    ')}
 
-    Create a broadcast style 40 word poetic intro including session information for the event in the style of Jeremy Clarkson.`;
+    Create a broadcast style 40 word poetic prose intro including session information for the event in the style of Jeremy Clarkson.`;
 
     let intro = await createCompletion(introPrompt);
 
     for (let i = 0; i < notes.length && intro !== 'error'; ++i) {
-        let eventPrompt = `We are creating a broadcast style play by play of a wheel to wheel motorsports event using colorful and exciting language.  Note the interesting narratives as race events unfold but note that we don't know where in the track these events happened.
-    
-    This is what just happened:
-    ${notes[i].note[notes[i].note.length - 1]}
-
-    Generate very succinct commentary in present tense about what just happened in the style of Jeremy Clarkson.`;
+        let eventPrompt = `Combine the followiong 2 sentences into 1 keeping it in present tense:
+    ${notes[i].note[notes[i].note.length - 2]}
+    ${notes[i].note[notes[i].note.length - 1]} `;
 
         let newComment = await createCompletion(eventPrompt);
 
