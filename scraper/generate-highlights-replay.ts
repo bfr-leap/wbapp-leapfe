@@ -384,8 +384,8 @@ function addNotes(lapChartData: LapChartData, events: PositionChangeEvent[]) {
 }
 
 async function main() {
-    const subsessionId = 63904624; // 63763387; // 63744248;
-    const simsessionId = 0;
+    const subsessionId = 64035451;
+    const simsessionId = -3;
 
     let notes = await getRawReplayNotes(subsessionId, simsessionId);
 

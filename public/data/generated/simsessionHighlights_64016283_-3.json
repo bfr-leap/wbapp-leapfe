@@ -1,0 +1,111 @@
+[
+    {
+        "time": 115980,
+        "lookAt": 227791,
+        "note": [
+            "lap 5 - Leigh Aberdeen has an off track moment. Frank Bieser overtakes Leigh Aberdeen for p1",
+            "Zoom, boom, lighting up the room!",
+            "Leigh Aberdeen has an off-track moment, allowing Frank Bieser to zoom, boom, and light up the room as he overtakes for P1."
+        ],
+        "intro": "Experience the thrill of iFormula League HEAT 1 at the impressive Circuito de Jerez - Ángel Nieto! On Saturday, September 30th at 15:00 UTC, fierce competitors will battle it out in a race to be remembered. Get ready for an epic show of speed and skill as these masterful drivers demonstrate their extraordinary talents! Don't miss your chance to witness history in the making!"
+    },
+    {
+        "time": 116100,
+        "lookAt": 217326,
+        "note": [
+            "lap 4 - Jacob Bieser overtakes Derek Miller6 for p3",
+            "Zooming through the lane, like a train on the plain!",
+            "Jacob Bieser zooms through the lane like a train on the plain, overtaking Derek Miller for P3 in Lap 4."
+        ]
+    },
+    {
+        "time": 116220,
+        "lookAt": 493175,
+        "note": [
+            "lap 5 - Leigh Aberdeen looses several positions: off track",
+            "Spun once, spun twice, that's not nice!",
+            "Leigh Aberdeen loses several positions as he spins off track twice during lap 5, that's not nice!"
+        ]
+    },
+    {
+        "time": 131280,
+        "lookAt": 227791,
+        "note": [
+            "lap 7 - Frank Bieser looses several positions: off track",
+            "And just like that, his car's value plummeted faster than my hopes for a vegetarian steak!",
+            "Frank Bieser loses several positions on lap 7 and just like that, his car's value plummets faster than my hopes for a vegetarian steak!"
+        ]
+    },
+    {
+        "time": 187920,
+        "lookAt": 402468,
+        "note": [
+            "lap 19 - Frederik Høygaard Larsen overtakes Jacob Bieser for p1",
+            "Bright as a kite, he takes to flight!",
+            "Bright as a kite, Frederik Høygaard Larsen overtakes Jacob Bieser on lap 19 for p1 and takes to flight!"
+        ]
+    },
+    {
+        "time": 192540,
+        "lookAt": 402468,
+        "note": [
+            "lap 19 - Frederik Høygaard Larsen looses several positions: ",
+            "He's not crashing; he's just testing the track's resilience!",
+            "Lap 19 - Frederik Høygaard Larsen looses several positions but is not crashing, instead testing the track's resilience."
+        ]
+    },
+    {
+        "time": 234060,
+        "lookAt": 402468,
+        "note": [
+            "lap 28 - Frederik Høygaard Larsen overtakes Frank Bieser for p2",
+            "And just like a magician, one car disappears behind the other!",
+            "Frederik Høygaard Larsen overtakes Frank Bieser for p2 like a magician, one car disappearing behind the other!"
+        ]
+    },
+    {
+        "time": 273120,
+        "lookAt": 217326,
+        "note": [
+            "lap 35 - Jacob Bieser finishes in p1",
+            "Hats off and a bow, for the show, as Jacob Bieser takes P1 now!",
+            "Hats off and a bow for the show, as Jacob Bieser takes P1!"
+        ]
+    },
+    {
+        "time": 273540,
+        "lookAt": 402468,
+        "note": [
+            "lap 35 - Frederik Høygaard Larsen finishes in p2",
+            "P2 is lit by Frederik Høygaard Larsen's flair.",
+            "Frederik Høygaard Larsen's flair lights up p2 as he finishes."
+        ]
+    },
+    {
+        "time": 273840,
+        "lookAt": 742286,
+        "note": [
+            "lap 34 - Derek Miller6 finishes in p4",
+            "Derek Miller6 carves a niche at P4.",
+            "Derek Miller6 carves a niche as he finishes in p4."
+        ]
+    },
+    {
+        "time": 274500,
+        "lookAt": 524828,
+        "note": [
+            "lap 34 - Alexander Schanna finishes in p5",
+            "Alexander Schanna, with all the subtlety of a sledgehammer, claims P5.",
+            "Alexander Schanna finishes lap 34 with all the subtlety of a sledgehammer and claims P5."
+        ]
+    },
+    {
+        "time": 275460,
+        "lookAt": 227791,
+        "note": [
+            "lap 35 - Frank Bieser finishes in p3",
+            "Out of nowhere, like a sneaky ninja, Frank Bieser grabs P3.",
+            "Out of nowhere, like a sneaky ninja, Frank Bieser grabs P3."
+        ]
+    }
+]
