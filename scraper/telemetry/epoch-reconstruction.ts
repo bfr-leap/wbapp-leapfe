@@ -124,6 +124,10 @@ export async function reconstructEpochTelemetry(
         });
 
         for (let driverDataWithId of driverDataArrayWithId) {
+            if (driverDataWithId.perc < 0) {
+                continue;
+            }
+
             let a = dataByTime[driverDataWithId.t];
             if (!a) {
                 a = dataByTime[driverDataWithId.t] = [];

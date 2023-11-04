@@ -134,11 +134,11 @@ async function getRawReplayNotes(
         events.push(f);
     }
 
-    events = limitEventCount(
-        events,
-        (8 * 60) / 3 /** 160 */, // 8 min video
-        simsessionResults
-    );
+    // events = limitEventCount(
+    //     events,
+    //     (8 * 60) / 3 /** 160 */, // 8 min video
+    //     simsessionResults
+    // );
 
     let notes = getReplayNotes(events, driverNames);
 
@@ -325,7 +325,8 @@ function getReplayNotes(
 function filterEarlyChaos(
     events: PositionChangeEvent[]
 ): PositionChangeEvent[] {
-    return events.filter((v) => v.lapNumber > 1);
+    // return events.filter((v) => v.lapNumber > 1);
+    return events;
 }
 
 function detectIncidents(events: PositionChangeEvent[]): PositionChangeEvent[] {
@@ -391,45 +392,45 @@ async function main() {
 
     console.log(JSON.stringify(notes, null, '    '));
 
-    console.log((notes.length * 3) / 60, notes.length);
+    // console.log((notes.length * 3) / 60, notes.length);
 
-    const lapChartData = getLapChartData(subsessionId, simsessionId);
+    // const lapChartData = getLapChartData(subsessionId, simsessionId);
 
-    let sessionInfo = {
-        event_type_name: lapChartData.session_info.event_type_name,
-        //season_name: fileContents.session_info.season_name,
-        session_name: lapChartData.session_info.session_name,
-        simsession_name: lapChartData.session_info.simsession_name,
-        start_time: lapChartData.session_info.start_time,
-        track: lapChartData.session_info.track,
-    };
+    // let sessionInfo = {
+    //     event_type_name: lapChartData.session_info.event_type_name,
+    //     //season_name: fileContents.session_info.season_name,
+    //     session_name: lapChartData.session_info.session_name,
+    //     simsession_name: lapChartData.session_info.simsession_name,
+    //     start_time: lapChartData.session_info.start_time,
+    //     track: lapChartData.session_info.track,
+    // };
 
-    let introPrompt = `The following is session information for a wheel to wheel motorsports event:
-    ${JSON.stringify(sessionInfo, null, '    ')}
+    // let introPrompt = `The following is session information for a wheel to wheel motorsports event:
+    // ${JSON.stringify(sessionInfo, null, '    ')}
 
-    Create a broadcast style 40 word poetic prose intro including session information for the event in the style of Jeremy Clarkson.`;
+    // Create a broadcast style 40 word poetic prose intro including session information for the event in the style of Jeremy Clarkson.`;
 
-    let intro = await createCompletion(introPrompt);
+    // let intro = await createCompletion(introPrompt);
 
-    for (let i = 0; i < notes.length && intro !== 'error'; ++i) {
-        let eventPrompt = `Combine the followiong 2 sentences into 1 keeping it in present tense:
-    ${notes[i].note[notes[i].note.length - 2]}
-    ${notes[i].note[notes[i].note.length - 1]} `;
+    // for (let i = 0; i < notes.length && intro !== 'error'; ++i) {
+    //     let eventPrompt = `Combine the followiong 2 sentences into 1 keeping it in present tense:
+    // ${notes[i].note[notes[i].note.length - 2]}
+    // ${notes[i].note[notes[i].note.length - 1]} `;
 
-        let newComment = await createCompletion(eventPrompt);
+    //     let newComment = await createCompletion(eventPrompt);
 
-        notes[i].note.push(newComment);
+    //     notes[i].note.push(newComment);
 
-        if (newComment === 'error') {
-            console.log('exiting after generation error');
-            break;
-        }
-    }
+    //     if (newComment === 'error') {
+    //         console.log('exiting after generation error');
+    //         break;
+    //     }
+    // }
 
-    (<any>notes[0]).intro = intro;
+    // (<any>notes[0]).intro = intro;
 
-    // tel = tel.filter((v) => v.driverId === 115698);
-    console.log(JSON.stringify(notes, null, '    '));
+    // // tel = tel.filter((v) => v.driverId === 115698);
+    // console.log(JSON.stringify(notes, null, '    '));
 }
 
 main();

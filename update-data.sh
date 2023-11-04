@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 
 source .secrets
 npm run derive
