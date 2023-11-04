@@ -70,6 +70,7 @@ function loadTelemetrySubsessionIds(leagueId: number): number[] {
 }
 
 function loadSubsessionTelemetry(subsessionId: number): SubsessionTelemetry {
+    console.log(`loading telemetry for subsession ${subsessionId}`);
     let telem = <SubsessionTelemetry>JSON.parse(
         readFileSync(`${TELEMETRY_MNT_PT}${subsessionId}.json`, {
             encoding: 'utf8',
