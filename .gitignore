@@ -1,6 +1,7 @@
 cookie.txt
 .secrets
 out 
+out*
 
 # Logs
 logs
