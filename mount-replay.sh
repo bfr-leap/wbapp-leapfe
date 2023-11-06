@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 
 function single_arg_mode() {
     replay_root_dir=/z/arturo/iracing/replays

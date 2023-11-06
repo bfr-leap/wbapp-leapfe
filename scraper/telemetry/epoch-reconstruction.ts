@@ -106,6 +106,12 @@ export async function reconstructEpochTelemetry(
                     t: t.t,
                 };
 
+                if (367619 === driverTelemetry.id) {
+                    console.log((dB.t - dA.t) / 60);
+                    console.log(dA.perc, +'     ' + dB.perc);
+                    console.log('');
+                }
+
                 if (dA.t !== 0) {
                     pushNextTrackPosition(
                         dA,
