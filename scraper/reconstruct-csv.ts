@@ -16,7 +16,7 @@ async function trackPByEpochCSV(subsessionId, simsessionId, driverNames) {
         row += epoch.time + ',';
         epoch.data.sort((a, b) => a.driverId - b.driverId);
         for (let d of epoch.data) {
-            row += d.driverId + ',' + d.perc + ',';
+            row += d.perc + ',';
         }
         console.log(row);
     }

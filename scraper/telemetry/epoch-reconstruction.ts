@@ -55,12 +55,12 @@ function pushNextTrackPosition(
 
     if (newPerc > -100 && !hasCrossedStartFinish) {
         for (let i = 1; i < delta; ++i) {
-            let newTL = newT - i * 60;
+            let newTL = newT - (delta - i) * 60;
             let newPercL =
                 dA.perc +
                 ((newTL - dA.t) * (dB.perc - dA.perc)) / (dB.t - dA.t);
 
-            let d = { perc: newPercL, percD: newPercD, t: newT - i * 60 };
+            let d = { perc: newPercL, percD: newPercD, t: newTL };
             buffer.push(d);
         }
 
@@ -99,18 +99,17 @@ export async function reconstructEpochTelemetry(
         let driverDataArray: ST_TelemetryDatum[] = [];
         for (let lap of driverTelemetry.laps) {
             for (let t of lap.telemetry) {
+                if (dB.t + 1 === t.t) {
+                    // this means that there is a teleport in the telemetry
+                    continue;
+                }
+
                 dA = dB;
                 dB = {
                     perc: t.perc + lap.lapNumber - 1,
                     percD: t.percD,
                     t: t.t,
                 };
-
-                if (367619 === driverTelemetry.id) {
-                    console.log((dB.t - dA.t) / 60);
-                    console.log(dA.perc, +'     ' + dB.perc);
-                    console.log('');
-                }
 
                 if (dA.t !== 0) {
                     pushNextTrackPosition(
@@ -163,10 +162,6 @@ export async function reconstructEpochTelemetry(
             d.percD = (300 * d.percD) / _maxPercD;
         }
     }
-
-    // console.log('raw epochList start');
-    // console.log(JSON.stringify(epochList, null, '    '));
-    // console.log('raw epochList end\n\n\n\n');
 
     // prepare intermediate values for further processing
     let lastSeenEpochIndexByDriverId: { [name: string]: number } = {};
