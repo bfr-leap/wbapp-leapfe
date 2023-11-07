@@ -16,7 +16,7 @@ import type {
     ST_DriverTelemetry,
     CuratedTrackDisplayhInfo,
     GeneratedSimsessionSummary,
-} from '@/iracing-endpoints';
+} from 'ir-endpoints-types';
 
 async function fetchObjects(urls: string[]): Promise<any[]> {
     try {

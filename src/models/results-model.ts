@@ -1,4 +1,4 @@
-import type { SeasonSimsessionIndex } from '../iracing-endpoints';
+import type { SeasonSimsessionIndex } from 'ir-endpoints-types';
 import {
     getLeagueSimsessionIndex,
     getLeagueSeasonSessions,

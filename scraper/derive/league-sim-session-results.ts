@@ -17,7 +17,7 @@ import {
     LS_SeasonSummary,
     SimsessionResults,
     DriverResults,
-} from '../../src/iracing-endpoints.js';
+} from 'ir-endpoints-types';
 
 import {
     calculateRaceResults,

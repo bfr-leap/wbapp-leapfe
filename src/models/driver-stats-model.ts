@@ -1,4 +1,4 @@
-import type { DriverResults, SSR_ResultsEntry } from '../iracing-endpoints';
+import type { DriverResults, SSR_ResultsEntry } from 'ir-endpoints-types';
 import { getShortSubsessionName } from '@/utils/session-utils';
 
 async function getNames(

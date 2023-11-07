@@ -17,7 +17,7 @@ import type {
     LapChartData,
     MembersData,
     SubsessionTelemetry,
-} from '../../src/iracing-endpoints';
+} from 'ir-endpoints-types';
 
 const MNT_PT = './public/data/scraped/';
 

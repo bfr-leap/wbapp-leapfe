@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Ref } from 'vue';
 import { ref, watchEffect } from 'vue';
-import type { DriverResults } from '../iracing-endpoints';
+import type { DriverResults } from 'ir-endpoints-types';
 import type { ResultsTableModel } from '../models/results-table-model';
 import { getResultsTableModel } from '../models/results-table-model';
 

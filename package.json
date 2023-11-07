@@ -59,6 +59,7 @@
     "webpack-dev-server": "^4.11.1"
   },
   "dependencies": {
+    "ir-endpoints-types": "git+https://github.com/bfr-leap/ir-endpoint-types.git#v1.0.0",
     "mixpanel-browser": "^2.45.0",
     "openai": "^3.3.0",
     "pinia": "^2.0.28",

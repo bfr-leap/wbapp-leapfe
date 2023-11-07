@@ -6,7 +6,7 @@ import type {
     LeagueSeasons,
     DriverResults,
     SSR_ResultsEntry,
-} from '../iracing-endpoints';
+} from 'ir-endpoints-types';
 
 import {
     getCuratedLeagueTeamsInfo,

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watchEffect } from 'vue';
 import type { Ref } from 'vue';
-import type { TrackStats } from '../iracing-endpoints';
+import type { TrackStats } from 'ir-endpoints-types';
 import { getTrackStats } from '@/utils/fetch-util';
 import GenericTable from './generic-table.vue';
 import TrackResultsMenu from './track-results-menu.vue';

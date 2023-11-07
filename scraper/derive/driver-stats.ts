@@ -19,7 +19,7 @@ import {
     SimsessionResults,
     DriverStatsMap,
     DriverStats,
-} from '../../src/iracing-endpoints.js';
+} from 'ir-endpoints-types';
 
 import {
     calculateRaceResults,

@@ -1,4 +1,4 @@
-import type { DriverResults, SSR_ResultsEntry } from '../iracing-endpoints';
+import type { DriverResults, SSR_ResultsEntry } from 'ir-endpoints-types';
 import { getSubsessionName } from '@/utils/session-utils';
 
 export type ResultsTableModel = {

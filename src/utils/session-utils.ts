@@ -1,5 +1,5 @@
 import { getLeagueSimsessionIndex } from './fetch-util';
-import type { SeasonSimsessionIndex } from '@/iracing-endpoints';
+import type { SeasonSimsessionIndex } from 'ir-endpoints-types';
 
 const _subsessionNames: { [name: string]: string } = {};
 export async function getSubsessionName(

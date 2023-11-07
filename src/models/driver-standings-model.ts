@@ -5,7 +5,7 @@ import type {
     CuratedLeagueTeamsInfo,
     CLTI_Team,
     DriverStatsMap,
-} from '../iracing-endpoints';
+} from 'ir-endpoints-types';
 
 import {
     getMemberViewFromM_Memeber,

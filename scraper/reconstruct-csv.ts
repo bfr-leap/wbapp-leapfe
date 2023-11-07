@@ -1,6 +1,6 @@
 import { reconstructEpochTelemetry } from './telemetry/epoch-reconstruction.js';
 import { getLapChartData } from './iracing/iracing-scraped-data-loader.js';
-import { LapChartData } from '../src/iracing-endpoints.js';
+import { LapChartData } from 'ir-endpoints-types';
 
 import { getSubsessionTelemetry } from './iracing/iracing-scraped-data-loader.js';
 

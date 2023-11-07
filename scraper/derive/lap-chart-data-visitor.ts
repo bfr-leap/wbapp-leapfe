@@ -15,7 +15,7 @@ import {
     LeagueSeasonSessions,
     LSS_Session,
     LS_SeasonSummary,
-} from '../../src/iracing-endpoints.js';
+} from 'ir-endpoints-types';
 
 import {
     getLeagueSeasons,

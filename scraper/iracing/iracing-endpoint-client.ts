@@ -14,7 +14,7 @@ import type {
     LeagueSeasonSessions,
     LapChartData,
     MembersData,
-} from '../../src/iracing-endpoints';
+} from 'ir-endpoints-types';
 
 export async function getLeagueDirectory(
     restrictToMember: boolean

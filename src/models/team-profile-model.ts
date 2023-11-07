@@ -2,7 +2,7 @@ import {
     getCuratedLeagueTeamsInfo,
     getLeagueDriverStats,
 } from '@/utils/fetch-util';
-import type { DriverStats } from '@/iracing-endpoints';
+import type { DriverStats } from 'ir-endpoints-types';
 
 export interface TeamProfileModel {
     stats: DriverStats;

@@ -1,4 +1,4 @@
-import type { ST_DriverTelemetry, ST_LapTelemetry } from '@/iracing-endpoints';
+import type { ST_DriverTelemetry, ST_LapTelemetry } from 'ir-endpoints-types';
 import { getSimsessionDriverTelemetry } from '@/utils/fetch-util';
 
 function getIdealLap(t: ST_DriverTelemetry): number {

@@ -1,4 +1,4 @@
-import type { TS_RecordTable } from '@/iracing-endpoints';
+import type { TS_RecordTable } from 'ir-endpoints-types';
 import { getSingleMemberData } from '@/utils/fetch-util';
 
 export type GenericTableModel = {

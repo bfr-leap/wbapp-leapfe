@@ -15,7 +15,7 @@ import {
     ST_SimsessionTelemetry,
     SimsessionResults,
     ST_TelemetryDatum,
-} from '../../src/iracing-endpoints.js';
+} from 'ir-endpoints-types';
 
 function clone(obj: any): any {
     return JSON.parse(JSON.stringify(obj));

@@ -12,7 +12,7 @@
 import { reconstructEpochTelemetry } from './telemetry/epoch-reconstruction.js';
 import { getLapChartData } from './iracing/iracing-scraped-data-loader.js';
 import { getSimSessionResults } from './iracing/iracing-derived-data-loader.js';
-import { LapChartData, SimsessionResults } from '../src/iracing-endpoints.js';
+import { LapChartData, SimsessionResults } from 'ir-endpoints-types';
 import { createCompletion } from './openai/openai-endpoints.js';
 import { detectOvertakes } from './telemetry/overtake-detection.js';
 import { getCameraScript } from './telemetry/camera-direction.js';

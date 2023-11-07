@@ -1,4 +1,4 @@
-import type { LapChartData, LCD_Chunk } from '../iracing-endpoints';
+import type { LapChartData, LCD_Chunk } from 'ir-endpoints-types';
 import { getLapChartData } from '@/utils/fetch-util';
 import type { SeriesXY } from '@/models/line-chart-model';
 

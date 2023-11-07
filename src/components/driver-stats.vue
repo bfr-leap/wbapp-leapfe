@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
 import ResultsTable from './results-table.vue';
-import type { DriverStats, DriverResults } from '../iracing-endpoints';
+import type { DriverStats, DriverResults } from 'ir-endpoints-types';
 import BarChart from '@/components/bar-chart.vue';
 import HLBarChart from './hl-bar-chart.vue';
 import { ref, watchEffect } from 'vue';

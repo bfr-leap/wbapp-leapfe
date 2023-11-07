@@ -13,7 +13,7 @@ import {
     SeasonSimsessionIndex,
     SSI_Session,
     SSI_Simsession,
-} from '../../src/iracing-endpoints.js';
+} from 'ir-endpoints-types';
 import {
     getLapChartData,
     getLeagueSeasons,

@@ -5,7 +5,7 @@ import {
     getTelemetrySubsessionIds,
 } from '@/utils/fetch-util';
 import { getBestLaps } from '@/utils/telemetry-util';
-import type { ST_LapTelemetry } from '@/iracing-endpoints';
+import type { ST_LapTelemetry } from 'ir-endpoints-types';
 
 export interface BestQualifyLapChartModel {
     lapTimes: SeriesXY[];

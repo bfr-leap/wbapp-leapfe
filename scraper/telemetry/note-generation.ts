@@ -17,7 +17,7 @@ import {
 import {
     LapChartData,
     SimsessionResults,
-} from '../../src/iracing-endpoints.js';
+} from 'ir-endpoints-types';
 import { createCompletion } from '../openai/openai-endpoints.js';
 
 async function shortenNarrative(notes: ReplayNote[]) {

@@ -12,7 +12,7 @@ import {
     LCD_Chunk,
     SimsessionResults,
     SSR_ResultsEntry,
-} from '../../src/iracing-endpoints';
+} from 'ir-endpoints-types';
 
 export const RACE_SPRINT_THRESHOLD = 15;
 

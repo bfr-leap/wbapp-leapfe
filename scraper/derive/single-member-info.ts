@@ -9,7 +9,7 @@
  *
  */
 
-import { M_Member } from '../../src/iracing-endpoints.js';
+import { M_Member } from 'ir-endpoints-types';
 import {
     getLeagueSeasons,
     getMembersData,

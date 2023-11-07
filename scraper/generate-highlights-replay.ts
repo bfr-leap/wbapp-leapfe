@@ -16,7 +16,7 @@ import {
 } from './iracing/iracing-scraped-data-loader.js';
 
 import { getSimSessionResults } from './iracing/iracing-derived-data-loader.js';
-import { SimsessionResults, LapChartData } from '../src/iracing-endpoints.js';
+import { SimsessionResults, LapChartData } from 'ir-endpoints-types';
 import type {
     EpochTelemetry,
     ReplayNote,

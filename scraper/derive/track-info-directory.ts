@@ -16,7 +16,7 @@ import {
     LSS_Session,
     LapChartData,
     TrackInfoDirectory,
-} from '../../src/iracing-endpoints';
+} from 'ir-endpoints-types';
 import { acceptLapChartDataVisitor } from './lap-chart-data-visitor.js';
 import { wf } from './file-writer.js';
 

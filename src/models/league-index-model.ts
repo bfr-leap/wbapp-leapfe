@@ -5,7 +5,7 @@ import {
     getLeagueSimsessionIndex,
     getCuratedActiveLeagueSchedule,
 } from '@/utils/fetch-util';
-import type { SeasonSimsessionIndex } from '../iracing-endpoints';
+import type { SeasonSimsessionIndex } from 'ir-endpoints-types';
 
 export interface LeagueIndexModel {
     leagueOptions: DropdownModel;
