@@ -7,3 +7,9 @@
 [submodule "public/data/ldata-rsltsts"]
 	path = public/data/ldata-rsltsts
 	url = https://github.com/bfr-leap/ldata-rsltsts.git
+[submodule "public/data/ldata-usrcfg"]
+	path = public/data/ldata-usrcfg
+	url = https://github.com/bfr-leap/ldata-usrcfg.git
+[submodule "public/data/ldata-gentxt"]
+	path = public/data/ldata-gentxt
+	url = https://github.com/bfr-leap/ldata-gentxt.git

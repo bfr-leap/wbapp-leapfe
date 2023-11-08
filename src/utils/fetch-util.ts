@@ -187,7 +187,7 @@ export async function getTelemetrySubsessionIds(
 
 export async function getCuratedActiveLeagueSchedule(): Promise<ActiveLeagueSchedule> {
     return await fetchCachedObject<ActiveLeagueSchedule>(
-        `./data/curated/activeLeagueSchedule.json`
+        `./data/ldata-usrcfg/activeLeagueSchedule.json`
     );
 }
 
@@ -195,13 +195,13 @@ export async function getCuratedLeagueTeamsInfo(
     leagueId: string
 ): Promise<CuratedLeagueTeamsInfo> {
     return await fetchCachedObject<CuratedLeagueTeamsInfo>(
-        `./data/curated/leagueTeamsInfo_${leagueId}.json`
+        `./data/ldata-usrcfg/leagueTeamsInfo/${leagueId}.json`
     );
 }
 
 export async function getCuratedTrackDisplayInfo(): Promise<CuratedTrackDisplayhInfo> {
     return await fetchCachedObject<CuratedTrackDisplayhInfo>(
-        './data/curated/trackDisplayInfo.json'
+        './data/ldata-usrcfg/trackDisplayInfo.json'
     );
 }
 
@@ -210,6 +210,6 @@ export async function getGeneratedSimsessionSummary(
     simsessionNumber: number
 ): Promise<GeneratedSimsessionSummary> {
     return await fetchCachedObject<GeneratedSimsessionSummary>(
-        `./data/generated/simsessionSummary_${subsessionId}_${simsessionNumber}.json`
+        `./data/ldata-gentxt/simsessionSummary/${subsessionId}/${simsessionNumber}.json`
     );
 }
