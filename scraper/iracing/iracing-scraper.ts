@@ -21,17 +21,17 @@ import { getLapChartData as getLapChartDataCached } from './iracing-scraped-data
 import { writeFileSync, existsSync, mkdirSync } from 'fs';
 
 function wf(obj: any, name: string) {
-    writeFileSync(`./public/data/scraped/${name}`, JSON.stringify(obj));
+    const ids = name.split('.')[0].split('_');
+    const path = `./public/data/ldata-irweb/${ids.join('/')}/`;
+    if (!existsSync(path)) {
+        mkdirSync(path, { recursive: true });
+    }
+    let newName = ids[ids.length - 1];
+    if (newName.startsWith('-')) {
+        newName = 'n' + newName.slice(1);
+    }
+    writeFileSync(`${path}${newName}.json`, JSON.stringify(obj));
 }
-
-// function wf(obj: any, name: string) {
-//     const ids = name.split('.')[0].split('_');
-//     const path = `./public/data/scraped/${ids.join('/')}/`;
-//     if (!existsSync(path)) {
-//         mkdirSync(path, { recursive: true });
-//     }
-//     writeFileSync(`${path}${ids[ids.length - 1]}.json`, JSON.stringify(obj));
-// }
 
 export async function scrapeLeague(leagueId: number) {
     console.log('scrapeLeague: ', leagueId);

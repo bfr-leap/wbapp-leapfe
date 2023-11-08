@@ -9,13 +9,9 @@
 
 import { writeFileSync, existsSync, mkdirSync } from 'fs';
 
-// export function wf(obj: any, name: string) {
-//     writeFileSync(`./public/data/derived/${name}`, JSON.stringify(obj));
-// }
-
 export function wf(obj: any, name: string) {
     const ids = name.split('.')[0].split('_');
-    const path = `./public/data/derived/${ids.join('/')}/`;
+    const path = `./public/data/ldata-rsltsts/${ids.join('/')}/`;
     if (!existsSync(path)) {
         mkdirSync(path, { recursive: true });
     }

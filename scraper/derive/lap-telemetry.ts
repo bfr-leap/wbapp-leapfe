@@ -13,8 +13,7 @@ import { readFileSync } from 'fs';
 
 import { wf } from './file-writer.js';
 
-const TELEMETRY_MNT_PT = './public/data/scraped/telemetry/';
-const CURATED_MNT_PT = './public/data/curated//';
+const TELEMETRY_MNT_PT = './public/data/ldata-irrpy/';
 
 interface ST_TelemetryDatum {
     perc: number;
@@ -60,22 +59,31 @@ function rectifyLapEnds(subsession: SubsessionTelemetry) {
 
 function loadTelemetrySubsessionIds(leagueId: number): number[] {
     let ids = <number[]>JSON.parse(
-        readFileSync(`${CURATED_MNT_PT}telemetrySubsessions_${leagueId}.json`, {
-            encoding: 'utf8',
-            flag: 'r',
-        })
+        readFileSync(
+            `${TELEMETRY_MNT_PT}telemetrySubsessions/${leagueId}.json`,
+            {
+                encoding: 'utf8',
+                flag: 'r',
+            }
+        )
     );
 
     return ids;
 }
 
-function loadSubsessionTelemetry(subsessionId: number): SubsessionTelemetry {
+function loadSubsessionTelemetry(
+    leagueId: number,
+    subsessionId: number
+): SubsessionTelemetry {
     console.log(`loading telemetry for subsession ${subsessionId}`);
     let telem = <SubsessionTelemetry>JSON.parse(
-        readFileSync(`${TELEMETRY_MNT_PT}${subsessionId}.json`, {
-            encoding: 'utf8',
-            flag: 'r',
-        })
+        readFileSync(
+            `${TELEMETRY_MNT_PT}telemetryScans/${leagueId}/${subsessionId}.json`,
+            {
+                encoding: 'utf8',
+                flag: 'r',
+            }
+        )
     );
 
     return telem;
@@ -84,12 +92,12 @@ function loadSubsessionTelemetry(subsessionId: number): SubsessionTelemetry {
 export function deriveLeagueLapTelemetry(leagueId: number) {
     let subsessions = loadTelemetrySubsessionIds(leagueId);
     for (let subsession of subsessions) {
-        deriveSubsessionLapTelemetry(subsession);
+        deriveSubsessionLapTelemetry(leagueId, subsession);
     }
 }
 
-function deriveSubsessionLapTelemetry(subssesionId: number) {
-    let telem = loadSubsessionTelemetry(subssesionId);
+function deriveSubsessionLapTelemetry(leagueId: number, subssesionId: number) {
+    let telem = loadSubsessionTelemetry(leagueId, subssesionId);
 
     rectifyLapEnds(telem);
 
