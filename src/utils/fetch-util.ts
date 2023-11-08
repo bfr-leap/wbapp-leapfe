@@ -18,6 +18,10 @@ import type {
     GeneratedSimsessionSummary,
 } from 'ir-endpoints-types';
 
+function nNums(n: string): string {
+    return n.toString().replace('-', 'n');
+}
+
 async function fetchObjects(urls: string[]): Promise<any[]> {
     try {
         let objs = await Promise.all(
@@ -78,7 +82,9 @@ export async function getSimsessionResults(
     simsessionNumber: string
 ): Promise<SimsessionResults> {
     return await fetchCachedObject<SimsessionResults>(
-        `./data/ldata-rsltsts/simSessionResults/${subsessionId}/${simsessionNumber}.json`
+        `./data/ldata-rsltsts/simSessionResults/${subsessionId}/${nNums(
+            simsessionNumber
+        )}.json`
     );
 }
 
@@ -122,7 +128,9 @@ export async function getSimsessionDriverTelemetry(
     driver: string
 ): Promise<ST_DriverTelemetry> {
     return await fetchCachedObject<ST_DriverTelemetry>(
-        `./data/ldata-rsltsts/simsessionDriverTelemetry/${subssesion}/${simsession}/${driver}.json`
+        `./data/ldata-rsltsts/simsessionDriverTelemetry/${subssesion}/${nNums(
+            simsession
+        )}/${driver}.json`
     );
 }
 
@@ -163,7 +171,9 @@ export async function getLapChartData(
     simsession: string
 ): Promise<LapChartData> {
     return await fetchCachedObject<LapChartData>(
-        `./data/ldata-irweb/lapChartData/${subsession}/${simsession}.json`
+        `./data/ldata-irweb/lapChartData/${subsession}/${nNums(
+            simsession
+        )}.json`
     );
 }
 
