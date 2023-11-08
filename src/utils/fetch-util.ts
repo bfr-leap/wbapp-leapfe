@@ -51,7 +51,7 @@ async function fetchCachedObject<T>(source: string): Promise<T> {
 
 export async function getSingleMemberData(custId: string): Promise<M_Member> {
     return await fetchCachedObject<M_Member>(
-        `./data/derived/singleMemberData_${custId}.json`
+        `./data/ldata-rsltsts/singleMemberData/${custId}.json`
     );
 }
 
@@ -61,7 +61,7 @@ export async function getTrackStats(
     trackId: string
 ): Promise<TrackStats> {
     return await fetchCachedObject<TrackStats>(
-        `./data/derived/trackResults_${leagueId}_${carId}_${trackId}.json`
+        `./data/ldata-rsltsts/trackResults/${leagueId}/${carId}/${trackId}.json`
     );
 }
 
@@ -69,16 +69,7 @@ export async function getTrackInfoDirectory(
     leagueId: string
 ): Promise<TrackInfoDirectory> {
     return await fetchCachedObject<TrackInfoDirectory>(
-        `./data/derived/trackInfoDirectory_${leagueId}.json`
-    );
-}
-
-export async function getLeagueSeasonSessions(
-    leagueId: string,
-    seasonId: string
-): Promise<LeagueSeasonSessions> {
-    return await fetchCachedObject<LeagueSeasonSessions>(
-        `./data/scraped/leagueSeasonSessions_${leagueId}_${seasonId}.json`
+        `./data/ldata-rsltsts/trackInfoDirectory/${leagueId}.json`
     );
 }
 
@@ -87,7 +78,7 @@ export async function getSimsessionResults(
     simsessionNumber: string
 ): Promise<SimsessionResults> {
     return await fetchCachedObject<SimsessionResults>(
-        `./data/derived/simSessionResults_${subsessionId}_${simsessionNumber}.json`
+        `./data/ldata-rsltsts/simSessionResults/${subsessionId}/${simsessionNumber}.json`
     );
 }
 
@@ -95,27 +86,7 @@ export async function getLeagueSimsessionIndex(
     leagueId: string
 ): Promise<SeasonSimsessionIndex[]> {
     return await fetchCachedObject<SeasonSimsessionIndex[]>(
-        `./data/derived/leagueSimsessionIndex_${leagueId}.json`
-    );
-}
-
-export async function getLeagueSeasons(
-    leagueId: string
-): Promise<LeagueSeasons> {
-    return await fetchCachedObject<LeagueSeasons>(
-        `./data/scraped/leagueSeasons_${leagueId}.json`
-    );
-}
-
-export async function getCuratedBlockedSeasons(): Promise<BlockedSeasons> {
-    return await fetchCachedObject<BlockedSeasons>(
-        `./data/curated/blockedSeasons.json`
-    );
-}
-
-export async function getCuratedActiveLeagueSchedule(): Promise<ActiveLeagueSchedule> {
-    return await fetchCachedObject<ActiveLeagueSchedule>(
-        `./data/curated/activeLeagueSchedule.json`
+        `./data/ldata-rsltsts/leagueSimsessionIndex/${leagueId}.json`
     );
 }
 
@@ -123,32 +94,7 @@ export async function getLeagueDriverStats(
     leagueId: string
 ): Promise<{ [name: number]: DriverStatsMap }> {
     return await fetchCachedObject<{ [name: number]: DriverStatsMap }>(
-        `./data/derived/leagueDriverStats_${leagueId}.json`
-    );
-}
-
-export async function getCuratedLeagueTeamsInfo(
-    leagueId: string
-): Promise<CuratedLeagueTeamsInfo> {
-    return await fetchCachedObject<CuratedLeagueTeamsInfo>(
-        `./data/curated/leagueTeamsInfo_${leagueId}.json`
-    );
-}
-
-export async function getMembersData(
-    leagueId: string,
-    seasonId: string
-): Promise<MembersData> {
-    return await fetchCachedObject<MembersData>(
-        `./data/scraped/membersData_${leagueId}_${seasonId}.json`
-    );
-}
-
-export async function getSeasonSimsessionIndex(
-    leagueId: string
-): Promise<SeasonSimsessionIndex[]> {
-    return await fetchCachedObject<SeasonSimsessionIndex[]>(
-        `./data/derived/leagueSimsessionIndex_${leagueId}.json`
+        `./data/ldata-rsltsts/leagueDriverStats/${leagueId}.json`
     );
 }
 
@@ -158,16 +104,15 @@ export async function getDriverResults(
     sessionType: 'race' | 'sprint' | 'quali'
 ): Promise<DriverResults> {
     return await fetchCachedObject<DriverResults>(
-        `./data/derived/driverSessionResults_${leagueId}_${sessionType}_${driverId}.json`
+        `./data/ldata-rsltsts/driverSessionResults/${leagueId}/${sessionType}/${driverId}.json`
     );
 }
 
-export async function getLapChartData(
-    subsession: string,
-    simsession: string
-): Promise<LapChartData> {
-    return await fetchCachedObject<LapChartData>(
-        `./data/scraped/lapChartData_${subsession}_${simsession}.json`
+export async function getSeasonSimsessionIndex(
+    leagueId: string
+): Promise<SeasonSimsessionIndex[]> {
+    return await fetchCachedObject<SeasonSimsessionIndex[]>(
+        `./data/ldata-rsltsts/leagueSimsessionIndex/${leagueId}.json`
     );
 }
 
@@ -177,7 +122,48 @@ export async function getSimsessionDriverTelemetry(
     driver: string
 ): Promise<ST_DriverTelemetry> {
     return await fetchCachedObject<ST_DriverTelemetry>(
-        `./data/derived/simsessionDriverTelemetry_${subssesion}_${simsession}_${driver}.json`
+        `./data/ldata-rsltsts/simsessionDriverTelemetry/${subssesion}/${simsession}/${driver}.json`
+    );
+}
+
+export async function getLeagueSeasonSessions(
+    leagueId: string,
+    seasonId: string
+): Promise<LeagueSeasonSessions> {
+    return await fetchCachedObject<LeagueSeasonSessions>(
+        `./data/ldata-irweb/leagueSeasonSessions/${leagueId}/${seasonId}.json`
+    );
+}
+
+export async function getLeagueSeasons(
+    leagueId: string
+): Promise<LeagueSeasons> {
+    return await fetchCachedObject<LeagueSeasons>(
+        `./data/ldata-irweb/leagueSeasons/${leagueId}.json`
+    );
+}
+
+export async function getCuratedBlockedSeasons(): Promise<BlockedSeasons> {
+    return await fetchCachedObject<BlockedSeasons>(
+        `./data/ldata-irweb/blockedSeasons.json`
+    );
+}
+
+export async function getMembersData(
+    leagueId: string,
+    seasonId: string
+): Promise<MembersData> {
+    return await fetchCachedObject<MembersData>(
+        `./data/ldata-irweb/membersData/${leagueId}/${seasonId}.json`
+    );
+}
+
+export async function getLapChartData(
+    subsession: string,
+    simsession: string
+): Promise<LapChartData> {
+    return await fetchCachedObject<LapChartData>(
+        `./data/ldata-irweb/lapChartData/${subsession}/${simsession}.json`
     );
 }
 
@@ -185,7 +171,21 @@ export async function getTelemetrySubsessionIds(
     league: string
 ): Promise<number[]> {
     return await fetchCachedObject<number[]>(
-        `./data/curated/telemetrySubsessions_${league}.json`
+        `./data/ldata-irrpy/telemetrySubsessions/${league}.json`
+    );
+}
+
+export async function getCuratedActiveLeagueSchedule(): Promise<ActiveLeagueSchedule> {
+    return await fetchCachedObject<ActiveLeagueSchedule>(
+        `./data/curated/activeLeagueSchedule.json`
+    );
+}
+
+export async function getCuratedLeagueTeamsInfo(
+    leagueId: string
+): Promise<CuratedLeagueTeamsInfo> {
+    return await fetchCachedObject<CuratedLeagueTeamsInfo>(
+        `./data/curated/leagueTeamsInfo_${leagueId}.json`
     );
 }
 
