@@ -12,15 +12,17 @@ import { readFileSync } from 'fs';
 
 import type { SimsessionResults } from 'ir-endpoints-types';
 
-const MNT_PT = './public/data/derived/';
+const MNT_PT = './public/data/ldata-rsltsts/';
 
 export function getSimSessionResults(
     subsessionId: number,
     simsessionNumber: number
 ): SimsessionResults {
+    let simsessionStr =
+        simsessionNumber < 0 ? `n${-simsessionNumber}` : `${simsessionNumber}`;
     let ret: SimsessionResults = <SimsessionResults>JSON.parse(
         readFileSync(
-            `${MNT_PT}simSessionResults_${subsessionId}_${simsessionNumber}.json`,
+            `${MNT_PT}simSessionResults/${subsessionId}/${simsessionStr}.json`,
             {
                 encoding: 'utf8',
                 flag: 'r',

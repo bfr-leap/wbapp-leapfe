@@ -7,8 +7,21 @@
  *
  */
 
-import { writeFileSync } from 'fs';
+import { writeFileSync, existsSync, mkdirSync } from 'fs';
+
+// export function wf(obj: any, name: string) {
+//     writeFileSync(`./public/data/derived/${name}`, JSON.stringify(obj));
+// }
 
 export function wf(obj: any, name: string) {
-    writeFileSync(`./public/data/derived/${name}`, JSON.stringify(obj));
+    const ids = name.split('.')[0].split('_');
+    const path = `./public/data/derived/${ids.join('/')}/`;
+    if (!existsSync(path)) {
+        mkdirSync(path, { recursive: true });
+    }
+    let newName = ids[ids.length - 1];
+    if (newName.startsWith('-')) {
+        newName = 'n' + newName.slice(1);
+    }
+    writeFileSync(`${path}${newName}.json`, JSON.stringify(obj));
 }

@@ -19,7 +19,7 @@ import type {
     SubsessionTelemetry,
 } from 'ir-endpoints-types';
 
-const MNT_PT = './public/data/scraped/';
+const MNT_PT = './public/data/ldata-irweb/';
 
 export function getLeagueDirectory(): LeagueDirectory {
     let ret: LeagueDirectory = <LeagueDirectory>JSON.parse(
@@ -34,7 +34,7 @@ export function getLeagueDirectory(): LeagueDirectory {
 
 export function getLeagueSeasons(leagueId: number): LeagueSeasons {
     let ret: LeagueSeasons = <LeagueSeasons>JSON.parse(
-        readFileSync(`${MNT_PT}leagueSeasons_${leagueId}.json`, {
+        readFileSync(`${MNT_PT}leagueSeasons/${leagueId}.json`, {
             encoding: 'utf8',
             flag: 'r',
         })
@@ -49,7 +49,7 @@ export function getLeagueSeasonSessions(
 ): LeagueSeasonSessions {
     let ret: LeagueSeasonSessions = <LeagueSeasonSessions>JSON.parse(
         readFileSync(
-            `${MNT_PT}leagueSeasonSessions_${leagueId}_${seasonId}.json`,
+            `${MNT_PT}leagueSeasonSessions/${leagueId}/${seasonId}.json`,
             {
                 encoding: 'utf8',
                 flag: 'r',
@@ -64,9 +64,11 @@ export function getLapChartData(
     subsessionId: number,
     simsessionNumber: number
 ): LapChartData {
+    let simsessionStr =
+        simsessionNumber < 0 ? `n${-simsessionNumber}` : `${simsessionNumber}`;
     let ret: LapChartData = <LapChartData>JSON.parse(
         readFileSync(
-            `${MNT_PT}lapChartData_${subsessionId}_${simsessionNumber}.json`,
+            `${MNT_PT}lapChartData/${subsessionId}/${simsessionStr}.json`,
             {
                 encoding: 'utf8',
                 flag: 'r',
@@ -82,7 +84,7 @@ export function getMembersData(
     seasonId: number
 ): MembersData {
     let ret: MembersData = <MembersData>JSON.parse(
-        readFileSync(`${MNT_PT}membersData_${leagueId}_${seasonId}.json`, {
+        readFileSync(`${MNT_PT}membersData/${leagueId}/${seasonId}.json`, {
             encoding: 'utf8',
             flag: 'r',
         })
@@ -95,7 +97,7 @@ export function getSubsessionTelemetry(
     subsessionId: number
 ): SubsessionTelemetry {
     let ret: SubsessionTelemetry = <SubsessionTelemetry>JSON.parse(
-        readFileSync(`${MNT_PT}telemetry/${subsessionId}.json`, {
+        readFileSync(`${MNT_PT}../irrpy/${subsessionId}.json`, {
             encoding: 'utf8',
             flag: 'r',
         })

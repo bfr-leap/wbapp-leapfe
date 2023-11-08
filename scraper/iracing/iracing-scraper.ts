@@ -10,7 +10,6 @@
  */
 
 import {
-    getLeagueDirectory,
     getLeagueSeasons,
     getLeagueSeasonSessions,
     getLapChartData,
@@ -19,11 +18,20 @@ import {
 
 import { getLapChartData as getLapChartDataCached } from './iracing-scraped-data-loader.js';
 
-import { writeFileSync } from 'fs';
+import { writeFileSync, existsSync, mkdirSync } from 'fs';
 
 function wf(obj: any, name: string) {
     writeFileSync(`./public/data/scraped/${name}`, JSON.stringify(obj));
 }
+
+// function wf(obj: any, name: string) {
+//     const ids = name.split('.')[0].split('_');
+//     const path = `./public/data/scraped/${ids.join('/')}/`;
+//     if (!existsSync(path)) {
+//         mkdirSync(path, { recursive: true });
+//     }
+//     writeFileSync(`${path}${ids[ids.length - 1]}.json`, JSON.stringify(obj));
+// }
 
 export async function scrapeLeague(leagueId: number) {
     console.log('scrapeLeague: ', leagueId);
