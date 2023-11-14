@@ -170,6 +170,26 @@ const memberView = computed(() => {
     background-image: url(/flags/canada.png);
 }
 
+.club-39 {
+    background-image: url(/flags/france.png);
+}
+
+.club-24 {
+    background-image: url(/flags/hispanoamerica.jpg);
+}
+
+.club-48 {
+    background-image: url(/flags/japan.jpg);
+}
+
+.club-19 {
+    background-image: url(/flags/usa.png);
+}
+
+.club-47 {
+    background-image: url(/flags/asia.jpg);
+}
+
 .club-50 {
     background-image: url(/flags/southafrica.png);
 }
