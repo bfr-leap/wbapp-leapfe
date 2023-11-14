@@ -33,7 +33,7 @@ export async function getPastEventCardsModel(
 
     let leagueSeasonSessions = await getLeagueSeasonSessions(league, season);
 
-    for (let session of leagueSeasonSessions?.sessions) {
+    for (let session of leagueSeasonSessions?.sessions || []) {
         if (session?.subsession_id) {
             ret.pastRaces.push({
                 trackId: session.track.track_id.toString(),

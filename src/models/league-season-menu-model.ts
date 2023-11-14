@@ -27,7 +27,7 @@ export async function getLeagueSeasonMenuModel(
 ): Promise<LeagueSeasonMenuModel> {
     let ret = getDefaultLeagueSeasonMenuModel();
 
-    if (!league) {
+    if (!league || '0' === league) {
         return ret;
     }
 

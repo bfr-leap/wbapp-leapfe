@@ -42,7 +42,7 @@ export async function getSessionStats(
             simsessionId.toString()
         );
 
-        for (let result of results.results) {
+        for (let result of results?.results || []) {
             uidSet[result.cust_id] = true;
             raceNumberOfLaps += result.laps_completed;
             raceIncidentCount += result.incidents;
@@ -72,7 +72,7 @@ export async function getSimsessions(
     );
 
     let selectedSubsession = selectedSeason?.sessions.find(
-        (s) => s.subsession_id.toString() === subsessionId
+        (s) => s.subsession_id?.toString() || '-1' === subsessionId
     );
 
     let r: number[] = [];

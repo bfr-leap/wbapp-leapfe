@@ -110,6 +110,10 @@ export async function getSeasonProfileModel(
                 session.track.track_id;
                 session.launch_at;
 
+                if (!session.subsession_id) {
+                    session.subsession_id = -1;
+                }
+
                 let sessionStats = await getSessionStats(
                     leagueId,
                     seasonId,
