@@ -5,12 +5,6 @@
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "scrape": "ts-node scraper/scrape-data.ts",
-    "highlights": "ts-node scraper/generate-highlights-replay.ts",
-    "commentary": "ts-node scraper/generate-race-commentary-replay.ts",
-    "reconstruct-csv": "ts-node scraper/reconstruct-csv.ts > out.txt",
-    "derive": "ts-node scraper/update-derived-data.ts",
-    "gpt": "ts-node scraper/generate-summary-article.ts",
     "dev": "vite",
     "buildVite": "run-p type-check build-only",
     "preview": "vite preview",
