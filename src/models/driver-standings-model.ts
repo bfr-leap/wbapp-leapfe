@@ -133,7 +133,7 @@ export async function getDriverStandingsModel(
                     _driverStatsMap[_seasonId][a.cust_id].power_points
                   : (getRoadLicense(b.licenses).irating | 0) -
                     (getRoadLicense(a.licenses).irating | 0)
-          )
+          ) || []
         : [];
 
     let ret: DriverStandingsModel = getDefaultStandingsModel();
