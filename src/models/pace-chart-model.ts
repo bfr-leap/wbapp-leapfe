@@ -41,7 +41,7 @@ export async function getPaceChartModel(
 
     let telemetrySubsessionIds = await getTelemetrySubsessionIds(league);
     let telemetryAvailable =
-        -1 !== telemetrySubsessionIds.indexOf(parseInt(subsession, 10));
+        -1 !== (telemetrySubsessionIds?.indexOf(parseInt(subsession, 10)) || -1);
     let simsessionResults = await getSimsessionResults(subsession, simsession);
     let driverNameMaps: { [name: number]: string } = {};
 
