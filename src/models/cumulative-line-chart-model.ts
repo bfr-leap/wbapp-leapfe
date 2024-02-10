@@ -16,7 +16,10 @@ export function getCumulativeLineChartModel(
     series: SeriesXY[]
 ): CumulativeLineChartModel {
     let ret = getDefaultCumulativeLineChartModel();
+    series = series.filter( s => s.data.length >= 1);
     const seriesAndDelta = getSeriesDeltas(series);
+
+    console.log(series);
 
     const baseLine = seriesAndDelta.baselineTime;
 
@@ -28,8 +31,8 @@ export function getCumulativeLineChartModel(
         return getDefaultCumulativeLineChartModel();
     }
 
-    ret.yRange[0] = ret.seriesOut[0].data[0].y;
-    ret.yRange[1] = ret.seriesOut[0].data[0].y;
+    ret.yRange[0] = ret.seriesOut[0].data[0]?.y || 1;
+    ret.yRange[1] = ret.seriesOut[0].data[0]?.y || 1;
 
     let lapNum = (ret.seriesOut[0].data.length = ret.seriesOut[0].data.length);
 
