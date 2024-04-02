@@ -7,7 +7,7 @@ function getIdealLap(t: ST_DriverTelemetry): number {
     let s2Times: number[] = [];
     let s3Times: number[] = [];
 
-    for (let lap of t.laps) {
+    for (let lap of t?.laps || []) {
         let startT = lap.telemetry[0].t;
         let endT = lap.telemetry[lap.telemetry.length - 1].t;
 
@@ -54,7 +54,7 @@ function getBestLap(t: ST_DriverTelemetry): ST_LapTelemetry {
     };
     let fastest = Infinity;
 
-    for (let lap of t.laps) {
+    for (let lap of t?.laps || []) {
         let startT = lap.telemetry[0].t;
         let endT = lap.telemetry[lap.telemetry.length - 1].t;
 
