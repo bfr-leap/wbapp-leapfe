@@ -8,6 +8,7 @@ import DriverView from '@/components/driver-view.vue';
 import TeamView from '../components/team-view.vue';
 import TrackResultsView from '../components/track-results-view.vue';
 import NextEventTimerEmbed from '@/components/next-event-timer-embed.vue';
+import SubsessionSummaryEmbed from '@/components/subsession-summary-embed.vue';
 import SeasonProfile from '@/components/season-profile.vue';
 import { watch } from 'vue';
 import mixpanel from 'mixpanel-browser';
@@ -25,13 +26,12 @@ watch(() => route.params, track);
 <template>
     <HomeView v-if="!route.query.m"></HomeView>
     <ResultsView v-if="route.query.m === 'results'"></ResultsView>
-    <DriverStandingsView
-        v-if="route.query.m === 'standings'"
-    ></DriverStandingsView>
+    <DriverStandingsView v-if="route.query.m === 'standings'"></DriverStandingsView>
     <DriverView v-if="route.query.m === 'driver'"></DriverView>
     <TeamView v-if="route.query.m === 'team'"></TeamView>
     <TrackResultsView v-if="route.query.m === 'track'"></TrackResultsView>
-    <SeasonProfile v-if="route.query.m === 'season'" />
+    <SeasonProfile v-if="route.query.m === 'season'"></SeasonProfile>
 
-    <NextEventTimerEmbed v-if="route.query.m === 'nextEventTimerEmbed'" />
+    <NextEventTimerEmbed v-if="route.query.m === 'nextEventTimerEmbed'"></NextEventTimerEmbed>
+    <SubsessionSummaryEmbed v-if="route.query.m === 'subsessionSummaryEmbed'"></SubsessionSummaryEmbed>
 </template>
