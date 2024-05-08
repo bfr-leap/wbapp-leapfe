@@ -99,7 +99,7 @@ export async function getLeagueIndexModel(
         }
     }
 
-    for (let subsessionIt of selectedSeason.sessions) {
+    for (let subsessionIt of selectedSeason.sessions.filter(v => v.subsession_id)) {
         ret.subsessionOptions.options.push({
             display: subsessionIt.session_title,
             href: `?m=results&league=${leagueId}&season=${selectedSeason.season_id}&subsession=${subsessionIt.subsession_id}&simsession=${subsessionIt.simsessions[0]?.simsession_id}`,

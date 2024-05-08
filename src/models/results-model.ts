@@ -80,7 +80,7 @@ export async function getResultsModel(
     }
 
     let selectedSubsession = selectedSeason?.sessions.find(
-        (s) => s.subsession_id.toString() === subsessionId
+        (s) => s?.subsession_id?.toString() === subsessionId
     );
 
     let i = selectedSeason.sessions.length - 1;
