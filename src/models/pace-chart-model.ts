@@ -1,10 +1,8 @@
 import {
-    getSingleMemberData,
-    getSimsessionResults,
     getTelemetrySubsessionIds,
+    getPacePercentChartData,
+    getPacePercentVsIdealLapChartData
 } from '@/utils/fetch-util';
-
-import { getIdealLaps } from '@/utils/telemetry-util';
 
 export interface PaceChartModel {
     title: string;
@@ -42,42 +40,25 @@ export async function getPaceChartModel(
     let telemetrySubsessionIds = await getTelemetrySubsessionIds(league);
     let telemetryAvailable =
         -1 !== (telemetrySubsessionIds?.indexOf(parseInt(subsession, 10)) || -1);
-    let simsessionResults = await getSimsessionResults(subsession, simsession);
-    let driverNameMaps: { [name: number]: string } = {};
-
-    for (let r of simsessionResults.results) {
-        driverNameMaps[r.cust_id] = (
-            await getSingleMemberData(r.cust_id.toString())
-        ).display_name;
-    }
-
-    let fastest = simsessionResults.results[0].fastest_lap_time / 10000;
-
-    let idealLaps: number[] = [];
 
     if (telemetryAvailable) {
-        idealLaps = await getIdealLaps(
-            subsession,
-            simsession,
-            simsessionResults.results.map((v) => v.cust_id.toString())
-        );
-
-        ret.title = 'Pace Percent vs Ideal Lap';
+        let x = await getPacePercentVsIdealLapChartData(league, subsession, simsession);
+        ret.barChartData = x.map(v => {
+            return {
+                name: <string>v['name'],
+                value: <number>v['pace'],
+                value2: <number>v['ideal']
+            };
+        });
+    } else {
+        let x = await getPacePercentChartData(league, subsession, simsession);
+        ret.barChartData = x.map(v => {
+            return {
+                name: <string>v['name'],
+                value: <number>v['pace']
+            };
+        });
     }
-
-    ret.barChartData = simsessionResults.results.map((v, i) => {
-        return {
-            name: driverNameMaps[v.cust_id] + ' : P' + (i + 1),
-            value: v.pace_percent > 7 ? 0 : Math.min(v.pace_percent, 7),
-            value2: telemetryAvailable
-                ? Math.min(
-                      v.pace_percent,
-                      100 * (idealLaps[i] / fastest) - 100,
-                      7
-                  )
-                : undefined,
-        };
-    });
 
     return ret;
 }

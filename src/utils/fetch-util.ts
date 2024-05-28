@@ -16,6 +16,7 @@ import type {
     ST_DriverTelemetry,
     CuratedTrackDisplayhInfo,
     GeneratedSimsessionSummary,
+    ChartTable
 } from 'ir-endpoints-types';
 
 function nNums(n: string): string {
@@ -163,6 +164,57 @@ export async function getMembersData(
 ): Promise<MembersData> {
     return await fetchCachedObject<MembersData>(
         `./data/ldata-irweb/membersData/${leagueId}/${seasonId}.json`
+    );
+}
+
+export async function getCumulativeDeltaBestLapChartData(
+    leagueId: string,
+    subsessionId: string,
+    simsessionNumber: string): Promise<ChartTable> {
+    return await fetchCachedObject<ChartTable>(
+        `./data/ldata-charts/cumulativeDeltaBestLapChartData/${leagueId}/${subsessionId}/${nNums(
+            simsessionNumber
+        )}.json`
+    );
+}
+
+export async function getPacePercentVsIdealLapChartData(
+    leagueId: string, subsessionId: string, simsessionNumber: string
+): Promise<ChartTable> {
+    return await fetchCachedObject<ChartTable>(
+        `./data/ldata-charts/pacePercentVsIdealLapChartData/${leagueId}/${subsessionId}/${nNums(
+            simsessionNumber
+        )}.json`
+    );
+}
+
+export async function getPacePercentChartData(
+    leagueId: string, subsessionId: string, simsessionNumber: string
+): Promise<ChartTable> {
+    return await fetchCachedObject<ChartTable>(
+        `./data/ldata-charts/pacePercentChartData/${leagueId}/${subsessionId}/${nNums(
+            simsessionNumber
+        )}.json`
+    );
+}
+
+export async function getStartFinishChartData(
+    leagueId: string, subsessionId: string, simsessionNumber: string
+): Promise<ChartTable> {
+    return await fetchCachedObject<ChartTable>(
+        `./data/ldata-charts/startFinishChartData/${leagueId}/${subsessionId}/${nNums(
+            simsessionNumber
+        )}.json`
+    );
+}
+
+export async function getCumulativeDeltaChartData(
+    leagueId: string, subsessionId: string, simsessionNumber: string
+): Promise<ChartTable> {
+    return await fetchCachedObject<ChartTable>(
+        `./data/ldata-charts/cumulativeDeltaChartData/${leagueId}/${subsessionId}/${nNums(
+            simsessionNumber
+        )}.json`
     );
 }
 

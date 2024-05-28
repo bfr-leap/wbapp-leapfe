@@ -6,6 +6,7 @@ import type { HLBarChartDatum } from '@/models/hl-bar-chart-model';
 import { getStartFinishData } from '@/models/start-finish-chart-model';
 
 const props = defineProps<{
+    league?: string;
     subsession?: string;
     simsession?: string;
 }>();
@@ -19,6 +20,7 @@ const barChartData: Ref<HLBarChartDatum[]> = ref([
 
 watchEffect(async () => {
     barChartData.value = await getStartFinishData(
+        props.league || '',
         props.subsession || '',
         props.simsession || ''
     );

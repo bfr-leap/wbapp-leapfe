@@ -1,19 +1,22 @@
 <script setup lang="ts">
 import { watchEffect, watch, ref } from 'vue';
 import type { Ref } from 'vue';
-import ComulativeLineChart from '@/components/cumulative-line-chart.vue';
+import LineChart from '@/components/line-chart.vue';
 import type { SeriesXY } from '@/models/line-chart-model';
-import { getCumulativeDeltaachartModel as getCumulativeDeltaChartModel } from '@/models/cumulative-delta-chart-model';
+import { getCumulativeDeltaChartModel } from '@/models/cumulative-delta-chart-model';
+import type { CumulativeDeltaChartModel } from '@/models/cumulative-delta-chart-model';
 
 const props = defineProps<{
+    league?: string;
     subsession?: string;
     simsession?: string;
 }>();
 
-const lapTimes: Ref<SeriesXY[]> = ref([]);
+
+const lapTimesNew: Ref<CumulativeDeltaChartModel> = ref(<CumulativeDeltaChartModel>{ series: Array<SeriesXY>(), range: [0, 1] });
 
 // A cumulative delta chart is a graphical representation of the time differences between two or
-// more cars over the course of a race. It is often used in motorsports, particularly in timed racing events,
+// more cars over the course of a race. It is often used in motor sports, particularly in timed racing events,
 // to show the difference in lap times between drivers or teams.
 
 // The chart is typically displayed on a computer screen or other electronic display, and it shows the difference
@@ -31,28 +34,23 @@ const lapTimes: Ref<SeriesXY[]> = ref([]);
 // drivers or teams in a race, and it can help provide valuable insights into the dynamics of the competition.
 
 async function fetchModel() {
-    if (props.simsession == undefined || props.subsession == undefined) {
+    if (props.simsession == undefined || props.subsession == undefined || props.league == undefined) {
         return;
     }
-
-    lapTimes.value = await getCumulativeDeltaChartModel(
+    lapTimesNew.value = await getCumulativeDeltaChartModel(
+        props.league || '',
         props.simsession || '',
         props.subsession || ''
-    );
+    )
 }
 
 watchEffect(fetchModel);
 watch(props, fetchModel);
-
-interface GridItem {
-    custid: number;
-    is_ai: number;
-    displayName: string;
-    helmetPattern: number;
-    licenseLevel: number;
-}
 </script>
 
 <template>
-    <ComulativeLineChart :series="lapTimes" />
+    <LineChart :title="''" :data="lapTimesNew.series" :y-range="[
+        lapTimesNew.range[0],
+        lapTimesNew.range[1],
+    ]" />
 </template>

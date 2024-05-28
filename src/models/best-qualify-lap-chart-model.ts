@@ -1,11 +1,8 @@
 import type { SeriesXY } from '@/models/line-chart-model';
 import {
-    getSingleMemberData,
-    getSimsessionResults,
     getTelemetrySubsessionIds,
+    getCumulativeDeltaBestLapChartData
 } from '@/utils/fetch-util';
-import { getBestLaps } from '@/utils/telemetry-util';
-import type { ST_LapTelemetry } from 'ir-endpoints-types';
 
 export interface BestQualifyLapChartModel {
     lapTimes: SeriesXY[];
@@ -28,49 +25,20 @@ export async function getBestQualifyLapChartModel(
     let telemetryAvailable =
         -1 !== telemetrySubsessionIds.indexOf(parseInt(subsession, 10));
 
-    let simsessionResults = await getSimsessionResults(subsession, simsession);
-
-    let driverNameMaps: { [name: number]: string } = {};
-
-    for (let r of simsessionResults.results) {
-        driverNameMaps[r.cust_id] = (
-            await getSingleMemberData(r.cust_id.toString())
-        ).display_name;
-    }
-
-    let fastestLaps: ST_LapTelemetry[] = [];
-
     if (telemetryAvailable) {
-        fastestLaps = await getBestLaps(
-            subsession,
-            simsession,
-            simsessionResults.results.map((v) => v.cust_id.toString())
-        );
+        let r = await getCumulativeDeltaBestLapChartData(league, subsession, simsession);
 
-        let uid2NameMap: { [name: number]: string } = {};
+        let xKey = 'Lap Percent';
+        let keys = Object.keys(r[0]).filter(k => k !== xKey);
 
-        for (let res of simsessionResults.results) {
-            let custid = res.cust_id;
-            let mData = await getSingleMemberData(custid.toString());
-            uid2NameMap[custid] = mData.display_name;
-        }
-
-        ret.lapTimes = fastestLaps.map((tLap, i) => {
-            let tp: number = -1;
-
-            let d = tLap.telemetry.map((t) => {
-                let y = -1 === tp ? 0 : t.t - tp;
-                tp = t.t;
-                return { x: t.perc, y: y / 60 };
-            });
-            d.shift();
-            return {
-                name: `P${i + 1}: ${
-                    uid2NameMap[simsessionResults.results[i].cust_id]
-                }`,
-                data: d,
-            };
+        let lapDeltas: SeriesXY[] = keys.map(k => {
+            let d = r.map(v => { return { x: <number>v[xKey], y: <number>v[k] }; }).filter(v => v.y !== undefined)
+            return { name: k, data: d };
         });
+
+        ret.lapTimes = lapDeltas;
+
+        console.log('here');
     }
 
     return ret;

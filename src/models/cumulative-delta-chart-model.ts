@@ -1,5 +1,5 @@
-import type { LapChartData, LCD_Chunk } from 'ir-endpoints-types';
-import { getLapChartData } from '@/utils/fetch-util';
+import type { LCD_Chunk } from 'ir-endpoints-types';
+import { getLapChartData, getCumulativeDeltaChartData } from '@/utils/fetch-util';
 import type { SeriesXY } from '@/models/line-chart-model';
 
 interface GridItem {
@@ -8,66 +8,6 @@ interface GridItem {
     displayName: string;
     helmetPattern: number;
     licenseLevel: number;
-}
-
-function getLapTimes(
-    lapChartInfo: LapChartData,
-    startgrid: GridItem[]
-): SeriesXY[] {
-    let uid2gridMap: { [name: number]: number } = {};
-
-    let ret: { x: number; y: number }[][] = [];
-
-    let i = 0;
-    for (let gridItem of startgrid) {
-        uid2gridMap[gridItem.custid] = i++;
-        ret.push([]);
-    }
-
-    let prevLapMap: { [name: number]: number } = {};
-    let firstTime = lapChartInfo.chunk_info[0].session_time;
-
-    for (let lapdataIt of lapChartInfo.chunk_info) {
-        if (lapdataIt.lap_number !== 0) {
-            break;
-        }
-
-        let cTime = lapdataIt.session_time - firstTime;
-
-        prevLapMap[lapdataIt.cust_id] = lapdataIt.session_time;
-        ret[uid2gridMap[lapdataIt.cust_id]].push({ x: 0, y: cTime });
-    }
-
-    for (let lapdataIt of lapChartInfo.chunk_info) {
-        if (lapdataIt.lap_number === 0) {
-            continue;
-        }
-
-        let cTime = lapdataIt.session_time - prevLapMap[lapdataIt.cust_id];
-
-        prevLapMap[lapdataIt.cust_id] = lapdataIt.session_time;
-
-        ret[uid2gridMap[lapdataIt.cust_id]].push({
-            x: lapdataIt.lap_number,
-            y: cTime,
-        });
-    }
-
-    for (let laps of ret) {
-        for (let lap of laps) {
-            lap.y = lap.y / 10000;
-        }
-    }
-
-    return ret.map((d, index) => {
-        let driverName: string = startgrid?.[index].displayName ?? '';
-        driverName = decodeURI(driverName).replace(/\+/g, ' ');
-
-        return {
-            name: `P${index + 1} - ${driverName}`,
-            data: d,
-        };
-    });
 }
 
 function getStartGrid(chunks: LCD_Chunk[]): GridItem[] {
@@ -108,19 +48,73 @@ function getStartGrid(chunks: LCD_Chunk[]): GridItem[] {
     return startgrid;
 }
 
-export async function getCumulativeDeltaachartModel(
+export interface CumulativeDeltaChartModel {
+    series: SeriesXY[];
+    range: [number, number]
+}
+
+export async function getCumulativeDeltaChartModel(
+    league: string,
     simsession: string,
     subsession: string
-): Promise<SeriesXY[]> {
+): Promise<CumulativeDeltaChartModel> {
     if (simsession == undefined || subsession == undefined) {
-        return [];
+        return { series: [], range: [0, 1] };
     }
 
     const lapChartData = await getLapChartData(subsession, simsession);
 
     const startGrid = getStartGrid(lapChartData.chunk_info);
 
-    let ret: SeriesXY[] = getLapTimes(lapChartData, startGrid);
+    let name2gridMap: { [name: string]: number } = {};
 
-    return ret;
+    let driverNames: { [key: number]: string } = {};
+    for (let r of lapChartData.chunk_info) {
+        driverNames[r.cust_id] = r.display_name; // na[na.length - 1].substring(0, 3);
+    }
+
+    let i = 0;
+    for (let gridItem of startGrid) {
+        name2gridMap[driverNames[gridItem.custid]] = i++;
+    }
+
+    let r = await getCumulativeDeltaChartData(league, subsession, simsession);
+    let xKey = 'Lap';
+    let keys = Object.keys(r[0]).filter(k => k !== xKey);
+
+    let ret: SeriesXY[] = keys.map(k => {
+        let d = r.map(v => { return { x: <number>v[xKey], y: <number>v[k] }; }).filter(v => v.y !== undefined)
+        return { name: k, data: d };
+    });
+
+    ret.sort((a, b) => name2gridMap[a.name] - name2gridMap[b.name]);
+
+    for (let series of ret) {
+        series.name = `P${name2gridMap[series.name] + 1} - ${series.name}`;
+    }
+
+    let lapNum = (ret[0].data.length = ret[0].data.length);
+    const relevantLapPercent = 0.95;
+
+    let yRange: [number, number] = [Infinity, -Infinity];
+
+    for (let singleSeries of ret) {
+        let r1 = yRange[0];
+        let r2 = yRange[1];
+        for (let lDelta of singleSeries.data) {
+            if (!isNaN(lDelta.y)) {
+                r1 = Math.min(r1, lDelta.y);
+                r2 = Math.max(r2, lDelta.y);
+            }
+        }
+
+        if (lapNum * relevantLapPercent <= singleSeries.data.length) {
+            yRange[0] = r1;
+            yRange[1] = r2;
+        } else {
+            break;
+        }
+    }
+
+    return { series: ret, range: yRange };
 }

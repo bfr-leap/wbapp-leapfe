@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { watchEffect, ref, watch } from 'vue';
 import type { Ref } from 'vue';
-import CumulativeLineChart from '@/components/cumulative-line-chart.vue';
-
+import LineChart from '@/components/line-chart.vue';
 import type { BestQualifyLapChartModel } from '@/models/best-qualify-lap-chart-model';
 import {
     getDefaultBestQualifyLapChartModel,
@@ -32,5 +31,5 @@ watch(props, fetchModel);
 </script>
 
 <template>
-    <CumulativeLineChart :series="bestQualifyLapChartModel.lapTimes" />
+    <LineChart :data="bestQualifyLapChartModel.lapTimes" />
 </template>
