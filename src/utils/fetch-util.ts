@@ -91,9 +91,20 @@ export async function getSimsessionResults(
 export async function getLeagueSimsessionIndex(
     leagueId: string
 ): Promise<SeasonSimsessionIndex[]> {
-    return await fetchCachedObject<SeasonSimsessionIndex[]>(
+    let ret = await fetchCachedObject<SeasonSimsessionIndex[]>(
         `./data/ldata-rsltsts/leagueSimsessionIndex/${leagueId}.json`
     );
+
+    // TODO: move to backend
+
+    for (let season of ret) {
+        season.sessions = season.sessions.filter(session => {
+            let hasRace = session.simsessions.reduce((p, c) => p || c.type === 'race', false);
+            return hasRace;
+        });
+    }
+
+    return ret;
 }
 
 export async function getLeagueDriverStats(
@@ -138,9 +149,27 @@ export async function getLeagueSeasonSessions(
     leagueId: string,
     seasonId: string
 ): Promise<LeagueSeasonSessions> {
-    return await fetchCachedObject<LeagueSeasonSessions>(
+    let ret = await fetchCachedObject<LeagueSeasonSessions>(
         `./data/ldata-irweb/leagueSeasonSessions/${leagueId}/${seasonId}.json`
     );
+
+    // TODO: move this to the backend
+
+    let ss = await getLeagueSimsessionIndex(leagueId);
+    let season = ss.find(v => v.season_id.toString() === seasonId);
+
+    ret.sessions = ret.sessions.filter(v => {
+        let simsessions = season?.sessions.find(ses => ses.subsession_id === v.subsession_id)?.simsessions || [];
+        let hasRace = simsessions.reduce((p, c) => {
+            return p || c.type === 'race'
+        }, false);
+
+        return hasRace;
+    });
+
+    console.log(ret);
+
+    return ret;
 }
 
 export async function getLeagueSeasons(
