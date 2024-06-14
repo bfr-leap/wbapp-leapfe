@@ -39,7 +39,7 @@ async function formatRows(
                         let totalSec = v / 10000;
                         let min = Math.floor(Math.floor(totalSec) / 60);
                         let sec = totalSec - 60 * min;
-                        r[k] = `${min}:${(sec < 10) ? "0" : ""}${sec.toPrecision(5)}`;
+                        r[k] = `${min}:${(sec < 10) ? "0" : ""}${sec.toPrecision((sec < 10) ? ((sec < 1) ? 3 : 4) : 5)}`;
                     }
                     break;
                 }
