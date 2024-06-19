@@ -55,6 +55,30 @@ async function fetchCachedObject<T>(source: string): Promise<T> {
     return <T>JSON.parse(JSON.stringify(leagueSimsessionIndex));
 }
 
+function prepUrl(args: { [name: string]: string | number }): string {
+    let ret = [];
+    let keys = Object.keys(args);
+    for (let key of keys) {
+        ret.push(`${key}=${args[key]}`);
+    }
+
+    return `/api/fetch-document?${ret.join('&')}`;
+}
+
+async function fetchCachedDocument<T>(args: { [name: string]: string | number }): Promise<T> {
+    let source: string = prepUrl(args);
+    let p = _cacheStorage[source];
+
+    if (!p) {
+        p = fetchObjects([source]);
+        _cacheStorage[source] = p;
+    }
+
+    let a = await p;
+    let leagueSimsessionIndex = <SeasonSimsessionIndex[]>a[0];
+    return <T>(JSON.parse(JSON.stringify(leagueSimsessionIndex)).doc);
+}
+
 export async function getSingleMemberData(custId: string): Promise<M_Member> {
     return await fetchCachedObject<M_Member>(
         `/data/ldata-rsltsts/singleMemberData/${custId}.json`
@@ -90,12 +114,15 @@ export async function getSimsessionResults(
     );
 }
 
+
+
 export async function getLeagueSimsessionIndex(
-    leagueId: string
+    league: string
 ): Promise<SeasonSimsessionIndex[]> {
-    let ret = await fetchCachedObject<SeasonSimsessionIndex[]>(
-        `/data/ldata-rsltsts/leagueSimsessionIndex/${leagueId}.json`
-    );
+    const namespace = 'ldata-rsltsts';
+    const type = 'leagueSimsessionIndex';
+
+    let ret = await fetchCachedDocument<SeasonSimsessionIndex[]>({ namespace, type, league });
 
     // TODO: move to backend
 
