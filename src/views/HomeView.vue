@@ -16,7 +16,7 @@ import mixpanel from 'mixpanel-browser';
 const route = useRoute();
 
 function track() {
-    // mixpanel.track(route.query.m?.toString() || 'home', route.query);
+    mixpanel.track(route.query.m?.toString() || 'home', route.query);
 }
 
 track();

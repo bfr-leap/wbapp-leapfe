@@ -8,7 +8,7 @@ import mixpanel from 'mixpanel-browser';
 
 // Enabling the debug mode flag is useful during implementation,
 // but it's recommended you remove it for production
-mixpanel.init('ef54b5309bb2ad867ef01d2ddc3f1206', { debug: true });
+mixpanel.init('ef54b5309bb2ad867ef01d2ddc3f1206', { debug: false });
 
 const app = createApp(App);
 
