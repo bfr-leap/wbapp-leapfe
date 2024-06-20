@@ -87,7 +87,7 @@ watch(routeObserver, fetchModelData);
                 <div class="container">
                     <div class="row">
                         <GenericTable title="Session Report" :leagueId="resultsModel.leagueId"
-                            :rows="resultsModel.results" />
+                            :rows="resultsModel.results" :season-id="resultsModel.seasonId" />
                     </div>
                     <div style="height: 2em"></div>
                 </div>
