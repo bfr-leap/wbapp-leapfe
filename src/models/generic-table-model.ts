@@ -1,4 +1,4 @@
-import type { TS_RecordTable } from 'ir-endpoints-types';
+import type { TS_RecordTable, M_Member } from 'ir-endpoints-types';
 import { getSingleMemberData } from '@/utils/fetch-util';
 
 export type GenericTableModel = {
@@ -19,12 +19,35 @@ export function getDefaultGenericTableModel(): GenericTableModel {
 }
 
 const _nameToIdMap: { [name: string]: string } = {};
+const _idToNameMap: { [name: string]: string } = {};
 
 async function formatRows(
     rows: { [name: string]: string }[],
     keys: string[]
 ): Promise<{ [name: string]: string }[]> {
     let ret: { [name: string]: string }[] = JSON.parse(JSON.stringify(rows));
+
+    let collectedCustIds = [];
+    let userPromises: Promise<M_Member>[] = [];
+    for (let r of ret) {
+        for (let k of keys) {
+            switch (k) {
+                case 'cust_id': {
+                    let id = r[k];
+                    collectedCustIds.push(id);
+                    userPromises.push(getSingleMemberData(id));
+                    break;
+                }
+                default:
+            }
+        }
+    }
+
+    let results = await Promise.all(userPromises);
+    for (let user of results) {
+        _idToNameMap[user.cust_id] = user.display_name;
+        _nameToIdMap[user.display_name] = user.cust_id;
+    }
 
     for (let r of ret) {
         for (let k of keys) {
@@ -50,10 +73,7 @@ async function formatRows(
                 }
                 case 'cust_id': {
                     let id = r[k];
-                    let mData = await getSingleMemberData(id);
-                    r[k] = mData?.display_name || id;
-
-                    _nameToIdMap[r[k]] = id;
+                    r[k] = _idToNameMap[id] || id;
                     break;
                 }
                 default:
