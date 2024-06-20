@@ -33,8 +33,8 @@ export default async function handler(req, res) {
         }${ldArg(q.subsession)
         }${nNums(ldArg(q.simsession))
         }${ldArg(q.driver)
-        }${ldArg(q.carId)
-        }${ldArg(q.trackId)
+        }${ldArg(q.car)
+        }${ldArg(q.track)
         }${ldArg(q.sessionType)
         }${ldArg(q.custId)
         }.json`;
