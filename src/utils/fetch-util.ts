@@ -80,9 +80,9 @@ async function fetchCachedDocument<T>(args: { [name: string]: string | number })
 }
 
 export async function getSingleMemberData(custId: string): Promise<M_Member> {
-    return await fetchCachedObject<M_Member>(
-        `/data/ldata-rsltsts/singleMemberData/${custId}.json`
-    );
+    const namespace = 'ldata-rsltsts';
+    const type = 'singleMemberData';
+    return await fetchCachedDocument<SeasonSimsessionIndex[]>({ namespace, type, custId });
 }
 
 export async function getTrackStats(
@@ -145,13 +145,13 @@ export async function getLeagueDriverStats(
 }
 
 export async function getDriverResults(
-    leagueId: string,
-    driverId: string,
+    league: string,
+    custId: string,
     sessionType: 'race' | 'sprint' | 'quali'
 ): Promise<DriverResults> {
-    return await fetchCachedObject<DriverResults>(
-        `/data/ldata-rsltsts/driverSessionResults/${leagueId}/${sessionType}/${driverId}.json`
-    );
+    const namespace = 'ldata-rsltsts';
+    const type = 'driverSessionResults';
+    return await fetchCachedDocument<SeasonSimsessionIndex[]>({ namespace, type, league, custId, sessionType });
 }
 
 export async function getSeasonSimsessionIndex(
@@ -302,12 +302,7 @@ export async function getTelemetrySubsessionIds(
 export async function getCuratedActiveLeagueSchedule(): Promise<ActiveLeagueSchedule> {
     const namespace = 'ldata-usrcfg';
     const type = 'activeLeagueSchedule';
-
     return await fetchCachedDocument<SeasonSimsessionIndex[]>({ namespace, type });
-
-    // return await fetchCachedObject<ActiveLeagueSchedule>(
-    //     `/data/ldata-usrcfg/activeLeagueSchedule.json`
-    // );
 }
 
 export async function getCuratedLeagueTeamsInfo(
@@ -315,23 +310,13 @@ export async function getCuratedLeagueTeamsInfo(
 ): Promise<CuratedLeagueTeamsInfo> {
     const namespace = 'ldata-usrcfg';
     const type = 'leagueTeamsInfo';
-
     return await fetchCachedDocument<SeasonSimsessionIndex[]>({ namespace, type, league });
-
-    // return await fetchCachedObject<CuratedLeagueTeamsInfo>(
-    //     `/data/ldata-usrcfg/leagueTeamsInfo/${league}.json`
-    // );
 }
 
 export async function getCuratedTrackDisplayInfo(): Promise<CuratedTrackDisplayhInfo> {
     const namespace = 'ldata-usrcfg';
     const type = 'trackDisplayInfo';
-
     return await fetchCachedDocument<SeasonSimsessionIndex[]>({ namespace, type });
-
-    // return await fetchCachedObject<CuratedTrackDisplayhInfo>(
-    //     '/data/ldata-usrcfg/trackDisplayInfo.json'
-    // );
 }
 
 export async function getGeneratedSimsessionSummary(

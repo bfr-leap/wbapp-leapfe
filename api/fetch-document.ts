@@ -34,7 +34,10 @@ export default async function handler(req, res) {
         }${nNums(ldArg(q.simsession))
         }${ldArg(q.driver)
         }${ldArg(q.carId)
-        }${ldArg(q.trackId)}.json`;
+        }${ldArg(q.trackId)
+        }${ldArg(q.sessionType)
+        }${ldArg(q.custId)
+        }.json`;
 
     console.log(`fetch: ${url}`);
 
