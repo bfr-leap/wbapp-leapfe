@@ -37,8 +37,6 @@ export async function getBestQualifyLapChartModel(
         });
 
         ret.lapTimes = lapDeltas;
-
-        console.log('here');
     }
 
     return ret;

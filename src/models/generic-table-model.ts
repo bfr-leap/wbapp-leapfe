@@ -1,5 +1,5 @@
-import type { TS_RecordTable } from 'ir-endpoints-types';
-import { getSingleMemberData } from '@/utils/fetch-util';
+import type { TS_RecordTable, M_Member } from 'ir-endpoints-types';
+import { getSingleMemberData, getMembersData } from '@/utils/fetch-util';
 
 export type GenericTableModel = {
     columnNames: { [name: string]: string };
@@ -19,12 +19,50 @@ export function getDefaultGenericTableModel(): GenericTableModel {
 }
 
 const _nameToIdMap: { [name: string]: string } = {};
+const _idToNameMap: { [name: string]: string } = {};
 
 async function formatRows(
     rows: { [name: string]: string }[],
-    keys: string[]
+    keys: string[],
+    leagueId: string, seasonId: string
 ): Promise<{ [name: string]: string }[]> {
     let ret: { [name: string]: string }[] = JSON.parse(JSON.stringify(rows));
+
+    let collectedCustIds = [];
+    let userPromises: Promise<M_Member>[] = [];
+
+    try {
+        // sometimes the league/season info us just not available
+        let members = (await getMembersData(leagueId, seasonId)).members;
+        for (let m of members) {
+            _idToNameMap[m.cust_id] = m.display_name;
+            _nameToIdMap[m.display_name] = m.cust_id;
+        }
+    } catch (e) { }
+
+    // parallelize user info fetching
+    for (let r of ret) {
+        for (let k of keys) {
+            switch (k) {
+                case 'cust_id': {
+                    let id = r[k];
+                    if (!_idToNameMap[id]) {
+                        collectedCustIds.push(id);
+                        userPromises.push(getSingleMemberData(id));
+                    }
+                    break;
+                }
+                default:
+            }
+        }
+    }
+
+    let results = await Promise.all(userPromises);
+    for (let user of results) {
+        _idToNameMap[user.cust_id] = user.display_name;
+        _nameToIdMap[user.display_name] = user.cust_id;
+    }
+    // parallelize user info fetching [end]
 
     for (let r of ret) {
         for (let k of keys) {
@@ -50,10 +88,7 @@ async function formatRows(
                 }
                 case 'cust_id': {
                     let id = r[k];
-                    let mData = await getSingleMemberData(id);
-                    r[k] = mData?.display_name || id;
-
-                    _nameToIdMap[r[k]] = id;
+                    r[k] = _idToNameMap[id] || id;
                     break;
                 }
                 default:
@@ -76,13 +111,15 @@ function formatHeader(name: string): string {
 
 export async function getGenericTableModel(
     title: string,
-    rows: { [name: string]: string }[]
+    rows: { [name: string]: string }[],
+    leagueId: string,
+    seasonId: string
 ): Promise<GenericTableModel> {
     let ret: GenericTableModel = getDefaultGenericTableModel();
     ret.title = title;
     if (rows[0]) {
         let keys = Object.keys(rows[0]);
-        ret.rows = await formatRows(rows, keys);
+        ret.rows = await formatRows(rows, keys, leagueId, seasonId);
         ret.keys = keys;
 
         for (let k of keys) {

@@ -41,19 +41,6 @@ type CacheStorage = {
     [name: string]: Promise<any[]>;
 };
 let _cacheStorage: CacheStorage = {};
-async function fetchCachedObject<T>(source: string): Promise<T> {
-    source = 'https://arturo-mayorga.github.io/irl_stats/dist' + source;
-    let p = _cacheStorage[source];
-
-    if (!p) {
-        p = fetchObjects([source]);
-        _cacheStorage[source] = p;
-    }
-
-    let a = await p;
-    let leagueSimsessionIndex = <SeasonSimsessionIndex[]>a[0];
-    return <T>JSON.parse(JSON.stringify(leagueSimsessionIndex));
-}
 
 function prepUrl(args: { [name: string]: string | number }): string {
     let ret = [];
@@ -80,38 +67,36 @@ async function fetchCachedDocument<T>(args: { [name: string]: string | number })
 }
 
 export async function getSingleMemberData(custId: string): Promise<M_Member> {
-    return await fetchCachedObject<M_Member>(
-        `/data/ldata-rsltsts/singleMemberData/${custId}.json`
-    );
+    const namespace = 'ldata-rsltsts';
+    const type = 'singleMemberData';
+    return await fetchCachedDocument<SeasonSimsessionIndex[]>({ namespace, type, custId });
 }
 
 export async function getTrackStats(
-    leagueId: string,
-    carId: string,
-    trackId: string
+    league: string,
+    car: string,
+    track: string
 ): Promise<TrackStats> {
-    return await fetchCachedObject<TrackStats>(
-        `/data/ldata-rsltsts/trackResults/${leagueId}/${carId}/${trackId}.json`
-    );
+    const namespace = 'ldata-rsltsts';
+    const type = 'trackResults';
+    return await fetchCachedDocument<SeasonSimsessionIndex[]>({ namespace, type, league, car, track });
 }
 
 export async function getTrackInfoDirectory(
-    leagueId: string
+    league: string
 ): Promise<TrackInfoDirectory> {
-    return await fetchCachedObject<TrackInfoDirectory>(
-        `/data/ldata-rsltsts/trackInfoDirectory/${leagueId}.json`
-    );
+    const namespace = 'ldata-rsltsts';
+    const type = 'trackInfoDirectory';
+    return await fetchCachedDocument<SeasonSimsessionIndex[]>({ namespace, type, league });
 }
 
 export async function getSimsessionResults(
-    subsessionId: string,
-    simsessionNumber: string
+    subsession: string,
+    simsession: string
 ): Promise<SimsessionResults> {
-    return await fetchCachedObject<SimsessionResults>(
-        `/data/ldata-rsltsts/simSessionResults/${subsessionId}/${nNums(
-            simsessionNumber
-        )}.json`
-    );
+    const namespace = 'ldata-rsltsts';
+    const type = 'simSessionResults';
+    return await fetchCachedDocument<SeasonSimsessionIndex[]>({ namespace, type, subsession, simsession });
 }
 
 
@@ -121,7 +106,6 @@ export async function getLeagueSimsessionIndex(
 ): Promise<SeasonSimsessionIndex[]> {
     const namespace = 'ldata-rsltsts';
     const type = 'leagueSimsessionIndex';
-
     let ret = await fetchCachedDocument<SeasonSimsessionIndex[]>({ namespace, type, league });
 
     // TODO: move to backend
@@ -137,58 +121,46 @@ export async function getLeagueSimsessionIndex(
 }
 
 export async function getLeagueDriverStats(
-    leagueId: string
+    league: string
 ): Promise<{ [name: number]: DriverStatsMap }> {
-    return await fetchCachedObject<{ [name: number]: DriverStatsMap }>(
-        `/data/ldata-rsltsts/leagueDriverStats/${leagueId}.json`
-    );
+    const namespace = 'ldata-rsltsts';
+    const type = 'leagueDriverStats';
+    return await fetchCachedDocument<SeasonSimsessionIndex[]>({ namespace, type, league });
 }
 
 export async function getDriverResults(
-    leagueId: string,
-    driverId: string,
+    league: string,
+    custId: string,
     sessionType: 'race' | 'sprint' | 'quali'
 ): Promise<DriverResults> {
-    return await fetchCachedObject<DriverResults>(
-        `/data/ldata-rsltsts/driverSessionResults/${leagueId}/${sessionType}/${driverId}.json`
-    );
+    const namespace = 'ldata-rsltsts';
+    const type = 'driverSessionResults';
+    return await fetchCachedDocument<SeasonSimsessionIndex[]>({ namespace, type, league, custId, sessionType });
 }
 
 export async function getSeasonSimsessionIndex(
-    leagueId: string
+    league: string
 ): Promise<SeasonSimsessionIndex[]> {
-    return await fetchCachedObject<SeasonSimsessionIndex[]>(
-        `/data/ldata-rsltsts/leagueSimsessionIndex/${leagueId}.json`
-    );
-}
-
-export async function getSimsessionDriverTelemetry(
-    subssesion: string,
-    simsession: string,
-    driver: string
-): Promise<ST_DriverTelemetry> {
-    return await fetchCachedObject<ST_DriverTelemetry>(
-        `/data/ldata-rsltsts/simsessionDriverTelemetry/${subssesion}/${nNums(
-            simsession
-        )}/${driver}.json`
-    );
+    const namespace = 'ldata-rsltsts';
+    const type = 'leagueSimsessionIndex';
+    return await fetchCachedDocument<SeasonSimsessionIndex[]>({ namespace, type, league });
 }
 
 export async function getLeagueSeasonSessions(
-    leagueId: string,
-    seasonId: string
+    league: string,
+    season: string
 ): Promise<LeagueSeasonSessions> {
-    let ret = await fetchCachedObject<LeagueSeasonSessions>(
-        `/data/ldata-irweb/leagueSeasonSessions/${leagueId}/${seasonId}.json`
-    );
+    const namespace = 'ldata-irweb';
+    const type = 'leagueSeasonSessions';
+    let ret = await fetchCachedDocument<SeasonSimsessionIndex[]>({ namespace, type, league, season });
 
     // TODO: move this to the backend
 
-    let ss = await getLeagueSimsessionIndex(leagueId);
-    let season = ss.find(v => v.season_id.toString() === seasonId);
+    let ss = await getLeagueSimsessionIndex(league);
+    let season_ = ss.find(v => v.season_id.toString() === season);
 
     ret.sessions = ret.sessions.filter(v => {
-        let simsessions = season?.sessions.find(ses => ses.subsession_id === v.subsession_id)?.simsessions || [];
+        let simsessions = season_?.sessions.find(ses => ses.subsession_id === v.subsession_id)?.simsessions || [];
         let hasRace = simsessions.reduce((p, c) => {
             return p || c.type === 'race'
         }, false);
@@ -196,129 +168,115 @@ export async function getLeagueSeasonSessions(
         return hasRace;
     });
 
-    console.log(ret);
-
     return ret;
 }
 
 export async function getLeagueSeasons(
-    leagueId: string
+    league: string
 ): Promise<LeagueSeasons> {
-    return await fetchCachedObject<LeagueSeasons>(
-        `/data/ldata-irweb/leagueSeasons/${leagueId}.json`
-    );
+    const namespace = 'ldata-irweb';
+    const type = 'leagueSeasons';
+    return await fetchCachedDocument<SeasonSimsessionIndex[]>({ namespace, type, league });
 }
 
 export async function getCuratedBlockedSeasons(): Promise<BlockedSeasons> {
-    return await fetchCachedObject<BlockedSeasons>(
-        `/data/ldata-irweb/blockedSeasons.json`
-    );
+    const namespace = 'ldata-irweb';
+    const type = 'blockedSeasons';
+    return await fetchCachedDocument<SeasonSimsessionIndex[]>({ namespace, type });
 }
 
 export async function getMembersData(
-    leagueId: string,
-    seasonId: string
+    league: string,
+    season: string
 ): Promise<MembersData> {
-    return await fetchCachedObject<MembersData>(
-        `/data/ldata-irweb/membersData/${leagueId}/${seasonId}.json`
-    );
+    const namespace = 'ldata-irweb';
+    const type = 'membersData';
+    return await fetchCachedDocument<SeasonSimsessionIndex[]>({ namespace, type, league, season });
 }
 
 export async function getCumulativeDeltaBestLapChartData(
-    leagueId: string,
-    subsessionId: string,
-    simsessionNumber: string): Promise<ChartTable> {
-    return await fetchCachedObject<ChartTable>(
-        `/data/ldata-charts/cumulativeDeltaBestLapChartData/${leagueId}/${subsessionId}/${nNums(
-            simsessionNumber
-        )}.json`
-    );
+    league: string,
+    subsession: string,
+    simsession: string): Promise<ChartTable> {
+    const namespace = 'ldata-charts';
+    const type = 'cumulativeDeltaBestLapChartData';
+    return await fetchCachedDocument<SeasonSimsessionIndex[]>({ namespace, type, league, subsession, simsession });
 }
 
 export async function getPacePercentVsIdealLapChartData(
-    leagueId: string, subsessionId: string, simsessionNumber: string
+    league: string, subsession: string, simsession: string
 ): Promise<ChartTable> {
-    return await fetchCachedObject<ChartTable>(
-        `/data/ldata-charts/pacePercentVsIdealLapChartData/${leagueId}/${subsessionId}/${nNums(
-            simsessionNumber
-        )}.json`
-    );
+    const namespace = 'ldata-charts';
+    const type = 'pacePercentVsIdealLapChartData';
+    return await fetchCachedDocument<SeasonSimsessionIndex[]>({ namespace, type, league, subsession, simsession });
 }
 
 export async function getPacePercentChartData(
-    leagueId: string, subsessionId: string, simsessionNumber: string
+    league: string, subsession: string, simsession: string
 ): Promise<ChartTable> {
-    return await fetchCachedObject<ChartTable>(
-        `/data/ldata-charts/pacePercentChartData/${leagueId}/${subsessionId}/${nNums(
-            simsessionNumber
-        )}.json`
-    );
+    const namespace = 'ldata-charts';
+    const type = 'pacePercentChartData';
+    return await fetchCachedDocument<SeasonSimsessionIndex[]>({ namespace, type, league, subsession, simsession });
 }
 
 export async function getStartFinishChartData(
-    leagueId: string, subsessionId: string, simsessionNumber: string
+    league: string, subsession: string, simsession: string
 ): Promise<ChartTable> {
-    return await fetchCachedObject<ChartTable>(
-        `/data/ldata-charts/startFinishChartData/${leagueId}/${subsessionId}/${nNums(
-            simsessionNumber
-        )}.json`
-    );
+    const namespace = 'ldata-charts';
+    const type = 'startFinishChartData';
+    return await fetchCachedDocument<SeasonSimsessionIndex[]>({ namespace, type, league, subsession, simsession });
 }
 
 export async function getCumulativeDeltaChartData(
-    leagueId: string, subsessionId: string, simsessionNumber: string
+    league: string, subsession: string, simsession: string
 ): Promise<ChartTable> {
-    return await fetchCachedObject<ChartTable>(
-        `/data/ldata-charts/cumulativeDeltaChartData/${leagueId}/${subsessionId}/${nNums(
-            simsessionNumber
-        )}.json`
-    );
+    const namespace = 'ldata-charts';
+    const type = 'cumulativeDeltaChartData';
+    return await fetchCachedDocument<SeasonSimsessionIndex[]>({ namespace, type, league, subsession, simsession });
 }
 
 export async function getLapChartData(
     subsession: string,
     simsession: string
 ): Promise<LapChartData> {
-    return await fetchCachedObject<LapChartData>(
-        `/data/ldata-irweb/lapChartData/${subsession}/${nNums(
-            simsession
-        )}.json`
-    );
+    const namespace = 'ldata-irweb';
+    const type = 'lapChartData';
+    return await fetchCachedDocument<SeasonSimsessionIndex[]>({ namespace, type, subsession, simsession });
 }
 
 export async function getTelemetrySubsessionIds(
     league: string
 ): Promise<number[]> {
-    return await fetchCachedObject<number[]>(
-        `/data/ldata-irrpy/telemetrySubsessions/${league}.json`
-    );
+    const namespace = 'ldata-irrpy';
+    const type = 'telemetrySubsessions';
+    return await fetchCachedDocument<SeasonSimsessionIndex[]>({ namespace, type, league });
 }
 
 export async function getCuratedActiveLeagueSchedule(): Promise<ActiveLeagueSchedule> {
-    return await fetchCachedObject<ActiveLeagueSchedule>(
-        `/data/ldata-usrcfg/activeLeagueSchedule.json`
-    );
+    const namespace = 'ldata-usrcfg';
+    const type = 'activeLeagueSchedule';
+    return await fetchCachedDocument<SeasonSimsessionIndex[]>({ namespace, type });
 }
 
 export async function getCuratedLeagueTeamsInfo(
-    leagueId: string
+    league: string
 ): Promise<CuratedLeagueTeamsInfo> {
-    return await fetchCachedObject<CuratedLeagueTeamsInfo>(
-        `/data/ldata-usrcfg/leagueTeamsInfo/${leagueId}.json`
-    );
+    const namespace = 'ldata-usrcfg';
+    const type = 'leagueTeamsInfo';
+    return await fetchCachedDocument<SeasonSimsessionIndex[]>({ namespace, type, league });
 }
 
 export async function getCuratedTrackDisplayInfo(): Promise<CuratedTrackDisplayhInfo> {
-    return await fetchCachedObject<CuratedTrackDisplayhInfo>(
-        '/data/ldata-usrcfg/trackDisplayInfo.json'
-    );
+    const namespace = 'ldata-usrcfg';
+    const type = 'trackDisplayInfo';
+    return await fetchCachedDocument<SeasonSimsessionIndex[]>({ namespace, type });
 }
 
 export async function getGeneratedSimsessionSummary(
-    subsessionId: number,
-    simsessionNumber: number
+    subsession: number,
+    simsession: number
 ): Promise<GeneratedSimsessionSummary> {
-    return await fetchCachedObject<GeneratedSimsessionSummary>(
-        `/data/ldata-gentxt/simsessionSummary/${subsessionId}/${simsessionNumber}.json`
-    );
+    const namespace = 'ldata-gentxt';
+    const type = 'simsessionSummary';
+    return await fetchCachedDocument<SeasonSimsessionIndex[]>({ namespace, type, subsession, simsession });
 }
