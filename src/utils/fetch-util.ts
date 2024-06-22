@@ -23,6 +23,39 @@ function nNums(n: string): string {
     return n.toString().replace('-', 'n');
 }
 
+let _prefetchPromise: Promise<any> | null = null;
+
+async function toPromise(v: any): Promise<any> {
+    return v;
+}
+
+export async function preFetch(args: any) {
+
+    if (_prefetchPromise) {
+        await _prefetchPromise;
+    }
+
+    let keys = Object.keys(args);
+    let argv = keys.map((v) => `${v}=${args[v]}`);
+
+    let url = `/api/prefetch-load/?${argv.join('&')}`;
+
+    let p = fetchObjects([url]);
+
+    _prefetchPromise = p;
+
+    let x = (await p)[0];
+
+    _prefetchPromise = null;
+
+    keys = Object.keys(x.docs);
+    for (let key of keys) {
+        if (x.docs[key]) {
+            _cacheStorage[key] = toPromise([{ doc: x.docs[key] }]);
+        }
+    }
+}
+
 async function fetchObjects(urls: string[]): Promise<any[]> {
     try {
         let objs = await Promise.all(
@@ -53,6 +86,10 @@ function prepUrl(args: { [name: string]: string | number }): string {
 }
 
 async function fetchCachedDocument<T>(args: { [name: string]: string | number }): Promise<T> {
+    if (_prefetchPromise) {
+        await _prefetchPromise;
+    }
+
     let source: string = prepUrl(args);
     let p = _cacheStorage[source];
 
