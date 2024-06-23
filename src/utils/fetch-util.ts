@@ -19,6 +19,8 @@ import type {
     ChartTable
 } from 'ir-endpoints-types';
 
+const DEBUG_PREFETCH = false;
+
 function nNums(n: string): string {
     return n.toString().replace('-', 'n');
 }
@@ -30,6 +32,7 @@ async function toPromise(v: any): Promise<any> {
 }
 
 export async function preFetch(args: any) {
+    if (DEBUG_PREFETCH) {console.log('preFetch() start');}
 
     if (_prefetchPromise) {
         await _prefetchPromise;
@@ -54,6 +57,7 @@ export async function preFetch(args: any) {
             _cacheStorage[key] = toPromise([{ doc: x.docs[key] }]);
         }
     }
+    if (DEBUG_PREFETCH) {console.log('preFetch() done');}
 }
 
 async function fetchObjects(urls: string[]): Promise<any[]> {
@@ -94,6 +98,8 @@ async function fetchCachedDocument<T>(args: { [name: string]: string | number })
     let p = _cacheStorage[source];
 
     if (!p) {
+        if (DEBUG_PREFETCH) {console.log('looking for: ', source);}
+
         p = fetchObjects([source]);
         _cacheStorage[source] = p;
     }

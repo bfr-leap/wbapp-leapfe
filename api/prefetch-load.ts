@@ -50,6 +50,7 @@ async function preFetchHome(query: { [name: string]: string | number }) {
 
     const hc = await fetchObjects(urlNames.map(v => `${mnt}${v}`));
 
+    
     let r = {};
 
     for (let i = 0; i < urlNames.length; ++i) {
@@ -61,17 +62,37 @@ async function preFetchHome(query: { [name: string]: string | number }) {
     return r;
 }
 
+async function toPromise(v: any): Promise<any> {
+    return v;
+}
+
 async function fetchObjects(urls: string[]): Promise<any[]> {
     console.log("pre-fetch:", JSON.stringify(urls, null, '  '));
     try {
+        let x = (
+            await Promise.all(urls.map((url) => fetch(url)))
+        ).map(async (response) => { 
+            try {
+                console.log('in try');
+                let r = await response.json();
+                console.log('ret');
+                return toPromise(r);
+            } catch(e){
+                console.log('catching');
+                return toPromise(null);
+            } 
+            return toPromise(null);
+        });
+
         let objs = await Promise.all(
-            (
-                await Promise.all(urls.map((url) => fetch(url)))
-            ).map((response) => response.json())
+            x
         );
+
+        // console.log(objs);
 
         return objs;
     } catch (e) {
+        console.log(e);
         return urls.map((v) => null);
     }
 }
