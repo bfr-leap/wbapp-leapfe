@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router';
 import { useRoute } from 'vue-router';
+import { SignedIn, SignedOut, SignInButton, UserButton } from 'vue-clerk'
 
 const route = useRoute();
 
@@ -31,6 +32,12 @@ const leagueId = 637;
                     <RouterLink class="nav-link" v-bind:to="`/?m=results&league=${leagueId}`">Results</RouterLink>
                 </div>
             </div>
+            <SignedOut>
+                <SignInButton />
+            </SignedOut>
+            <SignedIn>
+                <UserButton />
+            </SignedIn>
         </div>
     </nav>
 
