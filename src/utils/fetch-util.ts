@@ -18,6 +18,9 @@ import type {
     GeneratedSimsessionSummary,
     ChartTable
 } from 'ir-endpoints-types';
+import { useAuth } from 'vue-clerk';
+
+const DEBUG_PREFETCH = false;
 
 function nNums(n: string): string {
     return n.toString().replace('-', 'n');
@@ -30,6 +33,7 @@ async function toPromise(v: any): Promise<any> {
 }
 
 export async function preFetch(args: any) {
+    if (DEBUG_PREFETCH) { console.log('preFetch() start'); }
 
     if (_prefetchPromise) {
         await _prefetchPromise;
@@ -54,16 +58,28 @@ export async function preFetch(args: any) {
             _cacheStorage[key] = toPromise([{ doc: x.docs[key] }]);
         }
     }
+    if (DEBUG_PREFETCH) { console.log('preFetch() done'); }
 }
+
+let _auth: any = null;
 
 async function fetchObjects(urls: string[]): Promise<any[]> {
     try {
+        if (!_auth) {
+            _auth = useAuth();
+        }
+
+        const token = await _auth.getToken.value();
+
         let objs = await Promise.all(
             (
-                await Promise.all(urls.map((url) => fetch(url)))
+                await Promise.all(urls.map((url) => fetch(url
+                    , {
+                        headers: { Authorization: `Bearer ${token}` }
+                    }
+                )))
             ).map((response) => response.json())
         );
-
         return objs;
     } catch (e) {
         return urls.map((v) => null);
@@ -94,13 +110,18 @@ async function fetchCachedDocument<T>(args: { [name: string]: string | number })
     let p = _cacheStorage[source];
 
     if (!p) {
+        if (DEBUG_PREFETCH) { console.log('looking for: ', source); }
+
         p = fetchObjects([source]);
         _cacheStorage[source] = p;
     }
 
     let a = await p;
     let leagueSimsessionIndex = <SeasonSimsessionIndex[]>a[0];
-    return <T>(JSON.parse(JSON.stringify(leagueSimsessionIndex)).doc);
+    if (leagueSimsessionIndex) {
+        return <T>(JSON.parse(JSON.stringify(leagueSimsessionIndex)).doc);
+    }
+    return null;
 }
 
 export async function getSingleMemberData(custId: string): Promise<M_Member> {

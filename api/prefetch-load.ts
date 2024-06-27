@@ -1,9 +1,16 @@
-export default async function handler(req, res) {
+// import { middleware } from './middleware/_auth-user';
+
+// export default async function handler(req: any, res: any, next: (q: any, s: any) => void) {
+//     middleware(req, res, prefetch);
+// }
+
+export default async function prefetch(req: any, res: any) {
     const q: {
         [name: string]: string | number
     } = req?.query || {};
 
-    console.log('pre-fetch:', JSON.stringify(q));
+    // console.log('email ', req.user.emailAddresses);
+    // console.log('pre-fetch:', JSON.stringify(q));
 
     q.m = q?.m || '';
 
@@ -50,7 +57,8 @@ async function preFetchHome(query: { [name: string]: string | number }) {
 
     const hc = await fetchObjects(urlNames.map(v => `${mnt}${v}`));
 
-    let r = {};
+
+    let r: { [namea: string]: any } = {};
 
     for (let i = 0; i < urlNames.length; ++i) {
         let url = urlKeys[i];
@@ -61,17 +69,35 @@ async function preFetchHome(query: { [name: string]: string | number }) {
     return r;
 }
 
+async function toPromise(v: any): Promise<any> {
+    return v;
+}
+
 async function fetchObjects(urls: string[]): Promise<any[]> {
     console.log("pre-fetch:", JSON.stringify(urls, null, '  '));
     try {
+        let x = (
+            await Promise.all(urls.map((url) => fetch(url)))
+        ).map(async (response) => {
+            try {
+                let r = await response.json();
+                return toPromise(r);
+            } catch (e) {
+                console.log('catching');
+                return toPromise(null);
+            }
+            return toPromise(null);
+        });
+
         let objs = await Promise.all(
-            (
-                await Promise.all(urls.map((url) => fetch(url)))
-            ).map((response) => response.json())
+            x
         );
+
+        // console.log(objs);
 
         return objs;
     } catch (e) {
+        console.log(e);
         return urls.map((v) => null);
     }
 }

@@ -1,4 +1,3 @@
-
 async function fetchObjects(urls: string[]): Promise<any[]> {
     try {
         let objs = await Promise.all(
@@ -21,7 +20,7 @@ function nNums(n: any): string {
     return n.toString().replace('-', 'n');
 }
 
-export default async function handler(req, res) {
+export default async function handler(req: any, res: any) {
     const q: {
         [name: string]: string | number
     } = req?.query || {};
