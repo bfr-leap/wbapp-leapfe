@@ -1,12 +1,22 @@
 <script setup lang="ts">
+import { watch, watchEffect } from 'vue';
 import { RouterLink, RouterView } from 'vue-router';
 import { useRoute } from 'vue-router';
 import { SignedIn, SignedOut, SignInButton, UserButton } from 'vue-clerk'
 
 const route = useRoute();
 
-// const leagueId = 6555;;
-const leagueId = 637;
+let leagueId = '6555';
+
+function fetchModel() {
+    leagueId = route.query.league as string;
+    if (!leagueId) {
+        leagueId = '6555';
+    }
+}
+
+watchEffect(fetchModel);
+watch(route, fetchModel);
 </script>
 
 <template>
@@ -14,21 +24,21 @@ const leagueId = 637;
         -1
         " class="navbar navbar-dark navbar-expand-lg bg-nav">
         <div class="container-fluid">
-            <RouterLink class="navbar-brand" to="/">
-                <img class="icon" v-bind:src="`blue-frog-racing-s4-icon.png`" />
-                LEAP
-            </RouterLink>
-            <!-- <a class="navbar-brand" href="/">
-                <img class="icon" v-bind:src="`blue-frog-racing-s4-icon.png`" />
-                LEAP</a
-            > -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+            <div>
+                <button class="me-2 navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <RouterLink class="navbar-brand " to="/">
+                    <img class="icon" v-bind:src="`blue-frog-racing-s4-icon.png`" />
+                    LEAP
+                </RouterLink>
+
+            </div>
+
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="navbar-nav">
-                    <!-- <RouterLink class="nav-link" to="/">Home</RouterLink> -->
                     <RouterLink class="nav-link" v-bind:to="`/?m=results&league=${leagueId}`">Results</RouterLink>
                 </div>
             </div>
