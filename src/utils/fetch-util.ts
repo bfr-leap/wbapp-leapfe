@@ -61,14 +61,15 @@ export async function preFetch(args: any) {
     if (DEBUG_PREFETCH) { console.log('preFetch() done'); }
 }
 
-
+let _auth: any = null;
 
 async function fetchObjects(urls: string[]): Promise<any[]> {
     try {
-        const auth = useAuth();
-        const token = await auth.getToken.value();
+        if (!_auth) {
+            _auth = useAuth();
+        }
 
-        console.log(token);
+        const token = await _auth.getToken.value();
 
         let objs = await Promise.all(
             (
@@ -79,7 +80,6 @@ async function fetchObjects(urls: string[]): Promise<any[]> {
                 )))
             ).map((response) => response.json())
         );
-
         return objs;
     } catch (e) {
         return urls.map((v) => null);
@@ -118,7 +118,10 @@ async function fetchCachedDocument<T>(args: { [name: string]: string | number })
 
     let a = await p;
     let leagueSimsessionIndex = <SeasonSimsessionIndex[]>a[0];
-    return <T>(JSON.parse(JSON.stringify(leagueSimsessionIndex)).doc);
+    if (leagueSimsessionIndex) {
+        return <T>(JSON.parse(JSON.stringify(leagueSimsessionIndex)).doc);
+    }
+    return null;
 }
 
 export async function getSingleMemberData(custId: string): Promise<M_Member> {
