@@ -12,7 +12,7 @@ const leagueId = 637;
 <template>
     <nav v-if="['nextEventTimerEmbed', 'subsessionSummaryEmbed'].indexOf(route.query.m?.toString() || '') ==
         -1
-        " class="navbar navbar-dark navbar-expand-lg bg-primary">
+        " class="navbar navbar-dark navbar-expand-lg bg-nav">
         <div class="container-fluid">
             <RouterLink class="navbar-brand" to="/">
                 <img class="icon" v-bind:src="`blue-frog-racing-s4-icon.png`" />
