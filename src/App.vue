@@ -2,7 +2,8 @@
 import { watch, watchEffect } from 'vue';
 import { RouterLink, RouterView } from 'vue-router';
 import { useRoute } from 'vue-router';
-import { SignedIn, SignedOut, SignInButton, UserButton } from 'vue-clerk'
+import { SignedIn, SignedOut, SignInButton, UserButton } from 'vue-clerk';
+import IRIdentityCardLink from '@/components/ir-identity-card-link.vue';
 
 const route = useRoute();
 
@@ -37,7 +38,7 @@ watch(route, fetchModel);
 
             </div>
 
-            <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="collapse_ navbar-collapse" id="navbarNav">
                 <div class="navbar-nav">
                     <RouterLink class="nav-link" v-bind:to="`/?m=results&league=${leagueId}`">Results</RouterLink>
                 </div>
@@ -46,7 +47,13 @@ watch(route, fetchModel);
                 <SignInButton />
             </SignedOut>
             <SignedIn>
-                <UserButton />
+
+                <div style="display:inline-flex">
+                    <IRIdentityCardLink />
+                    <UserButton />
+                </div>
+
+
             </SignedIn>
         </div>
     </nav>

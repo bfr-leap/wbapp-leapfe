@@ -1,5 +1,5 @@
 import { middleware as authMW } from './_auth';
-import { clerkClient } from '@clerk/clerk-sdk-node';
+import { clerkClient, User } from '@clerk/clerk-sdk-node';
 
 async function handler(req: any, res: any, next: (req: any, res: any) => void) {
     try {

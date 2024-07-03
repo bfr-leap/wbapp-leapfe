@@ -338,3 +338,42 @@ export async function getGeneratedSimsessionSummary(
     const type = 'simsessionSummary';
     return await fetchCachedDocument<SeasonSimsessionIndex[]>({ namespace, type, subsession, simsession });
 }
+
+export interface IrLinkState {
+    isVerified: boolean,
+    irCustId: string,
+    msgSent: boolean,
+}
+
+export async function getIrLinkState(
+): Promise<IrLinkState> {
+    const namespace = 'ldata-usrdata';
+    const type = 'irLinkState';
+
+    let source: string = prepUrl({ namespace, type });
+    let ret = await fetchObjects([source]);
+
+    return ret[0].doc;
+}
+
+export async function setIrLinkDriver(driver: string
+): Promise<{}> {
+    const namespace = 'ldata-usrdata';
+    const type = 'irLinkDriver';
+
+    let source: string = prepUrl({ namespace, type, driver });
+    let ret = await fetchObjects([source]);
+
+    return ret[0].doc;
+}
+
+export async function setIrLinkCode(code: number
+): Promise<{}> {
+    const namespace = 'ldata-usrdata';
+    const type = 'irLinkCode';
+
+    let source: string = prepUrl({ namespace, type, code });
+    let ret = await fetchObjects([source]);
+
+    return ret[0].doc;
+}

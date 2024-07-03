@@ -105,18 +105,18 @@ watchEffect(fetchModel);
 @media (min-width: 820px) and (max-width: 859px) {
     .truncate-button {
         max-width: 400px;
-        
+
     }
 }
 
 @media (min-width: 801px) and (max-width: 819px) {
     .truncate-button {
         max-width: 390px;
-        
+
     }
 }
 
- @media (min-width: 768px) and (max-width: 800px) {
+@media (min-width: 768px) and (max-width: 800px) {
     .truncate-button {
         max-width: 365px;
     }
@@ -132,7 +132,7 @@ watchEffect(fetchModel);
     .truncate-button {
         max-width: 275px;
     }
-} 
+}
 
 @media (min-width: 652px) and (max-width: 675px) {
     .truncate-button {
@@ -144,58 +144,47 @@ watchEffect(fetchModel);
     .truncate-button {
         max-width: 235px;
     }
-} 
+}
 
 @media (min-width: 600px) and (max-width: 637px) {
     .truncate-button {
         max-width: 200px;
     }
-} 
+}
 
 @media (min-width: 550px) and (max-width: 599px) {
     .truncate-button {
         max-width: 410px;
     }
-} 
+}
 
-@media (min-width: 430px) and (max-width: 549px){
+@media (min-width: 430px) and (max-width: 549px) {
     .truncate-button {
         max-width: 280px;
     }
-} 
+}
 
-@media (min-width: 414px) and (max-width: 429px){
+@media (min-width: 414px) and (max-width: 429px) {
     .truncate-button {
         max-width: 275px;
     }
-} 
+}
 
-@media (min-width: 390px) and (max-width: 413px){
+@media (min-width: 390px) and (max-width: 413px) {
     .truncate-button {
         max-width: 250px;
     }
-} 
+}
 
-@media (min-width: 375px) and (max-width: 389px){
+@media (min-width: 375px) and (max-width: 389px) {
     .truncate-button {
         max-width: 235px;
     }
-} 
+}
 
-@media (min-width: 1px) and (max-width: 374px){
+@media (min-width: 1px) and (max-width: 374px) {
     .truncate-button {
         max-width: 200px;
     }
-} 
-
-/* 
-
-
-
-
-
-
-
-
- */
+}
 </style>

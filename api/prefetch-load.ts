@@ -1,3 +1,5 @@
+// import { getXataClient, XataClient } from './_xata';
+
 // import { middleware } from './middleware/_auth-user';
 
 // export default async function handler(req: any, res: any, next: (q: any, s: any) => void) {
@@ -5,6 +7,26 @@
 // }
 
 export default async function prefetch(req: any, res: any) {
+
+    // try {
+    //     const xata: XataClient = getXataClient();
+
+    //     const page = await xata.db.IRCustIDMapping.select([
+    //         "userID",
+    //         "irCustID",
+    //         "verifyCode",
+    //         "isVerified",
+    //     ]).getPaginated({
+    //         pagination: {
+    //             size: 15,
+    //         },
+    //     });
+    //     console.log(page);
+    // } catch (e) {
+    //     console.log(e);
+    // }
+
+
     const q: {
         [name: string]: string | number
     } = req?.query || {};
