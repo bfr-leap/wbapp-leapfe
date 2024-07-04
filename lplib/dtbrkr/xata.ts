@@ -15,6 +15,7 @@ const tables = [
       { name: "verifyCode", type: "int" },
       { name: "isVerified", type: "bool", defaultValue: "false" },
       { name: "msgSent", type: "bool", notNull: true, defaultValue: "false" },
+      { name: "tryCount", type: "int", notNull: true, defaultValue: "0" },
     ],
   },
 ] as const;

@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { ref, watch, watchEffect } from 'vue';
+import { watchEffect } from 'vue';
 
 
 async function fetchModel() {
-    // teamTagModel.value = await getTeamTagModel(props.teamId, props.leagueId);
 }
 
 watchEffect(fetchModel);
 </script>
 <template>
-    <div class="helmet-container"><button class="helmet"></button></div>
+    <div class="helmet-container">
+        <RouterLink class="helmet" to="/?m=profile"></RouterLink>
+    </div>
 </template>
 <style>
 .helmet-container {
