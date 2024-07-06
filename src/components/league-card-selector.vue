@@ -2,22 +2,16 @@
 import { ref, reactive, watch, watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
 import type { Ref } from 'vue';
-import { getLeagueCardSelectorModel } from '@/models/league-card-selector-model';
+import { getDefaultLeagueCardSelectorModel, getLeagueCardSelectorModel, saveLeagueCardSelectorModel } from '@/models/league-card-selector-model';
 
 
 const route = useRoute();
 
-let leagueSelection: Ref<any> = ref(
-    [
-        { isActive: true, name: 'iGP' },
-        { isActive: false, name: 'iFL' },
-        { isActive: true, name: 'J2iCS' },
-        { isActive: false, name: 'LZ' },
-    ]
+let leagueSelection: Ref<any> = ref(getDefaultLeagueCardSelectorModel()
 );
 
-function saveState() {
-    console.log('save');
+async function saveState() {
+    leagueSelection.value = await saveLeagueCardSelectorModel(leagueSelection.value);
 }
 
 let _saveTimeout: any = 0;
@@ -32,7 +26,7 @@ function onClick(league: any) {
 }
 
 async function fectchModel() {
-    await getLeagueCardSelectorModel();
+    leagueSelection.value = await getLeagueCardSelectorModel();
 }
 
 watchEffect(fectchModel);

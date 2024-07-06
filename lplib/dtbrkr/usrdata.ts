@@ -1,4 +1,5 @@
 import { getXataClient, XataClient } from './xata';
+import type { UserSelectedLeaguesRecord } from './xata';
 
 export async function getIrLinkState(userID: string): Promise<any> {
     console.log('getIrLinkState()', userID);
@@ -62,19 +63,51 @@ export async function updIrLinkCode(userID: string, verifyCode: string): Promise
 }
 
 async function getUserLeaguesState(userID: string): Promise<any> {
-    console.log('getUserLeaguesState()');
-
+    console.log('getUserLeaguesState()', userID);
     try {
-
         const xata: XataClient = getXataClient();
-        const { records } = await xata.sql<any>`SELECT "leagueID" FROM "UserSelectedLeagues" WHERE "userID"=${userID}`;
+        const { records } = await xata.sql<UserSelectedLeaguesRecord>`
+        SELECT 
+          "Leagues"."name", 
+          "Leagues"."leagueID",
+          "shortName"
+        FROM "UserSelectedLeagues"
+        INNER JOIN "Leagues" ON
+          "UserSelectedLeagues"."leagueID"="Leagues"."leagueID"
+        WHERE "userID"=${userID}`;
 
-        console.log(records);
+        return records;
     } catch (e) {
         console.log(e);
     }
 
     return {};
+}
+
+async function updUserLeaguesState(userID: string, code: string): Promise<any> {
+    console.log('updUserLeaguesState()', userID, code);
+
+    const codes = code.split('-').map(c => Number.parseInt(c));
+
+    let isValidInput: boolean = true;
+    for (let c of codes) {
+        if (isNaN(c)) {
+            isValidInput = false;
+            break;
+        }
+    }
+
+    console.log(codes);
+
+    if (isValidInput) {
+
+    }
+
+
+
+    const ret = await getUserLeaguesState(userID);
+
+    return ret;
 }
 
 export async function userDataHandler(namespace: string, query: any): Promise<any> {
@@ -93,8 +126,10 @@ export async function userDataHandler(namespace: string, query: any): Promise<an
             doc = await updIrLinkCode(q?.userID || "", q?.code || "");
             break;
         case 'userLeagues':
-            doc = await getUserLeaguesState(q?.userID);
+            doc = await getUserLeaguesState(q?.userID || "");
             break;
+        case 'userLeaguesUpd':
+            doc = await updUserLeaguesState(q?.userID || "", q?.code || "");
     }
 
     return doc;

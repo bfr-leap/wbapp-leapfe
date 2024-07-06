@@ -18,6 +18,7 @@ import type {
     GeneratedSimsessionSummary,
     ChartTable
 } from 'lplib/endpoint-types/iracing-endpoints';
+import type { UserLeaguesState } from 'lplib/endpoint-types/usrdata';
 import { useAuth } from 'vue-clerk';
 
 const DEBUG_PREFETCH = false;
@@ -378,11 +379,24 @@ export async function setIrLinkCode(code: number): Promise<{}> {
     return ret[0].doc;
 }
 
-export async function getUserLeaguesState(): Promise<IrLinkState> {
+export async function getUserLeaguesState(): Promise<UserLeaguesState> {
     const namespace = 'ldata-usrdata';
     const type = 'userLeagues';
 
     let source: string = prepUrl({ namespace, type });
+    let ret = await fetchObjects([source]);
+
+    return ret[0].doc;
+}
+
+
+export async function setUserLeaguesState(leagueIDList: number[]): Promise<UserLeaguesState> {
+    const namespace = 'ldata-usrdata';
+    const type = 'userLeaguesUpd';
+
+    let code = leagueIDList.join('-');
+
+    let source: string = prepUrl({ namespace, type, code });
     let ret = await fetchObjects([source]);
 
     return ret[0].doc;
