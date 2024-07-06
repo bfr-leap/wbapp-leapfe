@@ -1,6 +1,6 @@
 import { getXataClient, XataClient } from './xata';
 
-async function getIrLinkState(userID: string): Promise<any> {
+export async function getIrLinkState(userID: string): Promise<any> {
     console.log('getIrLinkState()', userID);
     const ret = {
         isVerified: false,
@@ -21,7 +21,7 @@ async function getIrLinkState(userID: string): Promise<any> {
     return ret;
 }
 
-async function updIrLinkDriver(userID: string, irCustID: string): Promise<any> {
+export async function updIrLinkDriver(userID: string, irCustID: string): Promise<any> {
     console.log('updIrLinkDriver()', userID);
     const xata: XataClient = getXataClient();
     const userLink = await xata.db.IRCustIDMapping.select(['userID', 'tryCount']).filter({ userID }).getFirst();
@@ -43,7 +43,7 @@ async function updIrLinkDriver(userID: string, irCustID: string): Promise<any> {
     return {};
 }
 
-async function updIrLinkCode(userID: string, verifyCode: string): Promise<any> {
+export async function updIrLinkCode(userID: string, verifyCode: string): Promise<any> {
     console.log('updIrLinkCode()', userID);
     const xata: XataClient = getXataClient();
     const userLink = await xata.db.IRCustIDMapping.select([
@@ -61,16 +61,41 @@ async function updIrLinkCode(userID: string, verifyCode: string): Promise<any> {
     return {};
 }
 
-export async function userDataHandler(req: any, res: any) {
-    const q: {
-        [name: string]: string | number
-    } = req?.query || {};
+async function getUserLeaguesState(userID: string): Promise<any> {
+    console.log('getUserLeaguesState()');
 
-    if ('irLinkState' === q?.type) {
-        res.status(200).json({ doc: await getIrLinkState(req?.user?.id || "") });
-    } else if ('irLinkDriverUpd' === q?.type) {
-        res.status(200).json({ doc: await updIrLinkDriver(req?.user?.id || "", req?.query?.driver || "") });
-    } else if ('irLinkCodeUpd' === q?.type) {
-        res.status(200).json({ doc: await updIrLinkCode(req?.user?.id || "", req?.query?.code || "") });
+    try {
+
+        const xata: XataClient = getXataClient();
+        const { records } = await xata.sql<any>`SELECT "leagueID" FROM "UserSelectedLeagues" WHERE "userID"=${userID}`;
+
+        console.log(records);
+    } catch (e) {
+        console.log(e);
     }
+
+    return {};
+}
+
+export async function userDataHandler(namespace: string, query: any): Promise<any> {
+    const q = query;
+
+    let doc: any = null;
+
+    switch (q?.type) {
+        case 'irLinkState':
+            doc = await getIrLinkState(q?.userID || "");
+            break;
+        case 'irLinkDriverUpd':
+            doc = await updIrLinkDriver(q?.userID || "", q?.driver || "");
+            break;
+        case 'irLinkCodeUpd':
+            doc = await updIrLinkCode(q?.userID || "", q?.code || "");
+            break;
+        case 'userLeagues':
+            doc = await getUserLeaguesState(q?.userID);
+            break;
+    }
+
+    return doc;
 }

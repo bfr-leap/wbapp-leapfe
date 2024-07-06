@@ -18,6 +18,21 @@ const tables = [
       { name: "tryCount", type: "int", notNull: true, defaultValue: "0" },
     ],
   },
+  {
+    name: "UserSelectedLeagues",
+    columns: [
+      { name: "leagueID", type: "int", notNull: true, defaultValue: "0" },
+      { name: "userID", type: "string" },
+    ],
+  },
+  {
+    name: "leagues",
+    columns: [
+      { name: "leagueID", type: "int", unique: true },
+      { name: "name", type: "string" },
+      { name: "shortName", type: "string" },
+    ],
+  },
 ] as const;
 
 export type SchemaTables = typeof tables;
@@ -26,8 +41,16 @@ export type InferredTypes = SchemaInference<SchemaTables>;
 export type IRCustIDMapping = InferredTypes["IRCustIDMapping"];
 export type IRCustIDMappingRecord = IRCustIDMapping & XataRecord;
 
+export type UserSelectedLeagues = InferredTypes["UserSelectedLeagues"];
+export type UserSelectedLeaguesRecord = UserSelectedLeagues & XataRecord;
+
+export type Leagues = InferredTypes["leagues"];
+export type LeaguesRecord = Leagues & XataRecord;
+
 export type DatabaseSchema = {
   IRCustIDMapping: IRCustIDMappingRecord;
+  UserSelectedLeagues: UserSelectedLeaguesRecord;
+  leagues: LeaguesRecord;
 };
 
 const DatabaseClient = buildClient();

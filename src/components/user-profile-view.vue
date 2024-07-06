@@ -5,6 +5,7 @@ import { SignedIn, SignedOut, SignInButton, UserButton } from 'vue-clerk';
 import { useRoute } from 'vue-router';
 import { getDefaultUserProfileModel, getUserProfileModel, sendCustId, sendVerification } from '@/models/user-profile-model';
 import type { UserProfileModel } from '@/models/user-profile-model';
+import LeagueCardSelector from '@/components/league-card-selector.vue';
 
 
 
@@ -108,6 +109,21 @@ watch(route, fectchModel);
             </div>
         </div>
 
+        <div class="card bg-dark text-light m-2" v-if="userProfileModel.isVerified">
+            <div class="card-body p-2">
+                My Leagues
+                <div class="container">
+                    <div style="height: 1em"></div>
+                    <div class="row g-1">
+                        <div class="col-12">
+                            <div class="row g-1 h-100">
+                                <LeagueCardSelector></LeagueCardSelector>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="height: 1em"></div>
+                </div>
+            </div>
+        </div>
     </SignedIn>
-
 </template>

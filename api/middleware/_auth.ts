@@ -1,4 +1,4 @@
-export async function middleware(req: any, res: any, next: (req: any, res: any) => void) {
+export async function middleware(req: any, res: any, next: (req: any, res: any) => Promise<void>) {
     if (req.method === 'GET') {
         try {
             let authorizationHeader = req.headers.authorization;
@@ -6,7 +6,7 @@ export async function middleware(req: any, res: any, next: (req: any, res: any) 
             req.auth = token;
 
             try {
-                next(req, res);
+                await next(req, res);
             } catch (e) {
                 res.status(500).json({ error: 'Internal Server Error' });
             }

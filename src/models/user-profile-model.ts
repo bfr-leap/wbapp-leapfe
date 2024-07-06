@@ -25,8 +25,6 @@ export async function getUserProfileModel(): Promise<UserProfileModel> {
 
     const f = await getIrLinkState();
 
-    console.log(f);
-
     ret.isVerified = f.isVerified;
     ret.irCustId = f.irCustId;
     ret.msgSent = f.msgSent;

@@ -36,7 +36,8 @@ export async function preFetch(args: any) {
     if (DEBUG_PREFETCH) { console.log('preFetch() start'); }
 
     if (_prefetchPromise) {
-        await _prefetchPromise;
+        if (DEBUG_PREFETCH) { console.log('preFetch() skip'); }
+        return;
     }
 
     let keys = Object.keys(args);
@@ -337,7 +338,8 @@ export async function getGeneratedSimsessionSummary(
 ): Promise<GeneratedSimsessionSummary | null> {
     const namespace = 'ldata-gentxt';
     const type = 'simsessionSummary';
-    return await fetchCachedDocument<GeneratedSimsessionSummary>({ namespace, type, subsession, simsession });
+    let ret = await fetchCachedDocument<GeneratedSimsessionSummary>({ namespace, type, subsession, simsession });
+    return ret;
 }
 
 export interface IrLinkState {
@@ -346,8 +348,7 @@ export interface IrLinkState {
     msgSent: boolean,
 }
 
-export async function getIrLinkState(
-): Promise<IrLinkState> {
+export async function getIrLinkState(): Promise<IrLinkState> {
     const namespace = 'ldata-usrdata';
     const type = 'irLinkState';
 
@@ -357,8 +358,7 @@ export async function getIrLinkState(
     return ret[0].doc;
 }
 
-export async function setIrLinkDriver(driver: string
-): Promise<{}> {
+export async function setIrLinkDriver(driver: string): Promise<{}> {
     const namespace = 'ldata-usrdata';
     const type = 'irLinkDriverUpd';
 
@@ -368,12 +368,21 @@ export async function setIrLinkDriver(driver: string
     return ret[0].doc;
 }
 
-export async function setIrLinkCode(code: number
-): Promise<{}> {
+export async function setIrLinkCode(code: number): Promise<{}> {
     const namespace = 'ldata-usrdata';
     const type = 'irLinkCodeUpd';
 
     let source: string = prepUrl({ namespace, type, code });
+    let ret = await fetchObjects([source]);
+
+    return ret[0].doc;
+}
+
+export async function getUserLeaguesState(): Promise<IrLinkState> {
+    const namespace = 'ldata-usrdata';
+    const type = 'userLeagues';
+
+    let source: string = prepUrl({ namespace, type });
     let ret = await fetchObjects([source]);
 
     return ret[0].doc;
