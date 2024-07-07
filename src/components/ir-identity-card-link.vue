@@ -18,7 +18,7 @@ watchEffect(fetchModel);
 }
 
 .helmet {
-    background-image: url("helmet.png");
+    background-image: url("/helmet.png");
     background-repeat: no-repeat;
     background-size: contain;
     background-color: transparent;
