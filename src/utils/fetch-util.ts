@@ -379,14 +379,29 @@ export async function setIrLinkCode(code: number): Promise<{}> {
     return ret[0].doc;
 }
 
+let _userLeagueStateCache: Promise<any> | null = null;
+let _userLeagueStateTimer: any = 0;
+let _userLeagueStateTimeout = 1500;
 export async function getUserLeaguesState(): Promise<UserLeaguesState> {
     const namespace = 'ldata-usrdata';
     const type = 'userLeagues';
 
-    let source: string = prepUrl({ namespace, type });
-    let ret = await fetchObjects([source]);
 
-    return ret[0].doc;
+    if (_userLeagueStateTimer) {
+        clearTimeout(_userLeagueStateTimer);
+        _userLeagueStateTimer = 0;
+    }
+
+    _userLeagueStateTimer = setTimeout(() => {
+        _userLeagueStateCache = null;
+    }, _userLeagueStateTimeout);
+
+    if (!_userLeagueStateCache) {
+        let source: string = prepUrl({ namespace, type });
+        _userLeagueStateCache = fetchObjects([source]);
+    }
+
+    return (await _userLeagueStateCache)[0].doc;
 }
 
 

@@ -1,18 +1,44 @@
 <script setup lang="ts">
-import { watch, watchEffect } from 'vue';
+import { ref, watch, watchEffect } from 'vue';
 import { RouterLink, RouterView } from 'vue-router';
 import { useRoute } from 'vue-router';
 import { SignedIn, SignedOut, SignInButton } from 'vue-clerk';
 import IRIdentityCardLink from '@/components/ir-identity-card-link.vue';
+import { useAuth } from 'vue-clerk';
+import { getUserLeaguesState } from '@/utils/fetch-util';
+import type { Ref } from 'vue';
 
 const route = useRoute();
+const { isSignedIn } = useAuth();
 
-let leagueId = '6555';
+let leagueId: Ref<string> = ref(
+    '6555'
+);
 
-function fetchModel() {
-    leagueId = route.query.league as string;
-    if (!leagueId) {
-        leagueId = '6555';
+async function fetchModel() {
+    let leagueIdValue = route.query.league as string;
+    if (!leagueIdValue) {
+        let signedIn = false;
+
+        try {
+            signedIn = isSignedIn.value === true;
+        } catch (e) {
+            console.log(e);
+        }
+
+        if (signedIn) {
+            let uls = await getUserLeaguesState();
+
+            leagueIdValue = uls[0].leagueID.toString();
+            console.log('leagueID', leagueIdValue);
+        } else {
+            leagueIdValue = '6555';
+            console.log('leagueID-default', leagueId);
+        }
+    }
+
+    if (leagueId.value !== leagueIdValue) {
+        leagueId.value = leagueIdValue;
     }
 }
 
