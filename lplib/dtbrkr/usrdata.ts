@@ -97,17 +97,35 @@ async function updUserLeaguesState(userID: string, code: string): Promise<any> {
         }
     }
 
-    console.log(codes);
-
     if (isValidInput) {
+        const xata: XataClient = getXataClient();
 
+        let s = {
+            statement: `
+                DELETE FROM "UserSelectedLeagues"
+                WHERE "userID" = '${userID}'
+                AND "leagueID" NOT IN (${codes.join(', ')})
+            `
+        }
+
+        await xata.sql<UserSelectedLeaguesRecord>(s, []);
+
+        s = {
+            statement: `
+                INSERT INTO "UserSelectedLeagues" ("userID", "leagueID")
+                SELECT '${userID}', "leagueID"
+                FROM (VALUES ${codes.map(c => `(${c})`).join(', ')}) AS ids("leagueID")
+                WHERE "leagueID" NOT IN (
+                    SELECT "leagueID"
+                    FROM "UserSelectedLeagues"
+                    WHERE "userID" = '${userID}'
+                );`
+        };
+
+        await xata.sql<UserSelectedLeaguesRecord>(s, []);
     }
 
-
-
-    const ret = await getUserLeaguesState(userID);
-
-    return ret;
+    return await getUserLeaguesState(userID);
 }
 
 export async function userDataHandler(namespace: string, query: any): Promise<any> {
