@@ -6,7 +6,6 @@ import {
 } from '@/utils/fetch-util';
 import type { DropdownModel } from '@/models/dropdown-model';
 import { getDefaultDropdownModel } from '@/models/dropdown-model';
-import { useAuth } from 'vue-clerk';
 
 export interface LeagueSeasonMenuModel {
     leagueOptions: DropdownModel;
@@ -25,16 +24,10 @@ export function getDefaultLeagueSeasonMenuModel(): LeagueSeasonMenuModel {
 export async function getLeagueSeasonMenuModel(
     league: string,
     season: string,
-    targetPage: string
+    targetPage: string,
+    isSignedIn: boolean
 ): Promise<LeagueSeasonMenuModel> {
     let ret = getDefaultLeagueSeasonMenuModel();
-
-    let signedIn = false;
-
-    try {
-        const { isSignedIn } = useAuth();
-        signedIn = isSignedIn.value === true;
-    } catch (e) { }
 
     if (!league || '0' === league) {
         return ret;
@@ -43,20 +36,18 @@ export async function getLeagueSeasonMenuModel(
     let leagueSchedule = await getCuratedActiveLeagueSchedule();
     let blockedSeasons = await getCuratedBlockedSeasons();
 
-    if (signedIn) {
+    if (isSignedIn) {
         let userLeaguesState = await getUserLeaguesState();
 
-        if (userLeaguesState.length === 0) {
-            return ret;
-        }
+        if (userLeaguesState.length !== 0) {
+            if (leagueSchedule) {
+                leagueSchedule.leagues = leagueSchedule.leagues.filter(
+                    l => userLeaguesState.findIndex(ls => ls.leagueID === l.league_id) >= 0);
+            }
 
-        if (leagueSchedule) {
-            leagueSchedule.leagues = leagueSchedule.leagues.filter(
-                l => userLeaguesState.findIndex(ls => ls.leagueID === l.league_id) >= 0);
-        }
-
-        if (userLeaguesState.findIndex(ls => ls.leagueID.toString() === league) < 0) {
-            league = userLeaguesState[0].leagueID.toString();
+            if (userLeaguesState.findIndex(ls => ls.leagueID.toString() === league) < 0) {
+                league = userLeaguesState[0].leagueID.toString();
+            }
         }
     }
 

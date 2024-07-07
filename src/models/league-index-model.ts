@@ -46,11 +46,7 @@ export async function getLeagueIndexModel(
     if (signedIn) {
         let userLeaguesState = await getUserLeaguesState();
 
-        if (userLeaguesState.length === 0) {
-            return getDefaultLeagueIndexModel();
-        }
-
-        if (leagueSchedule) {
+        if (userLeaguesState.length !== 0 && leagueSchedule) {
             leagueSchedule.leagues = leagueSchedule.leagues.filter(
                 l => userLeaguesState.findIndex(ls => ls.leagueID === l.league_id) >= 0);
         }

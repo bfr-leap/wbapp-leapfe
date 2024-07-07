@@ -109,7 +109,7 @@ watch(route, fectchModel);
             </div>
         </div>
 
-        <div class="card bg-dark text-light m-2" v-if="userProfileModel.isVerified">
+        <div class="card bg-dark text-light m-2">
             <div class="card-body p-2">
                 My Leagues
                 <div class="container">
