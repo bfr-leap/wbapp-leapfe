@@ -1,0 +1,1 @@
+# iracing-endpoint-types
