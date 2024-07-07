@@ -8,7 +8,6 @@ export async function middleware(req: any, res: any, next: (req: any, res: any) 
             try {
                 await next(req, res);
             } catch (e) {
-                console.log(e.toString());
                 res.status(500).json({ error: 'Internal Server Error ' });
             }
 
