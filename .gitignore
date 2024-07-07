@@ -33,3 +33,7 @@ coverage
 *.sln
 *.sw?
 .vercel
+
+.env
+.xata
+.xatarc

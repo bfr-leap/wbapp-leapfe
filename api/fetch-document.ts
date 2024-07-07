@@ -1,47 +1,29 @@
-async function fetchObjects(urls: string[]): Promise<any[]> {
-    try {
-        let objs = await Promise.all(
-            (
-                await Promise.all(urls.map((url) => fetch(url)))
-            ).map((response) => response.json())
-        );
-
-        return objs;
-    } catch (e) {
-        return urls.map((v) => null);
-    }
-}
-
-function ldArg(arg: string | number | undefined): string {
-    return (arg) ? '/' + arg : '';
-}
-
-function nNums(n: any): string {
-    return n.toString().replace('-', 'n');
-}
+import { middleware as authMiddleware } from './middleware/_auth-user';
+import { getDocument } from '../lplib/dtbrkr/ftchdata';
 
 export default async function handler(req: any, res: any) {
-    const q: {
-        [name: string]: string | number
-    } = req?.query || {};
+    const namespace = req?.query?.namespace?.toLocaleString() || '';
 
-    const url = `https://arturo-mayorga.github.io/irl_stats/dist/data/${q.namespace + '/'
-        }${q.type
-        }${ldArg(q.league)
-        }${ldArg(q.season)
-        }${ldArg(q.subsession)
-        }${nNums(ldArg(q.simsession))
-        }${ldArg(q.driver)
-        }${ldArg(q.car)
-        }${ldArg(q.track)
-        }${ldArg(q.sessionType)
-        }${ldArg(q.custId)
-        }.json`;
+    async function authMwAdapter(n_: string, q_: any, next: (n__: string, q__: any) => Promise<any>): Promise<any> {
+        let ret: any = null;
 
-    console.log(`fetch: ${url}`);
+        await authMiddleware(req, res, async (rq, rs) => {
 
+            const q: { [name: string]: string | number } = {
+                userID: req?.user?.id,
+            }
 
-    const hc = await fetchObjects([url]);
+            for (let key of Object.keys(req?.query || {})) {
+                q[key] = req?.query?.[key] || '';
+            }
 
-    res.status(200).json({ doc: hc[0] });
+            ret = await next(namespace, q);
+        });
+
+        return ret;
+    }
+
+    const doc = await getDocument(namespace, req?.query || {}, authMwAdapter);
+
+    res.status(200).json({ doc });
 }

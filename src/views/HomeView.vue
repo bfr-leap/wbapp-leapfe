@@ -9,7 +9,8 @@ import TeamView from '../components/team-view.vue';
 import TrackResultsView from '../components/track-results-view.vue';
 import NextEventTimerEmbed from '@/components/next-event-timer-embed.vue';
 import SubsessionSummaryEmbed from '@/components/subsession-summary-embed.vue';
-import SeasonProfile from '@/components/season-profile.vue';
+import SeasonProfile from '@/components/season-profile-view.vue';
+import UserProfile from '@/components/user-profile-view.vue';
 import { watch } from 'vue';
 import mixpanel from 'mixpanel-browser';
 
@@ -31,6 +32,7 @@ watch(() => route.params, track);
     <TeamView v-if="route.query.m === 'team'"></TeamView>
     <TrackResultsView v-if="route.query.m === 'track'"></TrackResultsView>
     <SeasonProfile v-if="route.query.m === 'season'"></SeasonProfile>
+    <UserProfile v-if="route.query.m === 'profile'"></UserProfile>
 
     <NextEventTimerEmbed v-if="route.query.m === 'nextEventTimerEmbed'"></NextEventTimerEmbed>
     <SubsessionSummaryEmbed v-if="route.query.m === 'subsessionSummaryEmbed'"></SubsessionSummaryEmbed>
