@@ -29,11 +29,13 @@ async function fetchModel() {
         if (signedIn) {
             let uls = await getUserLeaguesState();
 
-            leagueIdValue = uls[0].leagueID.toString();
-            console.log('leagueID', leagueIdValue);
-        } else {
+            if (uls.length > 0) {
+                leagueIdValue = uls[0].leagueID.toString();
+            }
+        }
+
+        if (!leagueIdValue) {
             leagueIdValue = '6555';
-            console.log('leagueID-default', leagueId);
         }
     }
 

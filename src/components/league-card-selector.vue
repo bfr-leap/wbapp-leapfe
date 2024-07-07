@@ -11,7 +11,7 @@ let leagueSelection: Ref<any> = ref(getDefaultLeagueCardSelectorModel()
 );
 
 async function saveState() {
-    leagueSelection.value = await saveLeagueCardSelectorModel(leagueSelection.value);
+    await saveLeagueCardSelectorModel(leagueSelection.value);
 }
 
 let _saveTimeout: any = 0;

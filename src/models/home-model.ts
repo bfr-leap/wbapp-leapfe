@@ -27,21 +27,19 @@ export function getDefaultHomeModel(): HomeModel {
 
 export async function getHomeModel(
     league: string,
-    season: string
+    season: string,
+    isSignedIn: boolean
 ): Promise<HomeModel> {
     let ret: HomeModel = getDefaultHomeModel();
     let now: number = new Date().getTime();
 
-    let signedIn = false;
 
-    try {
-        const { isSignedIn } = useAuth();
-        signedIn = isSignedIn.value === true;
-    } catch (e) { }
+
+
 
     let s = await getCuratedActiveLeagueSchedule();
 
-    if (signedIn) {
+    if (isSignedIn) {
         let userLeaguesState = await getUserLeaguesState();
 
         if (userLeaguesState.length === 0) {

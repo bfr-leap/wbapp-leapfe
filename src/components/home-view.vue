@@ -11,6 +11,9 @@ import PastEventCards from './past-event-cards.vue';
 import type { HomeModel } from '@/models/home-model';
 import { getDefaultHomeModel, getHomeModel } from '@/models/home-model';
 import { preFetch } from '@/utils/fetch-util';
+import { useAuth } from 'vue-clerk';
+
+const { isSignedIn } = useAuth();
 
 const route = useRoute();
 
@@ -22,7 +25,7 @@ async function fetchModel() {
     let leagueId = route.query.league as string;
     let seasonId = route.query.season as string;
 
-    homeModel.value = await getHomeModel(leagueId, seasonId);
+    homeModel.value = await getHomeModel(leagueId, seasonId, isSignedIn.value === true);
 }
 watchEffect(fetchModel);
 watch(route, fetchModel);
