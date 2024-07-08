@@ -48,11 +48,11 @@ export async function getHomeModel(
 
         if (s) {
             s.leagues = s.leagues.filter(
-                l => userLeaguesState.findIndex(ls => ls.leagueID === l.league_id) >= 0);
+                l => userLeaguesState.findIndex(ls => ls.league_id === l.league_id) >= 0);
         }
 
-        if (userLeaguesState.findIndex(ls => ls.leagueID.toString() === league) < 0) {
-            league = userLeaguesState[0].leagueID.toString();
+        if (userLeaguesState.findIndex(ls => ls.league_id.toString() === league) < 0) {
+            league = userLeaguesState[0].league_id.toString();
         }
     }
 

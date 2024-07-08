@@ -48,7 +48,7 @@ export async function getLeagueIndexModel(
 
         if (userLeaguesState.length !== 0 && leagueSchedule) {
             leagueSchedule.leagues = leagueSchedule.leagues.filter(
-                l => userLeaguesState.findIndex(ls => ls.leagueID === l.league_id) >= 0);
+                l => userLeaguesState.findIndex(ls => ls.league_id === l.league_id) >= 0);
         }
     }
 

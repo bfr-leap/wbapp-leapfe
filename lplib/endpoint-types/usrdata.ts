@@ -1,5 +1,5 @@
 export type UserLeaguesState = {
-    leagueID: number,
+    league_id: number,
     name: string,
-    shortName: string
+    short_name: string
 }[];
