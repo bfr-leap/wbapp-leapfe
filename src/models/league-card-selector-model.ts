@@ -28,7 +28,7 @@ async function convertUserLeaguesState(state: UserLeaguesState): Promise<LeagueC
     return await _knownLeagues.map(l => {
         return {
             leagueID: l.id, name: l.name,
-            isActive: state.findIndex((v => v.leagueID === l.id)) >= 0
+            isActive: state.findIndex((v => v.league_id === l.id)) >= 0
         };
     });
 }

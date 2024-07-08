@@ -30,7 +30,7 @@ async function fetchModel() {
             let uls = await getUserLeaguesState();
 
             if (uls.length > 0) {
-                leagueIdValue = uls[0].leagueID.toString();
+                leagueIdValue = uls[0].league_id.toString();
             }
         }
 

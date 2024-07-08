@@ -8,29 +8,29 @@ import type {
 
 const tables = [
   {
-    name: "IRCustIDMapping",
+    name: "user_ir_cust_mappings",
     columns: [
-      { name: "userID", type: "string", unique: true },
-      { name: "irCustID", type: "string" },
-      { name: "verifyCode", type: "int" },
-      { name: "isVerified", type: "bool", defaultValue: "false" },
-      { name: "msgSent", type: "bool", notNull: true, defaultValue: "false" },
-      { name: "tryCount", type: "int", notNull: true, defaultValue: "0" },
-    ],
-  },
-  {
-    name: "UserSelectedLeagues",
-    columns: [
-      { name: "leagueID", type: "int", notNull: true, defaultValue: "0" },
-      { name: "userID", type: "string" },
+      { name: "user_id", type: "string", unique: true },
+      { name: "ir_cust_id", type: "string" },
+      { name: "verify_code", type: "int" },
+      { name: "is_verified", type: "bool", defaultValue: "false" },
+      { name: "msg_sent", type: "bool", notNull: true, defaultValue: "false" },
+      { name: "try_count", type: "int", notNull: true, defaultValue: "0" },
     ],
   },
   {
     name: "leagues",
     columns: [
-      { name: "leagueID", type: "int", unique: true },
+      { name: "league_id", type: "int", unique: true },
       { name: "name", type: "string" },
-      { name: "shortName", type: "string" },
+      { name: "short_name", type: "string" },
+    ],
+  },
+  {
+    name: "users_leagues_interest",
+    columns: [
+      { name: "league_id", type: "int" },
+      { name: "user_id", type: "string" },
     ],
   },
 ] as const;
@@ -38,19 +38,19 @@ const tables = [
 export type SchemaTables = typeof tables;
 export type InferredTypes = SchemaInference<SchemaTables>;
 
-export type IRCustIDMapping = InferredTypes["IRCustIDMapping"];
-export type IRCustIDMappingRecord = IRCustIDMapping & XataRecord;
-
-export type UserSelectedLeagues = InferredTypes["UserSelectedLeagues"];
-export type UserSelectedLeaguesRecord = UserSelectedLeagues & XataRecord;
+export type UserIrCustMappings = InferredTypes["user_ir_cust_mappings"];
+export type UserIrCustMappingsRecord = UserIrCustMappings & XataRecord;
 
 export type Leagues = InferredTypes["leagues"];
 export type LeaguesRecord = Leagues & XataRecord;
 
+export type UsersLeaguesInterest = InferredTypes["users_leagues_interest"];
+export type UsersLeaguesInterestRecord = UsersLeaguesInterest & XataRecord;
+
 export type DatabaseSchema = {
-  IRCustIDMapping: IRCustIDMappingRecord;
-  UserSelectedLeagues: UserSelectedLeaguesRecord;
+  user_ir_cust_mappings: UserIrCustMappingsRecord;
   leagues: LeaguesRecord;
+  users_leagues_interest: UsersLeaguesInterestRecord;
 };
 
 const DatabaseClient = buildClient();
