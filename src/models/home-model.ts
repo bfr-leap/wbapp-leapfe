@@ -42,17 +42,15 @@ export async function getHomeModel(
     if (isSignedIn) {
         let userLeaguesState = await getUserLeaguesState();
 
-        if (userLeaguesState.length === 0) {
-            return ret;
-        }
+        if (userLeaguesState.length > 0) {
+            if (s) {
+                s.leagues = s.leagues.filter(
+                    l => userLeaguesState.findIndex(ls => ls.league_id === l.league_id) >= 0);
+            }
 
-        if (s) {
-            s.leagues = s.leagues.filter(
-                l => userLeaguesState.findIndex(ls => ls.league_id === l.league_id) >= 0);
-        }
-
-        if (userLeaguesState.findIndex(ls => ls.league_id.toString() === league) < 0) {
-            league = userLeaguesState[0].league_id.toString();
+            if (userLeaguesState.findIndex(ls => ls.league_id.toString() === league) < 0) {
+                league = userLeaguesState[0].league_id.toString();
+            }
         }
     }
 

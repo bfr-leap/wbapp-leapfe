@@ -386,7 +386,6 @@ export async function getUserLeaguesState(): Promise<UserLeaguesState> {
     const namespace = 'ldata-usrdata';
     const type = 'userLeagues';
 
-
     if (_userLeagueStateTimer) {
         clearTimeout(_userLeagueStateTimer);
         _userLeagueStateTimer = 0;
