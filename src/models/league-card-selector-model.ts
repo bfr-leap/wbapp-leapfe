@@ -18,11 +18,11 @@ export function getDefaultLeagueCardSelectorModel(): LeagueCardSelectorModel {
 }
 
 const _knownLeagues = [
-    { id: 6555, name: 'iFL' },
-    { id: 637, name: 'iGP' },
-    { id: 4534, name: 'LZ' },
+    { id: 6555, name: 'iFormula League' },
+    { id: 637, name: 'iGP Fun' },
+    { id: 4534, name: 'League Zero' },
     { id: 3630, name: 'J2iCS' }
-]
+].sort((a, b) => (a.name.toUpperCase() < b.name.toUpperCase()) ? -1 : 1);
 
 async function convertUserLeaguesState(state: UserLeaguesState): Promise<LeagueCardSelectorModel> {
     return await _knownLeagues.map(l => {

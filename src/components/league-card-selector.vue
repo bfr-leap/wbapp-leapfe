@@ -7,6 +7,8 @@ import { getDefaultLeagueCardSelectorModel, getLeagueCardSelectorModel, saveLeag
 
 const route = useRoute();
 
+let forms = reactive({ newLeague: '' });
+
 let leagueSelection: Ref<any> = ref(getDefaultLeagueCardSelectorModel()
 );
 
@@ -25,6 +27,21 @@ function onClick(league: any) {
     _saveTimeout = setTimeout(saveState, 1000);
 }
 
+function onAddLeagueBtn() {
+    let i = leagueSelection.value.map(m => m.name).indexOf(forms.newLeague);
+    if (i < 0) return;
+
+    var myModalEl = document.getElementById('exampleModal');
+    var modal = (<any>global).bootstrap.Modal.getInstance(myModalEl)
+    modal.hide();
+    forms.newLeague = '';
+
+    let league = leagueSelection.value[i];
+    league.isActive = false;
+    onClick(league);
+
+}
+
 async function fectchModel() {
     leagueSelection.value = await getLeagueCardSelectorModel();
 }
@@ -34,32 +51,68 @@ watch(route, fectchModel);
 
 </script>
 <template>
-    <div v-for="league in  leagueSelection " class="col">
-        <div class="wrap" @click="onClick(league)">
-            <img class="bg" v-bind:src="`./tracks/123.jpg`" />
-            <div class="hv content d-flex h-100">
-                <div class="d-flex flex-column fs-6 justify-content-center mx-1 mx-sm-3">
-                    <div class="" style="line-height: 1rem">
-                        <span>{{ '' }}</span>
-                    </div>
+    <div>
+        <table class="table table-dark table-hover">
+            <tr>
+                <th>❏</th>
+                <th>Name</th>
+                <th>League ID</th>
+                <th></th>
+            </tr>
 
-                    <template v-for="cName of [
-        'd-flex d-sm-none justify-content-center fs-4',
-        'd-none d-sm-flex d-md-none justify-content-center fs-2',
-        'd-none d-sm-none d-md-flex justify-content-center fs-1']">
-                        <div v-bind:class="cName" style="line-height: 1em">
-                            <span>{{ league.isActive ? '✔️' : '❌' }}</span>
-                        </div>
-                    </template>
+            <tr v-for="league in leagueSelection.filter(l => l.isActive)">
+                <td>❏</td>
+                <td>{{ league.name }}</td>
+                <td>{{ league.leagueID }}</td>
+                <td>
+                    <button @click="onClick(league)" type="button" class="btn btn-primary">
+                        ❌
+                    </button>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        ✚
+                    </button>
+                </td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+
+        </table>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class=" modal-dialog">
+            <div class="bg-toplevel modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <template v-for="cName of [
-        'fs-6 d-flex d-sm-none flex-grow-1 justify-content-center align-items-center',
-        'fs-3 d-none d-sm-flex d-md-none flex-grow-1 justify-content-center align-items-center',
-        'fs-2 d-none d-sm-none d-md-flex flex-grow-1 justify-content-center align-items-center']">
-                    <div v-bind:class="cName">
-                        {{ league.name }}
-                    </div>
-                </template>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label">Recipient:</label>
+                            <input class="form-control" list="datalistOptions" id="exampleDataList"
+                                placeholder="Type to search..." v-model="forms.newLeague">
+                            <datalist id="datalistOptions">
+                                <option v-for="league in leagueSelection.filter(l => !l.isActive)"
+                                    v-bind:value="league.name"></option>
+                            </datalist>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button"
+                        v-bind:class="(leagueSelection.map(m => m.name).indexOf(forms.newLeague) > -1) ? 'btn btn-primary' : 'btn btn-primary disabled'"
+                        @click="onAddLeagueBtn()">Add
+                        League</button>
+                </div>
             </div>
         </div>
     </div>
