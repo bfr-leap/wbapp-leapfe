@@ -2,7 +2,7 @@ import { getXataClient, XataClient } from './xata';
 import type { UsersLeaguesInterestRecord } from './xata';
 
 export async function getIrLinkState(user_id: string): Promise<any> {
-    console.log('getIrLinkState()', user_id);
+    console.log('getIrLinkState():', user_id);
     const ret = {
         isVerified: false,
         irCustId: '',
@@ -23,7 +23,7 @@ export async function getIrLinkState(user_id: string): Promise<any> {
 }
 
 export async function updIrLinkDriver(user_id: string, ir_cust_id: string): Promise<any> {
-    console.log('updIrLinkDriver()', user_id);
+    console.log('updIrLinkDriver():', user_id);
     const xata: XataClient = getXataClient();
     const userLink = await xata.db.user_ir_cust_mappings
         .select(['user_id', 'try_count']).filter({ user_id }).getFirst();
@@ -46,7 +46,7 @@ export async function updIrLinkDriver(user_id: string, ir_cust_id: string): Prom
 }
 
 export async function updIrLinkCode(user_id: string, verify_code: string): Promise<any> {
-    console.log('updIrLinkCode()', user_id);
+    console.log('updIrLinkCode():', user_id);
     const xata: XataClient = getXataClient();
     const userLink = await xata.db.user_ir_cust_mappings.select([
         "id", "user_id", "verify_code", "is_verified", 'try_count']).filter({ user_id }).getFirst();
@@ -64,7 +64,7 @@ export async function updIrLinkCode(user_id: string, verify_code: string): Promi
 }
 
 async function getUserLeaguesState(user_id: string): Promise<any> {
-    console.log('getUserLeaguesState()', user_id);
+    console.log('getUserLeaguesState():', user_id);
     try {
         const xata: XataClient = getXataClient();
         const { records } = await xata.sql<UsersLeaguesInterestRecord>`
@@ -86,7 +86,7 @@ async function getUserLeaguesState(user_id: string): Promise<any> {
 }
 
 async function updUserLeaguesState(user_id: string, code: string): Promise<any> {
-    console.log('updUserLeaguesState()', user_id, code);
+    console.log('updUserLeaguesState():', user_id, code);
 
     const codes = code.split('-').map(c => Number.parseInt(c));
 
@@ -149,6 +149,7 @@ export async function userDataHandler(namespace: string, query: any): Promise<an
             break;
         case 'userLeaguesUpd':
             doc = await updUserLeaguesState(q?.userID || "", q?.code || "");
+            break;
     }
 
     return doc;
