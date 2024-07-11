@@ -33,6 +33,62 @@ const tables = [
       { name: "user_id", type: "string" },
     ],
   },
+  {
+    name: "journalists_leagues",
+    columns: [
+      { name: "journalist_id", type: "string" },
+      { name: "league_id", type: "int" },
+    ],
+  },
+  {
+    name: "journalists",
+    columns: [
+      { name: "style_name", type: "string" },
+      { name: "display_name", type: "string" },
+      { name: "fine_tuning_prompt", type: "text" },
+    ],
+  },
+  {
+    name: "seasons",
+    columns: [
+      { name: "season_id", type: "int" },
+      { name: "league_id", type: "int" },
+      { name: "display_name", type: "string" },
+      { name: "car_id", type: "int" },
+      { name: "is_active", type: "bool" },
+    ],
+  },
+  {
+    name: "sched_subsessions",
+    columns: [
+      { name: "season_id", type: "int" },
+      { name: "time", type: "datetime" },
+      { name: "track_id", type: "int" },
+      { name: "display_name", type: "string" },
+    ],
+  },
+  {
+    name: "tracks",
+    columns: [
+      { name: "display_name", type: "string" },
+      { name: "short_name", type: "string" },
+      { name: "track_id", type: "int" },
+    ],
+  },
+  {
+    name: "teams",
+    columns: [
+      { name: "display_name", type: "string" },
+      { name: "season_id", type: "int" },
+    ],
+  },
+  {
+    name: "teams_users",
+    columns: [
+      { name: "ir_cust_id", type: "int" },
+      { name: "team_id", type: "string" },
+    ],
+  },
 ] as const;
 
 export type SchemaTables = typeof tables;
@@ -47,10 +103,38 @@ export type LeaguesRecord = Leagues & XataRecord;
 export type UsersLeaguesInterest = InferredTypes["users_leagues_interest"];
 export type UsersLeaguesInterestRecord = UsersLeaguesInterest & XataRecord;
 
+export type JournalistsLeagues = InferredTypes["journalists_leagues"];
+export type JournalistsLeaguesRecord = JournalistsLeagues & XataRecord;
+
+export type Journalists = InferredTypes["journalists"];
+export type JournalistsRecord = Journalists & XataRecord;
+
+export type Seasons = InferredTypes["seasons"];
+export type SeasonsRecord = Seasons & XataRecord;
+
+export type SchedSubsessions = InferredTypes["sched_subsessions"];
+export type SchedSubsessionsRecord = SchedSubsessions & XataRecord;
+
+export type Tracks = InferredTypes["tracks"];
+export type TracksRecord = Tracks & XataRecord;
+
+export type Teams = InferredTypes["teams"];
+export type TeamsRecord = Teams & XataRecord;
+
+export type TeamsUsers = InferredTypes["teams_users"];
+export type TeamsUsersRecord = TeamsUsers & XataRecord;
+
 export type DatabaseSchema = {
   user_ir_cust_mappings: UserIrCustMappingsRecord;
   leagues: LeaguesRecord;
   users_leagues_interest: UsersLeaguesInterestRecord;
+  journalists_leagues: JournalistsLeaguesRecord;
+  journalists: JournalistsRecord;
+  seasons: SeasonsRecord;
+  sched_subsessions: SchedSubsessionsRecord;
+  tracks: TracksRecord;
+  teams: TeamsRecord;
+  teams_users: TeamsUsersRecord;
 };
 
 const DatabaseClient = buildClient();
