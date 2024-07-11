@@ -415,3 +415,11 @@ export async function setUserLeaguesState(leagueIDList: number[]): Promise<UserL
 
     return ret[0].doc;
 }
+
+export async function getLeagueRoster(league: string): Promise<any> {
+    const namespace = 'ldata-irweb';
+    const type = 'leagueRoster';
+
+    let ret = await fetchCachedDocument<any>({ namespace, type, league });
+    return ret;
+}

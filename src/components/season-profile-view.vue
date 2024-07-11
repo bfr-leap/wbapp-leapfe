@@ -9,7 +9,8 @@ import EventCardLg from '@/components/event-card-lg.vue';
 import EventCardSm from '@/components/event-card-sm.vue';
 import DriverStandings from '@/components/driver-standings.vue';
 import LeagueSeasonMenu from '@/components/league-season-menu.vue';
-import PastEventCards from '../components/past-event-cards.vue';
+import PastEventCards from '@/components/past-event-cards.vue';
+import LeagueRoster from '@/components/league-roster.vue';
 import {
     getChartDataFromStats,
     getDefaultSeasonProfileModel,
@@ -214,4 +215,14 @@ function onClick(eventInfo: { trackId: string; date: string }) {
     </div>
     <DriverStandings summary_mode v-bind:season="seasonProfileModel.seasonId"
         v-bind:league="seasonProfileModel.leagueId" />
+
+    <div class="card bg-dark text-light m-2">
+        <div class="card-body p-2">
+            <div class="container">
+                <div>
+                    <LeagueRoster v-bind:league="seasonProfileModel.leagueId" />
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
