@@ -59,8 +59,10 @@ async function formatRows(
 
     let results = await Promise.all(userPromises);
     for (let user of results) {
-        _idToNameMap[user.cust_id] = user.display_name;
-        _nameToIdMap[user.display_name] = user.cust_id;
+        if (user) {
+            _idToNameMap[user.cust_id] = user.display_name;
+            _nameToIdMap[user.display_name] = user.cust_id;
+        }
     }
     // parallelize user info fetching [end]
 

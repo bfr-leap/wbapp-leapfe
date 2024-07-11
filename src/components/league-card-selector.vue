@@ -53,35 +53,39 @@ watch(route, fectchModel);
 <template>
     <div>
         <table class="table table-dark table-hover">
-            <tr>
-                <th>❏</th>
-                <th>Name</th>
-                <th>League ID</th>
-                <th></th>
-            </tr>
+            <thead style="position: sticky; top: 0">
+                <tr>
+                    <th>❏</th>
+                    <th>Name</th>
+                    <th>League ID</th>
+                    <th></th>
+                </tr>
+            </thead>
 
-            <tr v-for="league in leagueSelection.filter(l => l.isActive)">
-                <td>❏</td>
-                <td>{{ league.name }}</td>
-                <td>{{ league.leagueID }}</td>
-                <td>
-                    <button @click="onClick(league)" type="button" class="btn btn-primary">
-                        ❌
-                    </button>
-                </td>
-            </tr>
+            <tbody>
+                <tr v-for="league in leagueSelection.filter(l => l.isActive)">
+                    <td>❏</td>
+                    <td>{{ league.name }}</td>
+                    <td>{{ league.leagueID }}</td>
+                    <td>
+                        <button @click="onClick(league)" type="button" class="btn btn-secondary">
+                            ❌
+                        </button>
+                    </td>
+                </tr>
 
-            <tr>
-                <td>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                        ✚
-                    </button>
-                </td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-
+                <tr>
+                    <td>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#exampleModal">
+                            ✚
+                        </button>
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
         </table>
     </div>
 
