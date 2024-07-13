@@ -105,6 +105,50 @@ async function getTrackDisplayInfo(): Promise<any> {
     return ret;
 }
 
+async function defLgSeasSubCtx(): Promise<any> {
+    console.log('defLgSeasSubCtx()');
+
+    try {
+
+        const xata: XataClient = getXataClient();
+
+        const q1 = xata.sql`
+    SELECT "seasons"."league_id", "seasons"."season_id", "time", ("time" - ${new Date()}) as  "delta"
+    FROM "sched_subsessions"
+    INNER JOIN "seasons" ON
+    "sched_subsessions"."season_id"="seasons"."season_id"
+    INNER JOIN "users_leagues_interest" ON
+    "users_leagues_interest"."league_id"="seasons"."league_id"
+    WHERE "time" > ${new Date()}
+     ORDER BY "time" ASC
+            FETCH FIRST 1 ROW ONLY`;
+        ;
+
+        const q2 = xata.sql`
+    SELECT "seasons"."league_id", "seasons"."season_id", "time", (${new Date()} - "time") as  "delta"
+    FROM "sched_subsessions"
+    INNER JOIN "seasons" ON
+    "sched_subsessions"."season_id"="seasons"."season_id"
+    INNER JOIN "users_leagues_interest" ON
+    "users_leagues_interest"."league_id"="seasons"."league_id"
+    WHERE "time" < ${new Date()}
+     ORDER BY "time" DESC
+            FETCH FIRST 1 ROW ONLY`;
+        ;
+
+        let [p1, p2] = await Promise.all([q1, q2]);
+        const futRecs = p1.records;
+        const pasRecs = p2.records;
+
+        return [futRecs, pasRecs];
+    } catch (e) {
+        console.log('caught');
+        console.log(e);
+    }
+
+    return { league_id: '', season_id: '' };
+}
+
 export async function userConfigHandler(namespace: string, query: any): Promise<any> {
     const q = query;
     let doc: any = null;
@@ -118,6 +162,9 @@ export async function userConfigHandler(namespace: string, query: any): Promise<
             break;
         case 'trackDisplayInfo':
             doc = await getTrackDisplayInfo();
+            break;
+        case 'defLgSeasSubCtx':
+            doc = await defLgSeasSubCtx();
             break;
     }
 

@@ -1,12 +1,31 @@
+import { middleware as authMiddleware } from './middleware/_auth-user';
 import { getDocument } from '../lplib/dtbrkr/ftchdata';
 
-export default async function prefetch(req: any, res: any) {
+import { userDataHandler } from '../lplib/dtbrkr/usrdata';
+
+export default async function handle(req: any, res: any) {
+    let handled = false;
+    await authMiddleware(req, res, async (rq, rs) => {
+        handled = true;
+        await prefetch(rq, rs);
+    })
+
+    if (!handled) {
+        await prefetch(req, res);
+    }
+}
+
+async function prefetch(req: any, res: any) {
     console.log('prefetch(): start');
     const q: {
         [name: string]: string | number
     } = req?.query || {};
 
     q.m = q?.m || '';
+
+    if (req?.user) {
+        q.userID = req.user.id;
+    }
 
     let r: any = {};
 
@@ -20,9 +39,30 @@ export default async function prefetch(req: any, res: any) {
     res.status(200).json({ docs: r });
 }
 
+async function getDefaultLeagueSeason(userID: string): Promise<{ league: number, season: number }> {
+    console.log('getDefaultLeagueSeason()', userID);
+    if (!userID) {
+        return { league: 6555, season: 99410 };
+    }
+
+    const defaultLeagueSeason = await userDataHandler('', { type: 'defaultLeagueSeason', userID });
+    console.log(defaultLeagueSeason);
+    return { league: defaultLeagueSeason.league_id, season: defaultLeagueSeason.season_id };
+
+}
+
 async function preFetchHome(query: { [name: string]: string | number }) {
-    let league = query.league || 6555;
-    let season = query.season || 99410;
+    // let league = query.league || 6555;
+    // let season = query.season || 99410;
+
+    let league = query.league;
+    let season = query.season;
+
+    if (!league || !season) {
+        const def = await getDefaultLeagueSeason(<string>query.userID);
+        league = def.league;
+        season = def.season;
+    }
 
     let queries: { [name: string]: string | number }[] = [
         { namespace: `ldata-usrcfg`, type: `activeLeagueSchedule` },

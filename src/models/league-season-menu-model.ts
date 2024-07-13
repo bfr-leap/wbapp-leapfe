@@ -29,7 +29,7 @@ export async function getLeagueSeasonMenuModel(
 ): Promise<LeagueSeasonMenuModel> {
     let ret = getDefaultLeagueSeasonMenuModel();
 
-    if (!league || '0' === league) {
+    if (!league || '0' === league || !season || '0' === season) {
         return ret;
     }
 
@@ -54,13 +54,8 @@ export async function getLeagueSeasonMenuModel(
     let leagueSeasons = await getLeagueSeasons(league);
     leagueSeasons?.seasons.sort((a, b) => b.season_id - a.season_id);
 
-    let pSeason = season;
-    if (!pSeason) {
-        pSeason = leagueSeasons?.seasons[0].season_id.toString() || '';
-    }
-
     let currentSeason = leagueSeasons?.seasons.find(
-        (s) => s.season_id.toString() === pSeason
+        (s) => s.season_id.toString() === season
     );
 
     let minSeasonId = <number>(<unknown>blockedSeasons?.['min_season_id']) || 0;

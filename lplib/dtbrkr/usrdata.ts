@@ -1,6 +1,25 @@
 import { getXataClient, XataClient } from './xata';
 import type { UsersLeaguesInterestRecord } from './xata';
 
+export async function getDefaultLeagueSeason(user_id: string): Promise<any> {
+    console.log('getDefaultLeagueSeason()', user_id);
+
+    const xata: XataClient = getXataClient();
+
+    const page = await xata.sql`
+    SELECT "seasons"."league_id", "seasons"."season_id"
+    FROM "sched_subsessions"
+    INNER JOIN "seasons" ON
+    "sched_subsessions"."season_id"="seasons"."season_id"
+    INNER JOIN "users_leagues_interest" ON
+    "users_leagues_interest"."league_id"="seasons"."league_id"
+     WHERE "time" > ${new Date()} AND "user_id"=${user_id}
+     ORDER BY "time"
+     FETCH FIRST 1 ROW ONLY`;
+
+    return page?.records?.[0] || { league_id: 6555, season_id: 99410 };
+}
+
 export async function getIrLinkState(user_id: string): Promise<any> {
     console.log('getIrLinkState():', user_id);
     const ret = {
@@ -149,6 +168,9 @@ export async function userDataHandler(namespace: string, query: any): Promise<an
             break;
         case 'userLeaguesUpd':
             doc = await updUserLeaguesState(q?.userID || "", q?.code || "");
+            break;
+        case 'defaultLeagueSeason':
+            doc = await getDefaultLeagueSeason(q?.userID);
             break;
     }
 

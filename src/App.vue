@@ -7,41 +7,19 @@ import IRIdentityCardLink from '@/components/ir-identity-card-link.vue';
 import { useAuth } from 'vue-clerk';
 import { getUserLeaguesState } from '@/utils/fetch-util';
 import type { Ref } from 'vue';
+import { preFetch } from '@/utils/fetch-util';
 
 const route = useRoute();
 const { isSignedIn } = useAuth();
 
-let leagueId: Ref<string> = ref(
-    '6555'
-);
+let league: Ref<string> = ref('');
+let season: Ref<string> = ref('');
+let subsession: Ref<string> = ref('');
 
 async function fetchModel() {
-    let leagueIdValue = route.query.league as string;
-    if (!leagueIdValue) {
-        let signedIn = false;
 
-        try {
-            signedIn = isSignedIn.value === true;
-        } catch (e) {
-            console.log(e);
-        }
+    await preFetch(route.query);
 
-        if (signedIn) {
-            let uls = await getUserLeaguesState();
-
-            if (uls.length > 0) {
-                leagueIdValue = uls[0].league_id.toString();
-            }
-        }
-
-        if (!leagueIdValue) {
-            leagueIdValue = '6555';
-        }
-    }
-
-    if (leagueId.value !== leagueIdValue) {
-        leagueId.value = leagueIdValue;
-    }
 }
 
 watchEffect(fetchModel);
@@ -68,7 +46,7 @@ watch(route, fetchModel);
 
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="navbar-nav">
-                    <RouterLink class="nav-link" v-bind:to="`/?m=results&league=${leagueId}`">Results</RouterLink>
+                    <RouterLink class="nav-link" v-bind:to="`/?m=results&league=${league}`">Results</RouterLink>
                 </div>
             </div>
             <SignedOut>

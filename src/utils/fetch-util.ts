@@ -423,3 +423,11 @@ export async function getLeagueRoster(league: string): Promise<any> {
     let ret = await fetchCachedDocument<any>({ namespace, type, league });
     return ret;
 }
+
+export async function defLgSeasSubCtx(): Promise<any> {
+    const namespace = 'ldata-usrcfg';
+    const type = 'defLgSeasSubCtx';
+
+    let ret = await fetchCachedDocument<any>({ namespace, type });
+    return ret;
+}

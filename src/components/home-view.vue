@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, watchEffect } from 'vue';
 import type { Ref } from 'vue';
-import { useRoute } from 'vue-router';
 
 import EventCardLg from '@/components/event-card-lg.vue';
 import EventCardSm from '@/components/event-card-sm.vue';
@@ -10,25 +9,21 @@ import LeagueSeasonMenu from '@/components/league-season-menu.vue';
 import PastEventCards from './past-event-cards.vue';
 import type { HomeModel } from '@/models/home-model';
 import { getDefaultHomeModel, getHomeModel } from '@/models/home-model';
-import { preFetch } from '@/utils/fetch-util';
 import { useAuth } from 'vue-clerk';
 
 const { isSignedIn } = useAuth();
 
-const route = useRoute();
+const props = defineProps<{
+    league: string;
+    season: string;
+}>();
 
 let homeModel: Ref<HomeModel> = ref(getDefaultHomeModel());
 
 async function fetchModel() {
-    preFetch(route.query);
-
-    let leagueId = route.query.league as string;
-    let seasonId = route.query.season as string;
-
-    homeModel.value = await getHomeModel(leagueId, seasonId, isSignedIn.value === true);
+    homeModel.value = await getHomeModel(props.league, props.season, isSignedIn.value === true);
 }
 watchEffect(fetchModel);
-watch(route, fetchModel);
 
 function onClick(eventInfo: { trackId: string; date: string }) {
     homeModel.value.selectedRace = {

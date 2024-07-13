@@ -1,4 +1,8 @@
-import { getCuratedActiveLeagueSchedule, getUserLeaguesState } from '@/utils/fetch-util';
+import {
+    getCuratedActiveLeagueSchedule,
+    getUserLeaguesState,
+    defLgSeasSubCtx
+} from '@/utils/fetch-util';
 import { useAuth } from 'vue-clerk';
 
 export interface HomeModel {
@@ -33,8 +37,12 @@ export async function getHomeModel(
     let ret: HomeModel = getDefaultHomeModel();
     let now: number = new Date().getTime();
 
-
-
+    console.log('**************************');
+    console.log('**************************');
+    console.log('**************************');
+    console.log('**************************');
+    let def = await defLgSeasSubCtx();
+    console.log(def);
 
 
     let s = await getCuratedActiveLeagueSchedule();
