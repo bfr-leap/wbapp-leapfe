@@ -117,6 +117,7 @@ async function getTrackDisplayInfo(): Promise<any> {
 }
 
 async function isValidSeason(season: string): Promise<number> {
+    console.log('isValidSeason()');
     const season_id = Number.parseInt(season, 10);
     if (isNaN(season_id)) {
         return 0;
@@ -149,6 +150,7 @@ async function isValidLeague(league: string): Promise<boolean> {
 }
 
 async function defLgSeasSubCtx_noParams(): Promise<any> {
+    console.log('defLgSeasSubCtx_noParams()');
     const xata: XataClient = getXataClient();
 
     const q1 = xata.sql`
@@ -176,7 +178,7 @@ async function defLgSeasSubCtx_noParams(): Promise<any> {
     const now = new Date().getTime();
     const ret =
         new Date(futRecs.time).getTime() - now <
-        now - new Date(pasRecs.time).getTime()
+            now - new Date(pasRecs.time).getTime()
             ? futRecs
             : pasRecs;
 
@@ -193,11 +195,16 @@ async function defLgSeasSubCtx_noParams(): Promise<any> {
             ?.filter((v: any) => v)
             ?.sort((a: any, b: any) => b - a)?.[0] || 0;
 
-    return {league_id: ret.league_id, season_id: ret.season_id, subsession_id: ret.subsession_id};
+    return { league_id: ret.league_id, season_id: ret.season_id, subsession_id: ret.subsession_id };
 }
 
 async function defLgSeasSubCtx_forLeague(league: string): Promise<any> {
+    console.log('defLgSeasSubCtx_forLeague()');
     const xata: XataClient = getXataClient();
+
+    if (await isValidLeague(league) === false) {
+        return defLgSeasSubCtx_noParams();
+    }
 
     const q1 = xata.sql`
         SELECT "seasons"."league_id", "seasons"."season_id", "time", ("time" - ${new Date()}) as  "delta"
@@ -227,14 +234,16 @@ async function defLgSeasSubCtx_forLeague(league: string): Promise<any> {
         return await defLgSeasSubCtx_noParams();
     } else if (!futRecs) {
         ret = pasRecs;
-    } else if (!)
-
-    const now = new Date().getTime();
-     ret =
-        new Date(futRecs.time).getTime() - now <
-        now - new Date(pasRecs.time).getTime()
-            ? futRecs
-            : pasRecs;
+    } else if (!pasRecs) {
+        ret = futRecs
+    } else {
+        const now = new Date().getTime();
+        ret =
+            new Date(futRecs.time).getTime() - now <
+                now - new Date(pasRecs.time).getTime()
+                ? futRecs
+                : pasRecs;
+    }
 
     const dlDoc = await getDataLakeDocument({
         namespace: `ldata-irweb`,
@@ -249,7 +258,111 @@ async function defLgSeasSubCtx_forLeague(league: string): Promise<any> {
             ?.filter((v: any) => v)
             ?.sort((a: any, b: any) => b - a)?.[0] || 0;
 
-    return {league_id: ret.league_id, season_id: ret.season_id, subsession_id: ret.subsession_id};
+    return { league_id: ret.league_id, season_id: ret.season_id, subsession_id: ret.subsession_id };
+}
+
+async function defLgSeasSubCtx_forSeason(league: string, season: string): Promise<any> {
+    console.log('defLgSeasSubCtx_forSeason()');
+
+    if (await isValidSeason(season) === 0) {
+        return defLgSeasSubCtx_forLeague(league);
+    }
+
+    const xata: XataClient = getXataClient();
+
+    const q1 = xata.sql`
+        SELECT "seasons"."league_id", "seasons"."season_id", "time", ("time" - ${new Date()}) as  "delta"
+        FROM "sched_subsessions"
+        INNER JOIN "seasons" ON
+        "sched_subsessions"."season_id"="seasons"."season_id"
+        WHERE "time" > ${new Date()} AND "seasons"."season_id"=${season}
+        ORDER BY "time" ASC
+        FETCH FIRST 1 ROW ONLY`;
+
+    const q2 = xata.sql`
+        SELECT "seasons"."league_id", "seasons"."season_id", "time", (${new Date()} - "time") as  "delta"
+        FROM "sched_subsessions"
+        INNER JOIN "seasons" ON
+        "sched_subsessions"."season_id"="seasons"."season_id"
+        WHERE "time" < ${new Date()} AND "seasons"."season_id"=${season}
+        ORDER BY "time" DESC
+        FETCH FIRST 1 ROW ONLY`;
+
+    let [p1, p2] = await Promise.all([q1, q2]);
+    const futRecs: any = p1.records[0];
+    const pasRecs: any = p2.records[0];
+
+    let ret: any = [];
+
+    if (!futRecs && !pasRecs) {
+        return await defLgSeasSubCtx_forLeague(league);
+    } else if (!futRecs) {
+        ret = pasRecs;
+    } else if (!pasRecs) {
+        ret = futRecs
+    } else {
+        const now = new Date().getTime();
+        ret =
+            new Date(futRecs.time).getTime() - now <
+                now - new Date(pasRecs.time).getTime()
+                ? futRecs
+                : pasRecs;
+    }
+
+    const dlDoc = await getDataLakeDocument({
+        namespace: `ldata-irweb`,
+        type: `leagueSeasonSessions`,
+        league: ret.league_id,
+        season: ret.season_id,
+    });
+
+    ret.subsession_id =
+        dlDoc?.sessions
+            ?.map((s: any) => s?.subsession_id)
+            ?.filter((v: any) => v)
+            ?.sort((a: any, b: any) => b - a)?.[0] || 0;
+
+    return { league_id: ret.league_id, season_id: ret.season_id, subsession_id: ret.subsession_id };
+}
+
+async function defLgSeasSubCtx_forSubsession(league: string, season: string, subsession: string): Promise<any> {
+    console.log('defLgSeasSubCtx_forSubsession()');
+
+    let subsession_id = Number.parseInt(subsession, 10);
+    if (isNaN(subsession_id)) {
+        return await defLgSeasSubCtx_forSeason(league, season);
+    }
+
+    let season_id = Number.parseInt(season, 10);
+    if (isNaN(season_id)) {
+        return await defLgSeasSubCtx_forLeague(league);
+    }
+
+    let league_id = Number.parseInt(league);
+    if (isNaN(league_id)) {
+        return await defLgSeasSubCtx_noParams();
+    }
+
+    const dlDoc = await getDataLakeDocument({
+        namespace: `ldata-irweb`,
+        type: `leagueSeasonSessions`,
+        league: league_id,
+        season: season_id,
+    });
+
+    if (!dlDoc) {
+        return await defLgSeasSubCtx_forLeague(league);
+    }
+
+    const subsessionFound = dlDoc?.sessions
+        ?.map((s: any) => s?.subsession_id)
+        ?.indexOf(subsession_id) > 0;
+
+    if (!subsessionFound) {
+        return await defLgSeasSubCtx_forSeason(league, season);
+    }
+
+    return { league_id, season_id, subsession_id };
 }
 
 async function defLgSeasSubCtx(
@@ -261,18 +374,16 @@ async function defLgSeasSubCtx(
 
     let ret = { league_id: '', season_id: '' };
     try {
-        const tempLeague = await isValidSeason(season);
-        if (tempLeague) {
-            //...
-        } else if (await isValidLeague(league)) {
+        if (subsession) {
+            ret = await defLgSeasSubCtx_forSubsession(league, season, subsession)
+        } else if (season) {
+            ret = await defLgSeasSubCtx_forSeason(league, season);
+        } else if (league) {
             ret = await defLgSeasSubCtx_forLeague(league);
         } else {
             ret = await defLgSeasSubCtx_noParams();
         }
-    } catch (e) {
-        console.log('caught');
-        console.log(e);
-    }
+    } catch (e) { }
 
     return ret;
 }
@@ -298,7 +409,7 @@ export async function userConfigHandler(
             doc = await defLgSeasSubCtx(
                 q?.league || '',
                 q?.season || '',
-                q?.simsession || ''
+                q?.subsession || ''
             );
             break;
     }
