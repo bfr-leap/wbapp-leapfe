@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { ref, watchEffect, watch } from 'vue';
+import { ref, watchEffect } from 'vue';
 import type { Ref } from 'vue';
-import { useRoute } from 'vue-router';
 import LeagueIndex from '@/components/league-index.vue';
 import CumulativeDeltaChart from '@/components/cumulative-delta-chart.vue';
 import StartFinishChart from './start-finish-chart.vue';
@@ -15,49 +14,24 @@ import {
     getResultsModel,
 } from '@/models/results-model';
 
-const route = useRoute();
+const props = defineProps<{
+    league: string;
+    season: string;
+    subsession: string;
+    simsession: string;
+}>();
 
 let resultsModel: Ref<ResultsModel> = ref(getDefaultResultsModel());
 
-let routeObserver: Ref<{
-    leagueId: string;
-    seasonId: string;
-    subsessionId: string;
-    simsessionId: string;
-}> = ref({
-    leagueId: '',
-    seasonId: '',
-    subsessionId: '',
-    simsessionId: '',
-});
-
 async function fetchModelData() {
-    let leagueId: string = (route.query.league as string) || '';
-    let seasonId: string = (route.query.season as string) || '';
-    let subsessionId: string = (route.query.subsession as string) || '';
-    let simsessionId: string = (route.query.simsession as string) || '';
-
-    if (
-        routeObserver.value.leagueId !== leagueId ||
-        routeObserver.value.seasonId !== seasonId ||
-        routeObserver.value.subsessionId !== subsessionId ||
-        routeObserver.value.simsessionId !== simsessionId
-    ) {
-        routeObserver.value.leagueId = leagueId;
-        routeObserver.value.seasonId = seasonId;
-        routeObserver.value.subsessionId = subsessionId;
-        routeObserver.value.simsessionId = simsessionId;
-    }
-
     resultsModel.value = await getResultsModel(
-        leagueId,
-        seasonId,
-        subsessionId,
-        simsessionId
+        props.league,
+        props.season,
+        props.subsession,
+        props.simsession
     );
 }
 watchEffect(fetchModelData);
-watch(routeObserver, fetchModelData);
 </script>
 
 <template>

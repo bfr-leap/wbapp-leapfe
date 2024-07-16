@@ -5,6 +5,9 @@ import type { Ref } from 'vue';
 import type { LeagueIndexModel } from '@/models/league-index-model';
 import { getLeagueIndexModel } from '@/models/league-index-model';
 import { getDefaultLeagueIndexModel } from '@/models/league-index-model';
+import { useAuth } from 'vue-clerk';
+
+const { isSignedIn } = useAuth();
 
 const props = defineProps<{
     leagueId: string;
@@ -17,10 +20,11 @@ let leagueIndexModel: Ref<LeagueIndexModel> = ref(getDefaultLeagueIndexModel());
 
 async function fetchModel() {
     leagueIndexModel.value = await getLeagueIndexModel(
-        props.leagueId,
+        props.leagueId || '',
         props.seasonId || '',
         props.subsessionId || '',
-        props.simsessionId || ''
+        props.simsessionId || '',
+        isSignedIn.value === true
     );
 }
 
@@ -45,13 +49,13 @@ watchEffect(fetchModel);
                             v-for="leagueOption in leagueIndexModel
                                 .leagueOptions.options"
                         >
-                            <a
+                            <RouterLink
                                 class="dropdown-item"
                                 type="button"
-                                v-bind:href="leagueOption.href"
+                                v-bind:to="leagueOption.href"
                             >
                                 {{ leagueOption.display }}
-                            </a>
+                            </RouterLink>
                         </li>
                     </ul>
                 </div>
@@ -69,13 +73,13 @@ watchEffect(fetchModel);
                             v-for="seasonOption in leagueIndexModel
                                 .seasonOptions.options"
                         >
-                            <a
+                            <RouterLink
                                 class="dropdown-item"
                                 type="button"
-                                v-bind:href="seasonOption.href"
+                                v-bind:to="seasonOption.href"
                             >
                                 {{ seasonOption.display }}
-                            </a>
+                            </RouterLink>
                         </li>
                     </ul>
                 </div>
@@ -94,13 +98,13 @@ watchEffect(fetchModel);
                             v-for="subsessionOption in leagueIndexModel
                                 .subsessionOptions.options"
                         >
-                            <a
+                            <RouterLink
                                 class="dropdown-item"
                                 type="button"
-                                v-bind:href="subsessionOption.href"
+                                v-bind:to="subsessionOption.href"
                             >
                                 {{ subsessionOption.display }}
-                            </a>
+                            </RouterLink>
                         </li>
                     </ul>
                 </div>
@@ -119,13 +123,13 @@ watchEffect(fetchModel);
                             v-for="simsessionOption in leagueIndexModel
                                 .simsessionOptions.options"
                         >
-                            <a
+                            <RouterLink
                                 class="dropdown-item"
                                 type="button"
-                                v-bind:href="simsessionOption.href"
+                                v-bind:to="simsessionOption.href"
                             >
                                 {{ simsessionOption.display }}
-                            </a>
+                            </RouterLink>
                         </li>
                     </ul>
                 </div>

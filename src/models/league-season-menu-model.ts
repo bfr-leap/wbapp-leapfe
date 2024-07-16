@@ -35,30 +35,6 @@ export async function getLeagueSeasonMenuModel(
 
     let leagueSchedule = await getCuratedActiveLeagueSchedule();
     let blockedSeasons = await getCuratedBlockedSeasons();
-
-    if (isSignedIn) {
-        let userLeaguesState = await getUserLeaguesState();
-
-        if (userLeaguesState.length !== 0) {
-            if (leagueSchedule) {
-                leagueSchedule.leagues = leagueSchedule.leagues.filter(
-                    (l) =>
-                        userLeaguesState.findIndex(
-                            (ls) => ls.league_id === l.league_id
-                        ) >= 0
-                );
-            }
-
-            if (
-                userLeaguesState.findIndex(
-                    (ls) => ls.league_id.toString() === league
-                ) < 0
-            ) {
-                league = userLeaguesState[0].league_id.toString();
-            }
-        }
-    }
-
     let leagueSeasons = await getLeagueSeasons(league);
     leagueSeasons?.seasons.sort((a, b) => b.season_id - a.season_id);
 
@@ -90,7 +66,24 @@ export async function getLeagueSeasonMenuModel(
             ?.name || '---';
 
     ret.leagueOptions.options = [];
-    for (let league of leagueSchedule?.leagues || []) {
+    let leagues = leagueSchedule?.leagues || [];
+
+    if (isSignedIn) {
+        let userLeaguesState = await getUserLeaguesState();
+
+        if (userLeaguesState.length !== 0) {
+            if (leagueSchedule) {
+                leagues = leagues.filter(
+                    (l) =>
+                        userLeaguesState.findIndex(
+                            (ls) => ls.league_id === l.league_id
+                        ) >= 0
+                );
+            }
+        }
+    }
+
+    for (let league of leagues) {
         ret.leagueOptions.options.push({
             display: league.name,
             href: `?m=${targetPage}&league=${league.league_id}`,

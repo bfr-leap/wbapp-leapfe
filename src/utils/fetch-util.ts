@@ -130,9 +130,6 @@ async function fetchCachedDocument<T>(args: {
             console.log('looking for: ', source);
         }
 
-        console.log('cache miss:', source);
-        console.log('---', Object.keys(_cacheStorage));
-
         p = fetchObjects([source]);
         _cacheStorage[source] = p;
     }

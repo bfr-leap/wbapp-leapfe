@@ -1,8 +1,6 @@
 import { middleware as authMiddleware } from './middleware/_auth-user';
 import { getDocument } from '../lplib/dtbrkr/ftchdata';
 
-import { userDataHandler } from '../lplib/dtbrkr/usrdata';
-
 export default async function handle(req: any, res: any) {
     let authorizationHeader = req?.headers?.authorization || 'Bearer null';
     const token = authorizationHeader.replace('Bearer ', '');
@@ -18,11 +16,12 @@ export default async function handle(req: any, res: any) {
 
 async function defLgSeasSubCtx(req: any): Promise<any> {
     const q = {
-        namespace: 'ldata-usrcfg',
+        namespace: req.query.userID ? 'ldata-usrdata' : 'ldata-usrcfg',
         type: `defLgSeasSubCtx`,
         league: req.query.league,
         season: req.query.season,
         subsession: req.query.subsession,
+        userID: req.query.userID,
     };
 
     const lgSeasSubCtx = await getDocument(q.namespace, q);

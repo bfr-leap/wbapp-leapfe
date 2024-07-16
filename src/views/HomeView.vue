@@ -20,11 +20,10 @@ const route = useRoute();
 let league: Ref<string> = ref('');
 let season: Ref<string> = ref('');
 let subsession: Ref<string> = ref('');
+let simsession: Ref<string> = ref('');
 
 async function track() {
     // mixpanel.track(route.query.m?.toString() || 'home', route.query);
-
-    console.log('fetch model', route.query.league as string);
 
     const def: any = await defLgSeasSubCtx(
         route.query.league as string,
@@ -35,10 +34,12 @@ async function track() {
     league.value = def?.league_id?.toString() || '';
     season.value = def?.season_id?.toString() || '';
     subsession.value = def?.subsession_id?.toString() || '';
+    simsession.value = (route.query.simsession as string) || '';
 }
 
 track();
-watch(() => route.params, track);
+
+watch(route, track);
 </script>
 
 <template>
@@ -49,7 +50,13 @@ watch(() => route.params, track);
         v-bind:subsession="subsession"
     >
     </HomeView>
-    <ResultsView v-if="route.query.m === 'results'"></ResultsView>
+    <ResultsView
+        v-if="route.query.m === 'results'"
+        v-bind:league="league"
+        v-bind:season="season"
+        v-bind:subsession="subsession"
+        v-bind:simsession="simsession"
+    ></ResultsView>
     <DriverStandingsView
         v-if="route.query.m === 'standings'"
     ></DriverStandingsView>

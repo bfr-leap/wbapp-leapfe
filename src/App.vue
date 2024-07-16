@@ -87,7 +87,13 @@ watch(route, fetchModel);
     <RouterView />
 
     <div class="text-center">
-        Live Event Analysis and Performance by Blue Frog Racing
+        <a
+            href="https://www.bluefrogracing.com/"
+            class="text-bg"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Live Event Analysis and Performance by Blue Frog Racing.</a
+        >
     </div>
 </template>
 
@@ -96,5 +102,9 @@ watch(route, fetchModel);
     height: 1.5em;
     width: 1.5em;
     border-radius: 1em;
+}
+
+.text-bg {
+    color: #888;
 }
 </style>
