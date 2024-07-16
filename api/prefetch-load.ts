@@ -4,14 +4,10 @@ import { getDocument } from '../lplib/dtbrkr/ftchdata';
 import { userDataHandler } from '../lplib/dtbrkr/usrdata';
 
 export default async function handle(req: any, res: any) {
-
-    console.log(req.query);
-
     let authorizationHeader = req?.headers?.authorization || 'Bearer null';
     const token = authorizationHeader.replace('Bearer ', '');
 
     if ('null' !== token) {
-        console.log(req.headers.authorization);
         await authMiddleware(req, res, async (rq, rs) => {
             await prefetch(rq, rs);
         });
