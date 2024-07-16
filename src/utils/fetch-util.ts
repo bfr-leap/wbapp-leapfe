@@ -38,8 +38,13 @@ export async function preFetch(args: any) {
 
     if (_prefetchPromise) {
         if (DEBUG_PREFETCH) { console.log('preFetch() skip'); }
+        await _prefetchPromise;
         return;
     }
+
+    args.league = args.league || '';
+    args.season = args.season || '';
+    args.subsession = args.subsession || '';
 
     let keys = Object.keys(args);
     let argv = keys.map((v) => `${v}=${args[v]}`);
@@ -54,7 +59,7 @@ export async function preFetch(args: any) {
 
     _prefetchPromise = null;
 
-    keys = Object.keys(x.docs);
+    keys = Object.keys(x?.docs || {});
     for (let key of keys) {
         if (x.docs[key]) {
             _cacheStorage[key] = toPromise([{ doc: x.docs[key] }]);
@@ -63,15 +68,15 @@ export async function preFetch(args: any) {
     if (DEBUG_PREFETCH) { console.log('preFetch() done'); }
 }
 
+
 let _auth: any = null;
+export function setAuth(auth: any) {
+    _auth = auth;
+}
 
 async function fetchObjects(urls: string[]): Promise<any[]> {
     try {
-        if (!_auth) {
-            _auth = useAuth();
-        }
-
-        const token = await _auth.getToken.value();
+        const token = await _auth?.getToken?.value() || null;
 
         let objs = await Promise.all(
             (
@@ -113,6 +118,9 @@ async function fetchCachedDocument<T>(args: { [name: string]: string | number })
 
     if (!p) {
         if (DEBUG_PREFETCH) { console.log('looking for: ', source); }
+
+        console.log('cache miss:', source);
+        console.log("---", Object.keys(_cacheStorage));
 
         p = fetchObjects([source]);
         _cacheStorage[source] = p;
@@ -424,10 +432,10 @@ export async function getLeagueRoster(league: string): Promise<any> {
     return ret;
 }
 
-export async function defLgSeasSubCtx(): Promise<any> {
+export async function defLgSeasSubCtx(league: string = '', season: string = '', subsession: string = ''): Promise<any> {
     const namespace = 'ldata-usrcfg';
     const type = 'defLgSeasSubCtx';
 
-    let ret = await fetchCachedDocument<any>({ namespace, type });
+    let ret = await fetchCachedDocument<any>({ namespace, type, league, season, subsession });
     return ret;
 }

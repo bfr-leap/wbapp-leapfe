@@ -370,7 +370,8 @@ async function defLgSeasSubCtx(
     season: string,
     subsession: string
 ): Promise<any> {
-    console.log('defLgSeasSubCtx()');
+    console.log('defLgSeasSubCtx()', league);
+
 
     let ret = { league_id: '', season_id: '' };
     try {
@@ -392,6 +393,8 @@ export async function userConfigHandler(
     namespace: string,
     query: any
 ): Promise<any> {
+    console.log('userConfigHandler()');
+
     const q = query;
     let doc: any = null;
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-
+import type { Ref } from 'vue';
 import HomeView from '../components/home-view.vue';
 import ResultsView from '../components/results-view.vue';
 import DriverStandingsView from '@/components/driver-standings-view.vue';
@@ -11,13 +11,28 @@ import NextEventTimerEmbed from '@/components/next-event-timer-embed.vue';
 import SubsessionSummaryEmbed from '@/components/subsession-summary-embed.vue';
 import SeasonProfile from '@/components/season-profile-view.vue';
 import UserProfile from '@/components/user-profile-view.vue';
-import { watch } from 'vue';
+import { ref, watch } from 'vue';
 import mixpanel from 'mixpanel-browser';
+import { defLgSeasSubCtx } from '@/utils/fetch-util';
 
 const route = useRoute();
 
-function track() {
+let league: Ref<string> = ref('');
+let season: Ref<string> = ref('');
+let subsession: Ref<string> = ref('');
+
+async function track() {
     // mixpanel.track(route.query.m?.toString() || 'home', route.query);
+
+
+    console.log('fetch model', route.query.league as string);
+
+    const def: any = await defLgSeasSubCtx(route.query.league as string, route.query.season as string, route.query.subsession as string);
+
+    league.value = def?.league_id?.toString() || "";
+    season.value = def?.season_id?.toString() || "";
+    subsession.value = def?.subsession_id?.toString() || ''
+
 }
 
 track();
@@ -25,7 +40,8 @@ watch(() => route.params, track);
 </script>
 
 <template>
-    <HomeView v-if="!route.query.m"></HomeView>
+    <HomeView v-if="!route.query.m" v-bind:league="league" v-bind:season="season" v-bind:subsession="subsession">
+    </HomeView>
     <ResultsView v-if="route.query.m === 'results'"></ResultsView>
     <DriverStandingsView v-if="route.query.m === 'standings'"></DriverStandingsView>
     <DriverView v-if="route.query.m === 'driver'"></DriverView>

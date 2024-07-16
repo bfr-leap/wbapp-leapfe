@@ -7,22 +7,24 @@ import IRIdentityCardLink from '@/components/ir-identity-card-link.vue';
 import { useAuth } from 'vue-clerk';
 import { getUserLeaguesState } from '@/utils/fetch-util';
 import type { Ref } from 'vue';
-import { preFetch } from '@/utils/fetch-util';
+import { preFetch, defLgSeasSubCtx, setAuth } from '@/utils/fetch-util';
 
 const route = useRoute();
-const { isSignedIn } = useAuth();
+const auth = useAuth();
 
 let league: Ref<string> = ref('');
 let season: Ref<string> = ref('');
 let subsession: Ref<string> = ref('');
+let isMounted: Ref<boolean> = ref(false);
 
 async function fetchModel() {
-
+    setAuth(auth);
     await preFetch(route.query);
-
+    const ctx = await defLgSeasSubCtx(route.query.league as string, route.query.season as string, route.query.subsession as string);
+    league.value = ctx.league_id;
 }
 
-watchEffect(fetchModel);
+// watchEffect(fetchModel);
 watch(route, fetchModel);
 </script>
 

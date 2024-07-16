@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, watchEffect } from 'vue';
 import type { Ref } from 'vue';
-
+import { useRoute } from 'vue-router';
 import EventCardLg from '@/components/event-card-lg.vue';
 import EventCardSm from '@/components/event-card-sm.vue';
 import DriverStandings from '@/components/driver-standings.vue';
@@ -10,12 +10,17 @@ import PastEventCards from './past-event-cards.vue';
 import type { HomeModel } from '@/models/home-model';
 import { getDefaultHomeModel, getHomeModel } from '@/models/home-model';
 import { useAuth } from 'vue-clerk';
+import { defLgSeasSubCtx } from '@/utils/fetch-util';
+
+
+const route = useRoute();
 
 const { isSignedIn } = useAuth();
 
 const props = defineProps<{
     league: string;
     season: string;
+    subsession: string;
 }>();
 
 let homeModel: Ref<HomeModel> = ref(getDefaultHomeModel());
@@ -23,7 +28,8 @@ let homeModel: Ref<HomeModel> = ref(getDefaultHomeModel());
 async function fetchModel() {
     homeModel.value = await getHomeModel(props.league, props.season, isSignedIn.value === true);
 }
-watchEffect(fetchModel);
+// watchEffect(fetchModel);
+watch(props, fetchModel);
 
 function onClick(eventInfo: { trackId: string; date: string }) {
     homeModel.value.selectedRace = {

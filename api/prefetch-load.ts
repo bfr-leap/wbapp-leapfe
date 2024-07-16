@@ -4,15 +4,34 @@ import { getDocument } from '../lplib/dtbrkr/ftchdata';
 import { userDataHandler } from '../lplib/dtbrkr/usrdata';
 
 export default async function handle(req: any, res: any) {
-    let handled = false;
-    await authMiddleware(req, res, async (rq, rs) => {
-        handled = true;
-        await prefetch(rq, rs);
-    })
 
-    if (!handled) {
+    console.log(req.query);
+
+    let authorizationHeader = req?.headers?.authorization || 'Bearer null';
+    const token = authorizationHeader.replace('Bearer ', '');
+
+    if ('null' !== token) {
+        console.log(req.headers.authorization);
+        await authMiddleware(req, res, async (rq, rs) => {
+            await prefetch(rq, rs);
+        });
+    } else {
         await prefetch(req, res);
     }
+}
+
+async function defLgSeasSubCtx(req: any): Promise<any> {
+    const q = {
+        namespace: 'ldata-usrcfg', type: `defLgSeasSubCtx`,
+        league: req.query.league, season: req.query.season, subsession: req.query.subsession
+    };
+
+    const lgSeasSubCtx = await getDocument(q.namespace, q);
+    req.query.league = lgSeasSubCtx.league_id;
+    req.query.season = lgSeasSubCtx.season_id;
+    req.query.subsession = lgSeasSubCtx.subsession_id;
+
+    return lgSeasSubCtx;
 }
 
 async function prefetch(req: any, res: any) {
@@ -27,6 +46,9 @@ async function prefetch(req: any, res: any) {
         q.userID = req.user.id;
     }
 
+    const ctxKey = `/api/fetch-document?namespace=ldata-usrcfg&type=defLgSeasSubCtx&league=${req?.query?.league || ''}&season=${req?.query?.season || ''}&subsession=${req?.query?.subsession || ''}`;
+    const lgSeasSubCtx = await defLgSeasSubCtx(req);
+
     let r: any = {};
 
     switch (q.m) {
@@ -36,33 +58,14 @@ async function prefetch(req: any, res: any) {
 
     console.log('prefetch(): done');
 
+    r[ctxKey] = lgSeasSubCtx;
+
     res.status(200).json({ docs: r });
 }
 
-async function getDefaultLeagueSeason(userID: string): Promise<{ league: number, season: number }> {
-    console.log('getDefaultLeagueSeason()', userID);
-    if (!userID) {
-        return { league: 6555, season: 99410 };
-    }
-
-    const defaultLeagueSeason = await userDataHandler('', { type: 'defaultLeagueSeason', userID });
-    console.log(defaultLeagueSeason);
-    return { league: defaultLeagueSeason.league_id, season: defaultLeagueSeason.season_id };
-
-}
-
 async function preFetchHome(query: { [name: string]: string | number }) {
-    // let league = query.league || 6555;
-    // let season = query.season || 99410;
-
     let league = query.league;
     let season = query.season;
-
-    if (!league || !season) {
-        const def = await getDefaultLeagueSeason(<string>query.userID);
-        league = def.league;
-        season = def.season;
-    }
 
     let queries: { [name: string]: string | number }[] = [
         { namespace: `ldata-usrcfg`, type: `activeLeagueSchedule` },

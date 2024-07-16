@@ -36,16 +36,11 @@ export async function getHomeModel(
 ): Promise<HomeModel> {
     let ret: HomeModel = getDefaultHomeModel();
     let now: number = new Date().getTime();
-
-    console.log('**************************');
-    console.log('**************************');
-    console.log('**************************');
-    console.log('**************************');
-    let def = await defLgSeasSubCtx();
-    console.log(def);
-
-
     let s = await getCuratedActiveLeagueSchedule();
+
+    if (!s) {
+        return ret;
+    }
 
     if (isSignedIn) {
         let userLeaguesState = await getUserLeaguesState();
@@ -64,17 +59,6 @@ export async function getHomeModel(
 
     ret.leagueId = league;
     ret.seasonId = season;
-
-    if (!ret.leagueId) {
-        ret.leagueId = s.leagues[0].league_id.toString();
-    }
-
-    if (!ret.seasonId) {
-        ret.seasonId =
-            s.leagues
-                .find((v) => v.league_id.toString() === ret.leagueId)
-                ?.seasons[0].season_id.toString() || '???';
-    }
 
     let selectedLeague = s.leagues.find(
         (l) => l.league_id.toString() === ret.leagueId
