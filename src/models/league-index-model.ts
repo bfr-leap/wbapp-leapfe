@@ -4,7 +4,7 @@ import {
     getCuratedBlockedSeasons,
     getLeagueSimsessionIndex,
     getCuratedActiveLeagueSchedule,
-    getUserLeaguesState
+    getUserLeaguesState,
 } from '@/utils/fetch-util';
 import type { SeasonSimsessionIndex } from 'ir-endpoints-types';
 import { useAuth } from 'vue-clerk';
@@ -38,7 +38,7 @@ export async function getLeagueIndexModel(
     try {
         const { isSignedIn } = useAuth();
         signedIn = isSignedIn.value === true;
-    } catch (e) { }
+    } catch (e) {}
 
     let leagueSchedule = await getCuratedActiveLeagueSchedule();
     let blockedSeasons = await getCuratedBlockedSeasons();
@@ -48,13 +48,18 @@ export async function getLeagueIndexModel(
 
         if (userLeaguesState.length !== 0 && leagueSchedule) {
             leagueSchedule.leagues = leagueSchedule.leagues.filter(
-                l => userLeaguesState.findIndex(ls => ls.league_id === l.league_id) >= 0);
+                (l) =>
+                    userLeaguesState.findIndex(
+                        (ls) => ls.league_id === l.league_id
+                    ) >= 0
+            );
         }
     }
 
-    let seasonSimsessionIndex: SeasonSimsessionIndex[] = (
-        await getLeagueSimsessionIndex(leagueId)
-    )?.sort((a, b) => b.season_id - a.season_id) || [];
+    let seasonSimsessionIndex: SeasonSimsessionIndex[] =
+        (await getLeagueSimsessionIndex(leagueId))?.sort(
+            (a, b) => b.season_id - a.season_id
+        ) || [];
 
     let selectedLeague = leagueSchedule?.leagues.find(
         (l) => l.league_id.toString() === leagueId
@@ -117,7 +122,9 @@ export async function getLeagueIndexModel(
         }
     }
 
-    for (let subsessionIt of selectedSeason.sessions.filter(v => v.subsession_id)) {
+    for (let subsessionIt of selectedSeason.sessions.filter(
+        (v) => v.subsession_id
+    )) {
         ret.subsessionOptions.options.push({
             display: subsessionIt.session_title,
             href: `?m=results&league=${leagueId}&season=${selectedSeason.season_id}&subsession=${subsessionIt.subsession_id}&simsession=${subsessionIt.simsessions[0]?.simsession_id}`,

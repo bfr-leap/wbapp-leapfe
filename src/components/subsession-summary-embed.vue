@@ -3,7 +3,10 @@ import { ref, watch, watchEffect } from 'vue';
 import type { Ref } from 'vue';
 import { useRoute } from 'vue-router';
 import type { SubsessionSummaryEmbedModel } from '@/models/subsession-summary-embed-model';
-import { getSubsessionSummaryEmbedModel, getDefaultSubsessionSummaryEmbedModel, } from '@/models/subsession-summary-embed-model';
+import {
+    getSubsessionSummaryEmbedModel,
+    getDefaultSubsessionSummaryEmbedModel,
+} from '@/models/subsession-summary-embed-model';
 
 const route = useRoute();
 
@@ -19,7 +22,7 @@ async function fetchModel() {
         0
     );
 
-    if (route.query.isLight as string === 'true') {
+    if ((route.query.isLight as string) === 'true') {
         isLight.value = true;
     } else {
         isLight.value = false;
@@ -32,7 +35,6 @@ watch(route, fetchModel);
 <template>
     <div v-if="isLight === false" class="card bg-dark text-light m-2">
         <div class="card-body p-2">
-
             <div class="card-body p-2">
                 <p v-for="p of subsessionSummaryEmbedModel.summaryText">
                     {{ p }}
@@ -43,7 +45,6 @@ watch(route, fetchModel);
 
     <div v-else class="card bg-light text-dark m-2">
         <div class="card-body p-2">
-
             <div class="card-body p-2">
                 <p v-for="p of subsessionSummaryEmbedModel.summaryText">
                     {{ p }}

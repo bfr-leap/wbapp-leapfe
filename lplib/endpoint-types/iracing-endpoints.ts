@@ -385,8 +385,8 @@ export interface ActiveLeagueSchedule {
 export interface ALS_LeagueInfo {
     league_id: number;
     name: string;
-    journalistStyleName: string,
-    journalistFineTunning: string,
+    journalistStyleName: string;
+    journalistFineTunning: string;
     seasons: ALS_SeasonInfo[];
 }
 
@@ -488,7 +488,7 @@ export interface PodcastScriptedSrc {
         poses: string[];
         time: number;
         lookAt: number;
-    }[]
+    }[];
 }
 
 export type ChartTable = { [key: string]: number | string }[];

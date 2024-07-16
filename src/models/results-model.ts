@@ -174,7 +174,8 @@ export async function getResultsModel(
     let telemetrySubsessionIds = await getTelemetrySubsessionIds(ret.leagueId);
 
     ret.hasTelemetry =
-        -1 !== (telemetrySubsessionIds?.indexOf(parseInt(ret.subsessionId, 10)) || -1);
+        -1 !==
+        (telemetrySubsessionIds?.indexOf(parseInt(ret.subsessionId, 10)) || -1);
 
     return ret;
 }

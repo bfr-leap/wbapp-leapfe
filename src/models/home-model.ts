@@ -1,7 +1,7 @@
 import {
     getCuratedActiveLeagueSchedule,
     getUserLeaguesState,
-    defLgSeasSubCtx
+    defLgSeasSubCtx,
 } from '@/utils/fetch-util';
 import { useAuth } from 'vue-clerk';
 
@@ -48,10 +48,18 @@ export async function getHomeModel(
         if (userLeaguesState.length > 0) {
             if (s) {
                 s.leagues = s.leagues.filter(
-                    l => userLeaguesState.findIndex(ls => ls.league_id === l.league_id) >= 0);
+                    (l) =>
+                        userLeaguesState.findIndex(
+                            (ls) => ls.league_id === l.league_id
+                        ) >= 0
+                );
             }
 
-            if (userLeaguesState.findIndex(ls => ls.league_id.toString() === league) < 0) {
+            if (
+                userLeaguesState.findIndex(
+                    (ls) => ls.league_id.toString() === league
+                ) < 0
+            ) {
                 league = userLeaguesState[0].league_id.toString();
             }
         }

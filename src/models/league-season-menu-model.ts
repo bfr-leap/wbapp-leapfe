@@ -2,7 +2,7 @@ import {
     getLeagueSeasons,
     getCuratedBlockedSeasons,
     getCuratedActiveLeagueSchedule,
-    getUserLeaguesState
+    getUserLeaguesState,
 } from '@/utils/fetch-util';
 import type { DropdownModel } from '@/models/dropdown-model';
 import { getDefaultDropdownModel } from '@/models/dropdown-model';
@@ -42,10 +42,18 @@ export async function getLeagueSeasonMenuModel(
         if (userLeaguesState.length !== 0) {
             if (leagueSchedule) {
                 leagueSchedule.leagues = leagueSchedule.leagues.filter(
-                    l => userLeaguesState.findIndex(ls => ls.league_id === l.league_id) >= 0);
+                    (l) =>
+                        userLeaguesState.findIndex(
+                            (ls) => ls.league_id === l.league_id
+                        ) >= 0
+                );
             }
 
-            if (userLeaguesState.findIndex(ls => ls.league_id.toString() === league) < 0) {
+            if (
+                userLeaguesState.findIndex(
+                    (ls) => ls.league_id.toString() === league
+                ) < 0
+            ) {
                 league = userLeaguesState[0].league_id.toString();
             }
         }

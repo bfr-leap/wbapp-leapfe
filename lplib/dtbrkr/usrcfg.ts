@@ -178,7 +178,7 @@ async function defLgSeasSubCtx_noParams(): Promise<any> {
     const now = new Date().getTime();
     const ret =
         new Date(futRecs.time).getTime() - now <
-            now - new Date(pasRecs.time).getTime()
+        now - new Date(pasRecs.time).getTime()
             ? futRecs
             : pasRecs;
 
@@ -195,14 +195,18 @@ async function defLgSeasSubCtx_noParams(): Promise<any> {
             ?.filter((v: any) => v)
             ?.sort((a: any, b: any) => b - a)?.[0] || 0;
 
-    return { league_id: ret.league_id, season_id: ret.season_id, subsession_id: ret.subsession_id };
+    return {
+        league_id: ret.league_id,
+        season_id: ret.season_id,
+        subsession_id: ret.subsession_id,
+    };
 }
 
 async function defLgSeasSubCtx_forLeague(league: string): Promise<any> {
     console.log('defLgSeasSubCtx_forLeague()');
     const xata: XataClient = getXataClient();
 
-    if (await isValidLeague(league) === false) {
+    if ((await isValidLeague(league)) === false) {
         return defLgSeasSubCtx_noParams();
     }
 
@@ -235,12 +239,12 @@ async function defLgSeasSubCtx_forLeague(league: string): Promise<any> {
     } else if (!futRecs) {
         ret = pasRecs;
     } else if (!pasRecs) {
-        ret = futRecs
+        ret = futRecs;
     } else {
         const now = new Date().getTime();
         ret =
             new Date(futRecs.time).getTime() - now <
-                now - new Date(pasRecs.time).getTime()
+            now - new Date(pasRecs.time).getTime()
                 ? futRecs
                 : pasRecs;
     }
@@ -258,13 +262,20 @@ async function defLgSeasSubCtx_forLeague(league: string): Promise<any> {
             ?.filter((v: any) => v)
             ?.sort((a: any, b: any) => b - a)?.[0] || 0;
 
-    return { league_id: ret.league_id, season_id: ret.season_id, subsession_id: ret.subsession_id };
+    return {
+        league_id: ret.league_id,
+        season_id: ret.season_id,
+        subsession_id: ret.subsession_id,
+    };
 }
 
-async function defLgSeasSubCtx_forSeason(league: string, season: string): Promise<any> {
+async function defLgSeasSubCtx_forSeason(
+    league: string,
+    season: string
+): Promise<any> {
     console.log('defLgSeasSubCtx_forSeason()');
 
-    if (await isValidSeason(season) === 0) {
+    if ((await isValidSeason(season)) === 0) {
         return defLgSeasSubCtx_forLeague(league);
     }
 
@@ -299,12 +310,12 @@ async function defLgSeasSubCtx_forSeason(league: string, season: string): Promis
     } else if (!futRecs) {
         ret = pasRecs;
     } else if (!pasRecs) {
-        ret = futRecs
+        ret = futRecs;
     } else {
         const now = new Date().getTime();
         ret =
             new Date(futRecs.time).getTime() - now <
-                now - new Date(pasRecs.time).getTime()
+            now - new Date(pasRecs.time).getTime()
                 ? futRecs
                 : pasRecs;
     }
@@ -322,10 +333,18 @@ async function defLgSeasSubCtx_forSeason(league: string, season: string): Promis
             ?.filter((v: any) => v)
             ?.sort((a: any, b: any) => b - a)?.[0] || 0;
 
-    return { league_id: ret.league_id, season_id: ret.season_id, subsession_id: ret.subsession_id };
+    return {
+        league_id: ret.league_id,
+        season_id: ret.season_id,
+        subsession_id: ret.subsession_id,
+    };
 }
 
-async function defLgSeasSubCtx_forSubsession(league: string, season: string, subsession: string): Promise<any> {
+async function defLgSeasSubCtx_forSubsession(
+    league: string,
+    season: string,
+    subsession: string
+): Promise<any> {
     console.log('defLgSeasSubCtx_forSubsession()');
 
     let subsession_id = Number.parseInt(subsession, 10);
@@ -354,9 +373,10 @@ async function defLgSeasSubCtx_forSubsession(league: string, season: string, sub
         return await defLgSeasSubCtx_forLeague(league);
     }
 
-    const subsessionFound = dlDoc?.sessions
-        ?.map((s: any) => s?.subsession_id)
-        ?.indexOf(subsession_id) > 0;
+    const subsessionFound =
+        dlDoc?.sessions
+            ?.map((s: any) => s?.subsession_id)
+            ?.indexOf(subsession_id) > 0;
 
     if (!subsessionFound) {
         return await defLgSeasSubCtx_forSeason(league, season);
@@ -372,11 +392,14 @@ async function defLgSeasSubCtx(
 ): Promise<any> {
     console.log('defLgSeasSubCtx()', league);
 
-
     let ret = { league_id: '', season_id: '' };
     try {
         if (subsession) {
-            ret = await defLgSeasSubCtx_forSubsession(league, season, subsession)
+            ret = await defLgSeasSubCtx_forSubsession(
+                league,
+                season,
+                subsession
+            );
         } else if (season) {
             ret = await defLgSeasSubCtx_forSeason(league, season);
         } else if (league) {
@@ -384,7 +407,7 @@ async function defLgSeasSubCtx(
         } else {
             ret = await defLgSeasSubCtx_noParams();
         }
-    } catch (e) { }
+    } catch (e) {}
 
     return ret;
 }

@@ -18,8 +18,11 @@ export default async function handle(req: any, res: any) {
 
 async function defLgSeasSubCtx(req: any): Promise<any> {
     const q = {
-        namespace: 'ldata-usrcfg', type: `defLgSeasSubCtx`,
-        league: req.query.league, season: req.query.season, subsession: req.query.subsession
+        namespace: 'ldata-usrcfg',
+        type: `defLgSeasSubCtx`,
+        league: req.query.league,
+        season: req.query.season,
+        subsession: req.query.subsession,
     };
 
     const lgSeasSubCtx = await getDocument(q.namespace, q);
@@ -33,7 +36,7 @@ async function defLgSeasSubCtx(req: any): Promise<any> {
 async function prefetch(req: any, res: any) {
     console.log('prefetch(): start');
     const q: {
-        [name: string]: string | number
+        [name: string]: string | number;
     } = req?.query || {};
 
     q.m = q?.m || '';
@@ -42,7 +45,11 @@ async function prefetch(req: any, res: any) {
         q.userID = req.user.id;
     }
 
-    const ctxKey = `/api/fetch-document?namespace=ldata-usrcfg&type=defLgSeasSubCtx&league=${req?.query?.league || ''}&season=${req?.query?.season || ''}&subsession=${req?.query?.subsession || ''}`;
+    const ctxKey = `/api/fetch-document?namespace=ldata-usrcfg&type=defLgSeasSubCtx&league=${
+        req?.query?.league || ''
+    }&season=${req?.query?.season || ''}&subsession=${
+        req?.query?.subsession || ''
+    }`;
     const lgSeasSubCtx = await defLgSeasSubCtx(req);
 
     let r: any = {};
@@ -67,12 +74,17 @@ async function preFetchHome(query: { [name: string]: string | number }) {
         { namespace: `ldata-usrcfg`, type: `activeLeagueSchedule` },
         { namespace: `ldata-irweb`, type: `blockedSeasons` },
         { namespace: `ldata-rsltsts`, type: `leagueDriverStats`, league },
-        { namespace: `ldata-irweb`, type: `leagueSeasonSessions`, league, season },
+        {
+            namespace: `ldata-irweb`,
+            type: `leagueSeasonSessions`,
+            league,
+            season,
+        },
         { namespace: `ldata-usrcfg`, type: `leagueTeamsInfo`, league },
         { namespace: `ldata-rsltsts`, type: `leagueSimsessionIndex`, league },
         { namespace: `ldata-irweb`, type: `leagueSeasons`, league },
         { namespace: `ldata-irweb`, type: `membersData`, league, season },
-        { namespace: `ldata-usrcfg`, type: `trackDisplayInfo` }
+        { namespace: `ldata-usrcfg`, type: `trackDisplayInfo` },
     ];
 
     let urlKeys = [
@@ -84,10 +96,12 @@ async function preFetchHome(query: { [name: string]: string | number }) {
         `/api/fetch-document?namespace=ldata-rsltsts&type=leagueSimsessionIndex&league=${league}`,
         `/api/fetch-document?namespace=ldata-irweb&type=leagueSeasons&league=${league}`,
         `/api/fetch-document?namespace=ldata-irweb&type=membersData&league=${league}&season=${season}`,
-        `/api/fetch-document?namespace=ldata-usrcfg&type=trackDisplayInfo`
+        `/api/fetch-document?namespace=ldata-usrcfg&type=trackDisplayInfo`,
     ];
 
-    const hc = await Promise.all(queries.map((q) => getDocument(q.namespace.toString(), q)));
+    const hc = await Promise.all(
+        queries.map((q) => getDocument(q.namespace.toString(), q))
+    );
 
     let r: { [namea: string]: any } = {};
 

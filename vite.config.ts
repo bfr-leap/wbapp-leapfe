@@ -9,8 +9,8 @@ export default defineConfig({
     base: '/',
     resolve: {
         alias: {
-            'lplib': fileURLToPath(new URL('./lplib', import.meta.url)),
-            '@': fileURLToPath(new URL('./src', import.meta.url))
+            lplib: fileURLToPath(new URL('./lplib', import.meta.url)),
+            '@': fileURLToPath(new URL('./src', import.meta.url)),
         },
     },
 });

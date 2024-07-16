@@ -1,7 +1,7 @@
 import type { SeriesXY } from '@/models/line-chart-model';
 import {
     getTelemetrySubsessionIds,
-    getCumulativeDeltaBestLapChartData
+    getCumulativeDeltaBestLapChartData,
 } from '@/utils/fetch-util';
 
 export interface BestQualifyLapChartModel {
@@ -26,13 +26,21 @@ export async function getBestQualifyLapChartModel(
         -1 !== telemetrySubsessionIds.indexOf(parseInt(subsession, 10));
 
     if (telemetryAvailable) {
-        let r = await getCumulativeDeltaBestLapChartData(league, subsession, simsession);
+        let r = await getCumulativeDeltaBestLapChartData(
+            league,
+            subsession,
+            simsession
+        );
 
         let xKey = 'Lap Percent';
-        let keys = Object.keys(r[0]).filter(k => k !== xKey);
+        let keys = Object.keys(r[0]).filter((k) => k !== xKey);
 
-        let lapDeltas: SeriesXY[] = keys.map(k => {
-            let d = r.map(v => { return { x: <number>v[xKey], y: <number>v[k] }; }).filter(v => v.y !== undefined)
+        let lapDeltas: SeriesXY[] = keys.map((k) => {
+            let d = r
+                .map((v) => {
+                    return { x: <number>v[xKey], y: <number>v[k] };
+                })
+                .filter((v) => v.y !== undefined);
             return { name: k, data: d };
         });
 

@@ -191,9 +191,14 @@ function onToggleAll() {
             <g :transform="`translate(${margin.left},${margin.top})`">
                 <g ref="xAxis" :transform="`translate(0,${innerHeight})`"></g>
                 <g ref="yAxis"></g>
-                <path v-for="(series, i) in data" fill="none" :stroke="getColor(i)"
-                    :stroke-dasharray="basePatterns[i % basePatterns.length]" stroke-width="1.5"
-                    :d="getDPathAttr(series)"></path>
+                <path
+                    v-for="(series, i) in data"
+                    fill="none"
+                    :stroke="getColor(i)"
+                    :stroke-dasharray="basePatterns[i % basePatterns.length]"
+                    stroke-width="1.5"
+                    :d="getDPathAttr(series)"
+                ></path>
             </g>
         </svg>
     </div>
@@ -205,9 +210,12 @@ function onToggleAll() {
     <div class="d-flex flex-wrap justify-content-center d-print-none">
         <div v-for="(series, i) in data" class="p-1">
             <button class="btn bg-dark text-white" @click="onToggle(i)">
-                <span class="d-inline-block" :style="`background-color:${getColor(
-            i
-        )}; width:10px; height:10px`"></span>
+                <span
+                    class="d-inline-block"
+                    :style="`background-color:${getColor(
+                        i
+                    )}; width:10px; height:10px`"
+                ></span>
                 {{ series.name }}
             </button>
         </div>

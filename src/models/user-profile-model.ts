@@ -1,4 +1,8 @@
-import { getIrLinkState, setIrLinkDriver, setIrLinkCode } from '@/utils/fetch-util';
+import {
+    getIrLinkState,
+    setIrLinkDriver,
+    setIrLinkCode,
+} from '@/utils/fetch-util';
 
 export interface UserProfileModel {
     isVerified: boolean | null;
@@ -15,7 +19,7 @@ export function getDefaultUserProfileModel(): UserProfileModel {
             irCustId: '1234',
             enableCustIdSendButton: true,
             enableVerifySendButton: true,
-            msgSent: false
+            msgSent: false,
         })
     );
 }
@@ -38,7 +42,9 @@ export async function sendCustId(driver: string): Promise<UserProfileModel> {
     return ret;
 }
 
-export async function sendVerification(code: number): Promise<UserProfileModel> {
+export async function sendVerification(
+    code: number
+): Promise<UserProfileModel> {
     await setIrLinkCode(code);
     let ret = await getUserProfileModel();
     return ret;

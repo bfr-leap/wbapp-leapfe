@@ -1,7 +1,7 @@
 import {
     getTelemetrySubsessionIds,
     getPacePercentChartData,
-    getPacePercentVsIdealLapChartData
+    getPacePercentVsIdealLapChartData,
 } from '@/utils/fetch-util';
 
 export interface PaceChartModel {
@@ -39,23 +39,28 @@ export async function getPaceChartModel(
 
     let telemetrySubsessionIds = await getTelemetrySubsessionIds(league);
     let telemetryAvailable =
-        -1 !== (telemetrySubsessionIds?.indexOf(parseInt(subsession, 10)) || -1);
+        -1 !==
+        (telemetrySubsessionIds?.indexOf(parseInt(subsession, 10)) || -1);
 
     if (telemetryAvailable) {
-        let x = await getPacePercentVsIdealLapChartData(league, subsession, simsession);
-        ret.barChartData = x.map(v => {
+        let x = await getPacePercentVsIdealLapChartData(
+            league,
+            subsession,
+            simsession
+        );
+        ret.barChartData = x.map((v) => {
             return {
                 name: <string>v['name'],
                 value: <number>v['pace'],
-                value2: <number>v['ideal']
+                value2: <number>v['ideal'],
             };
         });
     } else {
         let x = await getPacePercentChartData(league, subsession, simsession);
-        ret.barChartData = x.map(v => {
+        ret.barChartData = x.map((v) => {
             return {
                 name: <string>v['name'],
-                value: <number>v['pace']
+                value: <number>v['pace'],
             };
         });
     }

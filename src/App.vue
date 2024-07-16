@@ -20,7 +20,11 @@ let isMounted: Ref<boolean> = ref(false);
 async function fetchModel() {
     setAuth(auth);
     await preFetch(route.query);
-    const ctx = await defLgSeasSubCtx(route.query.league as string, route.query.season as string, route.query.subsession as string);
+    const ctx = await defLgSeasSubCtx(
+        route.query.league as string,
+        route.query.season as string,
+        route.query.subsession as string
+    );
     league.value = ctx.league_id;
 }
 
@@ -29,33 +33,51 @@ watch(route, fetchModel);
 </script>
 
 <template>
-    <nav v-if="['nextEventTimerEmbed', 'subsessionSummaryEmbed'].indexOf(route.query.m?.toString() || '') ==
-        -1
-        " class="navbar navbar-dark navbar-expand-lg bg-nav">
+    <nav
+        v-if="
+            ['nextEventTimerEmbed', 'subsessionSummaryEmbed'].indexOf(
+                route.query.m?.toString() || ''
+            ) == -1
+        "
+        class="navbar navbar-dark navbar-expand-lg bg-nav"
+    >
         <div class="container-fluid">
             <div>
-                <button class="me-2 navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <button
+                    class="me-2 navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav"
+                    aria-controls="navbarNav"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation"
+                >
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <RouterLink class="navbar-brand " to="/">
-                    <img class="icon" v-bind:src="`blue-frog-racing-s4-icon.png`" />
+                <RouterLink class="navbar-brand" to="/">
+                    <img
+                        class="icon"
+                        v-bind:src="`blue-frog-racing-s4-icon.png`"
+                    />
                     LEAP
                 </RouterLink>
-
             </div>
 
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="navbar-nav">
-                    <RouterLink class="nav-link" v-bind:to="`/?m=results&league=${league}`">Results</RouterLink>
+                    <RouterLink
+                        class="nav-link"
+                        v-bind:to="`/?m=results&league=${league}`"
+                        >Results</RouterLink
+                    >
                 </div>
             </div>
             <SignedOut>
                 <SignInButton />
             </SignedOut>
             <SignedIn>
-                <div style="display:inline-flex">
+                <div style="display: inline-flex">
                     <IRIdentityCardLink />
                 </div>
             </SignedIn>

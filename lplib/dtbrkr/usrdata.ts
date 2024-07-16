@@ -29,8 +29,16 @@ export async function getIrLinkState(user_id: string): Promise<any> {
     };
 
     const xata: XataClient = getXataClient();
-    const userLink = await xata.db.user_ir_cust_mappings.select([
-        "user_id", "ir_cust_id", "verify_code", "is_verified", "msg_sent"]).filter({ user_id }).getFirst();
+    const userLink = await xata.db.user_ir_cust_mappings
+        .select([
+            'user_id',
+            'ir_cust_id',
+            'verify_code',
+            'is_verified',
+            'msg_sent',
+        ])
+        .filter({ user_id })
+        .getFirst();
 
     if (null !== userLink) {
         ret.isVerified = userLink.is_verified === true;
@@ -41,11 +49,16 @@ export async function getIrLinkState(user_id: string): Promise<any> {
     return ret;
 }
 
-export async function updIrLinkDriver(user_id: string, ir_cust_id: string): Promise<any> {
+export async function updIrLinkDriver(
+    user_id: string,
+    ir_cust_id: string
+): Promise<any> {
     console.log('updIrLinkDriver():', user_id);
     const xata: XataClient = getXataClient();
     const userLink = await xata.db.user_ir_cust_mappings
-        .select(['user_id', 'try_count']).filter({ user_id }).getFirst();
+        .select(['user_id', 'try_count'])
+        .filter({ user_id })
+        .getFirst();
 
     let try_count = -1;
 
@@ -54,21 +67,37 @@ export async function updIrLinkDriver(user_id: string, ir_cust_id: string): Prom
         await userLink.delete();
     }
 
-    ++try_count
+    ++try_count;
 
     const numDigits = 6;
-    const verify_code = Number.parseInt(new Array(numDigits).fill(0).map(v => Math.round(Math.random() * 9).toString()).join('')) || 0;
+    const verify_code =
+        Number.parseInt(
+            new Array(numDigits)
+                .fill(0)
+                .map((v) => Math.round(Math.random() * 9).toString())
+                .join('')
+        ) || 0;
 
-    await xata.db.user_ir_cust_mappings.create({ user_id, verify_code, ir_cust_id, try_count });
+    await xata.db.user_ir_cust_mappings.create({
+        user_id,
+        verify_code,
+        ir_cust_id,
+        try_count,
+    });
 
     return {};
 }
 
-export async function updIrLinkCode(user_id: string, verify_code: string): Promise<any> {
+export async function updIrLinkCode(
+    user_id: string,
+    verify_code: string
+): Promise<any> {
     console.log('updIrLinkCode():', user_id);
     const xata: XataClient = getXataClient();
-    const userLink = await xata.db.user_ir_cust_mappings.select([
-        "id", "user_id", "verify_code", "is_verified", 'try_count']).filter({ user_id }).getFirst();
+    const userLink = await xata.db.user_ir_cust_mappings
+        .select(['id', 'user_id', 'verify_code', 'is_verified', 'try_count'])
+        .filter({ user_id })
+        .getFirst();
 
     if (null !== userLink && userLink.verify_code?.toString() === verify_code) {
         console.log('updIrLinkCode() Success');
@@ -104,10 +133,13 @@ async function getUserLeaguesState(user_id: string): Promise<any> {
     return {};
 }
 
-async function updUserLeaguesState(user_id: string, code: string): Promise<any> {
+async function updUserLeaguesState(
+    user_id: string,
+    code: string
+): Promise<any> {
     console.log('updUserLeaguesState():', user_id, code);
 
-    const codes = code.split('-').map(c => Number.parseInt(c));
+    const codes = code.split('-').map((c) => Number.parseInt(c));
 
     let isValidInput: boolean = true;
     for (let c of codes) {
@@ -125,8 +157,8 @@ async function updUserLeaguesState(user_id: string, code: string): Promise<any> 
                 DELETE FROM "users_leagues_interest"
                 WHERE "user_id" = '${user_id}'
                 AND "league_id" NOT IN (${codes.join(', ')})
-            `
-        }
+            `,
+        };
 
         await xata.sql<UsersLeaguesInterestRecord>(s, []);
 
@@ -134,12 +166,14 @@ async function updUserLeaguesState(user_id: string, code: string): Promise<any> 
             statement: `
                 INSERT INTO "users_leagues_interest" ("user_id", "league_id")
                 SELECT '${user_id}', "league_id"
-                FROM (VALUES ${codes.map(c => `(${c})`).join(', ')}) AS ids("league_id")
+                FROM (VALUES ${codes
+                    .map((c) => `(${c})`)
+                    .join(', ')}) AS ids("league_id")
                 WHERE "league_id" NOT IN (
                     SELECT "league_id"
                     FROM "users_leagues_interest"
                     WHERE "user_id" = '${user_id}'
-                );`
+                );`,
         };
 
         await xata.sql<UsersLeaguesInterestRecord>(s, []);
@@ -148,26 +182,29 @@ async function updUserLeaguesState(user_id: string, code: string): Promise<any> 
     return await getUserLeaguesState(user_id);
 }
 
-export async function userDataHandler(namespace: string, query: any): Promise<any> {
+export async function userDataHandler(
+    namespace: string,
+    query: any
+): Promise<any> {
     const q = query;
 
     let doc: any = null;
 
     switch (q?.type) {
         case 'irLinkState':
-            doc = await getIrLinkState(q?.userID || "");
+            doc = await getIrLinkState(q?.userID || '');
             break;
         case 'irLinkDriverUpd':
-            doc = await updIrLinkDriver(q?.userID || "", q?.driver || "");
+            doc = await updIrLinkDriver(q?.userID || '', q?.driver || '');
             break;
         case 'irLinkCodeUpd':
-            doc = await updIrLinkCode(q?.userID || "", q?.code || "");
+            doc = await updIrLinkCode(q?.userID || '', q?.code || '');
             break;
         case 'userLeagues':
-            doc = await getUserLeaguesState(q?.userID || "");
+            doc = await getUserLeaguesState(q?.userID || '');
             break;
         case 'userLeaguesUpd':
-            doc = await updUserLeaguesState(q?.userID || "", q?.code || "");
+            doc = await updUserLeaguesState(q?.userID || '', q?.code || '');
             break;
         case 'defaultLeagueSeason':
             doc = await getDefaultLeagueSeason(q?.userID);

@@ -62,41 +62,73 @@ function onClick(eventInfo: { trackId: string; date: string }) {
     <div class="card bg-dark text-light m-2">
         <div class="card-body p-2">
             <div class="container">
-                <div v-if="nextEventTimerEmbedModel.schedule.nextRace.date !== ''
-                    " class="row g-1">
+                <div
+                    v-if="
+                        nextEventTimerEmbedModel.schedule.nextRace.date !== ''
+                    "
+                    class="row g-1"
+                >
                     <div class="col-12 col-sm-3 col-lg-2">
                         <div class="row g-1 flex-sm-column h-100">
-                            <div class="col" @click="
-                    onClick(
-                        nextEventTimerEmbedModel.schedule
-                            .nextRace
-                    )
-                    ">
-                                <EventCardSm class="h-100" v-bind:track_id="nextEventTimerEmbedModel.schedule
-                        .nextRace.trackId
-                    " v-bind:is_next="true" v-bind:date="new Date(
-                    nextEventTimerEmbedModel.schedule.nextRace.date
-                )
-                    " v-bind:is_selected="nextEventTimerEmbedModel.schedule
-                        .nextRace.isSelected
-                    "></EventCardSm>
+                            <div
+                                class="col"
+                                @click="
+                                    onClick(
+                                        nextEventTimerEmbedModel.schedule
+                                            .nextRace
+                                    )
+                                "
+                            >
+                                <EventCardSm
+                                    class="h-100"
+                                    v-bind:track_id="
+                                        nextEventTimerEmbedModel.schedule
+                                            .nextRace.trackId
+                                    "
+                                    v-bind:is_next="true"
+                                    v-bind:date="
+                                        new Date(
+                                            nextEventTimerEmbedModel.schedule.nextRace.date
+                                        )
+                                    "
+                                    v-bind:is_selected="
+                                        nextEventTimerEmbedModel.schedule
+                                            .nextRace.isSelected
+                                    "
+                                ></EventCardSm>
                             </div>
-                            <div v-for="race in nextEventTimerEmbedModel.schedule
-                    .futureRaces" class="col" @click="onClick(race)">
-                                <EventCardSm class="h-100" v-bind:track_id="race.trackId" v-bind:is_next="false"
-                                    v-bind:date="new Date(race.date)" v-bind:is_selected="race.isSelected">
+                            <div
+                                v-for="race in nextEventTimerEmbedModel.schedule
+                                    .futureRaces"
+                                class="col"
+                                @click="onClick(race)"
+                            >
+                                <EventCardSm
+                                    class="h-100"
+                                    v-bind:track_id="race.trackId"
+                                    v-bind:is_next="false"
+                                    v-bind:date="new Date(race.date)"
+                                    v-bind:is_selected="race.isSelected"
+                                >
                                 </EventCardSm>
                             </div>
                         </div>
                     </div>
                     <div class="col-12 col-sm-9 col-lg-10">
-                        <EventCardLg v-bind:track_id="nextEventTimerEmbedModel.schedule.selectedRace.trackId.toString()
-                    " v-bind:car_id="nextEventTimerEmbedModel.carId"
-                            v-bind:league_id="nextEventTimerEmbedModel.leagueId" v-bind:is_next="false" embed_mode
-                            v-bind:date="new Date(
-                    nextEventTimerEmbedModel.schedule.selectedRace.date
-                )
-                    "></EventCardLg>
+                        <EventCardLg
+                            v-bind:track_id="
+                                nextEventTimerEmbedModel.schedule.selectedRace.trackId.toString()
+                            "
+                            v-bind:car_id="nextEventTimerEmbedModel.carId"
+                            v-bind:league_id="nextEventTimerEmbedModel.leagueId"
+                            v-bind:is_next="false"
+                            embed_mode
+                            v-bind:date="
+                                new Date(
+                                    nextEventTimerEmbedModel.schedule.selectedRace.date
+                                )
+                            "
+                        ></EventCardLg>
                     </div>
                 </div>
                 <div v-else>No Future Events</div>
