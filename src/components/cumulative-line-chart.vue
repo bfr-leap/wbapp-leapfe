@@ -23,8 +23,12 @@ watchEffect(async () => {
 </script>
 
 <template>
-    <LineChart :title="cumulativeLineChartModel.titleOut" :data="cumulativeLineChartModel.seriesOut" :y-range="[
-        cumulativeLineChartModel.yRange[0],
-        cumulativeLineChartModel.yRange[1],
-    ]" />
+    <LineChart
+        :title="cumulativeLineChartModel.titleOut"
+        :data="cumulativeLineChartModel.seriesOut"
+        :y-range="[
+            cumulativeLineChartModel.yRange[0],
+            cumulativeLineChartModel.yRange[1],
+        ]"
+    />
 </template>

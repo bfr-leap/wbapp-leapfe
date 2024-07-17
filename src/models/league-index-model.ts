@@ -4,10 +4,10 @@ import {
     getCuratedBlockedSeasons,
     getLeagueSimsessionIndex,
     getCuratedActiveLeagueSchedule,
-    getUserLeaguesState
+    getUserLeaguesState,
 } from '@/utils/fetch-util';
 import type { SeasonSimsessionIndex } from 'ir-endpoints-types';
-import { useAuth } from 'vue-clerk';
+//
 
 export interface LeagueIndexModel {
     leagueOptions: DropdownModel;
@@ -31,30 +31,16 @@ export async function getLeagueIndexModel(
     leagueId: string,
     seasonId: string,
     subsessionId: string,
-    simsessionId: string
+    simsessionId: string,
+    isSignedIn: boolean
 ): Promise<LeagueIndexModel> {
-    let signedIn = false;
-
-    try {
-        const { isSignedIn } = useAuth();
-        signedIn = isSignedIn.value === true;
-    } catch (e) { }
-
     let leagueSchedule = await getCuratedActiveLeagueSchedule();
     let blockedSeasons = await getCuratedBlockedSeasons();
 
-    if (signedIn) {
-        let userLeaguesState = await getUserLeaguesState();
-
-        if (userLeaguesState.length !== 0 && leagueSchedule) {
-            leagueSchedule.leagues = leagueSchedule.leagues.filter(
-                l => userLeaguesState.findIndex(ls => ls.league_id === l.league_id) >= 0);
-        }
-    }
-
-    let seasonSimsessionIndex: SeasonSimsessionIndex[] = (
-        await getLeagueSimsessionIndex(leagueId)
-    )?.sort((a, b) => b.season_id - a.season_id) || [];
+    let seasonSimsessionIndex: SeasonSimsessionIndex[] =
+        (await getLeagueSimsessionIndex(leagueId))?.sort(
+            (a, b) => b.season_id - a.season_id
+        ) || [];
 
     let selectedLeague = leagueSchedule?.leagues.find(
         (l) => l.league_id.toString() === leagueId
@@ -98,7 +84,21 @@ export async function getLeagueIndexModel(
         return ret;
     }
 
-    for (let leagueIt of leagueSchedule.leagues) {
+    let leagues = leagueSchedule?.leagues || [];
+    if (isSignedIn) {
+        let userLeaguesState = await getUserLeaguesState();
+
+        if (userLeaguesState.length !== 0 && leagueSchedule) {
+            leagues = leagues.filter(
+                (l) =>
+                    userLeaguesState.findIndex(
+                        (ls) => ls.league_id === l.league_id
+                    ) >= 0
+            );
+        }
+    }
+
+    for (let leagueIt of leagues) {
         ret.leagueOptions.options.push({
             display: leagueIt.name,
             href: `?m=results&league=${leagueIt.league_id}`,
@@ -107,7 +107,7 @@ export async function getLeagueIndexModel(
 
     for (let seasonIt of seasonSimsessionIndex) {
         if (
-            !blockedSeasons[`${leagueId}_${seasonIt.season_id}`] &&
+            !blockedSeasons?.[`${leagueId}_${seasonIt.season_id}`] &&
             seasonIt.sessions.length > 0
         ) {
             ret.seasonOptions.options.push({
@@ -117,7 +117,9 @@ export async function getLeagueIndexModel(
         }
     }
 
-    for (let subsessionIt of selectedSeason.sessions.filter(v => v.subsession_id)) {
+    for (let subsessionIt of selectedSeason.sessions.filter(
+        (v) => v.subsession_id
+    )) {
         ret.subsessionOptions.options.push({
             display: subsessionIt.session_title,
             href: `?m=results&league=${leagueId}&season=${selectedSeason.season_id}&subsession=${subsessionIt.subsession_id}&simsession=${subsessionIt.simsessions[0]?.simsession_id}`,

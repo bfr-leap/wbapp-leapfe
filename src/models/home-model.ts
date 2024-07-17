@@ -1,5 +1,4 @@
-import { getCuratedActiveLeagueSchedule, getUserLeaguesState } from '@/utils/fetch-util';
-import { useAuth } from 'vue-clerk';
+import { getCuratedActiveLeagueSchedule } from '@/utils/fetch-util';
 
 export interface HomeModel {
     leagueName: string;
@@ -27,46 +26,18 @@ export function getDefaultHomeModel(): HomeModel {
 
 export async function getHomeModel(
     league: string,
-    season: string,
-    isSignedIn: boolean
+    season: string
 ): Promise<HomeModel> {
     let ret: HomeModel = getDefaultHomeModel();
     let now: number = new Date().getTime();
-
-
-
-
-
     let s = await getCuratedActiveLeagueSchedule();
 
-    if (isSignedIn) {
-        let userLeaguesState = await getUserLeaguesState();
-
-        if (userLeaguesState.length > 0) {
-            if (s) {
-                s.leagues = s.leagues.filter(
-                    l => userLeaguesState.findIndex(ls => ls.league_id === l.league_id) >= 0);
-            }
-
-            if (userLeaguesState.findIndex(ls => ls.league_id.toString() === league) < 0) {
-                league = userLeaguesState[0].league_id.toString();
-            }
-        }
+    if (!s) {
+        return ret;
     }
 
     ret.leagueId = league;
     ret.seasonId = season;
-
-    if (!ret.leagueId) {
-        ret.leagueId = s.leagues[0].league_id.toString();
-    }
-
-    if (!ret.seasonId) {
-        ret.seasonId =
-            s.leagues
-                .find((v) => v.league_id.toString() === ret.leagueId)
-                ?.seasons[0].season_id.toString() || '???';
-    }
 
     let selectedLeague = s.leagues.find(
         (l) => l.league_id.toString() === ret.leagueId

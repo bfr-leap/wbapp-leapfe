@@ -55,7 +55,7 @@ export async function getResultsModel(
         simsessionId = '';
     }
 
-    let seasonSimsessionIndex: SeasonSimsessionIndex[] =
+    let seasonSimsessionIndex: SeasonSimsessionIndex[] | null =
         await getLeagueSimsessionIndex(leagueId);
 
     let selectedSeason = seasonSimsessionIndex?.find(
@@ -66,24 +66,24 @@ export async function getResultsModel(
         // find the first seasson with sessions
         // ...and do the same for other props
         let seasonIndex: number = 0;
-        for (let i = 0; i < seasonSimsessionIndex?.length || 0; ++i) {
-            if (seasonSimsessionIndex[i].sessions.length > 0) {
+        for (let i = 0; i < (seasonSimsessionIndex?.length || 0); ++i) {
+            if (seasonSimsessionIndex?.[i].sessions.length > 0) {
                 seasonIndex = i;
                 break;
             }
         }
 
-        selectedSeason = seasonSimsessionIndex[seasonIndex];
+        selectedSeason = seasonSimsessionIndex?.[seasonIndex] || '';
 
-        seasonId = selectedSeason.season_id.toString();
+        seasonId = selectedSeason?.season_id?.toString() || '';
         subsessionId = '';
     }
 
-    let selectedSubsession = selectedSeason?.sessions.find(
-        (s) => s?.subsession_id?.toString() === subsessionId
+    let selectedSubsession = selectedSeason?.sessions?.find(
+        (s: any) => s?.subsession_id?.toString() === subsessionId
     );
 
-    let i = selectedSeason.sessions.length - 1;
+    let i = (selectedSeason?.sessions?.length || 0) - 1;
 
     while (
         (!selectedSubsession || selectedSubsession.simsessions.length == 0) &&
@@ -95,7 +95,7 @@ export async function getResultsModel(
     }
 
     let selectedSimsession = selectedSubsession?.simsessions.find(
-        (s) => s.simsession_id.toString() === simsessionId
+        (s: any) => s.simsession_id.toString() === simsessionId
     );
 
     if (!selectedSimsession) {
@@ -128,7 +128,7 @@ export async function getResultsModel(
 
     let trackId: string = '-1';
 
-    for (let s of leagueSeasonSessions.sessions) {
+    for (let s of leagueSeasonSessions?.sessions || []) {
         if (s.subsession_id.toString() === subsessionId) {
             trackId = s.track.track_id.toString();
             break;
@@ -146,19 +146,20 @@ export async function getResultsModel(
         simsessionId
     );
 
-    ret.results = <any>simsessionResults.results.map((row) => {
-        let r: { [name: string]: any } = {
-            pos: row.position,
-            cust_id: row.cust_id,
-            fastest_lap: row.fastest_lap_time,
-            pace_percent:
-                row.pace_percent || row.pace_percent === 0
-                    ? row.pace_percent + '%'
-                    : '',
-            fast_lap: row.fast_lap,
-            laps: row.laps_completed,
-            inc: row.incidents,
-        };
+    ret.results = <any>simsessionResults?.results.map((row) => {
+        let r: { [name: string]: any } =
+            {
+                pos: row.position,
+                cust_id: row.cust_id,
+                fastest_lap: row.fastest_lap_time,
+                pace_percent:
+                    row.pace_percent || row.pace_percent === 0
+                        ? row.pace_percent + '%'
+                        : '',
+                fast_lap: row.fast_lap,
+                laps: row.laps_completed,
+                inc: row.incidents,
+            } || [];
 
         if (
             selectedSimsession?.type === 'race' ||
@@ -174,7 +175,8 @@ export async function getResultsModel(
     let telemetrySubsessionIds = await getTelemetrySubsessionIds(ret.leagueId);
 
     ret.hasTelemetry =
-        -1 !== (telemetrySubsessionIds?.indexOf(parseInt(ret.subsessionId, 10)) || -1);
+        -1 !==
+        (telemetrySubsessionIds?.indexOf(parseInt(ret.subsessionId, 10)) || -1);
 
     return ret;
 }

@@ -1,5 +1,8 @@
 import type { LCD_Chunk } from 'ir-endpoints-types';
-import { getLapChartData, getCumulativeDeltaChartData } from '@/utils/fetch-util';
+import {
+    getLapChartData,
+    getCumulativeDeltaChartData,
+} from '@/utils/fetch-util';
 import type { SeriesXY } from '@/models/line-chart-model';
 
 interface GridItem {
@@ -50,7 +53,7 @@ function getStartGrid(chunks: LCD_Chunk[]): GridItem[] {
 
 export interface CumulativeDeltaChartModel {
     series: SeriesXY[];
-    range: [number, number]
+    range: [number, number];
 }
 
 export async function getCumulativeDeltaChartModel(
@@ -80,10 +83,14 @@ export async function getCumulativeDeltaChartModel(
 
     let r = await getCumulativeDeltaChartData(league, subsession, simsession);
     let xKey = 'Lap';
-    let keys = Object.keys(r[0]).filter(k => k !== xKey);
+    let keys = Object.keys(r[0]).filter((k) => k !== xKey);
 
-    let ret: SeriesXY[] = keys.map(k => {
-        let d = r.map(v => { return { x: <number>v[xKey], y: <number>v[k] }; }).filter(v => v.y !== undefined)
+    let ret: SeriesXY[] = keys.map((k) => {
+        let d = r
+            .map((v) => {
+                return { x: <number>v[xKey], y: <number>v[k] };
+            })
+            .filter((v) => v.y !== undefined);
         return { name: k, data: d };
     });
 

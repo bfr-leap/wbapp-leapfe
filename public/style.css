@@ -2,7 +2,7 @@ body {
     background-color: rgb(50, 54, 57);
     font-family: Lato;
     font-size: 9pt;
-    color: #ddd; 
+    color: #ddd;
     cursor: default;
 }
 
@@ -28,7 +28,6 @@ div {
 .toolbar li {
     display: inline-block;
     height: 2em;
-
 }
 
 .toolbar li a {
@@ -36,12 +35,11 @@ div {
     display: inline-block;
     color: #000;
     height: 1.25em;
-    padding: .5em .75em;
+    padding: 0.5em 0.75em;
     text-decoration: none;
 }
 
 .toolbar li a:hover {
-
     background-color: rgb(100, 108, 114);
     color: white;
 }
@@ -53,7 +51,7 @@ div {
 }
 
 .toolbar li a span::before {
-    content: "\00a0";
+    content: '\00a0';
 }
 
 .toolbar li a .jira-ico,
@@ -96,12 +94,12 @@ div {
 }
 
 .linkbtn-item {
-    padding: .25em;
+    padding: 0.25em;
     text-align: center;
 }
 
 .linkbtn-inline-item {
-    padding: .25em;
+    padding: 0.25em;
     display: inline;
     text-align: left;
 }
@@ -130,10 +128,10 @@ div {
 .linkbtn-item a {
     border-radius: 1.25em;
     display: inline;
-    color: rgb(255, 255, 255); 
+    color: rgb(255, 255, 255);
     width: 100%;
     height: 100%;
-    padding: .2em 1em;
+    padding: 0.2em 1em;
     text-decoration: none;
     cursor: default;
 }
@@ -152,9 +150,9 @@ div {
     height: 75em;
     background-color: rgb(50, 54, 57);
     background-image: url('./blue-frog-racing.png');
-    background-size:     cover;                      /* <------ */
-    background-repeat:   no-repeat;
-    background-position: center center;  
+    background-size: cover; /* <------ */
+    background-repeat: no-repeat;
+    background-position: center center;
 }
 
 .chart {
@@ -184,33 +182,47 @@ div {
     color: white;
 }
 
-.p-ranking-header, .p-points-header, .driver-img-header, .driver-header, .p-ranking, .p-points, .driver-img, .driver  {
+.p-ranking-header,
+.p-points-header,
+.driver-img-header,
+.driver-header,
+.p-ranking,
+.p-points,
+.driver-img,
+.driver {
     display: inline-block;
     margin-left: 0.5em;
     margin-right: 0.5em;
 }
 
-.p-ranking-header, .p-points-header, .driver-img-header, .driver-header {
+.p-ranking-header,
+.p-points-header,
+.driver-img-header,
+.driver-header {
     font-weight: bold;
-   
 }
 
-.p-ranking-header, .p-ranking {
+.p-ranking-header,
+.p-ranking {
     width: 7em;
 }
 
-.p-points-header, .p-points {
+.p-points-header,
+.p-points {
     width: 6em;
 }
 
-.driver-img-header, .driver-img {
+.driver-img-header,
+.driver-img {
     width: 3em;
 }
 
-.p-ranking, .p-points, .driver-img {
-    align-content:center;
+.p-ranking,
+.p-points,
+.driver-img {
+    align-content: center;
     text-align: center;
-    float:left;
+    float: left;
 }
 
 .driver-img {
@@ -222,13 +234,13 @@ div {
 }
 
 .last-name {
-    text-transform:uppercase;
+    text-transform: uppercase;
     font-weight: bold;
     font-size: 16pt;
 }
 
 .license-pill-a {
-    background-color:darkgreen;
+    background-color: darkgreen;
 }
 
 .license-pill-b {
@@ -236,74 +248,82 @@ div {
 }
 
 .license-pill-c {
-    background-color:rgb(135, 131, 21);
+    background-color: rgb(135, 131, 21);
 }
 
 .license-pill-d {
-    background-color:rgb(135, 78, 21);
+    background-color: rgb(135, 78, 21);
 }
 
 .license-pill-e {
-    background-color:rgb(135, 21, 21);
+    background-color: rgb(135, 21, 21);
 }
 
-
-.license-pill-a, .license-pill-b, .license-pill-c, .license-pill-d, .license-pill-e {
-    padding-left: .75em;
-    padding-right: .75em;
-    border-radius: .5em;
+.license-pill-a,
+.license-pill-b,
+.license-pill-c,
+.license-pill-d,
+.license-pill-e {
+    padding-left: 0.75em;
+    padding-right: 0.75em;
+    border-radius: 0.5em;
     display: inline-block;
 }
 
 .more-detail-btn {
-    cursor:default;
+    cursor: default;
     padding-bottom: 1em;
     font-size: 12pt;
 }
 
 .more-detail-btn:hover {
     font-weight: bold;
-    color:rgb(255, 255, 255);
+    color: rgb(255, 255, 255);
 }
 
-.club-30, .club-14, .club-6, .club-27, .club-23, .club-28, .club-23, .club-17, .club-33, .club-26, .club-22, .club-29, .club-16, .club-32 {
+.club-30,
+.club-14,
+.club-6,
+.club-27,
+.club-23,
+.club-28,
+.club-23,
+.club-17,
+.club-33,
+.club-26,
+.club-22,
+.club-29,
+.club-16,
+.club-32 {
     background-image: url(flags/usa.png);
-    
 }
 
 .club-36 {
     background-image: url(flags/ukandi.jpg);
-    
 }
 
 .club-44 {
     background-image: url(flags/finland.png);
-    
 }
 
 .club-1 {
     background-image: url(flags/international.png);
-    
 }
 
 .club-43 {
     background-image: url(flags/scandinavia.png);
-    
 }
 
 .club-40 {
     background-image: url(flags/benelux.png);
-    
 }
 
 .club-46 {
     background-image: url(flags/europe.png);
-    
 }
 
 .club-45 {
     background-image: url(flags/brazil.png);
-    
 }
 
 .club-41 {
@@ -326,21 +346,20 @@ div {
 }
 
 .driver-stat::before {
-    content: "---";
+    content: '---';
     background-color: #aaa;
-    color:#aaa;
+    color: #aaa;
     border-radius: 1em;
     background-size: cover;
     background-position: center;
-    margin: .5em;
-    ;
+    margin: 0.5em;
 }
 
 .driver-stat .name {
-   color:#aaa;
+    color: #aaa;
 }
 .driver-stat .value {
-    color:#eee;
+    color: #eee;
 }
 
 .small-chart {

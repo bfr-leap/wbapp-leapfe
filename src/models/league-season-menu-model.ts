@@ -2,7 +2,7 @@ import {
     getLeagueSeasons,
     getCuratedBlockedSeasons,
     getCuratedActiveLeagueSchedule,
-    getUserLeaguesState
+    getUserLeaguesState,
 } from '@/utils/fetch-util';
 import type { DropdownModel } from '@/models/dropdown-model';
 import { getDefaultDropdownModel } from '@/models/dropdown-model';
@@ -29,38 +29,17 @@ export async function getLeagueSeasonMenuModel(
 ): Promise<LeagueSeasonMenuModel> {
     let ret = getDefaultLeagueSeasonMenuModel();
 
-    if (!league || '0' === league) {
+    if (!league || '0' === league || !season || '0' === season) {
         return ret;
     }
 
     let leagueSchedule = await getCuratedActiveLeagueSchedule();
     let blockedSeasons = await getCuratedBlockedSeasons();
-
-    if (isSignedIn) {
-        let userLeaguesState = await getUserLeaguesState();
-
-        if (userLeaguesState.length !== 0) {
-            if (leagueSchedule) {
-                leagueSchedule.leagues = leagueSchedule.leagues.filter(
-                    l => userLeaguesState.findIndex(ls => ls.league_id === l.league_id) >= 0);
-            }
-
-            if (userLeaguesState.findIndex(ls => ls.league_id.toString() === league) < 0) {
-                league = userLeaguesState[0].league_id.toString();
-            }
-        }
-    }
-
     let leagueSeasons = await getLeagueSeasons(league);
     leagueSeasons?.seasons.sort((a, b) => b.season_id - a.season_id);
 
-    let pSeason = season;
-    if (!pSeason) {
-        pSeason = leagueSeasons?.seasons[0].season_id.toString() || '';
-    }
-
     let currentSeason = leagueSeasons?.seasons.find(
-        (s) => s.season_id.toString() === pSeason
+        (s) => s.season_id.toString() === season
     );
 
     let minSeasonId = <number>(<unknown>blockedSeasons?.['min_season_id']) || 0;
@@ -87,7 +66,24 @@ export async function getLeagueSeasonMenuModel(
             ?.name || '---';
 
     ret.leagueOptions.options = [];
-    for (let league of leagueSchedule?.leagues || []) {
+    let leagues = leagueSchedule?.leagues || [];
+
+    if (isSignedIn) {
+        let userLeaguesState = await getUserLeaguesState();
+
+        if (userLeaguesState.length !== 0) {
+            if (leagueSchedule) {
+                leagues = leagues.filter(
+                    (l) =>
+                        userLeaguesState.findIndex(
+                            (ls) => ls.league_id === l.league_id
+                        ) >= 0
+                );
+            }
+        }
+    }
+
+    for (let league of leagues) {
         ret.leagueOptions.options.push({
             display: league.name,
             href: `?m=${targetPage}&league=${league.league_id}`,

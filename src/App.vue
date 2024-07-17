@@ -7,75 +7,77 @@ import IRIdentityCardLink from '@/components/ir-identity-card-link.vue';
 import { useAuth } from 'vue-clerk';
 import { getUserLeaguesState } from '@/utils/fetch-util';
 import type { Ref } from 'vue';
+import { preFetch, defLgSeasSubCtx, setAuth } from '@/utils/fetch-util';
 
 const route = useRoute();
-const { isSignedIn } = useAuth();
+const auth = useAuth();
 
-let leagueId: Ref<string> = ref(
-    '6555'
-);
+let league: Ref<string> = ref('');
+let season: Ref<string> = ref('');
+let subsession: Ref<string> = ref('');
+let isMounted: Ref<boolean> = ref(false);
 
 async function fetchModel() {
-    let leagueIdValue = route.query.league as string;
-    if (!leagueIdValue) {
-        let signedIn = false;
-
-        try {
-            signedIn = isSignedIn.value === true;
-        } catch (e) {
-            console.log(e);
-        }
-
-        if (signedIn) {
-            let uls = await getUserLeaguesState();
-
-            if (uls.length > 0) {
-                leagueIdValue = uls[0].league_id.toString();
-            }
-        }
-
-        if (!leagueIdValue) {
-            leagueIdValue = '6555';
-        }
-    }
-
-    if (leagueId.value !== leagueIdValue) {
-        leagueId.value = leagueIdValue;
-    }
+    setAuth(auth);
+    await preFetch(route.query);
+    const ctx = await defLgSeasSubCtx(
+        route.query.league as string,
+        route.query.season as string,
+        route.query.subsession as string
+    );
+    league.value = ctx.league_id;
 }
 
-watchEffect(fetchModel);
+// watchEffect(fetchModel);
 watch(route, fetchModel);
 </script>
 
 <template>
-    <nav v-if="['nextEventTimerEmbed', 'subsessionSummaryEmbed'].indexOf(route.query.m?.toString() || '') ==
-        -1
-        " class="navbar navbar-dark navbar-expand-lg bg-nav">
+    <nav
+        v-if="
+            ['nextEventTimerEmbed', 'subsessionSummaryEmbed'].indexOf(
+                route.query.m?.toString() || ''
+            ) == -1
+        "
+        class="navbar navbar-dark navbar-expand-lg bg-nav"
+    >
         <div class="container-fluid">
             <div>
-                <button class="me-2 navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <button
+                    class="me-2 navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav"
+                    aria-controls="navbarNav"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation"
+                >
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <RouterLink class="navbar-brand " to="/">
-                    <img class="icon" v-bind:src="`blue-frog-racing-s4-icon.png`" />
+                <RouterLink class="navbar-brand" to="/">
+                    <img
+                        class="icon"
+                        v-bind:src="`blue-frog-racing-s4-icon.png`"
+                    />
                     LEAP
                 </RouterLink>
-
             </div>
 
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="navbar-nav">
-                    <RouterLink class="nav-link" v-bind:to="`/?m=results&league=${leagueId}`">Results</RouterLink>
+                    <RouterLink
+                        class="nav-link"
+                        v-bind:to="`/?m=results&league=${league}`"
+                        >Results</RouterLink
+                    >
                 </div>
             </div>
             <SignedOut>
                 <SignInButton />
             </SignedOut>
             <SignedIn>
-                <div style="display:inline-flex">
+                <div style="display: inline-flex">
                     <IRIdentityCardLink />
                 </div>
             </SignedIn>
@@ -85,7 +87,13 @@ watch(route, fetchModel);
     <RouterView />
 
     <div class="text-center">
-        Live Event Analysis and Performance by Blue Frog Racing
+        <a
+            href="https://www.bluefrogracing.com/"
+            class="text-bg"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Live Event Analysis and Performance by Blue Frog Racing.</a
+        >
     </div>
 </template>
 
@@ -94,5 +102,9 @@ watch(route, fetchModel);
     height: 1.5em;
     width: 1.5em;
     border-radius: 1em;
+}
+
+.text-bg {
+    color: #888;
 }
 </style>

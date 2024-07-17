@@ -12,8 +12,9 @@ const props = defineProps<{
     simsession?: string;
 }>();
 
-
-const lapTimesNew: Ref<CumulativeDeltaChartModel> = ref(<CumulativeDeltaChartModel>{ series: Array<SeriesXY>(), range: [0, 1] });
+const lapTimesNew: Ref<CumulativeDeltaChartModel> = ref(<
+    CumulativeDeltaChartModel
+>{ series: Array<SeriesXY>(), range: [0, 1] });
 
 // A cumulative delta chart is a graphical representation of the time differences between two or
 // more cars over the course of a race. It is often used in motor sports, particularly in timed racing events,
@@ -34,14 +35,18 @@ const lapTimesNew: Ref<CumulativeDeltaChartModel> = ref(<CumulativeDeltaChartMod
 // drivers or teams in a race, and it can help provide valuable insights into the dynamics of the competition.
 
 async function fetchModel() {
-    if (props.simsession == undefined || props.subsession == undefined || props.league == undefined) {
+    if (
+        props.simsession == undefined ||
+        props.subsession == undefined ||
+        props.league == undefined
+    ) {
         return;
     }
     lapTimesNew.value = await getCumulativeDeltaChartModel(
         props.league || '',
         props.simsession || '',
         props.subsession || ''
-    )
+    );
 }
 
 watchEffect(fetchModel);
@@ -49,8 +54,9 @@ watch(props, fetchModel);
 </script>
 
 <template>
-    <LineChart :title="''" :data="lapTimesNew.series" :y-range="[
-        lapTimesNew.range[0],
-        lapTimesNew.range[1],
-    ]" />
+    <LineChart
+        :title="''"
+        :data="lapTimesNew.series"
+        :y-range="[lapTimesNew.range[0], lapTimesNew.range[1]]"
+    />
 </template>
