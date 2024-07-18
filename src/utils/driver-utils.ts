@@ -14,10 +14,10 @@ export function getFirstLastNames(display_name: string): {
     return { lastName, firstName };
 }
 
-export function getRoadLicense(licenses: M_License[]): M_License {
+export function getFormulaLicense(licenses: M_License[]): M_License {
     let rL = licenses[0];
     for (let l of licenses) {
-        if (l.category === 'road') {
+        if (l.category === 'formula_car') {
             rL = l;
             break;
         }
@@ -45,7 +45,7 @@ export function getMemberViewFromM_Memeber(
     }
 
     let names = getFirstLastNames(member.display_name);
-    let rL = getRoadLicense(member.licenses);
+    let rL = getFormulaLicense(member.licenses);
     let classLevel = rL.group_name[rL.group_name.length - 1].toUpperCase();
     let irating = rL.irating;
     if (!irating) {
