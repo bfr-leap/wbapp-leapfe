@@ -2,7 +2,7 @@ import {
     getCuratedLeagueTeamsInfo,
     getSingleMemberData,
 } from '@/utils/fetch-util';
-import { getFirstLastNames, getRoadLicense } from '@/utils/driver-utils';
+import { getFirstLastNames, getFormulaLicense } from '@/utils/driver-utils';
 
 interface TeamTagDriverModel {
     lastname: string;
@@ -20,7 +20,7 @@ async function sortDriverIdsByIRating(driverIds: string[]) {
 
     for (let driverId of driverIds) {
         let driver = await getSingleMemberData(driverId.toString());
-        let raiting = getRoadLicense(driver.licenses).irating;
+        let raiting = getFormulaLicense(driver.licenses).irating;
         driverIRatings[driverId] = raiting;
     }
 
@@ -79,7 +79,7 @@ export async function getTeamTagModel(
 
                 for (let driverId of driverIds) {
                     let driver = await getSingleMemberData(driverId.toString());
-                    let raiting = getRoadLicense(driver.licenses).irating;
+                    let raiting = getFormulaLicense(driver.licenses).irating;
                     cumulativeIRating += raiting;
                     ret.drivers.push({
                         lastname: getFirstLastNames(driver.display_name)
