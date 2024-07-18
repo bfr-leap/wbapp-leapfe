@@ -3,7 +3,7 @@ import { ref, watch, watchEffect } from 'vue';
 import { RouterLink, RouterView } from 'vue-router';
 import { useRoute } from 'vue-router';
 import { SignedIn, SignedOut, SignInButton } from 'vue-clerk';
-import IRIdentityCardLink from '@/components/ir-identity-card-link.vue';
+import IRIdentityCardLink from '@/components/user/ir-identity-card-link.vue';
 import { useAuth } from 'vue-clerk';
 import { getUserLeaguesState } from '@/utils/fetch-util';
 import type { Ref } from 'vue';
@@ -33,44 +33,27 @@ watch(route, fetchModel);
 </script>
 
 <template>
-    <nav
-        v-if="
-            ['nextEventTimerEmbed', 'subsessionSummaryEmbed'].indexOf(
-                route.query.m?.toString() || ''
-            ) == -1
-        "
-        class="navbar navbar-dark navbar-expand-lg bg-nav"
-    >
+    <nav v-if="
+        ['nextEventTimerEmbed', 'subsessionSummaryEmbed'].indexOf(
+            route.query.m?.toString() || ''
+        ) == -1
+    " class="navbar navbar-dark navbar-expand-lg bg-nav">
         <div class="container-fluid">
             <div>
-                <button
-                    class="me-2 navbar-toggler"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#navbarNav"
-                    aria-controls="navbarNav"
-                    aria-expanded="false"
-                    aria-label="Toggle navigation"
-                >
+                <button class="me-2 navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <RouterLink class="navbar-brand" to="/">
-                    <img
-                        class="icon"
-                        v-bind:src="`blue-frog-racing-s4-icon.png`"
-                    />
+                    <img class="icon" v-bind:src="`blue-frog-racing-s4-icon.png`" />
                     LEAP
                 </RouterLink>
             </div>
 
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="navbar-nav">
-                    <RouterLink
-                        class="nav-link"
-                        v-bind:to="`/?m=results&league=${league}`"
-                        >Results</RouterLink
-                    >
+                    <RouterLink class="nav-link" v-bind:to="`/?m=results&league=${league}`">Results</RouterLink>
                 </div>
             </div>
             <SignedOut>
@@ -87,13 +70,8 @@ watch(route, fetchModel);
     <RouterView />
 
     <div class="text-center">
-        <a
-            href="https://www.bluefrogracing.com/"
-            class="text-bg"
-            target="_blank"
-            rel="noopener noreferrer"
-            >Live Event Analysis and Performance by Blue Frog Racing.</a
-        >
+        <a href="https://www.bluefrogracing.com/" class="text-bg" target="_blank" rel="noopener noreferrer">Live Event
+            Analysis and Performance by Blue Frog Racing.</a>
     </div>
 </template>
 
