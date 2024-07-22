@@ -1,4 +1,4 @@
-import type { M_License, M_Member, CLTI_Team } from 'ir-endpoints-types';
+import type { M_License, M_Member, CLTI_Team } from 'lplib/endpoint-types/iracing-endpoints';
 
 export function getFirstLastNames(display_name: string): {
     lastName: string;
@@ -26,7 +26,7 @@ export function getFormulaLicense(licenses: M_License[]): M_License {
     return rL;
 }
 
-export function getMemberViewFromM_Memeber(
+export function getMemberViewFromM_Member(
     member: M_Member | null,
     _userTeamIdMap: { [name: number]: number },
     _teamInfoMap: { [name: number]: CLTI_Team }
