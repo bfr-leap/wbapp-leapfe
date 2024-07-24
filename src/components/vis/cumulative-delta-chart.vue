@@ -14,7 +14,7 @@ const props = defineProps<{
 
 const lapTimesNew: Ref<CumulativeDeltaChartModel> = ref(<
     CumulativeDeltaChartModel
-    >{ series: Array<SeriesXY>(), range: [0, 1] });
+>{ series: Array<SeriesXY>(), range: [0, 1] });
 
 // A cumulative delta chart is a graphical representation of the time differences between two or
 // more cars over the course of a race. It is often used in motor sports, particularly in timed racing events,
@@ -54,5 +54,9 @@ watch(props, fetchModel);
 </script>
 
 <template>
-    <LineChart :title="''" :data="lapTimesNew.series" :y-range="[lapTimesNew.range[0], lapTimesNew.range[1]]" />
+    <LineChart
+        :title="''"
+        :data="lapTimesNew.series"
+        :y-range="[lapTimesNew.range[0], lapTimesNew.range[1]]"
+    />
 </template>

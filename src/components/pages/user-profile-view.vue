@@ -64,26 +64,46 @@ watch(route, fectchModel);
                 </table>
             </div>
         </div>
-        <div v-if="userProfileModel.isVerified === false" class="card bg-dark text-light m-2">
+        <div
+            v-if="userProfileModel.isVerified === false"
+            class="card bg-dark text-light m-2"
+        >
             <div class="card-body p-2">
                 Link to iRacing
                 <p></p>
                 <div class="row g-3">
                     <div class="col-4">
-                        <label for="iRacingCustId" class="form-label">Cust Id:</label>
+                        <label for="iRacingCustId" class="form-label"
+                            >Cust Id:</label
+                        >
                     </div>
                     <div class="col-auto">
-                        <input type="text" class="form-control" id="iRacingCustId" aria-describedby="custIdHelp"
-                            v-model="forms.custId" />
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="iRacingCustId"
+                            aria-describedby="custIdHelp"
+                            v-model="forms.custId"
+                        />
                     </div>
                     <div class="col-auto">
-                        <button @click="onSubmitCustId" v-if="
-                            userProfileModel.enableCustIdSendButton &&
-                            userProfileModel.irCustId !== forms.custId
-                        " type="submit" class="btn btn-primary">
+                        <button
+                            @click="onSubmitCustId"
+                            v-if="
+                                userProfileModel.enableCustIdSendButton &&
+                                userProfileModel.irCustId !== forms.custId
+                            "
+                            type="submit"
+                            class="btn btn-primary"
+                        >
                             Submit
                         </button>
-                        <button v-else type="submit" class="btn btn-primary" disabled>
+                        <button
+                            v-else
+                            type="submit"
+                            class="btn btn-primary"
+                            disabled
+                        >
                             Submit
                         </button>
                     </div>
@@ -97,28 +117,48 @@ watch(route, fectchModel);
                 <span v-if="userProfileModel.msgSent"><br /></span>
                 <div v-if="userProfileModel.msgSent" class="row g-3">
                     <div class="col-4">
-                        <label for="exampleInputEmail1" class="form-label">Verification Code:</label>
+                        <label for="exampleInputEmail1" class="form-label"
+                            >Verification Code:</label
+                        >
                     </div>
                     <div class="col-auto">
-                        <input type="text" class="form-control" id="verificationCodeInput"
-                            aria-describedby="verificationCodeHelp" v-model="forms.verificationNum" />
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="verificationCodeInput"
+                            aria-describedby="verificationCodeHelp"
+                            v-model="forms.verificationNum"
+                        />
                     </div>
 
                     <div class="col-auto">
-                        <button @click="onSubmitVerificationNum" v-if="
-                            userProfileModel.enableVerifySendButton &&
-                            forms.verificationNum
-                        " type="submit" class="btn btn-primary">
+                        <button
+                            @click="onSubmitVerificationNum"
+                            v-if="
+                                userProfileModel.enableVerifySendButton &&
+                                forms.verificationNum
+                            "
+                            type="submit"
+                            class="btn btn-primary"
+                        >
                             Submit
                         </button>
-                        <button v-else type="submit" class="btn btn-primary" disabled>
+                        <button
+                            v-else
+                            type="submit"
+                            class="btn btn-primary"
+                            disabled
+                        >
                             Submit
                         </button>
                     </div>
                 </div>
             </div>
         </div>
-        <div v-if="userProfileModel.isVerified" class="card bg-dark text-light m-2">
+        <div
+            v-if="userProfileModel.isVerified"
+            class="card bg-dark text-light m-2"
+        >
             <div class="card-body p-2">Verified Profile...</div>
         </div>
 

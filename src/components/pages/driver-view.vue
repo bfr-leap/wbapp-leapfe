@@ -6,5 +6,8 @@ const route = useRoute();
 </script>
 
 <template>
-    <DriverProfile v-bind:league="(route.query.league as string)" v-bind:driver="(route.query.driver as string)" />
+    <DriverProfile
+        v-bind:league="(route.query.league as string)"
+        v-bind:driver="(route.query.driver as string)"
+    />
 </template>

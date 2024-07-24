@@ -33,7 +33,10 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
             <div class="row p-3">
                 <div v-bind:class="`driver-img team-${props.team}`"></div>
                 <div class="col">
-                    <TeamTag v-bind:league-id="props.league" v-bind:team-id="Number.parseInt(props.team, 10)"></TeamTag>
+                    <TeamTag
+                        v-bind:league-id="props.league"
+                        v-bind:team-id="Number.parseInt(props.team, 10)"
+                    ></TeamTag>
                 </div>
             </div>
         </div>
@@ -42,28 +45,38 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
     <div class="card bg-dark text-light m-2">
         <div class="d-flex flex-wrap">
             <div :class="statClasses">
-                <span class="name">Starts: </span><span class="value">
-                    {{ teamProfileModel.stats.started }}</span>
+                <span class="name">Starts: </span
+                ><span class="value">
+                    {{ teamProfileModel.stats.started }}</span
+                >
             </div>
             <div :class="statClasses">
-                <span class="name">Poles: </span><span class="value"> {{ teamProfileModel.stats.poles }}</span>
+                <span class="name">Poles: </span
+                ><span class="value"> {{ teamProfileModel.stats.poles }}</span>
             </div>
             <div :class="statClasses">
-                <span class="name">Wins: </span><span class="value"> {{ teamProfileModel.stats.wins }}</span>
+                <span class="name">Wins: </span
+                ><span class="value"> {{ teamProfileModel.stats.wins }}</span>
             </div>
             <div :class="statClasses">
-                <span class="name">Podiums: </span><span class="value">
-                    {{ teamProfileModel.stats.podiums }}</span>
+                <span class="name">Podiums: </span
+                ><span class="value">
+                    {{ teamProfileModel.stats.podiums }}</span
+                >
             </div>
             <div :class="statClasses">
-                <span class="name">Top 10: </span><span class="value"> {{ teamProfileModel.stats.top_10 }}</span>
+                <span class="name">Top 10: </span
+                ><span class="value"> {{ teamProfileModel.stats.top_10 }}</span>
             </div>
             <div :class="statClasses">
-                <span class="name">Top 20: </span><span class="value"> {{ teamProfileModel.stats.top_20 }}</span>
+                <span class="name">Top 20: </span
+                ><span class="value"> {{ teamProfileModel.stats.top_20 }}</span>
             </div>
             <div :class="statClasses">
-                <span class="name">LEAP Points: </span><span class="value">
-                    {{ teamProfileModel.stats.power_points }}</span>
+                <span class="name">LEAP Points: </span
+                ><span class="value">
+                    {{ teamProfileModel.stats.power_points }}</span
+                >
             </div>
         </div>
     </div>

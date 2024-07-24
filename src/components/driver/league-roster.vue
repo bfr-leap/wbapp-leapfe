@@ -20,7 +20,11 @@ watchEffect(fetchModel);
 watch(props, fetchModel);
 </script>
 <template>
-    <GenericTable v-bind:season-id="model?.seasonId?.toString() || ''"
-        v-bind:league-id="model?.league?.toString() || ''" v-bind:rows="model.rows" v-bind:title="model.title">
+    <GenericTable
+        v-bind:season-id="model?.seasonId?.toString() || ''"
+        v-bind:league-id="model?.league?.toString() || ''"
+        v-bind:rows="model.rows"
+        v-bind:title="model.title"
+    >
     </GenericTable>
 </template>

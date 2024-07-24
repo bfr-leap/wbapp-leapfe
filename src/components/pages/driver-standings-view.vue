@@ -6,5 +6,8 @@ const route = useRoute();
 </script>
 
 <template>
-    <DriverStandings v-bind:season="(route.query.season as string)" v-bind:league="(route.query.league as string)" />
+    <DriverStandings
+        v-bind:season="(route.query.season as string)"
+        v-bind:league="(route.query.league as string)"
+    />
 </template>

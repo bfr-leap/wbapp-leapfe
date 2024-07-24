@@ -212,25 +212,55 @@ function getDPathAttrAverage() {
             {{ title }}
         </div>
         <div ref="divRoot">
-            <svg ref="svgRoot" class="w-100" :height="height" v-bind:viewBox="`0 0 ${width} ${height}`">
+            <svg
+                ref="svgRoot"
+                class="w-100"
+                :height="height"
+                v-bind:viewBox="`0 0 ${width} ${height}`"
+            >
                 <g :transform="`translate(${margin.left},${margin.top})`">
-                    <g ref="xAxis" :transform="`translate(0,${innerHeight})`"></g>
+                    <g
+                        ref="xAxis"
+                        :transform="`translate(0,${innerHeight})`"
+                    ></g>
                     <g ref="yAxis"></g>
-                    <rect v-for="series in renderData" :x="getXAttr(series.name)"
-                        :y="getYAttr(Math.max(series.value, minBarHeight))" :width="scaleX?.bandwidth()" :height="getHeightAttr(
-                            Math.abs(Math.max(series.value, minBarHeight))
-                        )
-                            " style="fill: #1aa179"></rect>
-                    <rect v-for="series in renderData" :x="getXAttr(series.name)" :y="getYAttr(Math.max(series.value2 || 0, minBarHeight))
-                        " :width="scaleX?.bandwidth()" :height="getHeightAttr(
-                            Math.abs(
-                                Math.max(series.value2 || 0, minBarHeight)
+                    <rect
+                        v-for="series in renderData"
+                        :x="getXAttr(series.name)"
+                        :y="getYAttr(Math.max(series.value, minBarHeight))"
+                        :width="scaleX?.bandwidth()"
+                        :height="
+                            getHeightAttr(
+                                Math.abs(Math.max(series.value, minBarHeight))
                             )
-                        )
-                            " :style="series.value2 ? `fill: #1a79a1` : `fill: #1a79a100`
-                            "></rect>
-                    <path v-for="p in getDPathAttrAverage()" fill="none" :stroke="p[1]" stroke-width="1.5" :d="p[0]">
-                    </path>
+                        "
+                        style="fill: #1aa179"
+                    ></rect>
+                    <rect
+                        v-for="series in renderData"
+                        :x="getXAttr(series.name)"
+                        :y="
+                            getYAttr(Math.max(series.value2 || 0, minBarHeight))
+                        "
+                        :width="scaleX?.bandwidth()"
+                        :height="
+                            getHeightAttr(
+                                Math.abs(
+                                    Math.max(series.value2 || 0, minBarHeight)
+                                )
+                            )
+                        "
+                        :style="
+                            series.value2 ? `fill: #1a79a1` : `fill: #1a79a100`
+                        "
+                    ></rect>
+                    <path
+                        v-for="p in getDPathAttrAverage()"
+                        fill="none"
+                        :stroke="p[1]"
+                        stroke-width="1.5"
+                        :d="p[0]"
+                    ></path>
                 </g>
             </svg>
         </div>

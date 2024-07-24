@@ -3,7 +3,7 @@ import { getCuratedTrackDisplayInfo } from './fetch-util';
 export async function getshortTrackName(trackId: string): Promise<string> {
     let displayInfo = await getCuratedTrackDisplayInfo();
 
-    let ret = displayInfo[trackId]?.short_display;
+    let ret = displayInfo?.[trackId]?.short_display;
 
     if (!ret) {
         ret = trackId;
@@ -15,8 +15,8 @@ export async function getshortTrackName(trackId: string): Promise<string> {
 export async function getTrackName(trackId: string): Promise<string> {
     let displayInfo = await getCuratedTrackDisplayInfo();
 
-    if (displayInfo[trackId]) {
-        return displayInfo[trackId].long_display;
+    if (displayInfo && displayInfo[trackId]) {
+        return displayInfo[trackId].display;
     }
 
     return `---- ${trackId}`;

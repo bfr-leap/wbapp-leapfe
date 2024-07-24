@@ -1,4 +1,7 @@
-import type { TS_RecordTable, M_Member } from 'lplib/endpoint-types/iracing-endpoints';
+import type {
+    TS_RecordTable,
+    M_Member,
+} from 'lplib/endpoint-types/iracing-endpoints';
 import { getSingleMemberData, getMembersData } from '@/utils/fetch-util';
 
 export type GenericTableModel = {
@@ -39,7 +42,7 @@ async function formatRows(
             _idToNameMap[m.cust_id] = m.display_name;
             _nameToIdMap[m.display_name] = m.cust_id;
         }
-    } catch (e) { }
+    } catch (e) {}
 
     // parallelize user info fetching
     for (let r of ret) {

@@ -102,12 +102,12 @@ export async function getDriverStandingsModel(
             MembersData,
             SeasonSimsessionIndex[]
         ]
-        >[
-            await getLeagueDriverStats(league),
-            await getCuratedLeagueTeamsInfo(league),
-            await getMembersData(league, season),
-            await getSeasonSimsessionIndex(league),
-        ];
+    >[
+        await getLeagueDriverStats(league),
+        await getCuratedLeagueTeamsInfo(league),
+        await getMembersData(league, season),
+        await getSeasonSimsessionIndex(league),
+    ];
 
     let _seasonId = Number.parseInt(season);
 
@@ -122,18 +122,18 @@ export async function getDriverStandingsModel(
 
     let sortedM = _driverStatsMap
         ? _membersData?.members.sort((a, b) =>
-            !_driverStatsMap[_seasonId][b.cust_id] ||
-                !_driverStatsMap[_seasonId][a.cust_id]
-                ? !_driverStatsMap[_seasonId][b.cust_id]
-                    ? -1
-                    : 1
-                : _driverStatsMap[_seasonId][b.cust_id].power_points !==
+              !_driverStatsMap[_seasonId][b.cust_id] ||
+              !_driverStatsMap[_seasonId][a.cust_id]
+                  ? !_driverStatsMap[_seasonId][b.cust_id]
+                      ? -1
+                      : 1
+                  : _driverStatsMap[_seasonId][b.cust_id].power_points !==
                     _driverStatsMap[_seasonId][a.cust_id].power_points
-                    ? _driverStatsMap[_seasonId][b.cust_id].power_points -
+                  ? _driverStatsMap[_seasonId][b.cust_id].power_points -
                     _driverStatsMap[_seasonId][a.cust_id].power_points
-                    : (getFormulaLicense(b.licenses).irating | 0) -
+                  : (getFormulaLicense(b.licenses).irating | 0) -
                     (getFormulaLicense(a.licenses).irating | 0)
-        ) || []
+          ) || []
         : [];
 
     let ret: DriverStandingsModel = getDefaultStandingsModel();

@@ -6,5 +6,8 @@ const route = useRoute();
 </script>
 
 <template>
-    <TeamProfile v-bind:league="(route.query.league as string)" v-bind:team="(route.query.team as string)" />
+    <TeamProfile
+        v-bind:league="(route.query.league as string)"
+        v-bind:team="(route.query.team as string)"
+    />
 </template>

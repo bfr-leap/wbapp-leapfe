@@ -27,7 +27,10 @@ watchEffect(fetchModel);
 
 <template>
     <div class="table-responsive">
-        <table v-if="resultsTableModel.length > 0" class="table table-dark table-hover">
+        <table
+            v-if="resultsTableModel.length > 0"
+            class="table table-dark table-hover"
+        >
             <thead style="position: sticky; top: 0">
                 <tr>
                     <th class="header" scope="col">session</th>
@@ -44,9 +47,12 @@ watchEffect(fetchModel);
             <tbody>
                 <tr v-for="result in resultsTableModel">
                     <td v-if="result.sessionId > 0">
-                        <RouterLink class="link-light"
-                            :to="`/?m=results&league=${props.leagueId}&season=${props.seasonId}&simsession=0&subsession=${result.sessionId}`">
-                            {{ result.sessionName }}</RouterLink>
+                        <RouterLink
+                            class="link-light"
+                            :to="`/?m=results&league=${props.leagueId}&season=${props.seasonId}&simsession=0&subsession=${result.sessionId}`"
+                        >
+                            {{ result.sessionName }}</RouterLink
+                        >
                     </td>
                     <td v-else>
                         {{ result.sessionName }}
@@ -65,11 +71,12 @@ watchEffect(fetchModel);
                         {{
                             isNaN(result.resultEntry.fastest_lap_time)
                                 ? '--'
-                                : `${Math.round(
-                                    result.resultEntry.fastest_lap_time /
-                                    100
-                                ) / 100
-                                }s`
+                                : `${
+                                      Math.round(
+                                          result.resultEntry.fastest_lap_time /
+                                              100
+                                      ) / 100
+                                  }s`
                         }}
                     </td>
                     <td>

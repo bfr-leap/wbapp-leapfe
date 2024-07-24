@@ -30,5 +30,8 @@ watch(props, fetchModel);
 </script>
 
 <template>
-    <BarChart :title="paceChartModel.title" :data="paceChartModel.barChartData" />
+    <BarChart
+        :title="paceChartModel.title"
+        :data="paceChartModel.barChartData"
+    />
 </template>

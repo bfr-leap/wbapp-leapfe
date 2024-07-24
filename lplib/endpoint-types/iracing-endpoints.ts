@@ -397,6 +397,7 @@ export interface ALS_SeasonInfo {
 }
 
 export interface ALS_EventInfo {
+    comment: string;
     track_id: number;
     time: string;
 }
@@ -443,7 +444,7 @@ export interface ST_SimsessionTelemetry {
 export type SubsessionTelemetry = ST_SimsessionTelemetry[];
 
 export type CuratedTrackDisplayhInfo = {
-    [name: string]: { short_display: string; long_display: string };
+    [name: string]: { short_display: string; display: string };
 };
 
 export interface GeneratedSimsessionSummary {

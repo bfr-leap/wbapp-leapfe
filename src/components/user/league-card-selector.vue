@@ -30,7 +30,9 @@ function onClick(league: any) {
 }
 
 function onAddLeagueBtn() {
-    let i = leagueSelection.value.map((m: any) => m.name).indexOf(forms.newLeague);
+    let i = leagueSelection.value
+        .map((m: any) => m.name)
+        .indexOf(forms.newLeague);
     if (i < 0) return;
 
     var myModalEl = document.getElementById('exampleModal');
@@ -63,12 +65,18 @@ watch(route, fetchModel);
             </thead>
 
             <tbody>
-                <tr v-for="league in leagueSelection.filter((l: any) => l.isActive)">
+                <tr
+                    v-for="league in leagueSelection.filter((l: any) => l.isActive)"
+                >
                     <td>❏</td>
                     <td>{{ league.name }}</td>
                     <td>{{ league.leagueID }}</td>
                     <td>
-                        <button @click="onClick(league)" type="button" class="btn btn-secondary">
+                        <button
+                            @click="onClick(league)"
+                            type="button"
+                            class="btn btn-secondary"
+                        >
                             ❌
                         </button>
                     </td>
@@ -76,8 +84,12 @@ watch(route, fetchModel);
 
                 <tr>
                     <td>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                            data-bs-target="#exampleModal">
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            data-bs-toggle="modal"
+                            data-bs-target="#exampleModal"
+                        >
                             ✚
                         </button>
                     </td>
@@ -90,39 +102,68 @@ watch(route, fetchModel);
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div
+        class="modal fade"
+        id="exampleModal"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+    >
         <div class="modal-dialog">
             <div class="bg-toplevel modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">
                         Modal title
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"
+                    ></button>
                 </div>
                 <div class="modal-body">
                     <form>
                         <div class="mb-3">
-                            <label for="recipient-name" class="col-form-label">Recipient:</label>
-                            <input class="form-control" list="datalistOptions" id="exampleDataList"
-                                placeholder="Type to search..." v-model="forms.newLeague" />
+                            <label for="recipient-name" class="col-form-label"
+                                >Recipient:</label
+                            >
+                            <input
+                                class="form-control"
+                                list="datalistOptions"
+                                id="exampleDataList"
+                                placeholder="Type to search..."
+                                v-model="forms.newLeague"
+                            />
                             <datalist id="datalistOptions">
-                                <option v-for="league in leagueSelection.filter(
+                                <option
+                                    v-for="league in leagueSelection.filter(
                                     (l: any) => !l.isActive
-                                )" v-bind:value="league.name"></option>
+                                )"
+                                    v-bind:value="league.name"
+                                ></option>
                             </datalist>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal"
+                    >
                         Cancel
                     </button>
-                    <button type="button" v-bind:class="leagueSelection
+                    <button
+                        type="button"
+                        v-bind:class="leagueSelection
                         .map((m: any) => m.name)
                         .indexOf(forms.newLeague) > -1
                         ? 'btn btn-primary'
                         : 'btn btn-primary disabled'
-                        " @click="onAddLeagueBtn()">
+                        "
+                        @click="onAddLeagueBtn()"
+                    >
                         Add League
                     </button>
                 </div>

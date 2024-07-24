@@ -101,7 +101,11 @@ export async function getDriverProfileModel(league: string, driver: string) {
 
     leagueSeasons?.seasons.sort((a, b) => b.season_id - a.season_id) || [];
 
-    if (!driverSessionResultsRace || !driverSessionResultsSprint || !driverSessionResultsQuali) {
+    if (
+        !driverSessionResultsRace ||
+        !driverSessionResultsSprint ||
+        !driverSessionResultsQuali
+    ) {
         return ret;
     }
 

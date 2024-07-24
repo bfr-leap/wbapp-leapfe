@@ -1,4 +1,8 @@
-import type { M_License, M_Member, CLTI_Team } from 'lplib/endpoint-types/iracing-endpoints';
+import type {
+    M_License,
+    M_Member,
+    CLTI_Team,
+} from 'lplib/endpoint-types/iracing-endpoints';
 
 export function getFirstLastNames(display_name: string): {
     lastName: string;
