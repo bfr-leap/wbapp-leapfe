@@ -1,4 +1,7 @@
-import { getCuratedActiveLeagueSchedule } from '@/utils/fetch-util';
+import {
+    getCuratedActiveLeagueSchedule,
+    getCuratedTrackDisplayInfo,
+} from '@/utils/fetch-util';
 import { getTrackName } from '@/utils/track-utils';
 
 export interface CdrAdminEvent {
@@ -8,12 +11,18 @@ export interface CdrAdminEvent {
     displayName: string;
 }
 
+export interface CdrAdminTrackOption {
+    id: number;
+    name: string;
+}
+
 export interface CdrAdminModel {
     events: CdrAdminEvent[];
+    tracks: CdrAdminTrackOption[];
 }
 
 export function getDefaultCdrAdminModel(): CdrAdminModel {
-    return { events: [] };
+    return { events: [], tracks: [] };
 }
 
 export async function getCdrAdminModel(
@@ -54,6 +63,17 @@ export async function getCdrAdminModel(
     for (let e of ret.events) {
         e.trackDisplayName = await getTrackName(e.trackId.toString());
     }
+
+    let displayInfo = await getCuratedTrackDisplayInfo();
+    if (!displayInfo) {
+        return ret;
+    }
+
+    ret.tracks = Object.keys(displayInfo)
+        .map((k) => {
+            return { id: Number.parseInt(k, 10), name: displayInfo[k].display };
+        })
+        .sort((a, b) => a.name.localeCompare(b.name));
 
     return ret;
 }

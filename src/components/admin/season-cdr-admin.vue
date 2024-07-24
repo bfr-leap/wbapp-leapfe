@@ -16,7 +16,7 @@ const props = defineProps<{
     season: string;
 }>();
 
-let forms = reactive({ time: '' });
+let forms = reactive({ time: '', track: '' });
 
 let cdrAdminModel: Ref<CdrAdminModel> = ref(getDefaultCdrAdminModel());
 
@@ -34,9 +34,10 @@ function onEdit(event: CdrAdminEvent) {
     console.log('todo');
     isAdding.value = false;
     forms.time = event.time.toString();
+    forms.track = event.displayName;
 }
 
-function onAdd(event: CdrAdminEvent) {
+function onAdd() {
     console.log('todo');
     isAdding.value = true;
 
@@ -46,6 +47,8 @@ function onAdd(event: CdrAdminEvent) {
         ].time.getTime() +
             1000 * 60 * 60 * 24 * 7
     ).toString();
+
+    forms.track = '';
 }
 
 function onSave() {}
@@ -100,7 +103,7 @@ watchEffect(fetchModel);
                                     class="btn btn-primary"
                                     data-bs-toggle="modal"
                                     data-bs-target="#exampleModal"
-                                    @click="onAdd(event)"
+                                    @click="onAdd()"
                                 >
                                     ✚
                                 </button>
@@ -159,27 +162,19 @@ watchEffect(fetchModel);
                                 class="col-form-label text-bg"
                                 >Track:</label
                             >
-                            <div class="dropdown">
-                                <button
-                                    class="btn btn-secondary dropdown-toggle"
-                                    type="button"
-                                    data-bs-toggle="dropdown"
-                                    aria-expanded="false"
-                                >
-                                    Selected
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li v-for="seasonOption in [1, 2, 3]">
-                                        <RouterLink
-                                            class="dropdown-item"
-                                            type="button"
-                                            v-bind:to="'seasonOption.href'"
-                                        >
-                                            {{ seasonOption }}
-                                        </RouterLink>
-                                    </li>
-                                </ul>
-                            </div>
+                            <input
+                                class="form-control"
+                                list="trackOptions"
+                                id="trackDataList"
+                                placeholder="Type to search..."
+                                v-model="forms.track"
+                            />
+                            <datalist id="trackOptions">
+                                <option
+                                    v-for="track in cdrAdminModel.tracks"
+                                    v-bind:value="track.name"
+                                ></option>
+                            </datalist>
                         </div>
                     </form>
                 </div>
@@ -193,7 +188,12 @@ watchEffect(fetchModel);
                     </button>
                     <button
                         type="button"
-                        class="btn btn-primary"
+                        v-bind:class="cdrAdminModel.tracks
+                        .map((m: any) => m.name)
+                        .indexOf(forms.track) > -1 && !isNaN(new Date(forms.time).getTime())
+                        ? 'btn btn-primary'
+                        : 'btn btn-primary disabled'
+                        "
                         @click="onSave()"
                     >
                         <span v-if="isAdding">Add Event</span>
