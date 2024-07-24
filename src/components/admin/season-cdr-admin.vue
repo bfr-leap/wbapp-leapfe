@@ -11,9 +11,6 @@ import type {
     CdrAdminModel,
 } from '@/models/admin/season-cdr-admin-model';
 
-import { getCuratedActiveLeagueSchedule } from '@/utils/fetch-util';
-import { getTrackName } from '@/utils/track-utils';
-
 const props = defineProps<{
     league: string;
     season: string;
@@ -22,6 +19,8 @@ const props = defineProps<{
 let forms = reactive({ time: '' });
 
 let cdrAdminModel: Ref<CdrAdminModel> = ref(getDefaultCdrAdminModel());
+
+let isAdding: Ref<boolean> = ref(false);
 
 async function fetchModel() {
     cdrAdminModel.value = await getCdrAdminModel(props.league, props.season);
@@ -33,11 +32,23 @@ function onRemove(event: CdrAdminEvent) {
 
 function onEdit(event: CdrAdminEvent) {
     console.log('todo');
+    isAdding.value = false;
+    forms.time = event.time.toString();
 }
 
-function onAdd() {
+function onAdd(event: CdrAdminEvent) {
     console.log('todo');
+    isAdding.value = true;
+
+    forms.time = new Date(
+        cdrAdminModel.value.events[
+            cdrAdminModel.value.events.length - 1
+        ].time.getTime() +
+            1000 * 60 * 60 * 24 * 7
+    ).toString();
 }
+
+function onSave() {}
 
 watchEffect(fetchModel);
 </script>
@@ -63,6 +74,8 @@ watchEffect(fetchModel);
                                     @click="onEdit(event)"
                                     type="button"
                                     class="btn btn-secondary"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#exampleModal"
                                 >
                                     ✎
                                 </button>
@@ -87,6 +100,7 @@ watchEffect(fetchModel);
                                     class="btn btn-primary"
                                     data-bs-toggle="modal"
                                     data-bs-target="#exampleModal"
+                                    @click="onAdd(event)"
                                 >
                                     ✚
                                 </button>
@@ -145,13 +159,27 @@ watchEffect(fetchModel);
                                 class="col-form-label text-bg"
                                 >Track:</label
                             >
-                            <input
-                                class="form-control"
-                                list="datalistOptions"
-                                id="exampleDataList"
-                                placeholder="Type to search..."
-                                v-model="forms.time"
-                            />
+                            <div class="dropdown">
+                                <button
+                                    class="btn btn-secondary dropdown-toggle"
+                                    type="button"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false"
+                                >
+                                    Selected
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li v-for="seasonOption in [1, 2, 3]">
+                                        <RouterLink
+                                            class="dropdown-item"
+                                            type="button"
+                                            v-bind:to="'seasonOption.href'"
+                                        >
+                                            {{ seasonOption }}
+                                        </RouterLink>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -166,9 +194,10 @@ watchEffect(fetchModel);
                     <button
                         type="button"
                         class="btn btn-primary"
-                        @click="onAdd()"
+                        @click="onSave()"
                     >
-                        Add Event
+                        <span v-if="isAdding">Add Event</span>
+                        <span v-if="!isAdding">Save Event</span>
                     </button>
                 </div>
             </div>
