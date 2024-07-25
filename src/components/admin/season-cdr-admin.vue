@@ -5,6 +5,9 @@ import type { Ref } from 'vue';
 import {
     getDefaultCdrAdminModel,
     getCdrAdminModel,
+    createSchedEvent,
+    updateSchedEvent,
+    deleteSchedEvent,
 } from '@/models/admin/season-cdr-admin-model';
 import type {
     CdrAdminEvent,
@@ -16,25 +19,35 @@ const props = defineProps<{
     season: string;
 }>();
 
-let forms = reactive({ time: '', track: '' });
+let forms = reactive({ time: '', track: '', defaultTrack: '' });
 
 let cdrAdminModel: Ref<CdrAdminModel> = ref(getDefaultCdrAdminModel());
 
 let isAdding: Ref<boolean> = ref(false);
+let currentEvent: CdrAdminEvent | null = null;
 
 async function fetchModel() {
     cdrAdminModel.value = await getCdrAdminModel(props.league, props.season);
 }
 
-function onRemove(event: CdrAdminEvent) {
+async function onRemove(event: CdrAdminEvent) {
     console.log('todo');
+    cdrAdminModel.value = await deleteSchedEvent(
+        cdrAdminModel.value,
+        event.eventId
+    );
 }
 
 function onEdit(event: CdrAdminEvent) {
     console.log('todo');
     isAdding.value = false;
     forms.time = event.time.toString();
-    forms.track = event.displayName;
+    forms.track = event.trackDisplayName;
+    forms.defaultTrack = event.trackDisplayName;
+
+    currentEvent = event;
+
+    console.log(event);
 }
 
 function onAdd() {
@@ -51,7 +64,35 @@ function onAdd() {
     forms.track = '';
 }
 
-function onSave() {}
+async function onSave() {
+    var myModalEl = document.getElementById('cdrEditModal');
+    var modal = (<any>global).bootstrap.Modal.getInstance(myModalEl);
+    modal.hide();
+
+    const time = new Date(forms.time).getTime().toString();
+
+    const tID =
+        cdrAdminModel.value.tracks.find((t) => t.name === forms.track)?.id ||
+        '';
+
+    if (isAdding.value) {
+        cdrAdminModel.value = await createSchedEvent(
+            cdrAdminModel.value,
+            props.season,
+            time,
+            tID.toString()
+        );
+    } else {
+        cdrAdminModel.value = await updateSchedEvent(
+            cdrAdminModel.value,
+            currentEvent?.eventId || '',
+            time,
+            tID.toString()
+        );
+    }
+
+    // updateSchedEvent(model: CdrAdminModel, event: string, time: string, track: string)
+}
 
 watchEffect(fetchModel);
 </script>
@@ -78,7 +119,7 @@ watchEffect(fetchModel);
                                     type="button"
                                     class="btn btn-secondary"
                                     data-bs-toggle="modal"
-                                    data-bs-target="#exampleModal"
+                                    data-bs-target="#cdrEditModal"
                                 >
                                     ✎
                                 </button>
@@ -102,7 +143,7 @@ watchEffect(fetchModel);
                                     type="button"
                                     class="btn btn-primary"
                                     data-bs-toggle="modal"
-                                    data-bs-target="#exampleModal"
+                                    data-bs-target="#cdrEditModal"
                                     @click="onAdd()"
                                 >
                                     ✚
@@ -121,15 +162,15 @@ watchEffect(fetchModel);
     <!-- Modal -->
     <div
         class="modal fade"
-        id="exampleModal"
+        id="cdrEditModal"
         tabindex="-1"
-        aria-labelledby="exampleModalLabel"
+        aria-labelledby="cdrEditModalLabel"
         aria-hidden="true"
     >
         <div class="modal-dialog">
             <div class="bg-toplevel modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title text-bg" id="exampleModalLabel">
+                    <h5 class="modal-title text-bg" id="cdrEditModalLabel">
                         Event Details
                     </h5>
                     <button
@@ -190,7 +231,8 @@ watchEffect(fetchModel);
                         type="button"
                         v-bind:class="cdrAdminModel.tracks
                         .map((m: any) => m.name)
-                        .indexOf(forms.track) > -1 && !isNaN(new Date(forms.time).getTime())
+                        .indexOf(forms.track) > -1 && !isNaN(new Date(forms.time).getTime()) && 
+                        forms.track !== forms.defaultTrack
                         ? 'btn btn-primary'
                         : 'btn btn-primary disabled'
                         "

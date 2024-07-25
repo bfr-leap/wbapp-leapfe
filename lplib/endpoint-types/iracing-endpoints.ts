@@ -400,6 +400,7 @@ export interface ALS_EventInfo {
     comment: string;
     track_id: number;
     time: string;
+    event_id: string;
 }
 
 export interface ST_TelemetryDatum {

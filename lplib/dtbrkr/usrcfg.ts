@@ -51,7 +51,7 @@ async function getActiveLeagueSchedule(): Promise<any> {
     const xata = getXataClient();
 
     const rt: any = await xata.sql`
-    SELECT "sched_subsessions"."id", "seasons"."league_id", "leagues"."name" as "league_name", "car_id",
+    SELECT "sched_subsessions"."id" as "event_id", "sched_subsessions"."id", "seasons"."league_id", "leagues"."name" as "league_name", "car_id",
     "seasons"."display_name" as "season_name", "time", 
     "track_id", "sched_subsessions"."season_id", 
     "sched_subsessions"."display_name" as "event_name"
@@ -93,6 +93,7 @@ async function getActiveLeagueSchedule(): Promise<any> {
             time: r.time,
             track_id: r.track_id,
             comment: r.event_name,
+            event_id: r.event_id,
         };
         season.events.push(event);
     }
