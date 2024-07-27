@@ -92,7 +92,7 @@ export async function createSchedEvent(
     let e = await crtSchedEvent(season, time, track);
 
     const ev = {
-        trackDisplayName: await getTrackName(e.trackId.toString()),
+        trackDisplayName: await getTrackName(e.track_id.toString()),
         trackId: e.track_id,
         time: new Date(e.time),
         eventId: e.event_id,
