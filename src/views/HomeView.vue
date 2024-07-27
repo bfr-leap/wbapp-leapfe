@@ -11,6 +11,7 @@ import NextEventTimerEmbed from '@/components/embeds/next-event-timer-embed.vue'
 import SubsessionSummaryEmbed from '@/components/embeds/subsession-summary-embed.vue';
 import SeasonProfile from '@/components/pages/season-profile-view.vue';
 import UserProfile from '@/components/pages/user-profile-view.vue';
+import SeasonCdrAdmin from '@/components/pages/season-cdr-admin-view.vue';
 import { ref, watch } from 'vue';
 import mixpanel from 'mixpanel-browser';
 import { defLgSeasSubCtx } from '@/utils/fetch-util';
@@ -43,17 +44,40 @@ watch(route, track);
 </script>
 
 <template>
-    <HomeView v-if="!route.query.m" v-bind:league="league" v-bind:season="season" v-bind:subsession="subsession">
+    <HomeView
+        v-if="!route.query.m"
+        v-bind:league="league"
+        v-bind:season="season"
+        v-bind:subsession="subsession"
+    >
     </HomeView>
-    <ResultsView v-if="route.query.m === 'results'" v-bind:league="league" v-bind:season="season"
-        v-bind:subsession="subsession" v-bind:simsession="simsession"></ResultsView>
-    <DriverStandingsView v-if="route.query.m === 'standings'"></DriverStandingsView>
+    <ResultsView
+        v-if="route.query.m === 'results'"
+        v-bind:league="league"
+        v-bind:season="season"
+        v-bind:subsession="subsession"
+        v-bind:simsession="simsession"
+    ></ResultsView>
+    <DriverStandingsView
+        v-if="route.query.m === 'standings'"
+    ></DriverStandingsView>
     <DriverView v-if="route.query.m === 'driver'"></DriverView>
-    <TeamView v-if="route.query.m === 'team'"></TeamView> <!-- this needs help -->
+    <TeamView v-if="route.query.m === 'team'"></TeamView>
+    <!-- this needs help -->
     <TrackResultsView v-if="route.query.m === 'track'"></TrackResultsView>
     <SeasonProfile v-if="route.query.m === 'season'"></SeasonProfile>
     <UserProfile v-if="route.query.m === 'profile'"></UserProfile>
 
-    <NextEventTimerEmbed v-if="route.query.m === 'nextEventTimerEmbed'"></NextEventTimerEmbed>
-    <SubsessionSummaryEmbed v-if="route.query.m === 'subsessionSummaryEmbed'"></SubsessionSummaryEmbed>
+    <SeasonCdrAdmin
+        v-if="route.query.m === 'season-cdr-admin'"
+        v-bind:league="league"
+        v-bind:season="season"
+    ></SeasonCdrAdmin>
+
+    <NextEventTimerEmbed
+        v-if="route.query.m === 'nextEventTimerEmbed'"
+    ></NextEventTimerEmbed>
+    <SubsessionSummaryEmbed
+        v-if="route.query.m === 'subsessionSummaryEmbed'"
+    ></SubsessionSummaryEmbed>
 </template>

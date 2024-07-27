@@ -24,10 +24,14 @@ watchEffect(fetchModel);
     <div class="driver">
         <span style="display: inline-block">
             <div>
-                <RouterLink class="link-light" v-if="leagueId && leagueId"
-                    v-bind:to="`?m=team&league=${leagueId}&team=${teamId}`"><span class="last-name">{{ teamTagModel.name
-                        }}
-                    </span></RouterLink>
+                <RouterLink
+                    class="link-light"
+                    v-if="leagueId && leagueId"
+                    v-bind:to="`?m=team&league=${leagueId}&team=${teamId}`"
+                    ><span class="last-name"
+                        >{{ teamTagModel.name }}
+                    </span></RouterLink
+                >
                 <template v-else>
                     <span class="last-name">{{ teamTagModel.name }} </span>
                 </template>
@@ -35,10 +39,16 @@ watchEffect(fetchModel);
             </div>
             <div>
                 <span v-for="(driver, index) of teamTagModel.drivers">
-                    <RouterLink class="link-light text-decoration-none"
-                        v-bind:to="`?m=driver&league=${leagueId}&driver=${driver.driverId}`">{{
+                    <RouterLink
+                        class="link-light text-decoration-none"
+                        v-bind:to="`?m=driver&league=${leagueId}&driver=${driver.driverId}`"
+                        >{{
                             driver.lastname +
-                            (index < teamTagModel.drivers.length - 1 ? ',  ' : '') }}</RouterLink>
+                            (index < teamTagModel.drivers.length - 1
+                                ? ',  '
+                                : '')
+                        }}</RouterLink
+                    >
                 </span>
             </div>
         </span>

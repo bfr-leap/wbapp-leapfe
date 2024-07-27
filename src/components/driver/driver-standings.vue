@@ -34,8 +34,12 @@ watch(props, fetchModel);
 </script>
 
 <template>
-    <LeagueSeasonMenu v-if="!summary_mode" targetPage="standings" v-bind:league="props.league"
-        v-bind:season="props.season"></LeagueSeasonMenu>
+    <LeagueSeasonMenu
+        v-if="!summary_mode"
+        targetPage="standings"
+        v-bind:league="props.league"
+        v-bind:season="props.season"
+    ></LeagueSeasonMenu>
 
     <div class="card bg-dark text-light m-2">
         <div class="card-body p-2">
@@ -45,19 +49,28 @@ watch(props, fetchModel);
                         <div class="mx-1 inline-block"><span>LEAP</span></div>
                         <div class="inline-block"><span>R-P</span></div>
                     </div>
-                    <div class="col-2 d-none d-sm-flex text-center justify-content-center">
+                    <div
+                        class="col-2 d-none d-sm-flex text-center justify-content-center"
+                    >
                         <div>LEAP Ranking</div>
                     </div>
-                    <div class="col-2 d-none d-sm-flex text-center justify-content-center">
+                    <div
+                        class="col-2 d-none d-sm-flex text-center justify-content-center"
+                    >
                         <div>LEAP Points</div>
                     </div>
                     <div class="col-2 col-lg-1 text-center"></div>
                     <div class="col-6 col-lg-7 text-left">Driver</div>
                 </div>
 
-                <template v-if="view.drivers.length !== 0" v-for="(member, i) in view.drivers">
+                <template
+                    v-if="view.drivers.length !== 0"
+                    v-for="(member, i) in view.drivers"
+                >
                     <div class="row">
-                        <div class="col-2 justify-content-center d-flex d-sm-none text-center flex-column">
+                        <div
+                            class="col-2 justify-content-center d-flex d-sm-none text-center flex-column"
+                        >
                             <div class="fs-2 mx-1">
                                 {{ member.position }}
                             </div>
@@ -65,21 +78,34 @@ watch(props, fetchModel);
                                 <span>{{ member.points }}</span>
                             </div>
                         </div>
-                        <div class="col-2 d-none d-sm-flex justify-content-center fs-2">
+                        <div
+                            class="col-2 d-none d-sm-flex justify-content-center fs-2"
+                        >
                             <div>{{ member.position }}</div>
                         </div>
-                        <div class="col-2 d-none d-sm-flex justify-content-center fs-4">
+                        <div
+                            class="col-2 d-none d-sm-flex justify-content-center fs-4"
+                        >
                             <div>{{ member.points }}</div>
                         </div>
                         <div class="col-2 col-lg-1 text-center">
-                            <div v-bind:class="`driver-img club-${member.clubId}`"></div>
+                            <div
+                                v-bind:class="`driver-img club-${member.clubId}`"
+                            ></div>
                         </div>
                         <div class="col-6 col-lg-7">
-                            <DriverTag v-bind:lastName="member.lastName" v-bind:firstName="member.firstName"
-                                v-bind:licenseLevel="member.licenseLevel" v-bind:iRating="member.iRating"
-                                v-bind:safetyRating="member.safetyRating" v-bind:teamName="member.teamName"
-                                v-bind:clubId="member.clubId" v-bind:driverId="member.custId"
-                                v-bind:teamId="member.teamId?.toString()" v-bind:leagueId="props.league" />
+                            <DriverTag
+                                v-bind:lastName="member.lastName"
+                                v-bind:firstName="member.firstName"
+                                v-bind:licenseLevel="member.licenseLevel"
+                                v-bind:iRating="member.iRating"
+                                v-bind:safetyRating="member.safetyRating"
+                                v-bind:teamName="member.teamName"
+                                v-bind:clubId="member.clubId"
+                                v-bind:driverId="member.custId"
+                                v-bind:teamId="member.teamId?.toString()"
+                                v-bind:leagueId="props.league"
+                            />
                         </div>
                     </div>
                     <div class="row">
@@ -87,9 +113,15 @@ watch(props, fetchModel);
                         <div class="col text-center" style="height: 1em"></div>
                     </div>
                 </template>
-                <div class="row" v-if="view.drivers.length !== 0 && summary_mode">
-                    <RouterLink class="dropdown-item" type="button"
-                        v-bind:to="`?m=standings&league=${props.league}&season=${props.season}`">See all Standings
+                <div
+                    class="row"
+                    v-if="view.drivers.length !== 0 && summary_mode"
+                >
+                    <RouterLink
+                        class="dropdown-item"
+                        type="button"
+                        v-bind:to="`?m=standings&league=${props.league}&season=${props.season}`"
+                        >See all Standings
                     </RouterLink>
                 </div>
                 <div class="row" v-if="view.drivers.length === 0">
@@ -107,19 +139,28 @@ watch(props, fetchModel);
                         <div class="mx-1 inline-block"><span>LEAP</span></div>
                         <div class="inline-block"><span>R-P</span></div>
                     </div>
-                    <div class="col-2 d-none d-sm-flex text-center justify-content-center">
+                    <div
+                        class="col-2 d-none d-sm-flex text-center justify-content-center"
+                    >
                         <div>LEAP Ranking</div>
                     </div>
-                    <div class="col-2 d-none d-sm-flex text-center justify-content-center">
+                    <div
+                        class="col-2 d-none d-sm-flex text-center justify-content-center"
+                    >
                         <div>LEAP Points</div>
                     </div>
                     <div class="col-2 col-lg-1 text-center"></div>
                     <div class="col-6 col-lg-7 text-left">Team</div>
                 </div>
 
-                <template v-if="view.teams.length !== 0" v-for="(team, i) in view.teams">
+                <template
+                    v-if="view.teams.length !== 0"
+                    v-for="(team, i) in view.teams"
+                >
                     <div v-if="team.teamId" class="row">
-                        <div class="col-2 justify-content-center d-flex d-sm-none text-center flex-column">
+                        <div
+                            class="col-2 justify-content-center d-flex d-sm-none text-center flex-column"
+                        >
                             <div class="fs-2 mx-1">
                                 {{ team.position }}
                             </div>
@@ -127,14 +168,20 @@ watch(props, fetchModel);
                                 <span>{{ team.points }}</span>
                             </div>
                         </div>
-                        <div class="col-2 d-none d-sm-flex justify-content-center fs-2">
+                        <div
+                            class="col-2 d-none d-sm-flex justify-content-center fs-2"
+                        >
                             <div>{{ team.position }}</div>
                         </div>
-                        <div class="col-2 d-none d-sm-flex justify-content-center fs-4">
+                        <div
+                            class="col-2 d-none d-sm-flex justify-content-center fs-4"
+                        >
                             <div>{{ team.points }}</div>
                         </div>
                         <div class="col-2 col-lg-1 text-center">
-                            <div v-bind:class="`driver-img team-${team.teamId}`"></div>
+                            <div
+                                v-bind:class="`driver-img team-${team.teamId}`"
+                            ></div>
                         </div>
                         <div class="col-6 col-lg-7">
                             <!-- <RouterLink
@@ -144,7 +191,10 @@ watch(props, fetchModel);
                             >
                                 {{ team.teamName }}</RouterLink
                             > -->
-                            <TeamTag v-bind:league-id="props.league" v-bind:team-id="team.teamId"></TeamTag>
+                            <TeamTag
+                                v-bind:league-id="props.league"
+                                v-bind:team-id="team.teamId"
+                            ></TeamTag>
                         </div>
                     </div>
                     <div class="row">
@@ -152,8 +202,11 @@ watch(props, fetchModel);
                     </div>
                 </template>
                 <div class="row" v-if="view.teams.length !== 0 && summary_mode">
-                    <RouterLink class="dropdown-item" type="button"
-                        v-bind:to="`?m=standings&league=${props.league}&season=${props.season}`">See all Standings
+                    <RouterLink
+                        class="dropdown-item"
+                        type="button"
+                        v-bind:to="`?m=standings&league=${props.league}&season=${props.season}`"
+                        >See all Standings
                     </RouterLink>
                 </div>
             </div>

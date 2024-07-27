@@ -86,11 +86,12 @@ export async function getCumulativeDeltaChartModel(
     let keys = Object.keys(r?.[0] || {}).filter((k) => k !== xKey);
 
     let ret: SeriesXY[] = keys.map((k) => {
-        let d = r
-            ?.map((v) => {
-                return { x: <number>v[xKey], y: <number>v[k] };
-            })
-            .filter((v) => v.y !== undefined) || [];
+        let d =
+            r
+                ?.map((v) => {
+                    return { x: <number>v[xKey], y: <number>v[k] };
+                })
+                .filter((v) => v.y !== undefined) || [];
         return { name: k, data: d };
     });
 

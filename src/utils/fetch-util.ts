@@ -568,3 +568,41 @@ export async function defLgSeasSubCtx(
     });
     return ret;
 }
+
+export async function crtSchedEvent(
+    season: string,
+    time: string,
+    track: string
+): Promise<any> {
+    const namespace = 'ldata-admcfg';
+    const type = 'crtSchedEvent';
+
+    let source: string = prepUrl({ namespace, type, season, time, track });
+    let ret = await fetchObjects([source]);
+
+    return ret[0].doc;
+}
+
+export async function updSchedEvent(
+    event: string,
+    time: string,
+    track: string
+): Promise<any> {
+    const namespace = 'ldata-admcfg';
+    const type = 'updSchedEvent';
+
+    let source: string = prepUrl({ namespace, type, event, time, track });
+    let ret = await fetchObjects([source]);
+
+    return ret[0].doc;
+}
+
+export async function delSchedEvent(event: string) {
+    const namespace = 'ldata-admcfg';
+    const type = 'delSchedEvent';
+
+    let source: string = prepUrl({ namespace, type, event });
+    let ret = await fetchObjects([source]);
+
+    return ret[0].doc;
+}

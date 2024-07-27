@@ -46,8 +46,13 @@ watchEffect(fetchModel);
                     <tr v-for="row in table.rows">
                         <template v-for="key in table.keys">
                             <td v-if="key === 'cust_id'">
-                                <RouterLink class="link-light" v-bind:to="`/?m=driver&league=${props.leagueId
-                                    }&driver=${table.nameToIdMap[row[key]]}`">{{ row[key] }}</RouterLink>
+                                <RouterLink
+                                    class="link-light"
+                                    v-bind:to="`/?m=driver&league=${
+                                        props.leagueId
+                                    }&driver=${table.nameToIdMap[row[key]]}`"
+                                    >{{ row[key] }}</RouterLink
+                                >
                             </td>
                             <td v-else>{{ row[key] }}</td>
                         </template>

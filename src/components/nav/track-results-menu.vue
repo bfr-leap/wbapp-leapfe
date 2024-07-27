@@ -37,28 +37,48 @@ watch(props, fectchModel);
                     {{ trackResultsMenuModel.currentLeague }}
                 </span>
                 <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
+                    <button
+                        class="btn btn-secondary dropdown-toggle"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                    >
                         {{ trackResultsMenuModel.carOptions.selected }}
                     </button>
                     <ul class="dropdown-menu">
-                        <li v-for="carOption in trackResultsMenuModel.carOptions
-                            .options">
-                            <RouterLink class="dropdown-item" type="button" v-bind:to="carOption.href">
+                        <li
+                            v-for="carOption in trackResultsMenuModel.carOptions
+                                .options"
+                        >
+                            <RouterLink
+                                class="dropdown-item"
+                                type="button"
+                                v-bind:to="carOption.href"
+                            >
                                 {{ carOption.display }}
                             </RouterLink>
                         </li>
                     </ul>
                 </div>
                 <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
+                    <button
+                        class="btn btn-secondary dropdown-toggle"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                    >
                         {{ trackResultsMenuModel.trackOptions.selected }}
                     </button>
                     <ul class="dropdown-menu">
-                        <li v-for="trackOption in trackResultsMenuModel
-                            .trackOptions.options">
-                            <RouterLink class="dropdown-item" type="button" v-bind:to="trackOption.href">
+                        <li
+                            v-for="trackOption in trackResultsMenuModel
+                                .trackOptions.options"
+                        >
+                            <RouterLink
+                                class="dropdown-item"
+                                type="button"
+                                v-bind:to="trackOption.href"
+                            >
                                 {{ trackOption.display }}
                             </RouterLink>
                         </li>

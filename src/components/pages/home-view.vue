@@ -8,6 +8,7 @@ import LeagueSeasonMenu from '@/components/nav/league-season-menu.vue';
 import PastEventCards from '../event/past-event-cards.vue';
 import type { HomeModel } from '@/models/pages/home-model';
 import { getDefaultHomeModel, getHomeModel } from '@/models/pages/home-model';
+import { SignedIn, SignedOut, SignInButton } from 'vue-clerk';
 
 const props = defineProps<{
     league: string;
@@ -53,16 +54,26 @@ function onClick(eventInfo: { trackId: string; date: string }) {
 </script>
 
 <template>
-    <LeagueSeasonMenu v-if="homeModel.leagueId && homeModel.seasonId" target-page="" v-bind:league="homeModel.leagueId"
-        v-bind:season="homeModel.seasonId" />
+    <LeagueSeasonMenu
+        v-if="homeModel.leagueId && homeModel.seasonId"
+        target-page=""
+        v-bind:league="homeModel.leagueId"
+        v-bind:season="homeModel.seasonId"
+    />
 
-    <div class="card bg-dark text-light m-2" v-if="homeModel.leagueId && homeModel.seasonId">
+    <div
+        class="card bg-dark text-light m-2"
+        v-if="homeModel.leagueId && homeModel.seasonId"
+    >
         <div class="card-body p-2">
             <div class="container">
                 Past Events
                 <div style="height: 1em"></div>
-                <PastEventCards v-bind:league="homeModel.leagueId" v-bind:season="homeModel.seasonId"
-                    v-bind:car="homeModel.carId" />
+                <PastEventCards
+                    v-bind:league="homeModel.leagueId"
+                    v-bind:season="homeModel.seasonId"
+                    v-bind:car="homeModel.carId"
+                />
                 <div style="height: 1em"></div>
             </div>
         </div>
@@ -74,39 +85,80 @@ function onClick(eventInfo: { trackId: string; date: string }) {
                 <div v-if="homeModel.nextRace.date !== ''" class="row g-1">
                     <div class="col-12 col-sm-3 col-lg-2">
                         <div class="row g-1 flex-sm-column h-100">
-                            <div class="col" @click="onClick(homeModel.nextRace)">
-                                <EventCardSm class="h-100" v-bind:track_id="homeModel.nextRace.trackId"
-                                    v-bind:is_next="true" v-bind:date="new Date(homeModel.nextRace.date)
-                                        " v-bind:is_selected="homeModel.nextRace.isSelected
-                                            "></EventCardSm>
+                            <div
+                                class="col"
+                                @click="onClick(homeModel.nextRace)"
+                            >
+                                <EventCardSm
+                                    class="h-100"
+                                    v-bind:track_id="homeModel.nextRace.trackId"
+                                    v-bind:is_next="true"
+                                    v-bind:date="
+                                        new Date(homeModel.nextRace.date)
+                                    "
+                                    v-bind:is_selected="
+                                        homeModel.nextRace.isSelected
+                                    "
+                                ></EventCardSm>
                             </div>
-                            <div v-for="race in homeModel.futureRaces" class="col" @click="onClick(race)">
-                                <EventCardSm class="h-100" v-bind:track_id="race.trackId" v-bind:is_next="false"
-                                    v-bind:date="new Date(race.date)" v-bind:is_selected="race.isSelected">
+                            <div
+                                v-for="race in homeModel.futureRaces"
+                                class="col"
+                                @click="onClick(race)"
+                            >
+                                <EventCardSm
+                                    class="h-100"
+                                    v-bind:track_id="race.trackId"
+                                    v-bind:is_next="false"
+                                    v-bind:date="new Date(race.date)"
+                                    v-bind:is_selected="race.isSelected"
+                                >
                                 </EventCardSm>
                             </div>
                         </div>
                     </div>
                     <div class="col-12 col-sm-9 col-lg-10">
-                        <EventCardLg v-bind:track_id="homeModel.selectedRace?.trackId?.toString()
-                            " v-bind:car_id="homeModel.carId" v-bind:league_id="homeModel.leagueId"
-                            v-bind:is_next="false" v-bind:date="new Date(homeModel.selectedRace.date)"></EventCardLg>
+                        <EventCardLg
+                            v-bind:track_id="
+                                homeModel.selectedRace?.trackId?.toString()
+                            "
+                            v-bind:car_id="homeModel.carId"
+                            v-bind:league_id="homeModel.leagueId"
+                            v-bind:is_next="false"
+                            v-bind:date="new Date(homeModel.selectedRace.date)"
+                        ></EventCardLg>
                     </div>
                 </div>
                 <div v-else>No Future Events</div>
+                <SignedIn
+                    ><RouterLink
+                        class="dropdown-item"
+                        type="button"
+                        v-bind:to="`/?m=season-cdr-admin&league=${$props.league}&season=${$props.season}`"
+                    >
+                        Edit Calendar
+                    </RouterLink>
+                </SignedIn>
             </div>
         </div>
     </div>
-    <DriverStandings v-if="homeModel.seasonId && homeModel.leagueId" summary_mode v-bind:season="homeModel.seasonId"
-        v-bind:league="homeModel.leagueId" />
+    <DriverStandings
+        v-if="homeModel.seasonId && homeModel.leagueId"
+        summary_mode
+        v-bind:season="homeModel.seasonId"
+        v-bind:league="homeModel.leagueId"
+    />
 
     <div class="card bg-dark text-light m-2">
         <div class="card-body p-2">
             <div class="container">
                 <div>
-                    <RouterLink v-if="homeModel.seasonId && homeModel.leagueId" class="link-light"
-                        v-bind:to="`?m=season&league=${homeModel.leagueId}&season=${homeModel.seasonId}`">See More
-                        Season Details</RouterLink>
+                    <RouterLink
+                        v-if="homeModel.seasonId && homeModel.leagueId"
+                        class="link-light"
+                        v-bind:to="`?m=season&league=${homeModel.leagueId}&season=${homeModel.seasonId}`"
+                        >See More Season Details</RouterLink
+                    >
                 </div>
             </div>
         </div>

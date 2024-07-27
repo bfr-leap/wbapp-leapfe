@@ -35,13 +35,19 @@ watchEffect(fetchModelData);
 </script>
 
 <template>
-    <template v-if="
-        resultsModel.leagueId &&
-        resultsModel.seasonId &&
-        resultsModel.subsessionId
-    ">
-        <LeagueIndex v-bind:simsession-id="resultsModel.simsessionId" v-bind:subsession-id="resultsModel.subsessionId"
-            v-bind:season-id="resultsModel.seasonId" v-bind:league-id="resultsModel.leagueId" />
+    <template
+        v-if="
+            resultsModel.leagueId &&
+            resultsModel.seasonId &&
+            resultsModel.subsessionId
+        "
+    >
+        <LeagueIndex
+            v-bind:simsession-id="resultsModel.simsessionId"
+            v-bind:subsession-id="resultsModel.subsessionId"
+            v-bind:season-id="resultsModel.seasonId"
+            v-bind:league-id="resultsModel.leagueId"
+        />
 
         <div class="card bg-dark text-light m-2">
             <div class="card-body p-2">
@@ -49,7 +55,10 @@ watchEffect(fetchModelData);
             </div>
         </div>
 
-        <div v-if="resultsModel.summary.length > 0" class="card bg-dark text-light m-2">
+        <div
+            v-if="resultsModel.summary.length > 0"
+            class="card bg-dark text-light m-2"
+        >
             <div class="card-body p-2">
                 <p v-for="p of resultsModel.summary">
                     {{ p }}
@@ -61,8 +70,12 @@ watchEffect(fetchModelData);
                 <div style="height: 2em"></div>
                 <div class="container">
                     <div class="row">
-                        <GenericTable title="Session Report" :leagueId="resultsModel.leagueId"
-                            :rows="resultsModel.results" :season-id="resultsModel.seasonId" />
+                        <GenericTable
+                            title="Session Report"
+                            :leagueId="resultsModel.leagueId"
+                            :rows="resultsModel.results"
+                            :season-id="resultsModel.seasonId"
+                        />
                     </div>
                     <div style="height: 2em"></div>
                 </div>
@@ -70,62 +83,84 @@ watchEffect(fetchModelData);
         </div>
         <div class="page-break"></div>
 
-        <div v-if="
-            resultsModel.simsessionType === 'race' ||
-            resultsModel.simsessionType === 'sprint'
-        " class="card bg-dark text-light m-2">
+        <div
+            v-if="
+                resultsModel.simsessionType === 'race' ||
+                resultsModel.simsessionType === 'sprint'
+            "
+            class="card bg-dark text-light m-2"
+        >
             <div class="card-body p-2">
                 <div class="container">
                     <div class="row">
                         <div>Cumulative Delta</div>
                     </div>
                     <div class="row">
-                        <CumulativeDeltaChart v-bind:league="resultsModel.leagueId"
+                        <CumulativeDeltaChart
+                            v-bind:league="resultsModel.leagueId"
                             v-bind:subsession="resultsModel.subsessionId"
-                            v-bind:simsession="resultsModel.simsessionId" />
+                            v-bind:simsession="resultsModel.simsessionId"
+                        />
                     </div>
                 </div>
             </div>
         </div>
 
-        <div v-if="
-            resultsModel.simsessionType === 'race' ||
-            resultsModel.simsessionType === 'sprint'
-        " class="card bg-dark text-light m-2">
+        <div
+            v-if="
+                resultsModel.simsessionType === 'race' ||
+                resultsModel.simsessionType === 'sprint'
+            "
+            class="card bg-dark text-light m-2"
+        >
             <div class="card-body p-2">
                 <div class="container">
                     <div class="row">
-                        <StartFinishChart v-bind:league="resultsModel.leagueId"
+                        <StartFinishChart
+                            v-bind:league="resultsModel.leagueId"
                             v-bind:subsession="resultsModel.subsessionId"
-                            v-bind:simsession="resultsModel.simsessionId" />
+                            v-bind:simsession="resultsModel.simsessionId"
+                        />
                     </div>
                 </div>
             </div>
         </div>
 
-        <div v-if="resultsModel.simsessionType === 'qualify'" class="card bg-dark text-light m-2">
+        <div
+            v-if="resultsModel.simsessionType === 'qualify'"
+            class="card bg-dark text-light m-2"
+        >
             <div class="card-body p-2">
                 <div class="container">
                     <div class="row">
-                        <PaceChart v-bind:subsession="resultsModel.subsessionId"
-                            v-bind:simsession="resultsModel.simsessionId" v-bind:league="resultsModel.leagueId" />
+                        <PaceChart
+                            v-bind:subsession="resultsModel.subsessionId"
+                            v-bind:simsession="resultsModel.simsessionId"
+                            v-bind:league="resultsModel.leagueId"
+                        />
                     </div>
                 </div>
             </div>
         </div>
 
-        <div v-if="
-            resultsModel.simsessionType === 'qualify' &&
-            resultsModel.hasTelemetry
-        " class="card bg-dark text-light m-2">
+        <div
+            v-if="
+                resultsModel.simsessionType === 'qualify' &&
+                resultsModel.hasTelemetry
+            "
+            class="card bg-dark text-light m-2"
+        >
             <div class="card-body p-2">
                 <div class="container">
                     <div class="row">
                         <div>Fastest Lap Cumulative Delta</div>
                     </div>
                     <div class="row">
-                        <BestQualifyLapChart v-bind:subsession="resultsModel.subsessionId"
-                            v-bind:simsession="resultsModel.simsessionId" v-bind:league="resultsModel.leagueId" />
+                        <BestQualifyLapChart
+                            v-bind:subsession="resultsModel.subsessionId"
+                            v-bind:simsession="resultsModel.simsessionId"
+                            v-bind:league="resultsModel.leagueId"
+                        />
                     </div>
                 </div>
             </div>
@@ -141,7 +176,6 @@ watchEffect(fetchModelData);
 </template>
 <style scoped>
 @media print {
-
     /* .row{
         display: block;
     } */

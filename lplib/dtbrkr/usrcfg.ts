@@ -51,7 +51,8 @@ async function getActiveLeagueSchedule(): Promise<any> {
     const xata = getXataClient();
 
     const rt: any = await xata.sql`
-    SELECT "sched_subsessions"."id", "seasons"."league_id", "leagues"."name" as "league_name", "car_id", "seasons"."display_name" as "season_name", "time", 
+    SELECT "sched_subsessions"."id" as "event_id", "sched_subsessions"."id", "seasons"."league_id", "leagues"."name" as "league_name", "car_id",
+    "seasons"."display_name" as "season_name", "time", 
     "track_id", "sched_subsessions"."season_id", 
     "sched_subsessions"."display_name" as "event_name"
     FROM "sched_subsessions"
@@ -59,7 +60,8 @@ async function getActiveLeagueSchedule(): Promise<any> {
     "sched_subsessions"."season_id"="seasons"."season_id"
     INNER JOIN "leagues" ON
      "leagues"."league_id"="seasons"."league_id"
-     WHERE "seasons"."is_active"`;
+     WHERE "seasons"."is_active"
+     ORDER BY "time" ASC`;
 
     let leaguesM: any = {};
     let seasonsM: any = {};
@@ -91,6 +93,7 @@ async function getActiveLeagueSchedule(): Promise<any> {
             time: r.time,
             track_id: r.track_id,
             comment: r.event_name,
+            event_id: r.event_id,
         };
         season.events.push(event);
     }

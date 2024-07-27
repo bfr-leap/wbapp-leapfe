@@ -40,36 +40,57 @@ const memberView = computed(() => {
     <div class="card bg-dark text-light m-2 sticky-top">
         <div class="card-body p-2">
             <div class="row p-3">
-                <div v-bind:class="`col-1 driver-img club-${memberView.clubId}`"></div>
+                <div
+                    v-bind:class="`col-1 driver-img club-${memberView.clubId}`"
+                ></div>
                 <div class="col">
-                    <DriverTag class="fs-4" v-bind:lastName="memberView.lastName"
-                        v-bind:firstName="memberView.firstName" v-bind:licenseLevel="memberView.licenseLevel"
-                        v-bind:iRating="memberView.iRating" v-bind:safetyRating="memberView.safetyRating"
-                        v-bind:teamName="memberView.teamName" v-bind:clubId="memberView.clubId" />
+                    <DriverTag
+                        class="fs-4"
+                        v-bind:lastName="memberView.lastName"
+                        v-bind:firstName="memberView.firstName"
+                        v-bind:licenseLevel="memberView.licenseLevel"
+                        v-bind:iRating="memberView.iRating"
+                        v-bind:safetyRating="memberView.safetyRating"
+                        v-bind:teamName="memberView.teamName"
+                        v-bind:clubId="memberView.clubId"
+                    />
                 </div>
             </div>
         </div>
     </div>
     <div class="card bg-dark text-light m-2">
         <div class="card-body p-2">
-            <Stats v-if="driverProfileModel.driverStatsMap?.[0]?.[driverId]"
-                :stats="driverProfileModel.driverStatsMap[0][driverId]" :results="driverProfileModel.allTimeResults"
-                seasonName="All Time" v-bind:seasonId="0" v-bind:league-id="props.league" />
+            <Stats
+                v-if="driverProfileModel.driverStatsMap?.[0]?.[driverId]"
+                :stats="driverProfileModel.driverStatsMap[0][driverId]"
+                :results="driverProfileModel.allTimeResults"
+                seasonName="All Time"
+                v-bind:seasonId="0"
+                v-bind:league-id="props.league"
+            />
         </div>
     </div>
     <template v-for="season in driverProfileModel.leagueSeasons?.seasons">
-        <template v-if="
-            driverProfileModel.driverStatsMap?.[season.season_id]?.[
-            driverId
-            ]
-        ">
+        <template
+            v-if="
+                driverProfileModel.driverStatsMap?.[season.season_id]?.[
+                    driverId
+                ]
+            "
+        >
             <div class="card bg-dark text-light m-2">
                 <div class="card-body p-2">
-                    <Stats v-bind:stats="driverProfileModel.driverStatsMap?.[
-                        season.season_id
-                    ]?.[driverId]
-                        " v-bind:results="driverProfileModel.driverResults" v-bind:seasonName="season.season_name"
-                        v-bind:seasonId="season.season_id" v-bind:league-id="props.league" />
+                    <Stats
+                        v-bind:stats="
+                            driverProfileModel.driverStatsMap?.[
+                                season.season_id
+                            ]?.[driverId]
+                        "
+                        v-bind:results="driverProfileModel.driverResults"
+                        v-bind:seasonName="season.season_name"
+                        v-bind:seasonId="season.season_id"
+                        v-bind:league-id="props.league"
+                    />
                 </div>
             </div>
         </template>

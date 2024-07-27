@@ -1,4 +1,7 @@
-import type { DriverResults, SSR_ResultsEntry } from 'lplib/endpoint-types/iracing-endpoints';
+import type {
+    DriverResults,
+    SSR_ResultsEntry,
+} from 'lplib/endpoint-types/iracing-endpoints';
 import { getShortSubsessionName } from '@/utils/session-utils';
 
 async function getNames(
@@ -87,26 +90,26 @@ export async function getStartFinishChartData(
             return [
                 sprint
                     ? {
-                        name:
-                            (names[k.toString()] || k.toString()) + ':Sprint',
-                        lo:
-                            -1 *
-                            (sprint.start_position === 0
-                                ? sprint.position
-                                : sprint.start_position),
-                        hi: -1 * sprint.position,
-                    }
+                          name:
+                              (names[k.toString()] || k.toString()) + ':Sprint',
+                          lo:
+                              -1 *
+                              (sprint.start_position === 0
+                                  ? sprint.position
+                                  : sprint.start_position),
+                          hi: -1 * sprint.position,
+                      }
                     : null,
                 race
                     ? {
-                        name: (names[k.toString()] || k.toString()) + ':Race',
-                        lo:
-                            -1 *
-                            (race.start_position === 0
-                                ? race.position
-                                : race.start_position),
-                        hi: -1 * race.position,
-                    }
+                          name: (names[k.toString()] || k.toString()) + ':Race',
+                          lo:
+                              -1 *
+                              (race.start_position === 0
+                                  ? race.position
+                                  : race.start_position),
+                          hi: -1 * race.position,
+                      }
                     : null,
             ].filter((a) => a !== null);
         }

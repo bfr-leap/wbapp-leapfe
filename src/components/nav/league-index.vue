@@ -36,28 +36,48 @@ watchEffect(fetchModel);
         <div class="card-body p-2">
             <form class="row row-cols-auto g-3 align-items-center">
                 <div class="dropdown">
-                    <button class="btn btn-dark dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
+                    <button
+                        class="btn btn-dark dropdown-toggle"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                    >
                         {{ leagueIndexModel.leagueOptions.selected }}
                     </button>
                     <ul class="dropdown-menu dropdown-menu-dark">
-                        <li v-for="leagueOption in leagueIndexModel
-                            .leagueOptions.options">
-                            <RouterLink class="dropdown-item" type="button" v-bind:to="leagueOption.href">
+                        <li
+                            v-for="leagueOption in leagueIndexModel
+                                .leagueOptions.options"
+                        >
+                            <RouterLink
+                                class="dropdown-item"
+                                type="button"
+                                v-bind:to="leagueOption.href"
+                            >
                                 {{ leagueOption.display }}
                             </RouterLink>
                         </li>
                     </ul>
                 </div>
                 <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
+                    <button
+                        class="btn btn-secondary dropdown-toggle"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                    >
                         {{ leagueIndexModel.seasonOptions.selected }}
                     </button>
                     <ul class="dropdown-menu">
-                        <li v-for="seasonOption in leagueIndexModel
-                            .seasonOptions.options">
-                            <RouterLink class="dropdown-item" type="button" v-bind:to="seasonOption.href">
+                        <li
+                            v-for="seasonOption in leagueIndexModel
+                                .seasonOptions.options"
+                        >
+                            <RouterLink
+                                class="dropdown-item"
+                                type="button"
+                                v-bind:to="seasonOption.href"
+                            >
                                 {{ seasonOption.display }}
                             </RouterLink>
                         </li>
@@ -65,14 +85,24 @@ watchEffect(fetchModel);
                 </div>
 
                 <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle truncate-button" type="button"
-                        data-bs-toggle="dropdown" aria-expanded="false">
+                    <button
+                        class="btn btn-secondary dropdown-toggle truncate-button"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                    >
                         {{ leagueIndexModel.subsessionOptions.selected }}
                     </button>
                     <ul class="dropdown-menu">
-                        <li v-for="subsessionOption in leagueIndexModel
-                            .subsessionOptions.options">
-                            <RouterLink class="dropdown-item" type="button" v-bind:to="subsessionOption.href">
+                        <li
+                            v-for="subsessionOption in leagueIndexModel
+                                .subsessionOptions.options"
+                        >
+                            <RouterLink
+                                class="dropdown-item"
+                                type="button"
+                                v-bind:to="subsessionOption.href"
+                            >
                                 {{ subsessionOption.display }}
                             </RouterLink>
                         </li>
@@ -80,14 +110,24 @@ watchEffect(fetchModel);
                 </div>
 
                 <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
+                    <button
+                        class="btn btn-secondary dropdown-toggle"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                    >
                         {{ leagueIndexModel.simsessionOptions.selected }}
                     </button>
                     <ul class="dropdown-menu">
-                        <li v-for="simsessionOption in leagueIndexModel
-                            .simsessionOptions.options">
-                            <RouterLink class="dropdown-item" type="button" v-bind:to="simsessionOption.href">
+                        <li
+                            v-for="simsessionOption in leagueIndexModel
+                                .simsessionOptions.options"
+                        >
+                            <RouterLink
+                                class="dropdown-item"
+                                type="button"
+                                v-bind:to="simsessionOption.href"
+                            >
                                 {{ simsessionOption.display }}
                             </RouterLink>
                         </li>
