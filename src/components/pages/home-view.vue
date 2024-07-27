@@ -8,6 +8,7 @@ import LeagueSeasonMenu from '@/components/nav/league-season-menu.vue';
 import PastEventCards from '../event/past-event-cards.vue';
 import type { HomeModel } from '@/models/pages/home-model';
 import { getDefaultHomeModel, getHomeModel } from '@/models/pages/home-model';
+import { SignedIn, SignedOut, SignInButton } from 'vue-clerk';
 
 const props = defineProps<{
     league: string;
@@ -129,6 +130,15 @@ function onClick(eventInfo: { trackId: string; date: string }) {
                     </div>
                 </div>
                 <div v-else>No Future Events</div>
+                <SignedIn
+                    ><RouterLink
+                        class="dropdown-item"
+                        type="button"
+                        v-bind:to="`/?m=season-cdr-admin&league=${$props.league}&season=${$props.season}`"
+                    >
+                        Edit Calendar
+                    </RouterLink>
+                </SignedIn>
             </div>
         </div>
     </div>
