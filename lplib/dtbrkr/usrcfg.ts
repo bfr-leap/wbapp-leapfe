@@ -1,4 +1,5 @@
 import { getDocument as getDataLakeDocument } from './dtlkdata';
+import { getActiveLeagueSchedule } from './lib-usrcfg/active-league-schedule';
 import { getXataClient, XataClient } from './xata';
 
 async function getLeagueTeamsInfo(league: string): Promise<any> {
@@ -43,62 +44,6 @@ async function getLeagueTeamsInfo(league: string): Promise<any> {
     }
 
     return ret;
-}
-
-async function getActiveLeagueSchedule(): Promise<any> {
-    console.log('getActiveLeagueSchedule():');
-
-    const xata = getXataClient();
-
-    const rt: any = await xata.sql`
-    SELECT "sched_subsessions"."id" as "event_id", "sched_subsessions"."id", "seasons"."league_id", "leagues"."name" as "league_name", "car_id",
-    "seasons"."display_name" as "season_name", "time", 
-    "track_id", "sched_subsessions"."season_id", 
-    "sched_subsessions"."display_name" as "event_name"
-    FROM "sched_subsessions"
-    INNER JOIN "seasons" ON
-    "sched_subsessions"."season_id"="seasons"."season_id"
-    INNER JOIN "leagues" ON
-     "leagues"."league_id"="seasons"."league_id"
-     WHERE "seasons"."is_active"
-     ORDER BY "time" ASC`;
-
-    let leaguesM: any = {};
-    let seasonsM: any = {};
-    let leagues = [];
-
-    for (let r of rt.records) {
-        let league = leaguesM[r.league_id];
-        if (!league) {
-            league = leaguesM[r.league_id] = {
-                league_id: r.league_id,
-                name: r.league_name,
-                seasons: [],
-            };
-            leagues.push(league);
-        }
-
-        let season = seasonsM[r.season_id];
-        if (!season) {
-            season = seasonsM[r.season_id] = {
-                season_id: r.season_id,
-                car_id: r.car_id,
-                comment: r.season_name,
-                events: [],
-            };
-            league.seasons.push(season);
-        }
-
-        let event = {
-            time: r.time,
-            track_id: r.track_id,
-            comment: r.event_name,
-            event_id: r.event_id,
-        };
-        season.events.push(event);
-    }
-
-    return { leagues };
 }
 
 async function getTrackDisplayInfo(): Promise<any> {
@@ -181,7 +126,7 @@ async function defLgSeasSubCtx_noParams(): Promise<any> {
     const now = new Date().getTime();
     const ret =
         new Date(futRecs.time).getTime() - now <
-        now - new Date(pasRecs.time).getTime()
+            now - new Date(pasRecs.time).getTime()
             ? futRecs
             : pasRecs;
 
@@ -247,7 +192,7 @@ async function defLgSeasSubCtx_forLeague(league: string): Promise<any> {
         const now = new Date().getTime();
         ret =
             new Date(futRecs.time).getTime() - now <
-            now - new Date(pasRecs.time).getTime()
+                now - new Date(pasRecs.time).getTime()
                 ? futRecs
                 : pasRecs;
     }
@@ -318,7 +263,7 @@ async function defLgSeasSubCtx_forSeason(
         const now = new Date().getTime();
         ret =
             new Date(futRecs.time).getTime() - now <
-            now - new Date(pasRecs.time).getTime()
+                now - new Date(pasRecs.time).getTime()
                 ? futRecs
                 : pasRecs;
     }
@@ -410,7 +355,7 @@ async function defLgSeasSubCtx(
         } else {
             ret = await defLgSeasSubCtx_noParams();
         }
-    } catch (e) {}
+    } catch (e) { }
 
     return ret;
 }
