@@ -31,12 +31,17 @@ export function getDefaultHomeModel(): HomeModel {
 
 export async function getHomeModel(
     league: string,
-    season: string
+    season: string,
+    isSignedIn: boolean
 ): Promise<HomeModel> {
     let ret: HomeModel = getDefaultHomeModel();
     let now: number = new Date().getTime();
     let s = await getCuratedActiveLeagueSchedule();
-    let features = await getUserFeatures();
+    let features: string[] = [];
+
+    if (isSignedIn) {
+        features = await getUserFeatures();
+    }
 
     if (!s) {
         return ret;
