@@ -8,6 +8,7 @@ import {
     getPastEventCardsModel,
     getDefaultPastEventCardsModel,
 } from '../../models/event/past-events-cards-model';
+import RouterLinkProxy from '@/components/nav/router-link-proxy.vue';
 
 const route = useRoute();
 
@@ -39,7 +40,7 @@ watch(route, fetchModel);
                 class="row g-1 h-100"
             >
                 <div v-for="race in pastEventCardsModel.pastRaces" class="col">
-                    <RouterLink
+                    <RouterLinkProxy
                         style="text-decoration: none"
                         class="link-light"
                         v-bind:to="`?m=results&league=${props.league}&season=${props.season}&subsession=${race.sessionId}&simsession=0`"
@@ -51,7 +52,7 @@ watch(route, fetchModel);
                             v-bind:date="new Date(race.date)"
                             v-bind:is_selected="race.isSelected"
                         ></EventCardSm>
-                    </RouterLink>
+                    </RouterLinkProxy>
                 </div>
             </div>
             <div v-else class="row g-1 h-100">

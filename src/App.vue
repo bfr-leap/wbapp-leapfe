@@ -8,6 +8,7 @@ import { useAuth } from 'vue-clerk';
 import { getUserLeaguesState } from '@/utils/fetch-util';
 import type { Ref } from 'vue';
 import { preFetch, defLgSeasSubCtx, setAuth } from '@/utils/fetch-util';
+import RouterLinkProxy from '@/components/nav/router-link-proxy.vue';
 
 const route = useRoute();
 const auth = useAuth();
@@ -55,21 +56,21 @@ watch(route, fetchModel);
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <RouterLink class="navbar-brand" to="/">
+                <RouterLinkProxy class="navbar-brand" to="/">
                     <img
                         class="icon"
                         v-bind:src="`blue-frog-racing-s4-icon.png`"
                     />
                     LEAP
-                </RouterLink>
+                </RouterLinkProxy>
             </div>
 
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="navbar-nav">
-                    <RouterLink
+                    <RouterLinkProxy
                         class="nav-link"
                         v-bind:to="`/?m=results&league=${league}`"
-                        >Results</RouterLink
+                        >Results</RouterLinkProxy
                     >
                 </div>
             </div>

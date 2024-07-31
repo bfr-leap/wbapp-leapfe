@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import RouterLinkProxy from '@/components/nav/router-link-proxy.vue';
+
 const props = defineProps<{
     clubId: number;
     lastName: string;
@@ -17,7 +19,7 @@ const props = defineProps<{
     <div class="driver">
         <span style="display: inline-block">
             <div>
-                <RouterLink
+                <RouterLinkProxy
                     class="link-light"
                     v-if="leagueId && driverId"
                     v-bind:to="`?m=driver&league=${leagueId}&driver=${driverId}`"
@@ -26,7 +28,7 @@ const props = defineProps<{
                     </span>
                     <span class="firt-name"
                         >{{ props.firstName + ' ' }}
-                    </span></RouterLink
+                    </span></RouterLinkProxy
                 >
                 <template v-else>
                     <span class="last-name"
@@ -41,11 +43,11 @@ const props = defineProps<{
                 >
             </div>
             <div>
-                <RouterLink
+                <RouterLinkProxy
                     v-if="leagueId && teamId"
                     class="link-light text-decoration-none"
                     v-bind:to="`?m=team&league=${props.leagueId}&team=${props.teamId}`"
-                    >{{ props.teamName }}</RouterLink
+                    >{{ props.teamName }}</RouterLinkProxy
                 ><span v-else>{{ props.teamName }}</span>
             </div>
         </span>

@@ -6,6 +6,7 @@ import {
     getTeamTagModel,
     getDefaultTeamTagModel,
 } from '@/models/team/team-tag-model';
+import RouterLinkProxy from '@/components/nav/router-link-proxy.vue';
 
 const props = defineProps<{
     teamId: number;
@@ -24,13 +25,13 @@ watchEffect(fetchModel);
     <div class="driver">
         <span style="display: inline-block">
             <div>
-                <RouterLink
+                <RouterLinkProxy
                     class="link-light"
                     v-if="leagueId && leagueId"
                     v-bind:to="`?m=team&league=${leagueId}&team=${teamId}`"
                     ><span class="last-name"
                         >{{ teamTagModel.name }}
-                    </span></RouterLink
+                    </span></RouterLinkProxy
                 >
                 <template v-else>
                     <span class="last-name">{{ teamTagModel.name }} </span>
@@ -39,7 +40,7 @@ watchEffect(fetchModel);
             </div>
             <div>
                 <span v-for="(driver, index) of teamTagModel.drivers">
-                    <RouterLink
+                    <RouterLinkProxy
                         class="link-light text-decoration-none"
                         v-bind:to="`?m=driver&league=${leagueId}&driver=${driver.driverId}`"
                         >{{
@@ -47,7 +48,7 @@ watchEffect(fetchModel);
                             (index < teamTagModel.drivers.length - 1
                                 ? ',  '
                                 : '')
-                        }}</RouterLink
+                        }}</RouterLinkProxy
                     >
                 </span>
             </div>

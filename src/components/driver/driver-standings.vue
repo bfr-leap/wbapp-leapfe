@@ -10,6 +10,7 @@ import {
     getDriverStandingsModel,
     getDefaultStandingsModel,
 } from '@/models/driver/driver-standings-model';
+import RouterLinkProxy from '@/components/nav/router-link-proxy.vue';
 
 const props = withDefaults(
     defineProps<{
@@ -117,12 +118,12 @@ watch(props, fetchModel);
                     class="row"
                     v-if="view.drivers.length !== 0 && summary_mode"
                 >
-                    <RouterLink
+                    <RouterLinkProxy
                         class="dropdown-item"
                         type="button"
                         v-bind:to="`?m=standings&league=${props.league}&season=${props.season}`"
                         >See all Standings
-                    </RouterLink>
+                    </RouterLinkProxy>
                 </div>
                 <div class="row" v-if="view.drivers.length === 0">
                     Standings not Available
@@ -184,12 +185,12 @@ watch(props, fetchModel);
                             ></div>
                         </div>
                         <div class="col-6 col-lg-7">
-                            <!-- <RouterLink
+                            <!-- <RouterLinkProxy
                                 class="dropdown-item"
                                 type="button"
                                 v-bind:to="`?m=team&league=${props.league}&team=${team.teamId}`"
                             >
-                                {{ team.teamName }}</RouterLink
+                                {{ team.teamName }}</RouterLinkProxy
                             > -->
                             <TeamTag
                                 v-bind:league-id="props.league"
@@ -202,12 +203,12 @@ watch(props, fetchModel);
                     </div>
                 </template>
                 <div class="row" v-if="view.teams.length !== 0 && summary_mode">
-                    <RouterLink
+                    <RouterLinkProxy
                         class="dropdown-item"
                         type="button"
                         v-bind:to="`?m=standings&league=${props.league}&season=${props.season}`"
                         >See all Standings
-                    </RouterLink>
+                    </RouterLinkProxy>
                 </div>
             </div>
         </div>

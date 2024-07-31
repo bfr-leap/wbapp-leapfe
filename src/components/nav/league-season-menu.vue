@@ -8,6 +8,7 @@ import {
     getLeagueSeasonMenuModel,
 } from '@/models/nav/league-season-menu-model';
 import { useAuth } from 'vue-clerk';
+import RouterLinkProxy from '@/components/nav/router-link-proxy.vue';
 
 const { isSignedIn } = useAuth();
 
@@ -51,13 +52,13 @@ watch(props, fetchModel);
                             v-for="leagueOption in leagueSeasonMenuModel
                                 .leagueOptions.options"
                         >
-                            <RouterLink
+                            <RouterLinkProxy
                                 class="dropdown-item"
                                 type="button"
                                 v-bind:to="leagueOption.href"
                             >
                                 {{ leagueOption.display }}
-                            </RouterLink>
+                            </RouterLinkProxy>
                         </li>
                     </ul>
                 </div>
@@ -75,13 +76,13 @@ watch(props, fetchModel);
                             v-for="seasonOption in leagueSeasonMenuModel
                                 .seasonOptions.options"
                         >
-                            <RouterLink
+                            <RouterLinkProxy
                                 class="dropdown-item"
                                 type="button"
                                 v-bind:to="seasonOption.href"
                             >
                                 {{ seasonOption.display }}
-                            </RouterLink>
+                            </RouterLinkProxy>
                         </li>
                     </ul>
                 </div>

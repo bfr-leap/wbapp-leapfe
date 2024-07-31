@@ -2,6 +2,7 @@
 import { ref, watchEffect } from 'vue';
 import type { Ref } from 'vue';
 import { getTrackName } from '@/utils/track-utils';
+import RouterLinkProxy from '@/components/nav/router-link-proxy.vue';
 
 const props = defineProps<{
     track_id: string;
@@ -68,11 +69,11 @@ watchEffect(fetchModel);
                                 v-bind:href="`?m=track&league=${props.league_id}&car=${props.car_id}&track=${props.track_id}`"
                                 >track stats</a
                             >
-                            <RouterLink
+                            <RouterLinkProxy
                                 v-else
                                 class="link-light"
                                 v-bind:to="`?m=track&league=${props.league_id}&car=${props.car_id}&track=${props.track_id}`"
-                                >track stats</RouterLink
+                                >track stats</RouterLinkProxy
                             ></span
                         >
                     </div>

@@ -4,6 +4,7 @@ import { ref, watchEffect } from 'vue';
 import type { DriverResults } from 'lplib/endpoint-types/iracing-endpoints';
 import type { ResultsTableModel } from '@/models/event/results-table-model';
 import { getResultsTableModel } from '@/models/event/results-table-model';
+import RouterLinkProxy from '@/components/nav/router-link-proxy.vue';
 
 const props = defineProps<{
     results: DriverResults;
@@ -47,11 +48,11 @@ watchEffect(fetchModel);
             <tbody>
                 <tr v-for="result in resultsTableModel">
                     <td v-if="result.sessionId > 0">
-                        <RouterLink
+                        <RouterLinkProxy
                             class="link-light"
                             :to="`/?m=results&league=${props.leagueId}&season=${props.seasonId}&simsession=0&subsession=${result.sessionId}`"
                         >
-                            {{ result.sessionName }}</RouterLink
+                            {{ result.sessionName }}</RouterLinkProxy
                         >
                     </td>
                     <td v-else>

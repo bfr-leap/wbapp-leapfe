@@ -13,6 +13,7 @@ import {
     getQualifyingChartData,
     getStartFinishChartData,
 } from '@/models/driver/driver-stats-model';
+import RouterLinkProxy from '@/components/nav/router-link-proxy.vue';
 
 export interface ResultsCollection {
     race: DriverResults;
@@ -60,11 +61,11 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
 
 <template>
     <div class="fs-4">
-        <RouterLink
+        <RouterLinkProxy
             class="link-light"
             v-if="seasonId"
             :to="`/?m=standings&league=${props.leagueId}&season=${props.seasonId}`"
-            >{{ seasonName }}</RouterLink
+            >{{ seasonName }}</RouterLinkProxy
         >
         <span v-else>{{ seasonName }}</span>
     </div>
