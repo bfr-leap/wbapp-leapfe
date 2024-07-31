@@ -1,4 +1,7 @@
-import { getCuratedActiveLeagueSchedule } from '@/utils/fetch-util';
+import {
+    getCuratedActiveLeagueSchedule,
+    getUserFeatures,
+} from '@/utils/fetch-util';
 
 export interface HomeModel {
     leagueName: string;
@@ -8,6 +11,7 @@ export interface HomeModel {
     leagueId: string;
     seasonId: string;
     carId: string;
+    allowEditCalendar: boolean;
 }
 
 export function getDefaultHomeModel(): HomeModel {
@@ -20,17 +24,24 @@ export function getDefaultHomeModel(): HomeModel {
             leagueId: '',
             seasonId: '',
             carId: '',
+            allowEditCalendar: false,
         })
     );
 }
 
 export async function getHomeModel(
     league: string,
-    season: string
+    season: string,
+    isSignedIn: boolean
 ): Promise<HomeModel> {
     let ret: HomeModel = getDefaultHomeModel();
     let now: number = new Date().getTime();
     let s = await getCuratedActiveLeagueSchedule();
+    let features: string[] = [];
+
+    if (isSignedIn) {
+        features = await getUserFeatures();
+    }
 
     if (!s) {
         return ret;
@@ -69,6 +80,10 @@ export async function getHomeModel(
             date: events[i].time,
             isSelected: false,
         });
+    }
+
+    if (features.indexOf('league_cdr_admin') > -1) {
+        ret.allowEditCalendar = true;
     }
 
     return ret;

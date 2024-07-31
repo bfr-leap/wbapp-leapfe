@@ -21,6 +21,22 @@ export async function getDefaultLeagueSeason(user_id: string): Promise<any> {
     return page?.records?.[0] || { league_id: 6555, season_id: 99410 };
 }
 
+export async function userFeatures(user_id: string): Promise<any> {
+    console.log('userFeatures(): ', user_id);
+    const xata: XataClient = getXataClient();
+
+    const ret = await xata.sql`
+    SELECT "display_name", "user_id", "release_to_all"
+    FROM "app_features"
+    LEFT JOIN "users_app_features" ON
+    "users_app_features"."feature_id"="app_features"."id" and "users_app_features"."user_id"=${user_id}
+    WHERE ("app_features"."release_to_some" AND "users_app_features"."user_id" IS NOT NULL) OR
+    ("app_features"."release_to_all")
+    `;
+
+    return ret.records.map((r: any) => r.display_name);
+}
+
 export async function getIrLinkState(user_id: string): Promise<any> {
     console.log('getIrLinkState():', user_id);
     const ret = {
@@ -526,6 +542,9 @@ export async function userDataHandler(
                 q?.season || '',
                 q?.subsession || ''
             );
+            break;
+        case 'userFeatures':
+            doc = await userFeatures(q?.userID || '');
             break;
     }
 

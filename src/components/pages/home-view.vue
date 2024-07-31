@@ -9,6 +9,9 @@ import PastEventCards from '../event/past-event-cards.vue';
 import type { HomeModel } from '@/models/pages/home-model';
 import { getDefaultHomeModel, getHomeModel } from '@/models/pages/home-model';
 import { SignedIn, SignedOut, SignInButton } from 'vue-clerk';
+import { useAuth } from 'vue-clerk';
+
+const { isSignedIn } = useAuth();
 
 const props = defineProps<{
     league: string;
@@ -19,7 +22,7 @@ const props = defineProps<{
 let homeModel: Ref<HomeModel> = ref(getDefaultHomeModel());
 
 async function fetchModel() {
-    homeModel.value = await getHomeModel(props.league, props.season);
+    homeModel.value = await getHomeModel(props.league, props.season, isSignedIn.value === true);
 }
 
 watchEffect(fetchModel);
@@ -130,8 +133,9 @@ function onClick(eventInfo: { trackId: string; date: string }) {
                     </div>
                 </div>
                 <div v-else>No Future Events</div>
-                <SignedIn
-                    ><RouterLink
+                <SignedIn>
+                    <RouterLink
+                        v-if="homeModel.allowEditCalendar"
                         class="dropdown-item"
                         type="button"
                         v-bind:to="`/?m=season-cdr-admin&league=${$props.league}&season=${$props.season}`"

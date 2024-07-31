@@ -26,28 +26,7 @@ export default async function handler(req: any, res: any) {
         return ret;
     }
 
-    async function adminMWAdapter(
-        n: string,
-        q: any,
-        next: (n__: string, q__: any) => Promise<any>
-    ): Promise<any> {
-        let ret: any = null;
-
-        ret = await authMiddleware(n, q, async (n_, q_) => {
-            // check for admin privileges here
-
-            return await next(n_, q_);
-        });
-
-        return ret;
-    }
-
-    const doc = await getDocument(
-        namespace,
-        req?.query || {},
-        authMwAdapter,
-        adminMWAdapter
-    );
+    const doc = await getDocument(namespace, req?.query || {}, authMwAdapter);
 
     res.status(200).json({ doc });
 }

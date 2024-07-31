@@ -18,8 +18,10 @@ import type {
     GeneratedSimsessionSummary,
     ChartTable,
 } from 'lplib/endpoint-types/iracing-endpoints';
-import type { UserLeaguesState } from 'lplib/endpoint-types/usrdata';
-import { useAuth } from 'vue-clerk';
+import type {
+    UserLeaguesState,
+    UserFeatures,
+} from 'lplib/endpoint-types/usrdata';
 
 const DEBUG_PREFETCH = false;
 
@@ -527,6 +529,31 @@ export async function getUserLeaguesState(): Promise<UserLeaguesState> {
     }
 
     return (await _userLeagueStateCache)[0].doc;
+}
+
+///UserFeatures
+let _userFeaturesCache: Promise<any> | null = null;
+let _userFeaturesTimer: any = 0;
+let _userFeaturesTimeout = 1000 * 60 * 60;
+export async function getUserFeatures(): Promise<UserFeatures> {
+    const namespace = 'ldata-usrdata';
+    const type = 'userFeatures';
+
+    if (_userFeaturesTimer) {
+        clearTimeout(_userFeaturesTimer);
+        _userFeaturesTimer = 0;
+    }
+
+    _userFeaturesTimer = setTimeout(() => {
+        _userFeaturesCache = null;
+    }, _userFeaturesTimeout);
+
+    if (!_userFeaturesCache) {
+        let source: string = prepUrl({ namespace, type });
+        _userFeaturesCache = fetchObjects([source]);
+    }
+
+    return (await _userFeaturesCache)[0].doc;
 }
 
 export async function setUserLeaguesState(
