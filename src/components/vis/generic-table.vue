@@ -7,6 +7,7 @@ import {
     getDefaultGenericTableModel,
     getGenericTableModel,
 } from '@/models/vis/generic-table-model';
+import RouterLinkProxy from '@/components/nav/router-link-proxy.vue';
 
 const props = defineProps<{
     title: string;
@@ -46,12 +47,12 @@ watchEffect(fetchModel);
                     <tr v-for="row in table.rows">
                         <template v-for="key in table.keys">
                             <td v-if="key === 'cust_id'">
-                                <RouterLink
+                                <RouterLinkProxy
                                     class="link-light"
                                     v-bind:to="`/?m=driver&league=${
                                         props.leagueId
                                     }&driver=${table.nameToIdMap[row[key]]}`"
-                                    >{{ row[key] }}</RouterLink
+                                    >{{ row[key] }}</RouterLinkProxy
                                 >
                             </td>
                             <td v-else>{{ row[key] }}</td>

@@ -10,6 +10,7 @@ import type { HomeModel } from '@/models/pages/home-model';
 import { getDefaultHomeModel, getHomeModel } from '@/models/pages/home-model';
 import { SignedIn, SignedOut, SignInButton } from 'vue-clerk';
 import { useAuth } from 'vue-clerk';
+import RouterLinkProxy from '@/components/nav/router-link-proxy.vue';
 
 const { isSignedIn } = useAuth();
 
@@ -138,14 +139,14 @@ function onClick(eventInfo: { trackId: string; date: string }) {
                 </div>
                 <div v-else>No Future Events</div>
                 <SignedIn>
-                    <RouterLink
+                    <RouterLinkProxy
                         v-if="homeModel.allowEditCalendar"
                         class="dropdown-item"
                         type="button"
                         v-bind:to="`/?m=season-cdr-admin&league=${$props.league}&season=${$props.season}`"
                     >
                         Edit Calendar
-                    </RouterLink>
+                    </RouterLinkProxy>
                 </SignedIn>
             </div>
         </div>
@@ -161,11 +162,11 @@ function onClick(eventInfo: { trackId: string; date: string }) {
         <div class="card-body p-2">
             <div class="container">
                 <div>
-                    <RouterLink
+                    <RouterLinkProxy
                         v-if="homeModel.seasonId && homeModel.leagueId"
                         class="link-light"
                         v-bind:to="`?m=season&league=${homeModel.leagueId}&season=${homeModel.seasonId}`"
-                        >See More Season Details</RouterLink
+                        >See More Season Details</RouterLinkProxy
                     >
                 </div>
             </div>

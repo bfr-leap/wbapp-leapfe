@@ -7,6 +7,7 @@ import {
     getTrackResultsMenuModel,
     getDefaultTrackResultsMenuModel,
 } from '@/models/nav/track-results-menu-model';
+import RouterLinkProxy from '@/components/nav/router-link-proxy.vue';
 
 const props = defineProps<{
     league: string;
@@ -50,13 +51,13 @@ watch(props, fectchModel);
                             v-for="carOption in trackResultsMenuModel.carOptions
                                 .options"
                         >
-                            <RouterLink
+                            <RouterLinkProxy
                                 class="dropdown-item"
                                 type="button"
                                 v-bind:to="carOption.href"
                             >
                                 {{ carOption.display }}
-                            </RouterLink>
+                            </RouterLinkProxy>
                         </li>
                     </ul>
                 </div>
@@ -74,13 +75,13 @@ watch(props, fectchModel);
                             v-for="trackOption in trackResultsMenuModel
                                 .trackOptions.options"
                         >
-                            <RouterLink
+                            <RouterLinkProxy
                                 class="dropdown-item"
                                 type="button"
                                 v-bind:to="trackOption.href"
                             >
                                 {{ trackOption.display }}
-                            </RouterLink>
+                            </RouterLinkProxy>
                         </li>
                     </ul>
                 </div>

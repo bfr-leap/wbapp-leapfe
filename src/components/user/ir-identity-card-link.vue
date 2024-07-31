@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { watchEffect } from 'vue';
+import RouterLinkProxy from '@/components/nav/router-link-proxy.vue';
 
 async function fetchModel() {}
 
@@ -7,7 +8,7 @@ watchEffect(fetchModel);
 </script>
 <template>
     <div class="helmet-container">
-        <RouterLink class="helmet" to="/?m=profile"></RouterLink>
+        <RouterLinkProxy class="helmet" to="/?m=profile"></RouterLinkProxy>
     </div>
 </template>
 <style>
