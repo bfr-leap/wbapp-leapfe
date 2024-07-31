@@ -22,7 +22,11 @@ const props = defineProps<{
 let homeModel: Ref<HomeModel> = ref(getDefaultHomeModel());
 
 async function fetchModel() {
-    homeModel.value = await getHomeModel(props.league, props.season, isSignedIn.value === true);
+    homeModel.value = await getHomeModel(
+        props.league,
+        props.season,
+        isSignedIn.value === true
+    );
 }
 
 watchEffect(fetchModel);
