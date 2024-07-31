@@ -19,7 +19,7 @@ const router = createRouter({
     ],
 });
 
-const enableForcedSignIn = true;
+const enableForcedSignIn = false;
 
 router.beforeEach(async (to, from, next) => {
     if (enableForcedSignIn) {
