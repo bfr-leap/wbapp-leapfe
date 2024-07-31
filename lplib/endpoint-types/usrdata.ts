@@ -3,3 +3,5 @@ export type UserLeaguesState = {
     name: string;
     short_name: string;
 }[];
+
+export type UserFeatures = string[];

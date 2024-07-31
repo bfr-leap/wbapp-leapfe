@@ -130,8 +130,9 @@ function onClick(eventInfo: { trackId: string; date: string }) {
                     </div>
                 </div>
                 <div v-else>No Future Events</div>
-                <SignedIn
-                    ><RouterLink
+                <SignedIn>
+                    <RouterLink
+                        v-if="homeModel.allowEditCalendar"
                         class="dropdown-item"
                         type="button"
                         v-bind:to="`/?m=season-cdr-admin&league=${$props.league}&season=${$props.season}`"
