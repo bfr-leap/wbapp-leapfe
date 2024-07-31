@@ -19,22 +19,28 @@ const router = createRouter({
     ],
 });
 
+const enableForcedSignIn = true;
+
 router.beforeEach(async (to, from, next) => {
-    let { isSignedIn } = useAuth();
+    if (enableForcedSignIn) {
+        let { isSignedIn } = useAuth();
 
-    const publicPages = ['/sign-in'];
-    const authRequired = !publicPages.includes(to.path);
+        const publicPages = ['/sign-in'];
+        const authRequired = !publicPages.includes(to.path);
 
-    console.log(isSignedIn.value);
-    if (isSignedIn.value === false && authRequired) {
-        localStorage.setItem('redirect-target', to.fullPath);
-        next('/sign-in');
-    } else {
-        if (isSignedIn.value === true && to.path === '/sign-in') {
-            next('/');
+        console.log(isSignedIn.value);
+        if (isSignedIn.value === false && authRequired) {
+            localStorage.setItem('redirect-target', to.fullPath);
+            next('/sign-in');
         } else {
-            next();
+            if (isSignedIn.value === true && to.path === '/sign-in') {
+                next('/');
+            } else {
+                next();
+            }
         }
+    } else {
+        next();
     }
 });
 
