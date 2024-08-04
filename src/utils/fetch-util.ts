@@ -24,7 +24,9 @@ import type {
 } from '@@/lplib/endpoint-types/usrdata';
 
 const DEBUG_PREFETCH = false;
-const IS_LOCAL_DEV = false;
+
+const config = useRuntimeConfig();
+const API_BASE_URL = config.public.API_BASE_URL;
 
 function nNums(n: string): string {
     return n.toString().replace('-', 'n');
@@ -99,11 +101,7 @@ async function fetchObjects(urls: string[]): Promise<any[]> {
 
         if (import.meta.server) {
             token = _token;
-            if (IS_LOCAL_DEV) {
-                url = 'http:\\localhost:3000' + url;
-            } else {
-                url = 'http:\\localhost' + url;
-            }
+            url = API_BASE_URL + url;
         } else {
             token = _auth?.getToken ? await _auth.getToken.value() : null;
         }
