@@ -25,8 +25,11 @@ import type {
 
 const DEBUG_PREFETCH = false;
 
-const config = useRuntimeConfig();
-const API_BASE_URL = config.public.API_BASE_URL;
+let API_BASE_URL = '';
+export function setApiBaseURL(url: string) {
+    console.log('setting api base URL');
+    API_BASE_URL = url;
+}
 
 function nNums(n: string): string {
     return n.toString().replace('-', 'n');
