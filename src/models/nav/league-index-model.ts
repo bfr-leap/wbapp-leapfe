@@ -1,11 +1,11 @@
-import type { DropdownModel } from '@/models/dropdown-model';
-import { getDefaultDropdownModel } from '@/models/dropdown-model';
+import type { DropdownModel } from '@@/src/models/dropdown-model';
+import { getDefaultDropdownModel } from '@@/src/models/dropdown-model';
 import {
     getCuratedBlockedSeasons,
     getLeagueSimsessionIndex,
     getCuratedActiveLeagueSchedule,
     getUserLeaguesState,
-} from '@/utils/fetch-util';
+} from '@@/src/utils/fetch-util';
 import type { SeasonSimsessionIndex } from 'lplib/endpoint-types/iracing-endpoints';
 //
 

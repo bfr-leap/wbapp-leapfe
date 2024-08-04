@@ -8,9 +8,9 @@ import {
     getUserProfileModel,
     sendCustId,
     sendVerification,
-} from '@/models/pages/user-profile-model';
-import type { UserProfileModel } from '@/models/pages/user-profile-model';
-import LeagueCardSelector from '@/components/user/league-card-selector.vue';
+} from '@@/src/models/pages/user-profile-model';
+import type { UserProfileModel } from '@@/src/models/pages/user-profile-model';
+import LeagueCardSelector from '@@/src/components/user/league-card-selector.vue';
 
 const route = useRoute();
 

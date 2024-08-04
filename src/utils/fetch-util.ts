@@ -17,11 +17,11 @@ import type {
     CuratedTrackDisplayhInfo,
     GeneratedSimsessionSummary,
     ChartTable,
-} from 'lplib/endpoint-types/iracing-endpoints';
+} from '@@/lplib/endpoint-types/iracing-endpoints';
 import type {
     UserLeaguesState,
     UserFeatures,
-} from 'lplib/endpoint-types/usrdata';
+} from '@@/lplib/endpoint-types/usrdata';
 
 const DEBUG_PREFETCH = false;
 
@@ -81,24 +81,41 @@ export function setAuth(auth: any) {
     _auth = auth;
 }
 
+let _token: string = '';
+export function setToken(token: string) {
+    _token = token;
+}
+
 async function fetchObjects(urls: string[]): Promise<any[]> {
     try {
-        const token = (await _auth?.getToken?.value()) || null;
+        if (!urls || urls.length === 0) {
+            throw new Error('No URLs provided');
+        }
 
-        let objs = await Promise.all(
-            (
-                await Promise.all(
-                    urls.map((url) =>
-                        fetch(url, {
-                            headers: { Authorization: `Bearer ${token}` },
-                        })
-                    )
-                )
-            ).map((response) => response.json())
-        );
-        return objs;
+        let url = urls[0];
+
+        let token: string = '';
+
+        if (import.meta.server) {
+            token = _token;
+            url = 'http:\\localhost:3000' + url;
+        } else {
+            token = _auth?.getToken ? await _auth.getToken.value() : null;
+        }
+
+        const response = await fetch(url, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
+        }
+
+        const obj = await response.json();
+        return [obj]; // Wrap the object in an array
     } catch (e) {
-        return urls.map((v) => null);
+        console.error('Error fetching object:', e);
+        return [null]; // Return an array with null in case of error
     }
 }
 
@@ -528,7 +545,11 @@ export async function getUserLeaguesState(): Promise<UserLeaguesState> {
         _userLeagueStateCache = fetchObjects([source]);
     }
 
-    return (await _userLeagueStateCache)[0].doc;
+    const c = await _userLeagueStateCache;
+
+    const ret = c[0].doc;
+
+    return ret;
 }
 
 ///UserFeatures

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, watchEffect } from 'vue';
 import type { Ref } from 'vue';
-import { getTrackName } from '@/utils/track-utils';
-import RouterLinkProxy from '@/components/nav/router-link-proxy.vue';
+import { getTrackName } from '@@/src/utils/track-utils';
+import RouterLinkProxy from '@@/src/components/nav/router-link-proxy.vue';
 
 const props = defineProps<{
     track_id: string;
@@ -15,10 +15,10 @@ const props = defineProps<{
 
 let countdown: Ref<String> = ref('---');
 let timer: any = 0;
-let trackName: Ref<string> = ref('---');
 
 async function fetchModel() {
     updateTimer();
+    return await getTrackName(props.track_id);
 }
 
 async function updateTimer() {
@@ -37,11 +37,22 @@ async function updateTimer() {
     h %= 24;
     min %= 60;
     sec %= 60;
-    countdown.value = `${d} D  ${h} H  ${min} M  ${sec} S`;
-
-    trackName.value = await getTrackName(props.track_id);
+    countdown.value = `${d} D  ${h} H  ${min} M  ${sec < 10 ? 0 : ''}${sec} S`;
 }
-watchEffect(fetchModel);
+
+const trackName: Ref<string> = await asyncDataWithReactiveModel<string>(
+    `leagueSeasonMenuModel-${props.track_id}-${new Date().getTime()}`,
+    fetchModel,
+    () => '---',
+    [
+        () => props.track_id,
+        () => props.is_next,
+        () => props.date,
+        () => props.car_id,
+        () => props.league_id,
+        () => props.embed_mode,
+    ]
+);
 </script>
 
 <template>

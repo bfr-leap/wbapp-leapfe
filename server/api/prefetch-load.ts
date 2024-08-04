@@ -1,17 +1,30 @@
 import { middleware as authMiddleware } from './middleware/_auth-user';
-import { getDocument } from '../lplib/dtbrkr/ftchdata';
+import { getDocument } from '@@/lplib/dtbrkr/ftchdata';
+import { getQuery } from 'h3';
 
-export default async function handle(req: any, res: any) {
+export default defineEventHandler(async (event) => {
+    const req: any = event.node.req;
+
+    req.query = getQuery(event);
+
+    return await handler(req);
+});
+
+async function handler(req: any): Promise<any> {
     let authorizationHeader = req?.headers?.authorization || 'Bearer null';
     const token = authorizationHeader.replace('Bearer ', '');
 
+    let ret: any = null;
+
     if ('null' !== token) {
-        await authMiddleware(req, res, async (rq, rs) => {
-            await prefetch(rq, rs);
+        await authMiddleware(req, async (rq) => {
+            ret = await prefetch(rq);
         });
     } else {
-        await prefetch(req, res);
+        ret = await prefetch(req);
     }
+
+    return ret;
 }
 
 async function defLgSeasSubCtx(req: any): Promise<any> {
@@ -32,8 +45,7 @@ async function defLgSeasSubCtx(req: any): Promise<any> {
     return lgSeasSubCtx;
 }
 
-async function prefetch(req: any, res: any) {
-    console.log('prefetch(): start');
+async function prefetch(req: any): Promise<any> {
     const q: {
         [name: string]: string | number;
     } = req?.query || {};
@@ -41,7 +53,7 @@ async function prefetch(req: any, res: any) {
     q.m = q?.m || '';
 
     if (req?.user) {
-        q.userID = req.user.id;
+        q.userID = req?.user?.id;
     }
 
     const ctxKey = `/api/fetch-document?namespace=ldata-usrcfg&type=defLgSeasSubCtx&league=${
@@ -49,6 +61,7 @@ async function prefetch(req: any, res: any) {
     }&season=${req?.query?.season || ''}&subsession=${
         req?.query?.subsession || ''
     }`;
+
     const lgSeasSubCtx = await defLgSeasSubCtx(req);
 
     let r: any = {};
@@ -62,7 +75,7 @@ async function prefetch(req: any, res: any) {
 
     r[ctxKey] = lgSeasSubCtx;
 
-    res.status(200).json({ docs: r });
+    return { docs: r };
 }
 
 async function preFetchHome(query: { [name: string]: string | number }) {

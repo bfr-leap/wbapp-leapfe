@@ -1,4 +1,7 @@
-import { getUserLeaguesState, setUserLeaguesState } from '@/utils/fetch-util';
+import {
+    getUserLeaguesState,
+    setUserLeaguesState,
+} from '@@/src/utils/fetch-util';
 import type { UserLeaguesState } from 'lplib/endpoint-types/usrdata';
 
 type LeagueCardSelectorModel = {

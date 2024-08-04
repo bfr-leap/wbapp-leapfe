@@ -2,7 +2,7 @@ import {
     getIrLinkState,
     setIrLinkDriver,
     setIrLinkCode,
-} from '@/utils/fetch-util';
+} from '@@/src/utils/fetch-util';
 
 export interface UserProfileModel {
     isVerified: boolean | null;

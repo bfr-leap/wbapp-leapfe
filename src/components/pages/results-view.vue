@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import { ref, watchEffect } from 'vue';
 import type { Ref } from 'vue';
-import LeagueIndex from '@/components/nav/league-index.vue';
-import CumulativeDeltaChart from '@/components/vis/cumulative-delta-chart.vue';
+import LeagueIndex from '@@/src/components/nav/league-index.vue';
+import CumulativeDeltaChart from '@@/src/components/vis/cumulative-delta-chart.vue';
 import StartFinishChart from '../vis/start-finish-chart.vue';
 import PaceChart from '../vis/pace-chart.vue';
-import BestQualifyLapChart from '@/components/vis/best-qualify-lap-chart.vue';
+import BestQualifyLapChart from '@@/src/components/vis/best-qualify-lap-chart.vue';
 import GenericTable from '../vis/generic-table.vue';
 import TrackBanner from '../track/track-banner.vue';
-import type { ResultsModel } from '@/models/pages/results-model';
+import type { ResultsModel } from '@@/src/models/pages/results-model';
 import {
     getDefaultResultsModel,
     getResultsModel,
-} from '@/models/pages/results-model';
+} from '@@/src/models/pages/results-model';
 
 const props = defineProps<{
     league: string;
@@ -21,17 +21,32 @@ const props = defineProps<{
     simsession: string;
 }>();
 
-let resultsModel: Ref<ResultsModel> = ref(getDefaultResultsModel());
-
 async function fetchModelData() {
-    resultsModel.value = await getResultsModel(
+    return await getResultsModel(
         props.league,
         props.season,
         props.subsession,
         props.simsession
     );
 }
-watchEffect(fetchModelData);
+
+const resultsModel: Ref<ResultsModel> =
+    await asyncDataWithReactiveModel<ResultsModel>(
+        `ResultsModel-${[
+            props.league,
+            props.season,
+            props.subsession,
+            props.simsession,
+        ].join('-')}`,
+        fetchModelData,
+        getDefaultResultsModel,
+        [
+            () => props.league,
+            () => props.season,
+            () => props.subsession,
+            () => props.simsession,
+        ]
+    );
 </script>
 
 <template>

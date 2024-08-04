@@ -4,20 +4,29 @@ import GenericTable from '../vis/generic-table.vue';
 import {
     getRosterModel,
     getDefaultRosterModel,
-} from '@/models/driver/league-roster-model';
+} from '@@/src/models/driver/league-roster-model';
+import type { LeagueRosterModel } from '@@/src/models/driver/league-roster-model';
 
 const props = defineProps<{
     league: string;
 }>();
 
-const model = ref<any>(getDefaultRosterModel());
+// const model = ref<LeagueRosterModel>(getDefaultRosterModel());
 
 async function fetchModel() {
-    model.value = await getRosterModel(props.league);
+    return await getRosterModel(props.league);
 }
 
-watchEffect(fetchModel);
-watch(props, fetchModel);
+// watchEffect(fetchModel);
+// watch(props, fetchModel);
+
+const model: Ref<LeagueRosterModel> =
+    await asyncDataWithReactiveModel<LeagueRosterModel>(
+        `LeagueSeasonMenuModel-${props.league}`,
+        fetchModel,
+        getDefaultRosterModel,
+        [() => props.league]
+    );
 </script>
 <template>
     <GenericTable

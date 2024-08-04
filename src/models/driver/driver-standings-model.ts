@@ -10,14 +10,14 @@ import type {
 import {
     getMemberViewFromM_Member,
     getFormulaLicense,
-} from '@/utils/driver-utils';
+} from '@@/src/utils/driver-utils';
 
 import {
     getCuratedLeagueTeamsInfo,
     getLeagueDriverStats,
     getMembersData,
     getSeasonSimsessionIndex,
-} from '@/utils/fetch-util';
+} from '@@/src/utils/fetch-util';
 
 export interface TeamModel {
     position: number;

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { watchEffect, ref, watch } from 'vue';
 import type { Ref } from 'vue';
-import LineChart from '@/components/vis/line-chart.vue';
-import type { BestQualifyLapChartModel } from '@/models/vis/best-qualify-lap-chart-model';
+import LineChart from '@@/src/components/vis/line-chart.vue';
+import type { BestQualifyLapChartModel } from '@@/src/models/vis/best-qualify-lap-chart-model';
 import {
     getDefaultBestQualifyLapChartModel,
     getBestQualifyLapChartModel,
-} from '@/models/vis/best-qualify-lap-chart-model';
+} from '@@/src/models/vis/best-qualify-lap-chart-model';
 
 const props = defineProps<{
     subsession: string;
@@ -14,20 +14,27 @@ const props = defineProps<{
     league: string;
 }>();
 
-const bestQualifyLapChartModel: Ref<BestQualifyLapChartModel> = ref(
-    getDefaultBestQualifyLapChartModel()
-);
-
 async function fetchModel() {
-    bestQualifyLapChartModel.value = await getBestQualifyLapChartModel(
+    return await getBestQualifyLapChartModel(
         props.subsession,
         props.simsession,
         props.league
     );
 }
 
-watchEffect(fetchModel);
-watch(props, fetchModel);
+const bestQualifyLapChartModel: Ref<BestQualifyLapChartModel> =
+    await asyncDataWithReactiveModel<BestQualifyLapChartModel>(
+        `BestQualifyLapChartModel-${[
+            props.subsession,
+            props.simsession,
+            props.league,
+        ]
+            .map((v) => v.toString())
+            .join('-')}`,
+        fetchModel,
+        getDefaultBestQualifyLapChartModel,
+        [() => props.league, () => props.subsession, () => props.simsession]
+    );
 </script>
 
 <template>

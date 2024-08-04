@@ -1,20 +1,16 @@
 <script setup lang="ts">
 import { watchEffect, watch, ref } from 'vue';
 import type { Ref } from 'vue';
-import LineChart from '@/components/vis/line-chart.vue';
-import type { SeriesXY } from '@/models/vis/line-chart-model';
-import { getCumulativeDeltaChartModel } from '@/models/vis/cumulative-delta-chart-model';
-import type { CumulativeDeltaChartModel } from '@/models/vis/cumulative-delta-chart-model';
+import LineChart from '@@/src/components/vis/line-chart.vue';
+import type { SeriesXY } from '@@/src/models/vis/line-chart-model';
+import { getCumulativeDeltaChartModel } from '@@/src/models/vis/cumulative-delta-chart-model';
+import type { CumulativeDeltaChartModel } from '@@/src/models/vis/cumulative-delta-chart-model';
 
 const props = defineProps<{
     league?: string;
     subsession?: string;
     simsession?: string;
 }>();
-
-const lapTimesNew: Ref<CumulativeDeltaChartModel> = ref(<
-    CumulativeDeltaChartModel
->{ series: Array<SeriesXY>(), range: [0, 1] });
 
 // A cumulative delta chart is a graphical representation of the time differences between two or
 // more cars over the course of a race. It is often used in motor sports, particularly in timed racing events,
@@ -34,23 +30,38 @@ const lapTimesNew: Ref<CumulativeDeltaChartModel> = ref(<
 // Overall, the cumulative delta chart is a simple yet effective way to visualize the time differences between
 // drivers or teams in a race, and it can help provide valuable insights into the dynamics of the competition.
 
-async function fetchModel() {
+async function fetchModel(): Promise<CumulativeDeltaChartModel> {
     if (
         props.simsession == undefined ||
         props.subsession == undefined ||
         props.league == undefined
     ) {
-        return;
+        return getDefaultCumulativeLineChartModel();
     }
-    lapTimesNew.value = await getCumulativeDeltaChartModel(
+    return await getCumulativeDeltaChartModel(
         props.league || '',
         props.simsession || '',
         props.subsession || ''
     );
 }
 
-watchEffect(fetchModel);
-watch(props, fetchModel);
+function getDefaultCumulativeLineChartModel(): CumulativeDeltaChartModel {
+    return { series: Array<SeriesXY>(), range: [0, 1] };
+}
+
+const lapTimesNew: Ref<CumulativeDeltaChartModel> =
+    await asyncDataWithReactiveModel<CumulativeDeltaChartModel>(
+        `CumulativeDeltaChartModel-${[
+            props.league || '',
+            props.simsession || '',
+            props.subsession || '',
+        ]
+            .map((v) => v.toString())
+            .join('-')}`,
+        fetchModel,
+        getDefaultCumulativeLineChartModel,
+        [() => props.league, () => props.subsession, () => props.simsession]
+    );
 </script>
 
 <template>

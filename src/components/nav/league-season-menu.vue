@@ -1,16 +1,11 @@
 <script setup lang="ts">
-import { RouterLink } from 'vue-router';
-import { ref, watchEffect, watch } from 'vue';
 import type { Ref } from 'vue';
-import type { LeagueSeasonMenuModel } from '@/models/nav/league-season-menu-model';
+import type { LeagueSeasonMenuModel } from '@@/src/models/nav/league-season-menu-model';
 import {
     getDefaultLeagueSeasonMenuModel,
     getLeagueSeasonMenuModel,
-} from '@/models/nav/league-season-menu-model';
-import { useAuth } from 'vue-clerk';
-import RouterLinkProxy from '@/components/nav/router-link-proxy.vue';
-
-const { isSignedIn } = useAuth();
+} from '@@/src/models/nav/league-season-menu-model';
+import RouterLinkProxy from '@@/src/components/nav/router-link-proxy.vue';
 
 const props = defineProps<{
     league: string;
@@ -18,20 +13,31 @@ const props = defineProps<{
     targetPage: string;
 }>();
 
-let leagueSeasonMenuModel: Ref<LeagueSeasonMenuModel> = ref(
-    getDefaultLeagueSeasonMenuModel()
-);
+const { isSignedIn } = useAuthState();
 
-async function fetchModel() {
-    leagueSeasonMenuModel.value = await getLeagueSeasonMenuModel(
+async function fetchLeagueSeasonMenuModel() {
+    return await getLeagueSeasonMenuModel(
         props.league,
         props.season,
         props.targetPage,
-        isSignedIn.value === true
+        isSignedIn
     );
 }
-watchEffect(fetchModel);
-watch(props, fetchModel);
+
+const leagueSeasonMenuModel: Ref<LeagueSeasonMenuModel> =
+    await asyncDataWithReactiveModel<LeagueSeasonMenuModel>(
+        `LeagueSeasonMenuModel-${[
+            props.league,
+            props.season,
+            props.targetPage,
+            isSignedIn,
+        ]
+            .map((v) => v.toString())
+            .join('-')}`,
+        fetchLeagueSeasonMenuModel,
+        getDefaultLeagueSeasonMenuModel,
+        [() => props.league, () => props.season, () => props.targetPage]
+    );
 </script>
 
 <template>

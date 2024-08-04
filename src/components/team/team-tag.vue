@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { ref, watch, watchEffect } from 'vue';
 import type { Ref } from 'vue';
-import type { TeamTagModel } from '@/models/team/team-tag-model';
+import type { TeamTagModel } from '@@/src/models/team/team-tag-model';
 import {
     getTeamTagModel,
     getDefaultTeamTagModel,
-} from '@/models/team/team-tag-model';
-import RouterLinkProxy from '@/components/nav/router-link-proxy.vue';
+} from '@@/src/models/team/team-tag-model';
+import RouterLinkProxy from '@@/src/components/nav/router-link-proxy.vue';
 
 const props = defineProps<{
     teamId: number;

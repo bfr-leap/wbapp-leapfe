@@ -4,36 +4,42 @@ import type { Ref } from 'vue';
 import GenericTable from '../vis/generic-table.vue';
 import { useRoute } from 'vue-router';
 
-import BarChart from '@/components/vis/bar-chart.vue';
-import EventCardLg from '@/components/event/event-card-lg.vue';
-import EventCardSm from '@/components/event/event-card-sm.vue';
-import DriverStandings from '@/components/driver/driver-standings.vue';
-import LeagueSeasonMenu from '@/components/nav/league-season-menu.vue';
-import PastEventCards from '@/components/event/past-event-cards.vue';
-import LeagueRoster from '@/components/driver/league-roster.vue';
+import BarChart from '@@/src/components/vis/bar-chart.vue';
+import EventCardLg from '@@/src/components/event/event-card-lg.vue';
+import EventCardSm from '@@/src/components/event/event-card-sm.vue';
+import DriverStandings from '@@/src/components/driver/driver-standings.vue';
+import LeagueSeasonMenu from '@@/src/components/nav/league-season-menu.vue';
+import PastEventCards from '@@/src/components/event/past-event-cards.vue';
+import LeagueRoster from '@@/src/components/driver/league-roster.vue';
 import {
     getChartDataFromStats,
     getDefaultSeasonProfileModel,
     getSeasonProfileModel,
-} from '@/models/pages/season-profile-model';
-import type { SeasonProfileModel } from '@/models/pages/season-profile-model';
+} from '@@/src/models/pages/season-profile-model';
+import type { SeasonProfileModel } from '@@/src/models/pages/season-profile-model';
 
 const route = useRoute();
-
-let seasonProfileModel: Ref<SeasonProfileModel> = ref(
-    getDefaultSeasonProfileModel()
-);
 const statSplit = ['Overall', 'Race', 'Sprint'];
 
 async function fetchModel() {
     let leagueId = route.query.league as string;
     let seasonId = route.query.season as string;
 
-    seasonProfileModel.value = await getSeasonProfileModel(leagueId, seasonId);
+    return await getSeasonProfileModel(leagueId, seasonId);
 }
 
-watchEffect(fetchModel);
-watch(route, fetchModel);
+const seasonProfileModel: Ref<SeasonProfileModel> =
+    await asyncDataWithReactiveModel<SeasonProfileModel>(
+        `LeagueSeasonMenuModel-${[
+            route.query.league as string,
+            route.query.season as string,
+        ]
+            .map((v) => v.toString())
+            .join('-')}`,
+        fetchModel,
+        getDefaultSeasonProfileModel,
+        [() => route.query.league, () => route.query.season]
+    );
 
 function onClick(eventInfo: { trackId: string; date: string }) {
     seasonProfileModel.value.selectedRace = {

@@ -1,4 +1,4 @@
-import type { SeriesXY } from '@/models/vis/line-chart-model';
+import type { SeriesXY } from '@@/src/models/vis/line-chart-model';
 
 export interface CumulativeLineChartModel {
     titleOut: string;

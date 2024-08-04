@@ -3,12 +3,12 @@ import { ref, watch, watchEffect } from 'vue';
 import { RouterLink, RouterView } from 'vue-router';
 import { useRoute } from 'vue-router';
 import { SignedIn, SignedOut, SignInButton } from 'vue-clerk';
-import IRIdentityCardLink from '@/components/user/ir-identity-card-link.vue';
+import IRIdentityCardLink from '@@/src/components/user/ir-identity-card-link.vue';
 import { useAuth } from 'vue-clerk';
-import { getUserLeaguesState } from '@/utils/fetch-util';
+import { getUserLeaguesState } from '@@/src/utils/fetch-util';
 import type { Ref } from 'vue';
-import { preFetch, defLgSeasSubCtx, setAuth } from '@/utils/fetch-util';
-import RouterLinkProxy from '@/components/nav/router-link-proxy.vue';
+import { preFetch, defLgSeasSubCtx, setAuth } from '@@/src/utils/fetch-util';
+import RouterLinkProxy from '@@/src/components/nav/router-link-proxy.vue';
 
 const route = useRoute();
 const auth = useAuth();

@@ -6,7 +6,7 @@ import {
     getDefaultLeagueCardSelectorModel,
     getLeagueCardSelectorModel,
     saveLeagueCardSelectorModel,
-} from '@/models/user/league-card-selector-model';
+} from '@@/src/models/user/league-card-selector-model';
 
 const route = useRoute();
 

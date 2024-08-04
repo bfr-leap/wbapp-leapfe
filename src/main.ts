@@ -7,7 +7,7 @@ import mixpanel from 'mixpanel-browser';
 import { clerkPlugin, provideClerkToVueApp } from 'vue-clerk';
 import { dark } from '@clerk/themes';
 
-const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+const PUBLISHABLE_KEY = import.meta.env.CLERK_PUBLISHABLE_KEY;
 if (!PUBLISHABLE_KEY) {
     throw new Error('Missing Publishable Key');
 }

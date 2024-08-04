@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick, computed, watch } from 'vue';
-import type { BarChartDatum } from '@/models/vis/bar-chart-model';
+import { ref, onMounted, nextTick } from 'vue';
+import type { BarChartDatum } from '@@/src/models/vis/bar-chart-model';
+import * as d3 from 'd3';
 
-const d3: any = (<any>globalThis).d3;
 const aspectRatio = 0.37;
 
 const props = withDefaults(
@@ -22,245 +22,293 @@ const props = withDefaults(
 
 const svgRoot = ref<SVGGElement | null>(null);
 const divRoot = ref<HTMLElement | null>(null);
-const xAxis = ref<SVGGElement | null>(null);
-const yAxis = ref<SVGGElement | null>(null);
-const height = ref(100);
-const width = ref(100);
-const renderData = ref<BarChartDatum[]>([]);
-
-const margin = { top: 10, right: 10, bottom: 50, left: 50 };
-const innerHeight = computed(() => {
-    return height.value - margin.top - margin.bottom;
-});
-const innerWidth = computed(() => {
-    return width.value - margin.left - margin.right;
-});
 
 onMounted(async () => {
     await nextTick();
     if (ResizeObserver && divRoot.value) {
         let resizeObserver = new ResizeObserver(() => {
-            window.requestAnimationFrame(redrawAxis);
+            window.requestAnimationFrame(async () => {
+                barChartModel.value = await fetchModel();
+            });
         });
         resizeObserver.observe(divRoot.value);
     }
 });
 
-let scaleX = ref();
-let scaleY = ref();
-
 const minBarHeight = ref<number>(0.02);
+const startSize = 500;
 
-watch(() => props.data, redrawAxis); // reset the d3 avg axis when the data changes.
-function redrawAxis() {
-    const data: { name: string; value: number }[] = JSON.parse(
-        JSON.stringify(props.data)
-    );
-    renderData.value = data;
+async function fetchModel(): Promise<BarChartModel> {
+    let height = startSize * aspectRatio;
+    let width = startSize;
 
-    if (svgRoot.value /*&& props.data.length > 0*/) {
-        height.value = svgRoot.value.clientWidth * aspectRatio;
-        width.value = svgRoot.value.clientWidth;
-
-        const dataLength = data.length;
-        const n = 0.04 * width.value;
-        let nextB = ' ';
-
-        const xTicks = data.map((d, i) => {
-            const mod = Math.ceil(dataLength / n);
-            const r = i % mod === 0 ? d.name : (nextB += ' ');
-            data[i].name = r;
-            return r;
-        });
-
-        // add x axis
-        const xAxisSelection = d3.select(xAxis.value);
-        xAxisSelection.html(''); // clears the  inner nodes
-        scaleX.value = d3
-            .scaleBand()
-            .padding(0.1)
-            .domain(xTicks)
-            .range([0, innerWidth.value]);
-        const axisX = d3.axisBottom(scaleX.value);
-        axisX(xAxisSelection);
-        xAxisSelection
-            .selectAll(['line', 'path', 'text'])
-            .style('font-size', 12)
-            .style('stroke', 'white');
-        xAxisSelection
-            .selectAll('text')
-            .style('text-anchor', 'end')
-            .attr('dx', '-.8em')
-            .attr('dy', '.15em')
-            .attr('transform', 'rotate(-35)');
-
-        // add y axis
-        const yAxisSelection = d3.select(yAxis.value);
-        yAxisSelection.html('');
-        minBarHeight.value = Math.max(...data.map((d) => d.value)) / 100;
-        scaleY.value = d3
-            .scaleLinear()
-            .domain([
-                0,
-                Math.max(
-                    minBarHeight.value,
-                    Math.max(...data.map((d) => d.value))
-                ),
-            ])
-            .range([innerHeight.value, 0]);
-        yAxisSelection
-            .call(d3.axisLeft(scaleY.value).ticks(3))
-            .selectAll(['line', 'path', 'text'])
-            .style('font-size', 16)
-            .style('stroke', 'white');
+    if (svgRoot.value) {
+        height = svgRoot.value.clientWidth * aspectRatio;
+        width = svgRoot.value.clientWidth;
     }
+
+    return getBarChartModel(width, height, props.data);
 }
 
-function getXAttr(seriesName: string) {
-    if (!scaleX.value) {
-        return '0';
-    }
+function getBarChartModel(
+    width: number,
+    height: number,
+    data: BarChartDatum[]
+): BarChartModel {
+    let ret = getDefaultBarChartModel();
 
-    return scaleX.value(seriesName);
-}
+    data = JSON.parse(JSON.stringify(data));
 
-function getYAttr(seriesValue: number) {
-    if (!scaleY.value) {
-        return '0';
-    }
+    ret.height = height;
+    ret.width = width;
+    ret.innerHeight = ret.height - ret.margin_top - ret.margin_bottom;
+    ret.innerWidth = ret.width - ret.margin_left - ret.margin_right;
 
-    return scaleY.value(seriesValue);
-}
+    const dataLength = data.length;
+    const n = 0.04 * width;
+    let nextB = ' ';
 
-function getHeightAttr(seriesValue: number) {
-    if (!scaleY.value) {
-        return '0';
-    }
+    const xTicks = data.map((d, i) => {
+        const mod = Math.ceil(dataLength / n);
+        const r = i % mod === 0 ? d.name : (nextB += ' ');
+        data[i].name = r;
+        return r;
+    });
 
-    return scaleY.value(0) - scaleY.value(seriesValue);
-}
+    let scaleX = d3
+        .scaleBand()
+        .padding(0.1)
+        .domain(xTicks)
+        .range([0, ret.innerWidth]);
+    let minBarHeight = Math.max(...data.map((d) => d.value)) / 100;
 
-function getDPathAttrAverage() {
-    if (!scaleX.value || !scaleY.value || renderData.value.length === 0) {
-        return '';
-    }
+    let scaleY = d3
+        .scaleLinear()
+        .domain([
+            0,
+            Math.max(minBarHeight, Math.max(...data.map((d) => d.value))),
+        ])
+        .range([ret.innerHeight, 0]);
+
+    ret.xAxisHtml = generateXAxisSvg(ret.innerHeight, ret.innerWidth, scaleX);
+    ret.yAxisHtml = generateYAxisSvg(ret.innerHeight, ret.innerWidth, scaleY);
 
     let average =
-        renderData.value.map((v) => v.value).reduce((p, c) => p + c) /
-        renderData.value.length;
+        data.map((v) => v.value).reduce((p, c) => p + c) / data.length;
 
     let stdev = Math.sqrt(
-        renderData.value
+        data
             .map((v) => (v.value - average) * (v.value - average))
-            .reduce((p, c) => p + c) / renderData.value.length
+            .reduce((p, c) => p + c) / data.length
     );
 
-    let r = [];
+    ret.statLines.push(
+        `<path transform="translate(0,${scaleY(average)})" d="M0,0H${
+            ret.innerWidth
+        }" fill="none" stroke="#aaaaff44"></path>`
+    );
+    ret.statLines.push(
+        `<path transform="translate(0,${scaleY(average + stdev)})" d="M0,0H${
+            ret.innerWidth
+        }" fill="none" stroke="#aaaaaa55"></path>`
+    );
+    ret.statLines.push(
+        `<path transform="translate(0,${scaleY(average - stdev)})" d="M0,0H${
+            ret.innerWidth
+        }" fill="none" stroke="#aaaaaa55"></path>`
+    );
 
-    r.push([
-        d3
-            .line()
-            .x(function (d: any) {
-                return (
-                    scaleX.value(renderData.value[d].name) +
-                    scaleX.value.bandwidth() * d
-                );
-            })
-            .y(function (d: any) {
-                return scaleY.value(average);
-            })([0, renderData.value.length - 1]),
-        '#aaaaff44',
-    ]);
+    const bandwidth = scaleX.bandwidth();
 
-    r.push([
-        d3
-            .line()
-            .x(function (d: any) {
-                return (
-                    scaleX.value(renderData.value[d].name) +
-                    scaleX.value.bandwidth() * d
-                );
-            })
-            .y(function (d: any) {
-                return scaleY.value(average + stdev);
-            })([0, renderData.value.length - 1]),
-        '#aaaaaa55',
-    ]);
+    ret.rects = data.map((v) => {
+        return {
+            x: scaleX(v.name),
+            y: scaleY((v.value + 0) / 2 + Math.abs((v.value - 0) / 2)),
+            width: bandwidth,
+            height: Math.max(
+                Math.abs(scaleY(v.value) - scaleY(0)),
+                minBarHeight
+            ),
+            isVal2: false,
+        };
+    });
 
-    r.push([
-        d3
-            .line()
-            .x(function (d: any) {
-                return (
-                    scaleX.value(renderData.value[d].name) +
-                    scaleX.value.bandwidth() * d
-                );
-            })
-            .y(function (d: any) {
-                return scaleY.value(average - stdev);
-            })([0, renderData.value.length - 1]),
-        '#aaaaaa55',
-    ]);
+    ret.rects = ret.rects.concat(
+        data.map((v) => {
+            let v2 = v.value2 || 0;
 
-    return r;
+            return {
+                x: scaleX(v.name),
+                y: scaleY((v2 + 0) / 2 + Math.abs((v2 - 0) / 2)),
+                width: bandwidth,
+                height: Math.max(
+                    Math.abs(scaleY(v2) - scaleY(0)),
+                    minBarHeight
+                ),
+                isVal2: true,
+            };
+        })
+    );
+
+    return ret;
+}
+
+type D3_Scale = any | null;
+
+function generateXAxisSvg(
+    innerHeight: number,
+    innerWidth: number,
+    scaleX: D3_Scale
+) {
+    const ticks = scaleX.domain();
+    const bandwidth = scaleX.bandwidth() / 2;
+
+    const tickElements = ticks
+        .map((tick: any) => {
+            const x = scaleX(tick)!;
+
+            return `
+            <g class="tick" transform="translate(${x + bandwidth},0)">
+                <line y2="6" stroke="white"></line>
+                <text dx="-.8em" style="font-size: 12px; text-anchor: end" fill="white" y="9" dy="0.15em" transform="rotate(-35)">${tick}</text>
+            </g>`;
+        })
+        .join('');
+
+    const axisLine = `
+        <path d="M0,6V0H${innerWidth}V6" fill="none" stroke="white"></path>
+    `;
+
+    const g = `
+            <g transform="translate(0,${innerHeight})" fill="none" font-size="10" font-family="sans-serif" text-anchor="middle">
+                ${axisLine}
+                ${tickElements}
+            </g>
+    `;
+
+    return g;
+}
+
+function generateYAxisSvg(
+    innerHeight: number,
+    innerWidth: number,
+    scaleY: D3_Scale
+) {
+    const ticks = scaleY.ticks(5);
+    const tickFormat = scaleY.tickFormat(5);
+
+    const tickElements = ticks
+        .map((tick: any) => {
+            const y = scaleY(tick);
+            return `
+              <g class="tick" transform="translate(0,${y})">
+                <line x2="-6" stroke="white"></line>
+                <text style="font-size: 16px;" fill="white" x="-9" dy="0.32em">${tickFormat(
+                    tick
+                )}</text>
+            </g>`;
+        })
+        .join('');
+
+    const axisLine = `
+        <path d="M-6,0H0V${innerHeight}H-6" fill="none" stroke="white"></path>
+    `;
+
+    const g = `
+            <g font-size="10" font-family="sans-serif" text-anchor="end">
+                ${axisLine}
+                ${tickElements}
+            </g>
+    `;
+
+    return g;
+}
+
+const barChartModel: Ref<BarChartModel> =
+    await asyncDataWithReactiveModel<BarChartModel>(
+        `HLBarChartModel-${[
+            svgRoot.value ? svgRoot.value.clientWidth : startSize,
+            (svgRoot.value ? svgRoot.value.clientWidth : startSize) *
+                aspectRatio,
+            props.data,
+        ]
+            .map((v) => JSON.stringify(v))
+            .join('-')}`,
+        fetchModel,
+        getDefaultBarChartModel,
+        [() => props.data, () => props.title, () => divRoot?.value?.clientWidth]
+    );
+
+function getDefaultBarChartModel(): BarChartModel {
+    return {
+        width: 1000,
+        height: 500,
+        margin_left: 50,
+        margin_right: 10,
+        margin_top: 10,
+        margin_bottom: 50,
+        innerHeight: 440,
+        innerWidth: 940,
+        rects: [],
+        xAxisHtml: '',
+        yAxisHtml: '',
+        statLines: [],
+    };
+}
+
+interface BarRect {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    isVal2: boolean;
+}
+
+interface BarChartModel {
+    width: number;
+    height: number;
+    margin_left: number;
+    margin_right: number;
+    margin_top: number;
+    margin_bottom: number;
+    innerHeight: number;
+    innerWidth: number;
+    rects: BarRect[];
+    xAxisHtml: string;
+    yAxisHtml: string;
+    statLines: string[];
 }
 </script>
 
 <template>
     <div>
         <div>
-            {{ title }}
+            {{ props.title }}
         </div>
         <div ref="divRoot">
             <svg
                 ref="svgRoot"
                 class="w-100"
-                :height="height"
-                v-bind:viewBox="`0 0 ${width} ${height}`"
+                :height="barChartModel.height"
+                v-bind:viewBox="`0 0 ${barChartModel.width} ${barChartModel.height}`"
             >
-                <g :transform="`translate(${margin.left},${margin.top})`">
+                <g
+                    :transform="`translate(${barChartModel.margin_left},${barChartModel.margin_top})`"
+                >
+                    <g v-html="barChartModel.xAxisHtml"></g>
+                    <g v-html="barChartModel.yAxisHtml"></g>
+                    <rect
+                        v-for="rec in barChartModel.rects"
+                        :x="rec.x"
+                        :y="rec.y"
+                        :width="rec.width"
+                        :height="rec.height"
+                        :style="`fill: ${rec.isVal2 ? '#1a79a1' : '#1aa179'}`"
+                    ></rect>
                     <g
-                        ref="xAxis"
-                        :transform="`translate(0,${innerHeight})`"
+                        v-for="statLine of barChartModel.statLines"
+                        v-html="statLine"
                     ></g>
-                    <g ref="yAxis"></g>
-                    <rect
-                        v-for="series in renderData"
-                        :x="getXAttr(series.name)"
-                        :y="getYAttr(Math.max(series.value, minBarHeight))"
-                        :width="scaleX?.bandwidth()"
-                        :height="
-                            getHeightAttr(
-                                Math.abs(Math.max(series.value, minBarHeight))
-                            )
-                        "
-                        style="fill: #1aa179"
-                    ></rect>
-                    <rect
-                        v-for="series in renderData"
-                        :x="getXAttr(series.name)"
-                        :y="
-                            getYAttr(Math.max(series.value2 || 0, minBarHeight))
-                        "
-                        :width="scaleX?.bandwidth()"
-                        :height="
-                            getHeightAttr(
-                                Math.abs(
-                                    Math.max(series.value2 || 0, minBarHeight)
-                                )
-                            )
-                        "
-                        :style="
-                            series.value2 ? `fill: #1a79a1` : `fill: #1a79a100`
-                        "
-                    ></rect>
-                    <path
-                        v-for="p in getDPathAttrAverage()"
-                        fill="none"
-                        :stroke="p[1]"
-                        stroke-width="1.5"
-                        :d="p[0]"
-                    ></path>
                 </g>
             </svg>
         </div>

@@ -1,14 +1,11 @@
 <script setup lang="ts">
-import { RouterLink } from 'vue-router';
-import { ref, watchEffect } from 'vue';
 import type { Ref } from 'vue';
-import type { LeagueIndexModel } from '@/models/nav/league-index-model';
-import { getLeagueIndexModel } from '@/models/nav/league-index-model';
-import { getDefaultLeagueIndexModel } from '@/models/nav/league-index-model';
-import { useAuth } from 'vue-clerk';
-import RouterLinkProxy from '@/components/nav/router-link-proxy.vue';
+import type { LeagueIndexModel } from '@@/src/models/nav/league-index-model';
+import { getLeagueIndexModel } from '@@/src/models/nav/league-index-model';
+import { getDefaultLeagueIndexModel } from '@@/src/models/nav/league-index-model';
+import RouterLinkProxy from '@@/src/components/nav/router-link-proxy.vue';
 
-const { isSignedIn } = useAuth();
+const { isSignedIn } = useAuthState();
 
 const props = defineProps<{
     leagueId: string;
@@ -17,19 +14,36 @@ const props = defineProps<{
     simsessionId: string;
 }>();
 
-let leagueIndexModel: Ref<LeagueIndexModel> = ref(getDefaultLeagueIndexModel());
-
 async function fetchModel() {
-    leagueIndexModel.value = await getLeagueIndexModel(
+    return await getLeagueIndexModel(
         props.leagueId || '',
         props.seasonId || '',
         props.subsessionId || '',
         props.simsessionId || '',
-        isSignedIn.value === true
+        isSignedIn
     );
 }
 
-watchEffect(fetchModel);
+const leagueIndexModel: Ref<LeagueIndexModel> =
+    await asyncDataWithReactiveModel<LeagueIndexModel>(
+        `LeagueIndexModel-${[
+            props.leagueId || '',
+            props.seasonId || '',
+            props.subsessionId || '',
+            props.simsessionId || '',
+            isSignedIn,
+        ]
+            .map((v) => v.toString())
+            .join('-')}`,
+        fetchModel,
+        getDefaultLeagueIndexModel,
+        [
+            () => props.leagueId,
+            () => props.seasonId,
+            () => props.subsessionId,
+            () => props.simsessionId,
+        ]
+    );
 </script>
 
 <template>
