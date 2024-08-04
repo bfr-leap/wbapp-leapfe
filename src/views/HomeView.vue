@@ -19,7 +19,9 @@ import { defLgSeasSubCtx } from '@@/src/utils/fetch-util';
 const route = useRoute();
 
 async function track() {
-    mixpanel.track(route.query.m?.toString() || 'home', route.query);
+    if (!import.meta.server) {
+        mixpanel.track(route.query.m?.toString() || 'home', route.query);
+    }
 
     const def: any = await defLgSeasSubCtx(
         route.query.league as string,
