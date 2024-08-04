@@ -101,6 +101,8 @@ async function fetchObjects(urls: string[]): Promise<any[]> {
             token = _token;
             if (IS_LOCAL_DEV) {
                 url = 'http:\\localhost:3000' + url;
+            } else {
+                url = 'http:\\localhost' + url;
             }
         } else {
             token = _auth?.getToken ? await _auth.getToken.value() : null;
