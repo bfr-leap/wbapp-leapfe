@@ -27,4 +27,4 @@ logs
 .vscode/*
 !.vscode/extensions.json
 .xata
-.xatarc
+.xatarc 
