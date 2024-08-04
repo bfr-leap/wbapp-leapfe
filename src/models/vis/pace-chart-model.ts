@@ -2,7 +2,7 @@ import {
     getTelemetrySubsessionIds,
     getPacePercentChartData,
     getPacePercentVsIdealLapChartData,
-} from '@/utils/fetch-util';
+} from '@@/src/utils/fetch-util';
 
 export interface PaceChartModel {
     title: string;

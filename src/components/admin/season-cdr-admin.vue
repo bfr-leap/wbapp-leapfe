@@ -8,11 +8,11 @@ import {
     createSchedEvent,
     updateSchedEvent,
     deleteSchedEvent,
-} from '@/models/admin/season-cdr-admin-model';
+} from '@@/src/models/admin/season-cdr-admin-model';
 import type {
     CdrAdminEvent,
     CdrAdminModel,
-} from '@/models/admin/season-cdr-admin-model';
+} from '@@/src/models/admin/season-cdr-admin-model';
 
 const props = defineProps<{
     league: string;

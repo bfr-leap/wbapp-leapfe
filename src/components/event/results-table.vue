@@ -2,9 +2,9 @@
 import type { Ref } from 'vue';
 import { ref, watchEffect } from 'vue';
 import type { DriverResults } from 'lplib/endpoint-types/iracing-endpoints';
-import type { ResultsTableModel } from '@/models/event/results-table-model';
-import { getResultsTableModel } from '@/models/event/results-table-model';
-import RouterLinkProxy from '@/components/nav/router-link-proxy.vue';
+import type { ResultsTableModel } from '@@/src/models/event/results-table-model';
+import { getResultsTableModel } from '@@/src/models/event/results-table-model';
+import RouterLinkProxy from '@@/src/components/nav/router-link-proxy.vue';
 
 const props = defineProps<{
     results: DriverResults;

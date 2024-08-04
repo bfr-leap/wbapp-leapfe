@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { watchEffect } from 'vue';
-import RouterLinkProxy from '@/components/nav/router-link-proxy.vue';
+import RouterLinkProxy from '@@/src/components/nav/router-link-proxy.vue';
 
 async function fetchModel() {}
 

@@ -1,39 +1,32 @@
 <script setup lang="ts">
 import Stats from './driver-stats.vue';
 import DriverTag from './driver-tag.vue';
-import { getMemberViewFromM_Member } from '@/utils/driver-utils';
-import { ref, watchEffect, computed } from 'vue';
+import { computed } from 'vue';
 import type { Ref } from 'vue';
-import type { DriverProfileModel } from '@/models/driver/driver-profile-model';
+import type { DriverProfileModel } from '@@/src/models/driver/driver-profile-model';
 import {
     getDefaultDriverProfileModel,
     getDriverProfileModel,
-} from '@/models/driver/driver-profile-model';
+} from '@@/src/models/driver/driver-profile-model';
 
 const props = defineProps<{
     league: string;
     driver: string;
 }>();
 
-let driverProfileModel: Ref<DriverProfileModel> = ref(
-    getDefaultDriverProfileModel()
-);
-
-watchEffect(async () => {
-    driverProfileModel.value = await getDriverProfileModel(
-        props.league,
-        props.driver
-    );
-});
+async function fetchModelData() {
+    return await getDriverProfileModel(props.league, props.driver);
+}
 
 const driverId = computed(() => Number.parseInt(props.driver));
-const memberView = computed(() => {
-    return getMemberViewFromM_Member(
-        driverProfileModel.value.singleMemberData,
-        {},
-        {}
+
+const driverProfileModel: Ref<DriverProfileModel> =
+    await asyncDataWithReactiveModel<DriverProfileModel>(
+        `DriverProfileModel-${props.league}-${props.driver}`,
+        fetchModelData,
+        getDefaultDriverProfileModel,
+        [() => props.league, () => props.driver]
     );
-});
 </script>
 
 <template>
@@ -41,18 +34,24 @@ const memberView = computed(() => {
         <div class="card-body p-2">
             <div class="row p-3">
                 <div
-                    v-bind:class="`col-1 driver-img club-${memberView.clubId}`"
+                    v-bind:class="`col-1 driver-img club-${driverProfileModel.memberView.clubId}`"
                 ></div>
                 <div class="col">
                     <DriverTag
                         class="fs-4"
-                        v-bind:lastName="memberView.lastName"
-                        v-bind:firstName="memberView.firstName"
-                        v-bind:licenseLevel="memberView.licenseLevel"
-                        v-bind:iRating="memberView.iRating"
-                        v-bind:safetyRating="memberView.safetyRating"
-                        v-bind:teamName="memberView.teamName"
-                        v-bind:clubId="memberView.clubId"
+                        v-bind:lastName="driverProfileModel.memberView.lastName"
+                        v-bind:firstName="
+                            driverProfileModel.memberView.firstName
+                        "
+                        v-bind:licenseLevel="
+                            driverProfileModel.memberView.licenseLevel
+                        "
+                        v-bind:iRating="driverProfileModel.memberView.iRating"
+                        v-bind:safetyRating="
+                            driverProfileModel.memberView.safetyRating
+                        "
+                        v-bind:teamName="driverProfileModel.memberView.teamName"
+                        v-bind:clubId="driverProfileModel.memberView.clubId"
                     />
                 </div>
             </div>

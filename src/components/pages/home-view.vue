@@ -1,16 +1,19 @@
 <script setup lang="ts">
 import { ref, watchEffect } from 'vue';
 import type { Ref } from 'vue';
-import EventCardLg from '@/components/event/event-card-lg.vue';
-import EventCardSm from '@/components/event/event-card-sm.vue';
-import DriverStandings from '@/components/driver/driver-standings.vue';
-import LeagueSeasonMenu from '@/components/nav/league-season-menu.vue';
+import EventCardLg from '@@/src/components/event/event-card-lg.vue';
+import EventCardSm from '@@/src/components/event/event-card-sm.vue';
+import DriverStandings from '@@/src/components/driver/driver-standings.vue';
+import LeagueSeasonMenu from '@@/src/components/nav/league-season-menu.vue';
 import PastEventCards from '../event/past-event-cards.vue';
-import type { HomeModel } from '@/models/pages/home-model';
-import { getDefaultHomeModel, getHomeModel } from '@/models/pages/home-model';
+import type { HomeModel } from '@@/src/models/pages/home-model';
+import {
+    getDefaultHomeModel,
+    getHomeModel,
+} from '@@/src/models/pages/home-model';
 import { SignedIn, SignedOut, SignInButton } from 'vue-clerk';
 import { useAuth } from 'vue-clerk';
-import RouterLinkProxy from '@/components/nav/router-link-proxy.vue';
+import RouterLinkProxy from '@@/src/components/nav/router-link-proxy.vue';
 
 const { isSignedIn } = useAuth();
 
@@ -20,17 +23,22 @@ const props = defineProps<{
     subsession: string;
 }>();
 
-let homeModel: Ref<HomeModel> = ref(getDefaultHomeModel());
-
 async function fetchModel() {
-    homeModel.value = await getHomeModel(
+    return await getHomeModel(
         props.league,
         props.season,
         isSignedIn.value === true
     );
 }
 
-watchEffect(fetchModel);
+const homeModel: Ref<HomeModel> = await asyncDataWithReactiveModel<HomeModel>(
+    `homeViewPageModel-${[props.league, props.season, isSignedIn.value === true]
+        .map((v) => v.toString())
+        .join('-')}`,
+    fetchModel,
+    getDefaultHomeModel,
+    [() => props.league, () => props.season, () => props.subsession]
+);
 
 function onClick(eventInfo: { trackId: string; date: string }) {
     homeModel.value.selectedRace = {
@@ -151,6 +159,7 @@ function onClick(eventInfo: { trackId: string; date: string }) {
             </div>
         </div>
     </div>
+
     <DriverStandings
         v-if="homeModel.seasonId && homeModel.leagueId"
         summary_mode

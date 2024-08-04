@@ -1,8 +1,11 @@
 import {
     getCuratedLeagueTeamsInfo,
     getSingleMemberData,
-} from '@/utils/fetch-util';
-import { getFirstLastNames, getFormulaLicense } from '@/utils/driver-utils';
+} from '@@/src/utils/fetch-util';
+import {
+    getFirstLastNames,
+    getFormulaLicense,
+} from '@@/src/utils/driver-utils';
 
 interface TeamTagDriverModel {
     lastname: string;

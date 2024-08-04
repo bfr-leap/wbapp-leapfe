@@ -2,7 +2,7 @@ import {
     getLeagueRoster,
     getLeagueSeasons,
     getMembersData,
-} from '@/utils/fetch-util';
+} from '@@/src/utils/fetch-util';
 
 export type LeagueRosterModel = any;
 

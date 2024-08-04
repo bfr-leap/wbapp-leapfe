@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getshortTrackName } from '@/utils/track-utils';
+import { getshortTrackName } from '@@/src/utils/track-utils';
 import { ref, watchEffect } from 'vue';
 import type { Ref } from 'vue';
 const props = defineProps<{
@@ -24,13 +24,21 @@ const shortMonthNames = [
     'Dec',
 ];
 
-let shortNames: Ref<{ [name: string]: string }> = ref({});
-
 async function fetchModel() {
-    shortNames.value[props.track_id] = await getshortTrackName(props.track_id);
+    return await getshortTrackName(props.track_id);
 }
 
-watchEffect(fetchModel);
+const shortName: Ref<string> = await asyncDataWithReactiveModel<string>(
+    `EventCardsSmallModel-${props.track_id}`,
+    fetchModel,
+    () => '',
+    [
+        () => props.track_id,
+        () => props.is_next,
+        () => props.date,
+        () => props.is_selected,
+    ]
+);
 </script>
 
 <template>
@@ -81,17 +89,17 @@ watchEffect(fetchModel);
             <div
                 class="fs-6 d-flex d-sm-none flex-grow-1 justify-content-center align-items-center"
             >
-                {{ shortNames[track_id] }}
+                {{ shortName }}
             </div>
             <div
                 class="fs-3 d-none d-sm-flex d-md-none flex-grow-1 justify-content-center align-items-center"
             >
-                {{ shortNames[track_id] }}
+                {{ shortName }}
             </div>
             <div
                 class="fs-2 d-none d-sm-none d-md-flex flex-grow-1 justify-content-center align-items-center"
             >
-                {{ shortNames[track_id] }}
+                {{ shortName }}
             </div>
         </div>
     </div>

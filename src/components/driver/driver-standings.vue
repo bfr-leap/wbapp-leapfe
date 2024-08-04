@@ -1,37 +1,38 @@
 <script setup lang="ts">
-import { RouterLink } from 'vue-router';
-import { ref, watch, watchEffect } from 'vue';
 import type { Ref } from 'vue';
 import DriverTag from './driver-tag.vue';
 import TeamTag from '../team/team-tag.vue';
-import LeagueSeasonMenu from '@/components/nav/league-season-menu.vue';
-import type { DriverStandingsModel } from '@/models/driver/driver-standings-model';
+import LeagueSeasonMenu from '@@/src/components/nav/league-season-menu.vue';
+import type { DriverStandingsModel } from '@@/src/models/driver/driver-standings-model';
 import {
     getDriverStandingsModel,
     getDefaultStandingsModel,
-} from '@/models/driver/driver-standings-model';
-import RouterLinkProxy from '@/components/nav/router-link-proxy.vue';
+} from '@@/src/models/driver/driver-standings-model';
+import RouterLinkProxy from '@@/src/components/nav/router-link-proxy.vue';
 
-const props = withDefaults(
-    defineProps<{
-        league: string;
-        season: string;
-        summary_mode?: boolean;
-    }>(),
-    { summary_mode: false }
-);
-
-let view: Ref<DriverStandingsModel> = ref(getDefaultStandingsModel());
+const props = defineProps<{
+    league: string;
+    season: string;
+    summary_mode?: boolean;
+}>();
 
 async function fetchModel() {
-    view.value = await getDriverStandingsModel(
+    return await getDriverStandingsModel(
         props.league,
         props.season,
-        props.summary_mode
+        props.summary_mode === true
     );
 }
-watchEffect(fetchModel);
-watch(props, fetchModel);
+
+const view: Ref<DriverStandingsModel> =
+    await asyncDataWithReactiveModel<DriverStandingsModel>(
+        `DriverStandingsModel-${props.league}-${props.season}-${
+            props.summary_mode === true
+        }`,
+        fetchModel,
+        getDefaultStandingsModel,
+        [() => props.league, () => props.season, () => props.summary_mode]
+    );
 </script>
 
 <template>

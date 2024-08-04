@@ -1,35 +1,29 @@
 <script setup lang="ts">
-import { ref, watch, watchEffect } from 'vue';
 import type { Ref } from 'vue';
-import { useRoute } from 'vue-router';
-import EventCardSm from '@/components/event/event-card-sm.vue';
-import type { PastEventCardsModel } from '../../models/event/past-events-cards-model';
+import EventCardSm from '@@/src/components/event/event-card-sm.vue';
+import type { PastEventCardsModel } from '@@/src/models/event/past-events-cards-model';
 import {
     getPastEventCardsModel,
     getDefaultPastEventCardsModel,
-} from '../../models/event/past-events-cards-model';
-import RouterLinkProxy from '@/components/nav/router-link-proxy.vue';
-
-const route = useRoute();
+} from '@@/src/models/event/past-events-cards-model';
+import RouterLinkProxy from '@@/src/components/nav/router-link-proxy.vue';
 
 const props = defineProps<{
     league: string;
     season: string;
 }>();
 
-let pastEventCardsModel: Ref<PastEventCardsModel> = ref(
-    getDefaultPastEventCardsModel()
-);
-
 async function fetchModel() {
-    pastEventCardsModel.value = await getPastEventCardsModel(
-        props.league,
-        props.season
-    );
+    return await getPastEventCardsModel(props.league, props.season);
 }
 
-watchEffect(fetchModel);
-watch(route, fetchModel);
+const pastEventCardsModel: Ref<PastEventCardsModel> =
+    await asyncDataWithReactiveModel<PastEventCardsModel>(
+        `PastEventCardsModel-${[props.league, props.season].join('-')}`,
+        fetchModel,
+        getDefaultPastEventCardsModel,
+        [() => props.league, () => props.season]
+    );
 </script>
 
 <template>
@@ -41,7 +35,7 @@ watch(route, fetchModel);
             >
                 <div v-for="race in pastEventCardsModel.pastRaces" class="col">
                     <RouterLinkProxy
-                        style="text-decoration: none"
+                        :style="{ textDecoration: 'none' }"
                         class="link-light"
                         v-bind:to="`?m=results&league=${props.league}&season=${props.season}&subsession=${race.sessionId}&simsession=0`"
                     >

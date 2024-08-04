@@ -2,7 +2,7 @@ import type {
     DriverResults,
     SSR_ResultsEntry,
 } from 'lplib/endpoint-types/iracing-endpoints';
-import { getShortSubsessionName } from '@/utils/session-utils';
+import { getShortSubsessionName } from '@@/src/utils/session-utils';
 
 async function getNames(
     leagueId: string,
@@ -35,13 +35,13 @@ async function getNames(
     return names;
 }
 
-export async function getQualifyingChartData(
+async function getQualifyingChartData(
     quali: DriverResults,
     seasonId: number,
     leagueId: string
-): Promise<{ name: string; value: number }[] | null> {
+): Promise<{ name: string; value: number }[]> {
     if (!quali || !quali[seasonId]) {
-        return null;
+        return [];
     }
     const seasonRaceResults = quali[seasonId];
 
@@ -64,15 +64,15 @@ export async function getQualifyingChartData(
     return filteredData;
 }
 
-export async function getStartFinishChartData(
+async function getStartFinishChartData(
     qualiResults: DriverResults,
     raceResults: DriverResults,
     sprintResults: DriverResults,
     seasonId: number,
     leagueId: string
-): Promise<{ name: string; hi: number; lo: number }[] | null> {
+): Promise<{ name: string; hi: number; lo: number }[]> {
     if (!qualiResults || !qualiResults[seasonId]) {
-        return null;
+        return [];
     }
 
     const seasonRaceResults = qualiResults[seasonId];
@@ -116,4 +116,42 @@ export async function getStartFinishChartData(
     );
 
     return ret;
+}
+
+export interface DriverStatsModel {
+    qualifyingChartData: { name: string; value: number }[];
+    startFinishChartData: { name: string; hi: number; lo: number }[];
+}
+
+export async function getDriverStatsModel(
+    quali: DriverResults,
+    race: DriverResults,
+    sprint: DriverResults,
+    seasonId: number,
+    leagueId: string
+): Promise<DriverStatsModel> {
+    let ret = getDefaultDriverStatsModel();
+
+    ret.qualifyingChartData = await getQualifyingChartData(
+        quali,
+        seasonId,
+        leagueId
+    );
+
+    ret.startFinishChartData = await getStartFinishChartData(
+        quali,
+        race,
+        sprint,
+        seasonId,
+        leagueId
+    );
+
+    return ret;
+}
+
+export function getDefaultDriverStatsModel(): DriverStatsModel {
+    return {
+        qualifyingChartData: [],
+        startFinishChartData: [],
+    };
 }

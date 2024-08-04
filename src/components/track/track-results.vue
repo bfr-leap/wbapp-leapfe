@@ -2,10 +2,10 @@
 import { ref, watchEffect } from 'vue';
 import type { Ref } from 'vue';
 import type { TrackStats } from 'lplib/endpoint-types/iracing-endpoints';
-import { getTrackStats } from '@/utils/fetch-util';
-import GenericTable from '@/components/vis/generic-table.vue';
-import TrackResultsMenu from '@/components/nav/track-results-menu.vue';
-import TrackBanner from '@/components/track/track-banner.vue';
+import { getTrackStats } from '@@/src/utils/fetch-util';
+import GenericTable from '@@/src/components/vis/generic-table.vue';
+import TrackResultsMenu from '@@/src/components/nav/track-results-menu.vue';
+import TrackBanner from '@@/src/components/track/track-banner.vue';
 
 const props = defineProps<{
     league: string;

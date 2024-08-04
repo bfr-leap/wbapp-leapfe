@@ -1,7 +1,16 @@
 import { middleware as authMiddleware } from './middleware/_auth-user';
-import { getDocument } from '../lplib/dtbrkr/ftchdata';
+import { getDocument } from '@@/lplib/dtbrkr/ftchdata';
 
-export default async function handler(req: any, res: any) {
+export default defineEventHandler(async (event) => {
+    const req: any = event.node.req;
+
+    req.query = getQuery(event);
+
+    const ret = await handler(req);
+    return { doc: ret };
+});
+
+async function handler(req: any): Promise<any> {
     const namespace = req?.query?.namespace?.toLocaleString() || '';
 
     async function authMwAdapter(
@@ -11,7 +20,7 @@ export default async function handler(req: any, res: any) {
     ): Promise<any> {
         let ret: any = null;
 
-        await authMiddleware(req, res, async (rq, rs) => {
+        await authMiddleware(req, async (rq) => {
             const q: { [name: string]: string | number } = {
                 userID: req?.user?.id,
             };
@@ -28,5 +37,5 @@ export default async function handler(req: any, res: any) {
 
     const doc = await getDocument(namespace, req?.query || {}, authMwAdapter);
 
-    res.status(200).json({ doc });
+    return doc;
 }

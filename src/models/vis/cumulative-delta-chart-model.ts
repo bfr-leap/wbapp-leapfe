@@ -2,8 +2,8 @@ import type { LCD_Chunk } from 'lplib/endpoint-types/iracing-endpoints';
 import {
     getLapChartData,
     getCumulativeDeltaChartData,
-} from '@/utils/fetch-util';
-import type { SeriesXY } from '@/models/vis/line-chart-model';
+} from '@@/src/utils/fetch-util';
+import type { SeriesXY } from '@@/src/models/vis/line-chart-model';
 
 interface GridItem {
     custid: number;
@@ -101,7 +101,7 @@ export async function getCumulativeDeltaChartModel(
         series.name = `P${name2gridMap[series.name] + 1} - ${series.name}`;
     }
 
-    let lapNum = (ret[0].data.length = ret[0].data.length);
+    let lapNum = ret?.[0]?.data?.length || 0; // (ret[0].data.length = ret[0].data.length);
     const relevantLapPercent = 0.95;
 
     let yRange: [number, number] = [Infinity, -Infinity];

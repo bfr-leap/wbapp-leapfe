@@ -2,7 +2,7 @@ import type {
     TS_RecordTable,
     M_Member,
 } from 'lplib/endpoint-types/iracing-endpoints';
-import { getSingleMemberData, getMembersData } from '@/utils/fetch-util';
+import { getSingleMemberData, getMembersData } from '@@/src/utils/fetch-util';
 
 export type GenericTableModel = {
     columnNames: { [name: string]: string };

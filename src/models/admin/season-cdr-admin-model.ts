@@ -4,8 +4,8 @@ import {
     crtSchedEvent,
     updSchedEvent,
     delSchedEvent,
-} from '@/utils/fetch-util';
-import { getTrackName } from '@/utils/track-utils';
+} from '@@/src/utils/fetch-util';
+import { getTrackName } from '@@/src/utils/track-utils';
 
 export interface CdrAdminEvent {
     time: Date;
@@ -77,8 +77,6 @@ export async function getCdrAdminModel(
             };
         })
         .sort((a, b) => a.name.localeCompare(b.name));
-
-    console.log('here');
 
     return ret;
 }

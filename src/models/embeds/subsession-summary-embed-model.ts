@@ -1,18 +1,22 @@
-import { getGeneratedSimsessionSummary } from '@/utils/fetch-util';
+import { getGeneratedSimsessionSummary } from '@@/src/utils/fetch-util';
+import { is } from '@xata.io/client';
 
 export interface SubsessionSummaryEmbedModel {
     summaryText: string[];
+    isLight: boolean;
 }
 
 export function getDefaultSubsessionSummaryEmbedModel(): SubsessionSummaryEmbedModel {
     return {
         summaryText: [''],
+        isLight: false,
     };
 }
 
 export async function getSubsessionSummaryEmbedModel(
     subsessionId: number,
-    simsessionId: number
+    simsessionId: number,
+    isLight: boolean
 ): Promise<SubsessionSummaryEmbedModel> {
     let ret = getDefaultSubsessionSummaryEmbedModel();
 
@@ -21,7 +25,8 @@ export async function getSubsessionSummaryEmbedModel(
         simsessionId
     );
 
-    ret.summaryText = simsessionSummary.text.split('\n');
+    ret.summaryText = simsessionSummary?.text.split('\n') || [];
+    ret.isLight = isLight;
 
     return ret;
 }

@@ -1,4 +1,4 @@
-import { getLeagueSeasonSessions } from '@/utils/fetch-util';
+import { getLeagueSeasonSessions } from '@@/src/utils/fetch-util';
 
 export interface PastEventCardsModel {
     pastRaces: {

@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import { ref, watchEffect } from 'vue';
 import type { Ref } from 'vue';
-
-import type { GenericTableModel } from '@/models/vis/generic-table-model';
+import type { GenericTableModel } from '@@/src/models/vis/generic-table-model';
 import {
     getDefaultGenericTableModel,
     getGenericTableModel,
-} from '@/models/vis/generic-table-model';
-import RouterLinkProxy from '@/components/nav/router-link-proxy.vue';
+} from '@@/src/models/vis/generic-table-model';
+import RouterLinkProxy from '@@/src/components/nav/router-link-proxy.vue';
 
 const props = defineProps<{
     title: string;
@@ -16,17 +14,34 @@ const props = defineProps<{
     rows: { [name: string]: string }[];
 }>();
 
-let table: Ref<GenericTableModel> = ref(getDefaultGenericTableModel());
-
 async function fetchModel() {
-    table.value = await getGenericTableModel(
+    return await getGenericTableModel(
         props.title,
         props.rows,
         props.leagueId,
         props.seasonId
     );
 }
-watchEffect(fetchModel);
+
+const table: Ref<GenericTableModel> =
+    await asyncDataWithReactiveModel<GenericTableModel>(
+        `GenericTableModel-${[
+            props.title,
+            props.rows,
+            props.leagueId,
+            props.seasonId,
+        ]
+            .map((v) => v.toString())
+            .join('-')}`,
+        fetchModel,
+        getDefaultGenericTableModel,
+        [
+            () => props.title,
+            () => props.rows,
+            () => props.leagueId,
+            () => props.seasonId,
+        ]
+    );
 </script>
 
 <template>

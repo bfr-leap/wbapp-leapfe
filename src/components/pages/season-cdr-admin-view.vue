@@ -5,8 +5,8 @@ import { useRouter } from 'vue-router';
 import { SignedIn } from 'vue-clerk';
 import { useAuth } from 'vue-clerk';
 
-import LeagueSeasonMenu from '@/components/nav/league-season-menu.vue';
-import SeasonCdrAdmin from '@/components/admin/season-cdr-admin.vue';
+import LeagueSeasonMenu from '@@/src/components/nav/league-season-menu.vue';
+import SeasonCdrAdmin from '@@/src/components/admin/season-cdr-admin.vue';
 
 const { isSignedIn } = useAuth();
 

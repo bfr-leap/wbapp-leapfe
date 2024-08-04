@@ -1,5 +1,5 @@
 import type { DropdownModel } from '../dropdown-model';
-import { getTrackInfoDirectory } from '@/utils/fetch-util';
+import { getTrackInfoDirectory } from '@@/src/utils/fetch-util';
 
 export interface TrackResultsMenuModel {
     currentLeague: string;

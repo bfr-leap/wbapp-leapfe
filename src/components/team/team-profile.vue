@@ -2,11 +2,11 @@
 import { ref, watchEffect } from 'vue';
 import type { Ref } from 'vue';
 import TeamTag from './team-tag.vue';
-import type { TeamProfileModel } from '@/models/team/team-profile-model';
+import type { TeamProfileModel } from '@@/src/models/team/team-profile-model';
 import {
     getDefaultTeamProfileModel,
     getTeamProfileModel,
-} from '@/models/team/team-profile-model';
+} from '@@/src/models/team/team-profile-model';
 
 const props = defineProps<{
     league: string;

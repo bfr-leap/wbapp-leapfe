@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { watchEffect, ref, watch } from 'vue';
 import type { Ref } from 'vue';
-import BarChart from '@/components/vis/bar-chart.vue';
+import BarChart from '@@/src/components/vis/bar-chart.vue';
 
-import type { PaceChartModel } from '../../models/vis/pace-chart-model';
+import type { PaceChartModel } from '@@/src/models/vis/pace-chart-model';
 import {
     getDefaultPaceChartModel,
     getPaceChartModel,
-} from '../../models/vis/pace-chart-model';
+} from '@@/src/models/vis/pace-chart-model';
 
 const props = defineProps<{
     subsession?: string;
@@ -15,18 +14,21 @@ const props = defineProps<{
     league?: string;
 }>();
 
-const paceChartModel: Ref<PaceChartModel> = ref(getDefaultPaceChartModel());
-
 async function fetchModel() {
-    paceChartModel.value = await getPaceChartModel(
+    return await getPaceChartModel(
         props.subsession || '',
         props.simsession || '',
         props.league || ''
     );
 }
 
-watchEffect(fetchModel);
-watch(props, fetchModel);
+const paceChartModel: Ref<PaceChartModel> =
+    await asyncDataWithReactiveModel<PaceChartModel>(
+        'PaceChartModel',
+        fetchModel,
+        getDefaultPaceChartModel,
+        [() => props.league, () => props.subsession, () => props.simsession]
+    );
 </script>
 
 <template>

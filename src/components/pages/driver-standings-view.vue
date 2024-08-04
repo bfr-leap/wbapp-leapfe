@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-import DriverStandings from '@/components/driver/driver-standings.vue';
+import DriverStandings from '@@/src/components/driver/driver-standings.vue';
 
 const route = useRoute();
 </script>

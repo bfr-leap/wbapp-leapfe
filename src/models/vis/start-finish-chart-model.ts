@@ -1,5 +1,5 @@
-import type { HLBarChartDatum } from '@/models/vis/hl-bar-chart-model';
-import { getStartFinishChartData } from '@/utils/fetch-util';
+import type { HLBarChartDatum } from '@@/src/models/vis/hl-bar-chart-model';
+import { getStartFinishChartData } from '@@/src/utils/fetch-util';
 
 export async function getStartFinishData(
     league: string,

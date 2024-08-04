@@ -2,7 +2,7 @@ import type {
     DriverResults,
     SSR_ResultsEntry,
 } from 'lplib/endpoint-types/iracing-endpoints';
-import { getSubsessionName } from '@/utils/session-utils';
+import { getSubsessionName } from '@@/src/utils/session-utils';
 
 export type ResultsTableModel = {
     sessionId: number;

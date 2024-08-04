@@ -2,12 +2,12 @@
 import { RouterLink } from 'vue-router';
 import { ref, watchEffect, watch } from 'vue';
 import type { Ref } from 'vue';
-import type { TrackResultsMenuModel } from '@/models/nav/track-results-menu-model';
+import type { TrackResultsMenuModel } from '@@/src/models/nav/track-results-menu-model';
 import {
     getTrackResultsMenuModel,
     getDefaultTrackResultsMenuModel,
-} from '@/models/nav/track-results-menu-model';
-import RouterLinkProxy from '@/components/nav/router-link-proxy.vue';
+} from '@@/src/models/nav/track-results-menu-model';
+import RouterLinkProxy from '@@/src/components/nav/router-link-proxy.vue';
 
 const props = defineProps<{
     league: string;

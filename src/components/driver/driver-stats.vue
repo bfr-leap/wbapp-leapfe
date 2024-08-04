@@ -1,19 +1,21 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
-import ResultsTable from '@/components/event/results-table.vue';
+import ResultsTable from '@@/src/components/event/results-table.vue';
 import type {
     DriverStats,
     DriverResults,
-} from 'lplib/endpoint-types/iracing-endpoints';
-import BarChart from '@/components/vis/bar-chart.vue';
+} from '@@/lplib/endpoint-types/iracing-endpoints';
+import BarChart from '@@/src/components/vis/bar-chart.vue';
 import HLBarChart from '../vis/hl-bar-chart.vue';
 import { ref, watchEffect } from 'vue';
 import type { Ref } from 'vue';
 import {
-    getQualifyingChartData,
-    getStartFinishChartData,
-} from '@/models/driver/driver-stats-model';
-import RouterLinkProxy from '@/components/nav/router-link-proxy.vue';
+    getDriverStatsModel,
+    getDefaultDriverStatsModel,
+} from '@@/src/models/driver/driver-stats-model';
+import type { DriverStatsModel } from '@@/src/models/driver/driver-stats-model';
+
+import RouterLinkProxy from '@@/src/components/nav/router-link-proxy.vue';
 
 export interface ResultsCollection {
     race: DriverResults;
@@ -33,20 +35,8 @@ const props = defineProps<{
     seasonId: number;
 }>();
 
-const qualifyingChartData: Ref<{ name: string; value: number }[] | null> =
-    ref(null);
-const startFinishChartData: Ref<
-    { name: string; hi: number; lo: number }[] | null
-> = ref(null);
-
-async function fetchJsonData() {
-    qualifyingChartData.value = await getQualifyingChartData(
-        props.results.quali,
-        props.seasonId,
-        props.leagueId
-    );
-
-    startFinishChartData.value = await getStartFinishChartData(
+async function fetchModel() {
+    return await getDriverStatsModel(
         props.results.quali,
         props.results?.race,
         props.results?.sprint,
@@ -54,7 +44,29 @@ async function fetchJsonData() {
         props.leagueId
     );
 }
-watchEffect(fetchJsonData);
+watchEffect(fetchModel);
+
+const driverStatsModel: Ref<DriverStatsModel> =
+    await asyncDataWithReactiveModel<DriverStatsModel>(
+        `DriverStatsModel-${[
+            props.results.quali,
+            props.results?.race,
+            props.results?.sprint,
+            props.seasonId,
+            props.leagueId,
+        ]
+            .map((v) => v.toString)
+            .join('-')}`,
+        fetchModel,
+        getDefaultDriverStatsModel,
+        [
+            () => props.stats,
+            () => props.results,
+            () => props.seasonName,
+            () => props.leagueId,
+            () => props.seasonId,
+        ]
+    );
 
 const statClasses = 'px-2 py-1 m-1 fs-5';
 </script>
@@ -63,54 +75,44 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
     <div class="fs-4">
         <RouterLinkProxy
             class="link-light"
-            v-if="seasonId"
+            v-if="props.seasonId"
             :to="`/?m=standings&league=${props.leagueId}&season=${props.seasonId}`"
-            >{{ seasonName }}</RouterLinkProxy
+            >{{ props.seasonName }}</RouterLinkProxy
         >
-        <span v-else>{{ seasonName }}</span>
+        <span v-else>{{ driverStatsModel.seasonName }}</span>
     </div>
     <div class="d-flex flex-wrap">
         <div :class="statClasses">
             <span class="name">Starts: </span
-            ><span class="value"> {{ stats.started }}</span>
+            ><span class="value"> {{ props.stats.started }}</span>
         </div>
         <div :class="statClasses">
             <span class="name">Poles: </span
-            ><span class="value"> {{ stats.poles }}</span>
+            ><span class="value"> {{ props.stats.poles }}</span>
         </div>
         <div :class="statClasses">
             <span class="name">Wins: </span
-            ><span class="value"> {{ stats.wins }}</span>
+            ><span class="value"> {{ props.stats.wins }}</span>
         </div>
         <div :class="statClasses">
             <span class="name">Podiums: </span
-            ><span class="value"> {{ stats.podiums }}</span>
+            ><span class="value"> {{ props.stats.podiums }}</span>
         </div>
         <div :class="statClasses">
             <span class="name">Top 10: </span
-            ><span class="value"> {{ stats.top_10 }}</span>
+            ><span class="value"> {{ props.stats.top_10 }}</span>
         </div>
         <div :class="statClasses">
             <span class="name">Top 20: </span
-            ><span class="value"> {{ stats.top_20 }}</span>
+            ><span class="value"> {{ props.stats.top_20 }}</span>
         </div>
         <div :class="statClasses">
             <span class="name">LEAP Points: </span
-            ><span class="value"> {{ stats.power_points }}</span>
+            ><span class="value"> {{ props.stats.power_points }}</span>
         </div>
     </div>
 
     <ul class="nav nav-pills">
-        <!-- <li v-if="barChartData" class="nav-item">
-            <a
-                class="nav-link active"
-                data-bs-toggle="tab"
-                v-bind:data-bs-target="`#nav-qpchart-${seasonId}`"
-                aria-current="page"
-                href="#"
-                >Qualifying Performance</a
-            >
-        </li> -->
         <li class="nav-item dropdown">
             <a
                 class="nav-link dropdown-toggle active show"
@@ -125,7 +127,7 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
                     <a
                         class="dropdown-item active"
                         data-bs-toggle="tab"
-                        v-bind:data-bs-target="`#nav-qpchart-${seasonId}`"
+                        v-bind:data-bs-target="`#nav-qpchart-${props.seasonId}`"
                         href="#"
                     >
                         Qualifying Performance
@@ -135,7 +137,7 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
                     <a
                         class="dropdown-item"
                         data-bs-toggle="tab"
-                        v-bind:data-bs-target="`#nav-sechart-${seasonId}`"
+                        v-bind:data-bs-target="`#nav-sechart-${props.seasonId}`"
                         href="#"
                     >
                         Start / Finish
@@ -153,12 +155,12 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
                 >Tables</a
             >
             <ul class="dropdown-menu">
-                <template v-for="(result, i) in results">
-                    <li v-if="result && result[seasonId]">
+                <template v-for="(result, i) in props.results">
+                    <li v-if="result && result[props.seasonId]">
                         <a
                             class="dropdown-item"
                             data-bs-toggle="tab"
-                            v-bind:data-bs-target="`#nav-${i}-${seasonId}`"
+                            v-bind:data-bs-target="`#nav-${i}-${props.seasonId}`"
                             href="#"
                         >
                             {{ i }}
@@ -171,7 +173,7 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
     <div class="tab-content" id="nav-tabContent">
         <div
             class="tab-pane fade show active"
-            v-bind:id="`nav-qpchart-${seasonId}`"
+            v-bind:id="`nav-qpchart-${props.seasonId}`"
             role="tabpanel"
             aria-labelledby="nav-home-tab"
             tabindex="0"
@@ -182,8 +184,8 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
             <div class="row">
                 <div class="col-12 m-auto">
                     <BarChart
-                        v-if="qualifyingChartData"
-                        :data="qualifyingChartData"
+                        v-if="driverStatsModel.qualifyingChartData"
+                        :data="driverStatsModel.qualifyingChartData"
                     />
                 </div>
             </div>
@@ -201,16 +203,16 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
             <div class="row">
                 <div class="col-12 m-auto">
                     <HLBarChart
-                        v-if="startFinishChartData"
-                        v-bind:data="startFinishChartData"
+                        v-if="driverStatsModel.startFinishChartData"
+                        v-bind:data="driverStatsModel.startFinishChartData"
                     />
                 </div>
             </div>
         </div>
-        <template v-for="(result, i) in results">
+        <template v-for="(result, i) in props.results">
             <div
                 class="tab-pane fade"
-                v-bind:id="`nav-${i}-${seasonId}`"
+                v-bind:id="`nav-${i}-${props.seasonId}`"
                 role="tabpanel"
                 aria-labelledby="nav-profile-tab"
                 tabindex="0"
@@ -218,12 +220,12 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
                 <div
                     class="row"
                     style="margin-top: 1em"
-                    v-if="result && result[seasonId]"
+                    v-if="result && result[props.seasonId]"
                 >
                     <div class="col">{{ i }}</div>
                 </div>
                 <ResultsTable
-                    :seasonId="seasonId"
+                    :seasonId="props.seasonId"
                     :results="result"
                     v-bind:leagueId="props.leagueId"
                 />

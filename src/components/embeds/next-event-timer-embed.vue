@@ -7,25 +7,32 @@ import { useRoute } from 'vue-router';
 import {
     getDefaultNextEventTimerEmbedModel,
     getNextEventTimerEmbedModel,
-} from '@/models/embeds/next-event-timer-embed-model';
-import type { NextEventTimerEmbedModel } from '@/models/embeds/next-event-timer-embed-model';
-import EventCardLg from '@/components/event/event-card-lg.vue';
-import EventCardSm from '@/components/event/event-card-sm.vue';
+} from '@@/src/models/embeds/next-event-timer-embed-model';
+import type { NextEventTimerEmbedModel } from '@@/src/models/embeds/next-event-timer-embed-model';
+import EventCardLg from '@@/src/components/event/event-card-lg.vue';
+import EventCardSm from '@@/src/components/event/event-card-sm.vue';
 
 const route = useRoute();
 
-let nextEventTimerEmbedModel: Ref<NextEventTimerEmbedModel> = ref(
-    getDefaultNextEventTimerEmbedModel()
-);
-
 async function fetchModel() {
-    nextEventTimerEmbedModel.value = await getNextEventTimerEmbedModel(
+    return await getNextEventTimerEmbedModel(
         route.query.league as string,
         route.query.season as string
     );
 }
-watchEffect(fetchModel);
-watch(route, fetchModel);
+
+const nextEventTimerEmbedModel: Ref<NextEventTimerEmbedModel> =
+    await asyncDataWithReactiveModel<NextEventTimerEmbedModel>(
+        `NextEventTimerEmbedModel-${[
+            route.query.league as string,
+            route.query.season as string,
+        ]
+            .map((v) => v.toString())
+            .join('-')}`,
+        fetchModel,
+        getDefaultNextEventTimerEmbedModel,
+        [() => route.query.league, () => route.query.season]
+    );
 
 function onClick(eventInfo: { trackId: string; date: string }) {
     nextEventTimerEmbedModel.value.schedule.selectedRace = {

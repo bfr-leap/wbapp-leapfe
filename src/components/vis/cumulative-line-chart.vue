@@ -2,12 +2,12 @@
 import { watchEffect, ref } from 'vue';
 import type { Ref } from 'vue';
 import LineChart from './line-chart.vue';
-import type { SeriesXY } from '@/models/vis/line-chart-model';
-import type { CumulativeLineChartModel } from '@/models/vis/cumulative-line-chart-model';
+import type { SeriesXY } from '@@/src/models/vis/line-chart-model';
+import type { CumulativeLineChartModel } from '@@/src/models/vis/cumulative-line-chart-model';
 import {
     getCumulativeLineChartModel,
     getDefaultCumulativeLineChartModel,
-} from '@/models/vis/cumulative-line-chart-model';
+} from '@@/src/models/vis/cumulative-line-chart-model';
 
 const props = defineProps<{
     series: SeriesXY[];

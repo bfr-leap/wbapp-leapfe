@@ -6,7 +6,7 @@ import type {
     LeagueSeasons,
     DriverResults,
     SSR_ResultsEntry,
-} from 'lplib/endpoint-types/iracing-endpoints';
+} from '@@/lplib/endpoint-types/iracing-endpoints';
 
 import {
     getCuratedLeagueTeamsInfo,
@@ -14,7 +14,9 @@ import {
     getLeagueDriverStats,
     getLeagueSeasons,
     getSingleMemberData,
-} from '@/utils/fetch-util';
+} from '@@/src/utils/fetch-util';
+
+import { getMemberViewFromM_Member } from '@@/src/utils/driver-utils';
 
 interface DriverResultsModel {
     race: DriverResults;
@@ -26,6 +28,17 @@ function getDefaultDriverResultsModel(): DriverResultsModel {
     return JSON.parse(JSON.stringify({ race: {}, sprint: {}, quali: {} }));
 }
 
+interface MemberView {
+    clubId: any;
+    lastName: string;
+    firstName: string;
+    iRating: string;
+    licenseLevel: any;
+    safetyRating: string;
+    teamName: string;
+    teamId: number;
+}
+
 export interface DriverProfileModel {
     singleMemberData: M_Member | null;
     leagueSeasons: LeagueSeasons | null;
@@ -33,6 +46,7 @@ export interface DriverProfileModel {
     driverStatsMap: { [name: number]: DriverStatsMap } | null;
     driverResults: DriverResultsModel;
     allTimeResults: DriverResultsModel;
+    memberView: MemberView;
 }
 
 export function getDefaultDriverProfileModel(): DriverProfileModel {
@@ -44,9 +58,27 @@ export function getDefaultDriverProfileModel(): DriverProfileModel {
             driverStatsMap: null,
             driverResults: getDefaultDriverResultsModel(),
             allTimeResults: getDefaultDriverResultsModel(),
+            memberView: {
+                clubId: 0,
+                lastName: '---',
+                firstName: '---',
+                iRating: '---',
+                licenseLevel: '',
+                safetyRating: '---',
+                teamName: '---',
+                teamId: 0,
+            },
         })
     );
 }
+
+const memberView = computed(() => {
+    return getMemberViewFromM_Member(
+        driverProfileModel?.value?.singleMemberData,
+        {},
+        {}
+    );
+});
 
 function calculateAllTimeResults(
     inDriverResults: DriverResults
@@ -106,6 +138,7 @@ export async function getDriverProfileModel(league: string, driver: string) {
         !driverSessionResultsSprint ||
         !driverSessionResultsQuali
     ) {
+        console.log('early ret');
         return ret;
     }
 
@@ -125,6 +158,8 @@ export async function getDriverProfileModel(league: string, driver: string) {
         sprint: calculateAllTimeResults(driverSessionResultsSprint),
         quali: calculateAllTimeResults(driverSessionResultsQuali),
     };
+
+    ret.memberView = getMemberViewFromM_Member(ret.singleMemberData, {}, {});
 
     return ret;
 }

@@ -1,27 +1,22 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
 import type { Ref } from 'vue';
-import HomeView from '@/components/pages/home-view.vue';
-import ResultsView from '@/components/pages/results-view.vue';
-import DriverStandingsView from '@/components/pages/driver-standings-view.vue';
-import DriverView from '@/components/pages/driver-view.vue';
-import TeamView from '@/components/pages/team-view.vue';
-import TrackResultsView from '@/components/pages/track-results-view.vue';
-import NextEventTimerEmbed from '@/components/embeds/next-event-timer-embed.vue';
-import SubsessionSummaryEmbed from '@/components/embeds/subsession-summary-embed.vue';
-import SeasonProfile from '@/components/pages/season-profile-view.vue';
-import UserProfile from '@/components/pages/user-profile-view.vue';
-import SeasonCdrAdmin from '@/components/pages/season-cdr-admin-view.vue';
+import HomeView from '@@/src/components/pages/home-view.vue';
+import ResultsView from '@@/src/components/pages/results-view.vue';
+import DriverStandingsView from '@@/src/components/pages/driver-standings-view.vue';
+import DriverView from '@@/src/components/pages/driver-view.vue';
+import TeamView from '@@/src/components/pages/team-view.vue';
+import TrackResultsView from '@@/src/components/pages/track-results-view.vue';
+import NextEventTimerEmbed from '@@/src/components/embeds/next-event-timer-embed.vue';
+import SubsessionSummaryEmbed from '@@/src/components/embeds/subsession-summary-embed.vue';
+import SeasonProfile from '@@/src/components/pages/season-profile-view.vue';
+import UserProfile from '@@/src/components/pages/user-profile-view.vue';
+import SeasonCdrAdmin from '@@/src/components/pages/season-cdr-admin-view.vue';
 import { ref, watch } from 'vue';
 import mixpanel from 'mixpanel-browser';
-import { defLgSeasSubCtx } from '@/utils/fetch-util';
+import { defLgSeasSubCtx } from '@@/src/utils/fetch-util';
 
 const route = useRoute();
-
-let league: Ref<string> = ref('');
-let season: Ref<string> = ref('');
-let subsession: Ref<string> = ref('');
-let simsession: Ref<string> = ref('');
 
 async function track() {
     mixpanel.track(route.query.m?.toString() || 'home', route.query);
@@ -32,31 +27,54 @@ async function track() {
         route.query.subsession as string
     );
 
-    league.value = def?.league_id?.toString() || '';
-    season.value = def?.season_id?.toString() || '';
-    subsession.value = def?.subsession_id?.toString() || '';
-    simsession.value = (route.query.simsession as string) || '';
+    def.simsession_id = (route.query.simsession as string) || '';
+
+    return def;
 }
 
-track();
+interface LgSeasSubCtx {
+    league_id: number;
+    season_id: number;
+    subsession_id: number;
+    simsession_id: number;
+}
 
-watch(route, track);
+function getDefaultModel() {
+    return {
+        league_id: 0,
+        season_id: 0,
+        subsession_id: 0,
+        simsession_id: 0,
+    };
+}
+
+const lgSeasSubCtx: Ref<LgSeasSubCtx> =
+    await asyncDataWithReactiveModel<LgSeasSubCtx>(
+        `LgSeasSubCtx-${[
+            route.query.league as string,
+            route.query.season as string,
+            route.query.subsession as string,
+        ].join('-')}`,
+        track,
+        getDefaultModel,
+        [route]
+    );
 </script>
 
 <template>
     <HomeView
         v-if="!route.query.m"
-        v-bind:league="league"
-        v-bind:season="season"
-        v-bind:subsession="subsession"
+        v-bind:league="lgSeasSubCtx.league_id.toString()"
+        v-bind:season="lgSeasSubCtx.season_id.toString()"
+        v-bind:subsession="lgSeasSubCtx.subsession_id.toString()"
     >
     </HomeView>
     <ResultsView
         v-if="route.query.m === 'results'"
-        v-bind:league="league"
-        v-bind:season="season"
-        v-bind:subsession="subsession"
-        v-bind:simsession="simsession"
+        v-bind:league="lgSeasSubCtx.league_id.toString()"
+        v-bind:season="lgSeasSubCtx.season_id.toString()"
+        v-bind:subsession="lgSeasSubCtx.subsession_id.toString()"
+        v-bind:simsession="lgSeasSubCtx.simsession_id.toString()"
     ></ResultsView>
     <DriverStandingsView
         v-if="route.query.m === 'standings'"
@@ -70,8 +88,8 @@ watch(route, track);
 
     <SeasonCdrAdmin
         v-if="route.query.m === 'season-cdr-admin'"
-        v-bind:league="league"
-        v-bind:season="season"
+        v-bind:league="lgSeasSubCtx.league_id.toString()"
+        v-bind:season="lgSeasSubCtx.season_id.toString()"
     ></SeasonCdrAdmin>
 
     <NextEventTimerEmbed

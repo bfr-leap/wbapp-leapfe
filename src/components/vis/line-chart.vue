@@ -9,13 +9,13 @@ import {
     watch,
 } from 'vue';
 
-import type { SeriesXY } from '@/models/vis/line-chart-model';
+import type { SeriesXY } from '@@/src/models/vis/line-chart-model';
+import * as d3 from 'd3';
 
 export type PickNumericProps<T> = {
     [P in keyof T as T[P] extends number ? P : never]: T[P];
 };
 
-const d3: any = (<any>globalThis).d3;
 const aspectRatio = 0.5;
 
 const props = defineProps<{
@@ -26,59 +26,55 @@ const props = defineProps<{
 
 const svgRoot = ref<SVGGElement | null>(null);
 const divRoot = ref<HTMLElement | null>(null);
-const xAxis = ref<SVGGElement | null>(null);
-const yAxis = ref<SVGGElement | null>(null);
-const height = ref(100);
-const width = ref(100);
-
-const margin = { top: 10, right: 10, bottom: 30, left: 50 };
-const innerHeight = computed(() => {
-    return height.value - margin.top - margin.bottom;
-});
-const innerWidth = computed(() => {
-    return width.value - margin.left - margin.right;
-});
+const startSize = 500;
 
 onMounted(async () => {
     await nextTick();
     if (ResizeObserver && divRoot.value) {
         let resizeObserver = new ResizeObserver(() => {
-            window.requestAnimationFrame(redrawAxis);
+            window.requestAnimationFrame(async () => {
+                lineChartModel.value = await fetchModel();
+            });
         });
         resizeObserver.observe(divRoot.value);
     }
 });
 
-let scaleX = ref();
-let scaleY = ref();
+async function fetchModel() {
+    let height = startSize * aspectRatio;
+    let width = startSize;
 
-watch(() => props.data, redrawAxis); // reset the d3 avg axis when the data changes.
-function redrawAxis() {
-    if (svgRoot.value && props.data.length > 0) {
-        height.value = svgRoot.value.clientWidth * aspectRatio;
-        width.value = svgRoot.value.clientWidth;
+    if (svgRoot.value) {
+        height = svgRoot.value.clientWidth * aspectRatio;
+        width = svgRoot.value.clientWidth;
+    }
 
-        // add x axis
-        const xAxisSelection = d3.select(xAxis.value);
-        xAxisSelection.html(''); // clears the  inner nodes
-        scaleX.value = d3
+    return await getLineChartModel(width, height, props.data, props.yRange);
+}
+
+async function getLineChartModel(
+    width: number,
+    height: number,
+    data: SeriesXY[],
+    yRange: [number, number] | undefined
+) {
+    let ret = getDefaultLineChartModel();
+
+    ret.width = width;
+    ret.height = height;
+
+    ret.innerHeight = ret.height - ret.margin_top - ret.margin_bottom;
+    ret.innerWidth = ret.width - ret.margin_left - ret.margin_right;
+
+    if (data.length > 0) {
+        let xScale = d3
             .scaleLinear()
             .domain(
                 d3.extent(props.data[0].data, (d: any) => {
                     return d.x;
                 })
             )
-            .range([0, innerWidth.value]);
-        const axisX = d3
-            .axisBottom(scaleX.value)
-            .tickValues(props.data[0].data.map((d) => d.x))
-            .tickFormat(d3.format('d'));
-        axisX(xAxisSelection);
-        xAxisSelection
-            .call(d3.axisBottom(scaleX.value).ticks(5))
-            .selectAll(['line', 'path', 'text'])
-            .style('font-size', 16)
-            .style('stroke', 'white');
+            .range([0, ret.innerWidth]);
 
         let maxY = d3.max(props.data, (sXY: SeriesXY) =>
             d3.max(sXY.data, (d: any) => d.y)
@@ -87,38 +83,138 @@ function redrawAxis() {
             d3.min(sXY.data, (d: any) => d.y)
         );
 
-        if (props.yRange) {
-            minY = props.yRange[0];
-            maxY = props.yRange[1];
+        let maxX = d3.max(props.data, (sXY: SeriesXY) =>
+            d3.max(sXY.data, (d: any) => d.x)
+        );
+        let minX = d3.min(props.data, (sXY: SeriesXY) =>
+            d3.min(sXY.data, (d: any) => d.x)
+        );
+
+        ret.xAxisInnerHtml = generateXAxisSvg(
+            minX,
+            maxX,
+            ret.innerHeight,
+            ret.innerWidth,
+            xScale
+        );
+
+        if (yRange) {
+            minY = yRange[0];
+            maxY = yRange[1];
         }
 
-        // add y axis
-        const yAxisSelection = d3.select(yAxis.value);
-        yAxisSelection.html('');
-        scaleY.value = d3
+        let yScale = d3
             .scaleLinear()
             .domain([minY, maxY])
-            .range([innerHeight.value, 0]);
-        yAxisSelection
-            .call(d3.axisLeft(scaleY.value).ticks(5))
-            .selectAll(['line', 'path', 'text'])
-            .style('font-size', 16)
-            .style('stroke', 'white');
+            .range([ret.innerHeight, 0]);
+
+        ret.yAxisInnerHtml = generateYAxisSvg(
+            minY,
+            maxY,
+            ret.innerHeight,
+            ret.innerWidth,
+            yScale
+        );
+
+        ret.pathAttr = data.map((v) => getDPathAttr(v, xScale, yScale));
     }
+
+    toggleState.splice(0, toggleState.length, ...props.data.map(() => true));
+
+    return ret;
 }
 
-function getDPathAttr(series: SeriesXY) {
-    if (!scaleX.value || !scaleY.value) {
+function generateXAxisSvg(
+    minX: number,
+    maxX: number,
+    innerHeight: number,
+    innerWidth: number,
+    scaleX: D3_Scale
+) {
+    const ticks = scaleX.ticks(5);
+    const tickFormat = scaleX.tickFormat(5);
+
+    const tickElements = ticks
+        .map((tick: any) => {
+            const x = scaleX(tick);
+            return `
+            <g class="tick" transform="translate(${x},0)">
+                <line y2="6" stroke="white"></line>
+                <text style="font-size: 16px;" fill="white" y="9" dy="0.71em">${tickFormat(
+                    tick
+                )}</text>
+            </g>`;
+        })
+        .join('');
+
+    const axisLine = `
+        <path d="M0,6V0H${innerWidth}V6" fill="none" stroke="white"></path>
+    `;
+
+    // Wrap everything in the SVG element
+    const g = `
+            <g font-size="10" font-family="sans-serif" text-anchor="middle" transform="translate(0,${innerHeight})">
+                ${axisLine}
+                ${tickElements}
+            </g>
+    `;
+
+    return g;
+}
+
+function generateYAxisSvg(
+    minY: number,
+    maxY: number,
+    innerHeight: number,
+    innerWidth: number,
+    scaleY: D3_Scale
+) {
+    const ticks = scaleY.ticks(5);
+    const tickFormat = scaleY.tickFormat(5);
+
+    const tickElements = ticks
+        .map((tick: any) => {
+            const y = scaleY(tick);
+            return `
+              <g class="tick" transform="translate(0,${y})">
+                <line x2="-6" stroke="white"></line>
+                <text style="font-size: 16px;" fill="white" x="-9" dy="0.32em">${tickFormat(
+                    tick
+                )}</text>
+            </g>`;
+        })
+        .join('');
+
+    const axisLine = `
+        <path d="M-6,0H0V${innerHeight}H-6" fill="none" stroke="white"></path>
+    `;
+
+    const g = `
+            <g font-size="10" font-family="sans-serif" text-anchor="end">
+                ${axisLine}
+                ${tickElements}
+            </g>
+    `;
+
+    return g;
+}
+
+function getDPathAttr(
+    series: SeriesXY,
+    scaleX: D3_Scale,
+    scaleY: D3_Scale
+): string {
+    if (!scaleX || !scaleY) {
         return '';
     }
 
     const linePath = d3
         .line()
         .x(function (d: any) {
-            return scaleX.value(d.x);
+            return scaleX(d.x);
         })
         .y(function (d: any) {
-            return scaleY.value(d.y);
+            return scaleY(d.y);
         })(series.data);
     return linePath;
 }
@@ -165,9 +261,7 @@ const basePatterns: string[] = [
 ];
 
 const toggleState = reactive<boolean[]>([]);
-watchEffect(() => {
-    toggleState.splice(0, toggleState.length, ...props.data.map(() => true));
-});
+
 function getColor(seriesIndex: number) {
     const baseColor = baseColors[seriesIndex % baseColors.length];
     const dColor = d3.color(baseColor);
@@ -178,7 +272,60 @@ function onToggle(seriesIndex: number) {
     toggleState[seriesIndex] = !toggleState[seriesIndex];
 }
 function onToggleAll() {
-    toggleState.forEach((ts, i) => (toggleState[i] = !ts));
+    toggleState.forEach((ts: any, i: number) => (toggleState[i] = !ts));
+}
+
+const lineChartModel: Ref<LineChartModel> =
+    await asyncDataWithReactiveModel<LineChartModel>(
+        `LineChart-${[
+            svgRoot.value ? svgRoot.value.clientWidth : startSize,
+            (svgRoot.value ? svgRoot.value.clientWidth : startSize) *
+                aspectRatio,
+            props.data,
+            props.yRange,
+        ]
+            .map((v) => JSON.stringify(v))
+            .join('-')}`,
+        fetchModel,
+        getDefaultLineChartModel,
+        [
+            () => props.data,
+            () => props.title,
+            () => props.yRange,
+            () => divRoot?.value?.clientWidth,
+        ]
+    );
+
+type D3_Scale = any | null;
+
+interface LineChartModel {
+    width: number;
+    height: number;
+    margin_right: number;
+    margin_left: number;
+    margin_top: number;
+    margin_bottom: number;
+    innerWidth: number;
+    innerHeight: number;
+    xAxisInnerHtml: string;
+    yAxisInnerHtml: string;
+    pathAttr: string[];
+}
+
+function getDefaultLineChartModel(): LineChartModel {
+    return {
+        width: 1000,
+        height: 500,
+        margin_right: 10,
+        margin_left: 50,
+        margin_top: 10,
+        margin_bottom: 30,
+        innerHeight: 500,
+        innerWidth: 1000,
+        xAxisInnerHtml: '<g></g>',
+        yAxisInnerHtml: '<g></g>',
+        pathAttr: [],
+    };
 }
 </script>
 
@@ -187,17 +334,26 @@ function onToggleAll() {
         {{ title }}
     </div>
     <div ref="divRoot" style="overflow: hidden">
-        <svg ref="svgRoot" v-bind:viewBox="`0 0 ${width} ${height}`">
-            <g :transform="`translate(${margin.left},${margin.top})`">
-                <g ref="xAxis" :transform="`translate(0,${innerHeight})`"></g>
-                <g ref="yAxis"></g>
+        <svg
+            ref="svgRoot"
+            v-bind:viewBox="`0 0 ${lineChartModel.width || 10} ${
+                lineChartModel.height || 10
+            }`"
+        >
+            <g
+                :transform="`translate(${lineChartModel.margin_left || 0},${
+                    lineChartModel.margin_top || 0
+                })`"
+            >
+                <g v-html="lineChartModel.xAxisInnerHtml"></g>
+                <g v-html="lineChartModel.yAxisInnerHtml"></g>
                 <path
-                    v-for="(series, i) in data"
+                    v-for="(path, i) in lineChartModel.pathAttr"
                     fill="none"
                     :stroke="getColor(i)"
                     :stroke-dasharray="basePatterns[i % basePatterns.length]"
                     stroke-width="1.5"
-                    :d="getDPathAttr(series)"
+                    :d="path"
                 ></path>
             </g>
         </svg>
@@ -208,7 +364,7 @@ function onToggleAll() {
         </button>
     </div>
     <div class="d-flex flex-wrap justify-content-center d-print-none">
-        <div v-for="(series, i) in data" class="p-1">
+        <div v-for="(series, i) in props.data" class="p-1">
             <button class="btn bg-dark text-white" @click="onToggle(i)">
                 <span
                     class="d-inline-block"

@@ -1,8 +1,8 @@
-import type { SeriesXY } from '@/models/vis/line-chart-model';
+import type { SeriesXY } from '@@/src/models/vis/line-chart-model';
 import {
     getTelemetrySubsessionIds,
     getCumulativeDeltaBestLapChartData,
-} from '@/utils/fetch-util';
+} from '@@/src/utils/fetch-util';
 
 export interface BestQualifyLapChartModel {
     lapTimes: SeriesXY[];

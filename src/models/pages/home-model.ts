@@ -1,7 +1,7 @@
 import {
     getCuratedActiveLeagueSchedule,
     getUserFeatures,
-} from '@/utils/fetch-util';
+} from '@@/src/utils/fetch-util';
 
 export interface HomeModel {
     leagueName: string;
@@ -82,7 +82,7 @@ export async function getHomeModel(
         });
     }
 
-    if (features.indexOf('league_cdr_admin') > -1) {
+    if (features?.indexOf('league_cdr_admin') > -1) {
         ret.allowEditCalendar = true;
     }
 
