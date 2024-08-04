@@ -27,7 +27,7 @@ const DEBUG_PREFETCH = false;
 
 let API_BASE_URL = '';
 export function setApiBaseURL(url: string) {
-    console.log('setting api base URL');
+    console.log('setting api base URL', url);
     API_BASE_URL = url;
 }
 
