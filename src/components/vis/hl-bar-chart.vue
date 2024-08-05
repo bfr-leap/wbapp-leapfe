@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue';
+import { MurmurHashV2 } from '@@/src/utils/hash-util';
 import * as d3 from 'd3';
 
 const aspectRatio = 0.37;
@@ -227,9 +228,9 @@ const hlBarChartModel: Ref<HLBarChartModel> =
             svgRoot.value ? svgRoot.value.clientWidth : startSize,
             (svgRoot.value ? svgRoot.value.clientWidth : startSize) *
                 aspectRatio,
-            props.data,
+            MurmurHashV2(JSON.stringify(props.data), 123),
         ]
-            .map((v) => JSON.stringify(v))
+            .map((v) => v.toString())
             .join('-')}`,
         fetchModel,
         getDefaultHLBarChartModel,

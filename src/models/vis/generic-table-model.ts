@@ -124,6 +124,9 @@ export async function getGenericTableModel(
     seasonId: string
 ): Promise<GenericTableModel> {
     let ret: GenericTableModel = getDefaultGenericTableModel();
+    if (!rows) {
+        return ret;
+    }
     ret.title = title;
     if (rows[0]) {
         let keys = Object.keys(rows[0]);

@@ -30,7 +30,6 @@ export async function getLeagueSeasonMenuModel(
     let ret = getDefaultLeagueSeasonMenuModel();
 
     if (!league || '0' === league || !season || '0' === season) {
-        console.log('early return', league, season);
         return ret;
     }
 

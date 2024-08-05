@@ -48,13 +48,14 @@ export async function getPaceChartModel(
             subsession,
             simsession
         );
-        ret.barChartData = x.map((v) => {
-            return {
-                name: <string>v['name'],
-                value: <number>v['pace'],
-                value2: <number>v['ideal'],
-            };
-        });
+        ret.barChartData =
+            x?.map((v) => {
+                return {
+                    name: <string>v['name'],
+                    value: <number>v['pace'],
+                    value2: <number>v['ideal'],
+                };
+            }) || [];
     } else {
         let x = await getPacePercentChartData(league, subsession, simsession);
         ret.barChartData = x.map((v) => {

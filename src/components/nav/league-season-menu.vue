@@ -30,7 +30,7 @@ const leagueSeasonMenuModel: Ref<LeagueSeasonMenuModel> =
             props.league,
             props.season,
             props.targetPage,
-            isSignedIn,
+            // isSignedIn,
         ]
             .map((v) => v.toString())
             .join('-')}`,

@@ -60,4 +60,14 @@ onMounted(() => {
     >
         <slot />
     </RouterLink>
+
+    <!-- <RouterLink
+        @click="onClick()"
+        v-bind:style="props.style"
+        v-bind:class="props.class"
+        v-bind:type="props.type"
+        to="#"
+    >
+        <slot />
+    </RouterLink> -->
 </template>

@@ -6,6 +6,7 @@ import {
     getGenericTableModel,
 } from '@@/src/models/vis/generic-table-model';
 import RouterLinkProxy from '@@/src/components/nav/router-link-proxy.vue';
+import { MurmurHashV2 } from '@@/src/utils/hash-util';
 
 const props = defineProps<{
     title: string;
@@ -27,12 +28,10 @@ const table: Ref<GenericTableModel> =
     await asyncDataWithReactiveModel<GenericTableModel>(
         `GenericTableModel-${[
             props.title,
-            props.rows,
+            MurmurHashV2(JSON.stringify(props.rows), 123),
             props.leagueId,
             props.seasonId,
-        ]
-            .map((v) => v.toString())
-            .join('-')}`,
+        ].join('-')}`,
         fetchModel,
         getDefaultGenericTableModel,
         [
@@ -45,7 +44,7 @@ const table: Ref<GenericTableModel> =
 </script>
 
 <template>
-    <div>
+    <div v-if="table">
         <div class="table-responsive border border-secondary rounded m-1">
             <div class="d-flex justify-content-center">
                 {{ table.title }}

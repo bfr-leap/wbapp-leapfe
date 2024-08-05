@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue';
 import type { BarChartDatum } from '@@/src/models/vis/bar-chart-model';
+import { MurmurHashV2 } from '@@/src/utils/hash-util';
 import * as d3 from 'd3';
 
 const aspectRatio = 0.37;
@@ -94,13 +95,17 @@ function getBarChartModel(
     ret.yAxisHtml = generateYAxisSvg(ret.innerHeight, ret.innerWidth, scaleY);
 
     let average =
-        data.map((v) => v.value).reduce((p, c) => p + c) / data.length;
+        data.length > 0
+            ? data.map((v) => v.value).reduce((p, c) => p + c) / data.length
+            : 1;
 
-    let stdev = Math.sqrt(
-        data
-            .map((v) => (v.value - average) * (v.value - average))
-            .reduce((p, c) => p + c) / data.length
-    );
+    let stdev = data.length
+        ? Math.sqrt(
+              data
+                  .map((v) => (v.value - average) * (v.value - average))
+                  .reduce((p, c) => p + c) / data.length
+          )
+        : 1;
 
     ret.statLines.push(
         `<path transform="translate(0,${scaleY(average)})" d="M0,0H${
@@ -226,13 +231,13 @@ function generateYAxisSvg(
 
 const barChartModel: Ref<BarChartModel> =
     await asyncDataWithReactiveModel<BarChartModel>(
-        `HLBarChartModel-${[
+        `BarChartModel-${[
             svgRoot.value ? svgRoot.value.clientWidth : startSize,
             (svgRoot.value ? svgRoot.value.clientWidth : startSize) *
                 aspectRatio,
-            props.data,
+            MurmurHashV2(JSON.stringify(props.data), 123),
         ]
-            .map((v) => JSON.stringify(v))
+            .map((v) => v.toString())
             .join('-')}`,
         fetchModel,
         getDefaultBarChartModel,
