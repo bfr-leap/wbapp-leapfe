@@ -24,7 +24,11 @@ async function fetchModel() {
 
 const paceChartModel: Ref<PaceChartModel> =
     await asyncDataWithReactiveModel<PaceChartModel>(
-        'PaceChartModel',
+        `PaceChartModel-${[
+            props.subsession || '',
+            props.simsession || '',
+            props.league || '',
+        ].join('-')}`,
         fetchModel,
         getDefaultPaceChartModel,
         [() => props.league, () => props.subsession, () => props.simsession]

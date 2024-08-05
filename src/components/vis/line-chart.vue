@@ -9,6 +9,8 @@ import {
     watch,
 } from 'vue';
 
+import { MurmurHashV2 } from '@@/src/utils/hash-util';
+
 import type { SeriesXY } from '@@/src/models/vis/line-chart-model';
 import * as d3 from 'd3';
 
@@ -119,7 +121,11 @@ async function getLineChartModel(
         ret.pathAttr = data.map((v) => getDPathAttr(v, xScale, yScale));
     }
 
-    toggleState.splice(0, toggleState.length, ...props.data.map(() => true));
+    ret.toggleState.splice(
+        0,
+        ret.toggleState.length,
+        ...props.data.map(() => true)
+    );
 
     return ret;
 }
@@ -260,31 +266,34 @@ const basePatterns: string[] = [
     '16,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2',
 ];
 
-const toggleState = reactive<boolean[]>([]);
+// const toggleState = reactive<boolean[]>([]);
 
 function getColor(seriesIndex: number) {
     const baseColor = baseColors[seriesIndex % baseColors.length];
     const dColor = d3.color(baseColor);
-    dColor.opacity = toggleState[seriesIndex] ? 1 : 0.03;
+    dColor.opacity = lineChartModel.value.toggleState[seriesIndex] ? 1 : 0.03;
     return dColor.formatRgb();
 }
 function onToggle(seriesIndex: number) {
-    toggleState[seriesIndex] = !toggleState[seriesIndex];
+    lineChartModel.value.toggleState[seriesIndex] =
+        !lineChartModel.value.toggleState[seriesIndex];
 }
 function onToggleAll() {
-    toggleState.forEach((ts: any, i: number) => (toggleState[i] = !ts));
+    lineChartModel.value.toggleState.forEach(
+        (ts: any, i: number) => (lineChartModel.value.toggleState[i] = !ts)
+    );
 }
 
 const lineChartModel: Ref<LineChartModel> =
     await asyncDataWithReactiveModel<LineChartModel>(
-        `LineChart-${[
+        `LineChartModel-${[
             svgRoot.value ? svgRoot.value.clientWidth : startSize,
             (svgRoot.value ? svgRoot.value.clientWidth : startSize) *
                 aspectRatio,
-            props.data,
-            props.yRange,
+            MurmurHashV2(JSON.stringify(props.data), 123),
+            MurmurHashV2(JSON.stringify(props.yRange), 123),
         ]
-            .map((v) => JSON.stringify(v))
+            .map((v) => v?.toString() || '')
             .join('-')}`,
         fetchModel,
         getDefaultLineChartModel,
@@ -310,6 +319,7 @@ interface LineChartModel {
     xAxisInnerHtml: string;
     yAxisInnerHtml: string;
     pathAttr: string[];
+    toggleState: boolean[];
 }
 
 function getDefaultLineChartModel(): LineChartModel {
@@ -325,6 +335,7 @@ function getDefaultLineChartModel(): LineChartModel {
         xAxisInnerHtml: '<g></g>',
         yAxisInnerHtml: '<g></g>',
         pathAttr: [],
+        toggleState: [],
     };
 }
 </script>

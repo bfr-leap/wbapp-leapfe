@@ -7,28 +7,41 @@ export async function asyncDataWithReactiveModel<T>(
     defaultModelFunction: () => T,
     observables: any[]
 ): Promise<Ref<T>> {
+    // console.log(dataKey);
+
     // Using useAsyncData to fetch the model during SSR and client-side
     const {
         data: model,
         pending,
         error,
     } = await useAsyncData(dataKey, fetchModelFunction);
-    const modelRef = ref<T>(defaultModelFunction());
 
+    let refReady = false;
     watchEffect(async () => {
+        if (!refReady) {
+            return;
+        }
+
         if (model.value) {
-            modelRef.value = model.value;
+            modelRef.value = <T>model.value;
         } else {
-            model.value = await fetchModelFunction();
-            modelRef.value = model.value;
+            // model.value = await fetchModelFunction();
+            // modelRef.value = <T>model.value;
         }
     });
 
     // Watch for prop changes and refetch data accordingly
     watch(observables, async () => {
-        model.value = await fetchModelFunction();
-        modelRef.value = model.value;
+        if (modelRef?.value && refReady) {
+            model.value = <T>await fetchModelFunction();
+            modelRef.value = <T>model.value;
+        }
     });
 
-    return <Ref<T>>modelRef;
+    // modelRef.value = <T>model.value;
+
+    const modelRef: Ref<T> = <Ref<T>>ref<T>(<T>model.value);
+    refReady = true;
+
+    return modelRef;
 }

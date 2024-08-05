@@ -96,7 +96,9 @@ const trackName: Ref<string> = await asyncDataWithReactiveModel<string>(
                 </div>
                 <div class="row text-center" style="margin: 0">
                     <div class="col fs-2 padded-title bg-secondary">
-                        {{ countdown }}
+                        <span style="color: transparent">:: </span
+                        ><ClientOnly>{{ countdown }}</ClientOnly
+                        ><span style="color: transparent"> ::</span>
                     </div>
                 </div>
             </div>

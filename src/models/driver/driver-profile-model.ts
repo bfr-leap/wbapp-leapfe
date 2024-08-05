@@ -138,7 +138,6 @@ export async function getDriverProfileModel(league: string, driver: string) {
         !driverSessionResultsSprint ||
         !driverSessionResultsQuali
     ) {
-        console.log('early ret');
         return ret;
     }
 

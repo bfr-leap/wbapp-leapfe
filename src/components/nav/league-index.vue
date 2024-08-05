@@ -31,7 +31,7 @@ const leagueIndexModel: Ref<LeagueIndexModel> =
             props.seasonId || '',
             props.subsessionId || '',
             props.simsessionId || '',
-            isSignedIn,
+            // isSignedIn,
         ]
             .map((v) => v.toString())
             .join('-')}`,
@@ -47,7 +47,7 @@ const leagueIndexModel: Ref<LeagueIndexModel> =
 </script>
 
 <template>
-    <div class="card bg-dark text-light m-2">
+    <div v-cloak class="card bg-dark text-light m-2">
         <div class="card-body p-2">
             <form class="row row-cols-auto g-3 align-items-center">
                 <div class="dropdown">
@@ -153,6 +153,10 @@ const leagueIndexModel: Ref<LeagueIndexModel> =
     </div>
 </template>
 <style scoped>
+[v-cloak] {
+    display: none;
+}
+
 .truncate-button {
     display: inline-block;
     max-width: 100%;

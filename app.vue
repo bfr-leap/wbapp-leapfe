@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {setApiBaseURL} from '@@/src/utils/fetch-util';
+import { setApiBaseURL } from '@@/src/utils/fetch-util';
 useHead({
     bodyAttrs: {
         class: 'bg-toplevel',
@@ -36,7 +36,6 @@ useHead({
         },
     ],
 });
-
 
 const config = useRuntimeConfig();
 setApiBaseURL(config.public.API_BASE_URL);
