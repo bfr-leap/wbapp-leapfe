@@ -29,6 +29,8 @@ export async function getPaceChartModel(
     let ret: PaceChartModel = getDefaultPaceChartModel();
     ret.barChartData = [];
 
+    console.log('getPaceChartModel() ');
+
     if (
         simsession == undefined ||
         subsession == undefined ||
@@ -58,12 +60,13 @@ export async function getPaceChartModel(
             }) || [];
     } else {
         let x = await getPacePercentChartData(league, subsession, simsession);
-        ret.barChartData = x.map((v) => {
-            return {
-                name: <string>v['name'],
-                value: <number>v['pace'],
-            };
-        });
+        ret.barChartData =
+            x?.map((v) => {
+                return {
+                    name: <string>v['name'],
+                    value: <number>v['pace'],
+                };
+            }) || [];
     }
 
     return ret;
