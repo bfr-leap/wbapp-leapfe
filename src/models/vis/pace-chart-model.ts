@@ -29,8 +29,6 @@ export async function getPaceChartModel(
     let ret: PaceChartModel = getDefaultPaceChartModel();
     ret.barChartData = [];
 
-    console.log('getPaceChartModel() ');
-
     if (
         simsession == undefined ||
         subsession == undefined ||
