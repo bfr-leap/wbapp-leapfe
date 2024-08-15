@@ -58,10 +58,10 @@ const trackName: Ref<string> = await asyncDataWithReactiveModel<string>(
 <template>
     <div class="">
         <div class="wrap">
-            <img class="bg track-bg" v-bind:src="`./tracks/${track_id}.jpg`" />
+            <img class="bg track-bg" v-bind:src="`./tracks/${track_id.replace('-', 'n')}.jpg`" />
             <img
                 class="bg track-logo"
-                v-bind:src="`./tracks/${track_id}_logo.png`"
+                v-bind:src="`./tracks/${track_id.replace('-', 'n')}_logo.png`"
             />
             <div class="content">
                 <div class="row text-center">

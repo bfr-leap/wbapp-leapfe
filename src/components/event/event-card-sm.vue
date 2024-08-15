@@ -43,7 +43,7 @@ const shortName: Ref<string> = await asyncDataWithReactiveModel<string>(
 
 <template>
     <div class="wrap">
-        <img class="bg" v-bind:src="`./tracks/${track_id}.jpg`" />
+        <img class="bg" v-bind:src="`./tracks/${track_id.replace('-', 'n')}.jpg`" />
         <div
             v-if="is_next"
             v-bind:class="`${
