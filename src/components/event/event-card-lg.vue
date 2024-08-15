@@ -53,6 +53,8 @@ const trackName: Ref<string> = await asyncDataWithReactiveModel<string>(
         () => props.embed_mode,
     ]
 );
+
+updateTimer();
 </script>
 
 <template>
