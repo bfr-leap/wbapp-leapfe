@@ -41,7 +41,7 @@ async function updateTimer() {
 }
 
 const trackName: Ref<string> = await asyncDataWithReactiveModel<string>(
-    `leagueSeasonMenuModel-${props.track_id}-${new Date().getTime()}`,
+    `EventCardLgModel-${props.track_id}`,
     fetchModel,
     () => '---',
     [
