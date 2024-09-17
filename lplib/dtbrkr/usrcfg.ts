@@ -3,7 +3,7 @@ import { getActiveLeagueSchedule } from './lib-usrcfg/active-league-schedule';
 import { getXataClient, XataClient } from './xata';
 
 async function getLeagueTeamsInfo(league: string): Promise<any> {
-    console.log('getLeagueTeamsInfo():', league);
+    console.log('getLeagueTeamsInfo(): [', league, ']');
     const xata = getXataClient();
 
     const { records } = await xata.sql`
@@ -123,12 +123,24 @@ async function defLgSeasSubCtx_noParams(): Promise<any> {
     const futRecs: any = p1.records[0];
     const pasRecs: any = p2.records[0];
 
+    console.log('defLgSeasSubCtx_noParams fut ', futRecs);
+    console.log('defLgSeasSubCtx_noParams pas ', pasRecs);
+
     const now = new Date().getTime();
-    const ret =
-        new Date(futRecs.time).getTime() - now <
-        now - new Date(pasRecs.time).getTime()
+    let ret = { league_id: 4534, season_id: 105035 };
+
+    if (futRecs && pasRecs) {
+        ret = new Date(futRecs.time || 0).getTime() - now <
+            now - new Date(pasRecs.time || 0).getTime()
             ? futRecs
             : pasRecs;
+    } else if (futRecs) {
+        ret = futRecs;
+    } else if (pasRecs) {
+        ret = pasRecs;
+    }
+
+    console.log('defLgSeasSubCtx_noParams r ', ret);
 
     const dlDoc = await getDataLakeDocument({
         namespace: `ldata-irweb`,
@@ -192,7 +204,7 @@ async function defLgSeasSubCtx_forLeague(league: string): Promise<any> {
         const now = new Date().getTime();
         ret =
             new Date(futRecs.time).getTime() - now <
-            now - new Date(pasRecs.time).getTime()
+                now - new Date(pasRecs.time).getTime()
                 ? futRecs
                 : pasRecs;
     }
@@ -263,7 +275,7 @@ async function defLgSeasSubCtx_forSeason(
         const now = new Date().getTime();
         ret =
             new Date(futRecs.time).getTime() - now <
-            now - new Date(pasRecs.time).getTime()
+                now - new Date(pasRecs.time).getTime()
                 ? futRecs
                 : pasRecs;
     }
@@ -355,7 +367,7 @@ async function defLgSeasSubCtx(
         } else {
             ret = await defLgSeasSubCtx_noParams();
         }
-    } catch (e) {}
+    } catch (e) { }
 
     return ret;
 }
