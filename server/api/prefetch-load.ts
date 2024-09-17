@@ -37,6 +37,8 @@ async function defLgSeasSubCtx(req: any): Promise<any> {
         userID: req.query.userID,
     };
 
+    console.log('defLgSeasSubCtx() ', JSON.stringify(q));
+
     const lgSeasSubCtx = await getDocument(q.namespace, q);
     req.query.league = lgSeasSubCtx.league_id;
     req.query.season = lgSeasSubCtx.season_id;
@@ -46,36 +48,45 @@ async function defLgSeasSubCtx(req: any): Promise<any> {
 }
 
 async function prefetch(req: any): Promise<any> {
-    const q: {
-        [name: string]: string | number;
-    } = req?.query || {};
+    try {
+        const q: {
+            [name: string]: string | number;
+        } = req?.query || {};
 
-    q.m = q?.m || '';
+        q.m = q?.m || '';
 
-    if (req?.user) {
-        q.userID = req?.user?.id;
+        if (req?.user) {
+            q.userID = req?.user?.id;
+        }
+
+        const ctxKey = `/api/fetch-document?namespace=ldata-usrcfg&type=defLgSeasSubCtx&league=${req?.query?.league || ''
+            }&season=${req?.query?.season || ''}&subsession=${req?.query?.subsession || ''
+            }`;
+
+        console.log('prefetch ctxKey: ', ctxKey);
+
+        const lgSeasSubCtx = await defLgSeasSubCtx(req);
+
+        console.log('prefetch lgSeasSubCtx: ', lgSeasSubCtx);
+
+        let r: any = {};
+
+        switch (q.m) {
+            case '':
+                r = await preFetchHome(q);
+        }
+
+        console.log('prefetch(): done');
+
+        r[ctxKey] = lgSeasSubCtx;
+
+
+        return { docs: r };
+    } catch (e) {
+        console.log('prefetch(): error');
     }
 
-    const ctxKey = `/api/fetch-document?namespace=ldata-usrcfg&type=defLgSeasSubCtx&league=${
-        req?.query?.league || ''
-    }&season=${req?.query?.season || ''}&subsession=${
-        req?.query?.subsession || ''
-    }`;
-
-    const lgSeasSubCtx = await defLgSeasSubCtx(req);
-
-    let r: any = {};
-
-    switch (q.m) {
-        case '':
-            r = await preFetchHome(q);
-    }
-
-    console.log('prefetch(): done');
-
-    r[ctxKey] = lgSeasSubCtx;
-
-    return { docs: r };
+    return { docs: {} };
 }
 
 async function preFetchHome(query: { [name: string]: string | number }) {

@@ -265,7 +265,7 @@ async function defLgSeasSubCtx_noParams(userID: string): Promise<any> {
     const now = new Date().getTime();
     const ret =
         new Date(futRecs?.time || now * 2).getTime() - now <
-        now - new Date(pasRecs?.time || 0).getTime()
+            now - new Date(pasRecs?.time || 0).getTime()
             ? futRecs
             : pasRecs;
 
@@ -334,7 +334,7 @@ async function defLgSeasSubCtx_forLeague(
         const now = new Date().getTime();
         ret =
             new Date(futRecs.time).getTime() - now <
-            now - new Date(pasRecs.time).getTime()
+                now - new Date(pasRecs.time).getTime()
                 ? futRecs
                 : pasRecs;
     }
@@ -364,7 +364,7 @@ async function defLgSeasSubCtx_forSeason(
     league: string,
     season: string
 ): Promise<any> {
-    console.log('defLgSeasSubCtx_forSeason()');
+    console.log(`defLgSeasSubCtx_forSeason(${userID}, ${league}, ${season})`);
 
     if ((await isValidSeason(season)) === 0) {
         return defLgSeasSubCtx_forLeague(userID, league);
@@ -397,6 +397,23 @@ async function defLgSeasSubCtx_forSeason(
     let ret: any = [];
 
     if (!futRecs && !pasRecs) {
+        const leagueSeasonSessions = await getDataLakeDocument({
+            namespace: `ldata-irweb`,
+            type: `leagueSeasonSessions`,
+            league: league,
+            season: season,
+        });
+
+        const subsessionIds = leagueSeasonSessions.sessions.filter((v: any) => v.subsession_id).map((v: any) => v.subsession_id);
+        const subsession = subsessionIds[subsessionIds.length - 1];
+        if (subsession) { // this happens when a new season has started but the calendar has not been set up
+            return {
+                league_id: league,
+                season_id: season,
+                subsession_id: subsession,
+            };
+        }
+
         return await defLgSeasSubCtx_forLeague(userID, league);
     } else if (!futRecs) {
         ret = pasRecs;
@@ -406,7 +423,7 @@ async function defLgSeasSubCtx_forSeason(
         const now = new Date().getTime();
         ret =
             new Date(futRecs.time).getTime() - now <
-            now - new Date(pasRecs.time).getTime()
+                now - new Date(pasRecs.time).getTime()
                 ? futRecs
                 : pasRecs;
     }
@@ -501,7 +518,7 @@ async function defLgSeasSubCtx(
         } else {
             ret = await defLgSeasSubCtx_noParams(userID);
         }
-    } catch (e) {}
+    } catch (e) { }
 
     return ret;
 }
