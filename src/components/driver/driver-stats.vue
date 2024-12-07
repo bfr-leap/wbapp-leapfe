@@ -55,7 +55,7 @@ const driverStatsModel: Ref<DriverStatsModel> =
             props.seasonId,
             props.leagueId,
         ]
-            .map((v) => v.toString)
+            .map((v) => v.toString())
             .join('-')}`,
         fetchModel,
         getDefaultDriverStatsModel,
