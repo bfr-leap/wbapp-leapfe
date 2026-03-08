@@ -23,6 +23,7 @@ export async function getDefaultLeagueSeason(user_id: string): Promise<any> {
 
 export async function userFeatures(user_id: string): Promise<any> {
     console.log('userFeatures(): ', user_id);
+    return [];
     const xata: XataClient = getXataClient();
 
     const ret = await xata.sql`
@@ -234,6 +235,11 @@ async function isValidLeague(league: string): Promise<boolean> {
 
 async function defLgSeasSubCtx_noParams(userID: string): Promise<any> {
     console.log('defLgSeasSubCtx_noParams()', `[${userID}]`);
+    return {
+        league_id: "0",
+        season_id: "0",
+        subsession_id: "0",
+    };
     const xata: XataClient = getXataClient();
 
     const q1 = xata.sql`
@@ -502,7 +508,7 @@ async function defLgSeasSubCtx(
 ): Promise<any> {
     console.log('defLgSeasSubCtx()', userID, league);
 
-    let ret = { league_id: '', season_id: '' };
+    let ret = { league_id: '4534', season_id: '111025' };
     try {
         if (subsession) {
             ret = await defLgSeasSubCtx_forSubsession(

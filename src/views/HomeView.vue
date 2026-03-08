@@ -41,9 +41,9 @@ interface LgSeasSubCtx {
 
 function getDefaultModel() {
     return {
-        league_id: 0,
-        season_id: 0,
-        subsession_id: 0,
+        league_id: 4534,
+        season_id: 111025,
+        subsession_id: 71222316,
         simsession_id: 0,
     };
 }
@@ -64,17 +64,17 @@ const lgSeasSubCtx: Ref<LgSeasSubCtx> =
 <template>
     <HomeView
         v-if="!route.query.m"
-        v-bind:league="lgSeasSubCtx.league_id.toString()"
-        v-bind:season="lgSeasSubCtx.season_id.toString()"
-        v-bind:subsession="lgSeasSubCtx.subsession_id.toString()"
+        v-bind:league="lgSeasSubCtx?.league_id?.toString()"
+        v-bind:season="lgSeasSubCtx?.season_id?.toString()"
+        v-bind:subsession="lgSeasSubCtx?.subsession_id?.toString()"
     >
     </HomeView>
     <ResultsView
         v-if="route.query.m === 'results'"
-        v-bind:league="lgSeasSubCtx.league_id.toString()"
-        v-bind:season="lgSeasSubCtx.season_id.toString()"
-        v-bind:subsession="lgSeasSubCtx.subsession_id.toString()"
-        v-bind:simsession="lgSeasSubCtx.simsession_id.toString()"
+        v-bind:league="lgSeasSubCtx.league_id?.toString()"
+        v-bind:season="lgSeasSubCtx.season_id?.toString()"
+        v-bind:subsession="lgSeasSubCtx.subsession_id?.toString()"
+        v-bind:simsession="lgSeasSubCtx.simsession_id?.toString()"
     ></ResultsView>
     <DriverStandingsView
         v-if="route.query.m === 'standings'"

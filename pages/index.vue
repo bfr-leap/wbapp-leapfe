@@ -30,7 +30,7 @@ if (import.meta.server) {
 }
 
 async function fetchModel() {
-    await preFetch(route.query);
+    //await preFetch(route.query);
     return await defLgSeasSubCtx(
         route.query.league as string,
         route.query.season as string,

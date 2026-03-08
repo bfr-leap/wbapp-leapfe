@@ -58,6 +58,8 @@ export async function getLeagueSeasonMenuModel(
                 display: season.season_name,
                 href: `?m=${targetPage}&league=${league}&season=${season.season_id}`,
             });
+        } else {
+            console.log('blocked ', season.season_id);
         }
     }
 

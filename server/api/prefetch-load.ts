@@ -1,6 +1,7 @@
 import { middleware as authMiddleware } from './middleware/_auth-user';
 import { getDocument } from '@@/lplib/dtbrkr/ftchdata';
 import { getQuery } from 'h3';
+import { watch } from 'vue';
 
 export default defineEventHandler(async (event) => {
     const req: any = event.node.req;
@@ -94,20 +95,20 @@ async function preFetchHome(query: { [name: string]: string | number }) {
     let season = query.season;
 
     let queries: { [name: string]: string | number }[] = [
-        { namespace: `ldata-usrcfg`, type: `activeLeagueSchedule` },
-        { namespace: `ldata-irweb`, type: `blockedSeasons` },
-        { namespace: `ldata-rsltsts`, type: `leagueDriverStats`, league },
-        {
-            namespace: `ldata-irweb`,
-            type: `leagueSeasonSessions`,
-            league,
-            season,
-        },
-        { namespace: `ldata-usrcfg`, type: `leagueTeamsInfo`, league },
-        { namespace: `ldata-rsltsts`, type: `leagueSimsessionIndex`, league },
-        { namespace: `ldata-irweb`, type: `leagueSeasons`, league },
-        { namespace: `ldata-irweb`, type: `membersData`, league, season },
-        { namespace: `ldata-usrcfg`, type: `trackDisplayInfo` },
+        /*   { namespace: `ldata-usrcfg`, type: `activeLeagueSchedule` },
+           { namespace: `ldata-irweb`, type: `blockedSeasons` },
+           { namespace: `ldata-rsltsts`, type: `leagueDriverStats`, league },
+           {
+               namespace: `ldata-irweb`,
+               type: `leagueSeasonSessions`,
+               league,
+               season,
+           },
+           { namespace: `ldata-usrcfg`, type: `leagueTeamsInfo`, league },
+           { namespace: `ldata-rsltsts`, type: `leagueSimsessionIndex`, league },
+           { namespace: `ldata-irweb`, type: `leagueSeasons`, league },
+           { namespace: `ldata-irweb`, type: `membersData`, league, season },
+           { namespace: `ldata-usrcfg`, type: `trackDisplayInfo` },*/
     ];
 
     let urlKeys = [
@@ -125,6 +126,8 @@ async function preFetchHome(query: { [name: string]: string | number }) {
     const hc = await Promise.all(
         queries.map((q) => getDocument(q.namespace.toString(), q))
     );
+
+
 
     let r: { [namea: string]: any } = {};
 

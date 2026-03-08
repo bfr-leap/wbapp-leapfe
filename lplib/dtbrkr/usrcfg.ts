@@ -4,6 +4,7 @@ import { getXataClient, XataClient } from './xata';
 
 async function getLeagueTeamsInfo(league: string): Promise<any> {
     console.log('getLeagueTeamsInfo(): [', league, ']');
+    return { leageu_id: Number.parseInt(league, 10), seasons: []};
     const xata = getXataClient();
 
     const { records } = await xata.sql`
@@ -47,11 +48,17 @@ async function getLeagueTeamsInfo(league: string): Promise<any> {
 }
 
 async function getTrackDisplayInfo(): Promise<any> {
-    console.log('getTrackDisplayInfo():');
+    console.log('getTrackDisplayInfo(): dbg');
+    console.log('early return');
+    return {};
     const xata = getXataClient();
+    console.log('got client');
+    return {};
     const records = await xata.sql`
         SELECT "display_name", "short_name", "track_id" 
         FROM "tracks"`;
+
+    console.log('back from query');
 
     const ret: any = {};
     for (let t of <any>records.records) {
@@ -60,6 +67,8 @@ async function getTrackDisplayInfo(): Promise<any> {
             short_display: t.short_name,
         };
     }
+
+    console.log('returning');
 
     return ret;
 }
@@ -70,6 +79,8 @@ async function isValidSeason(season: string): Promise<number> {
     if (isNaN(season_id)) {
         return 0;
     }
+
+    return 1;
 
     const xata: XataClient = getXataClient();
 
@@ -82,6 +93,7 @@ async function isValidSeason(season: string): Promise<number> {
 }
 
 async function isValidLeague(league: string): Promise<boolean> {
+    return true;
     const league_id = Number.parseInt(league, 10);
     if (isNaN(league_id)) {
         return false;
@@ -99,6 +111,8 @@ async function isValidLeague(league: string): Promise<boolean> {
 
 async function defLgSeasSubCtx_noParams(): Promise<any> {
     console.log('defLgSeasSubCtx_noParams()');
+    let ret = { league_id: 4534, season_id: 105035 };
+    return ret;
     const xata: XataClient = getXataClient();
 
     const q1 = xata.sql`
@@ -127,7 +141,6 @@ async function defLgSeasSubCtx_noParams(): Promise<any> {
     console.log('defLgSeasSubCtx_noParams pas ', pasRecs);
 
     const now = new Date().getTime();
-    let ret = { league_id: 4534, season_id: 105035 };
 
     if (futRecs && pasRecs) {
         ret = new Date(futRecs.time || 0).getTime() - now <
@@ -169,7 +182,10 @@ async function defLgSeasSubCtx_forLeague(league: string): Promise<any> {
     if ((await isValidLeague(league)) === false) {
         return defLgSeasSubCtx_noParams();
     }
-
+    
+    let ret = { league_id: 4534, season_id: 105035 };
+    return ret;
+/*
     const q1 = xata.sql`
         SELECT "seasons"."league_id", "seasons"."season_id", "time", ("time" - ${new Date()}) as  "delta"
         FROM "sched_subsessions"
@@ -226,7 +242,7 @@ async function defLgSeasSubCtx_forLeague(league: string): Promise<any> {
         league_id: ret.league_id,
         season_id: ret.season_id,
         subsession_id: ret.subsession_id,
-    };
+    };*/
 }
 
 async function defLgSeasSubCtx_forSeason(
@@ -239,6 +255,9 @@ async function defLgSeasSubCtx_forSeason(
         return defLgSeasSubCtx_forLeague(league);
     }
 
+    let ret = { league_id: league, season_id: season};
+    return ret;
+/*
     const xata: XataClient = getXataClient();
 
     const q1 = xata.sql`
@@ -298,6 +317,7 @@ async function defLgSeasSubCtx_forSeason(
         season_id: ret.season_id,
         subsession_id: ret.subsession_id,
     };
+        */
 }
 
 async function defLgSeasSubCtx_forSubsession(
@@ -352,7 +372,7 @@ async function defLgSeasSubCtx(
 ): Promise<any> {
     console.log('defLgSeasSubCtx()', league);
 
-    let ret = { league_id: '', season_id: '' };
+    let ret = { league_id: 4534, season_id: 105035 };
     try {
         if (subsession) {
             ret = await defLgSeasSubCtx_forSubsession(
@@ -368,6 +388,8 @@ async function defLgSeasSubCtx(
             ret = await defLgSeasSubCtx_noParams();
         }
     } catch (e) { }
+
+    console.log(JSON.stringify(ret));
 
     return ret;
 }
@@ -399,6 +421,8 @@ export async function userConfigHandler(
             );
             break;
     }
+
+    console.log('returning document userConfigHandler()');
 
     return doc;
 }
