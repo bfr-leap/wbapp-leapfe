@@ -4,6 +4,7 @@ export async function getActiveLeagueSchedule(
     incJournalist: boolean = false
 ): Promise<any> {
     console.log('getActiveLeagueSchedule():');
+    return {leagues:[]};
 
     const xata = getXataClient();
 
