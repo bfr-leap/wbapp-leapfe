@@ -23,6 +23,8 @@ async function track() {
         mixpanel.track(route.query.m?.toString() || 'home', route.query);
     }
 
+	console.log("from route", route.query.subsession as string);
+
     const def: any = await defLgSeasSubCtx(
         route.query.league as string,
         route.query.season as string,
@@ -30,6 +32,8 @@ async function track() {
     );
 
     def.simsession_id = (route.query.simsession as string) || '';
+
+	console.log("loaded model", JSON.stringify(def));
 
     return def;
 }
