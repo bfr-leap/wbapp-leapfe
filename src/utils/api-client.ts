@@ -1,0 +1,192 @@
+/**
+ * Core API client — handles HTTP fetching, auth, and response caching.
+ *
+ * All data fetching in the app flows through this module.
+ * Service modules (src/services/) use these primitives to build
+ * domain-specific data accessors.
+ */
+
+const DEBUG_PREFETCH = false;
+
+let API_BASE_URL = '';
+export function setApiBaseURL(url: string) {
+    API_BASE_URL = url;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let _auth: any = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function setAuth(auth: any) {
+    _auth = auth;
+}
+
+let _token: string = '';
+export function setToken(token: string) {
+    _token = token;
+}
+
+// ---------------------------------------------------------------------------
+// Low-level fetch
+// ---------------------------------------------------------------------------
+
+async function fetchObjects(urls: string[]): Promise<unknown[]> {
+    try {
+        if (!urls || urls.length === 0) {
+            throw new Error('No URLs provided');
+        }
+
+        let url = urls[0];
+
+        let token: string = '';
+
+        if (import.meta.server) {
+            token = _token;
+            url = API_BASE_URL + url;
+        } else {
+            token = _auth?.getToken
+                ? await _auth.getToken.value()
+                : null;
+        }
+
+        const response = await fetch(url, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!response.ok) {
+            throw new Error(
+                `Failed to fetch ${url}: ${response.statusText}`
+            );
+        }
+
+        const obj = await response.json();
+        return [obj];
+    } catch (e) {
+        console.error('Error fetching object:', e);
+        return [null];
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Cache layer
+// ---------------------------------------------------------------------------
+
+type CacheStorage = {
+    [name: string]: Promise<unknown[]>;
+};
+let _cacheStorage: CacheStorage = {};
+
+/** Exposed for testing — clears the in-memory cache. */
+export function clearCache() {
+    _cacheStorage = {};
+}
+
+export function prepUrl(args: {
+    [name: string]: string | number;
+}): string {
+    let ret = [];
+    let keys = Object.keys(args);
+    for (let key of keys) {
+        ret.push(`${key}=${args[key]}`);
+    }
+    return `/api/fetch-document?${ret.join('&')}`;
+}
+
+// ---------------------------------------------------------------------------
+// Prefetch
+// ---------------------------------------------------------------------------
+
+let _prefetchPromise: Promise<unknown> | null = null;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function toPromise(v: any): Promise<unknown[]> {
+    return v;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function preFetch(args: any) {
+    if (DEBUG_PREFETCH) {
+        console.log('preFetch() start');
+    }
+
+    if (_prefetchPromise) {
+        if (DEBUG_PREFETCH) {
+            console.log('preFetch() skip');
+        }
+        await _prefetchPromise;
+        return;
+    }
+
+    args.league = args.league || '';
+    args.season = args.season || '';
+    args.subsession = args.subsession || '';
+
+    let keys = Object.keys(args);
+    let argv = keys.map((v: string) => `${v}=${args[v]}`);
+
+    let url = `/api/prefetch-load/?${argv.join('&')}`;
+
+    let p = fetchObjects([url]);
+
+    _prefetchPromise = p;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let x = (await p)[0] as any;
+
+    _prefetchPromise = null;
+
+    keys = Object.keys(x?.docs || {});
+    for (let key of keys) {
+        if (x.docs[key]) {
+            _cacheStorage[key] = toPromise([{ doc: x.docs[key] }]);
+        }
+    }
+    if (DEBUG_PREFETCH) {
+        console.log('preFetch() done');
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Cached document fetcher — the primary data access primitive
+// ---------------------------------------------------------------------------
+
+export async function fetchCachedDocument<T>(args: {
+    [name: string]: string | number;
+}): Promise<T | null> {
+    if (_prefetchPromise) {
+        await _prefetchPromise;
+    }
+
+    let source: string = prepUrl(args);
+    let p = _cacheStorage[source];
+
+    if (!p) {
+        if (DEBUG_PREFETCH) {
+            console.log('looking for: ', source);
+        }
+
+        p = fetchObjects([source]);
+        _cacheStorage[source] = p;
+    }
+
+    let a = await p;
+    let result = a[0];
+    if (result) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return (JSON.parse(JSON.stringify(result)) as any).doc as T;
+    }
+    return null;
+}
+
+/**
+ * Fetch without caching — used for mutations and user-specific state
+ * that should not be cached in the shared document cache.
+ */
+export async function fetchUncached(args: {
+    [name: string]: string | number;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+}): Promise<any> {
+    let source: string = prepUrl(args);
+    let ret = await fetchObjects([source]);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (ret[0] as any)?.doc;
+}
