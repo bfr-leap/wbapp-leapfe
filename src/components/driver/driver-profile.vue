@@ -15,7 +15,9 @@ const props = defineProps<{
 }>();
 
 async function fetchModelData() {
-    return await getDriverProfileModel(props.league, props.driver);
+    let ret = await getDriverProfileModel(props.league, props.driver);
+	console.log(ret);
+	return ret;
 }
 
 const driverId = computed(() => Number.parseInt(props.driver));
@@ -69,6 +71,7 @@ const driverProfileModel: Ref<DriverProfileModel> =
             />
         </div>
     </div>
+	<!--
     <template v-for="season in driverProfileModel.leagueSeasons?.seasons">
         <template
             v-if="
@@ -93,7 +96,7 @@ const driverProfileModel: Ref<DriverProfileModel> =
                 </div>
             </div>
         </template>
-    </template>
+	</template>-->
 </template>
 
 <style scoped>

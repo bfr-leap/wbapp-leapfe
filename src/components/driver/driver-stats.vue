@@ -77,7 +77,7 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
             class="link-light"
             v-if="props.seasonId"
             :to="`/?m=standings&league=${props.leagueId}&season=${props.seasonId}`"
-            >{{ props.seasonName }}</RouterLinkProxy
+            >{{ props.seasonName+" "+props.seasonId }}</RouterLinkProxy
         >
         <span v-else>{{ driverStatsModel.seasonName }}</span>
     </div>
