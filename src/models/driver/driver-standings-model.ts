@@ -157,6 +157,7 @@ export async function getDriverStandingsModel(
             ...memberView,
             showStats: false,
             custId: member.cust_id.toString(),
+            clubId: member.club_id,
             stats: {
                 started: -1,
                 poles: -1,
