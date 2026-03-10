@@ -6,6 +6,7 @@ import {
     getTelemetrySubsessionIds,
     getGeneratedSimsessionSummary,
 } from '@@/src/utils/fetch-util';
+import MarkdownIt from 'markdown-it';
 
 export interface ResultsModel {
     hasTelemetry: boolean;
@@ -120,10 +121,8 @@ export async function getResultsModel(
     );
 
     if (simsessionSummary) {
-        let texta = simsessionSummary.text.split('\n');
-        for (let t of texta) {
-            ret.summary.push(t);
-        }
+        const md = new MarkdownIt();
+        ret.summary = [md.render(simsessionSummary.text)];
     }
 
     let trackId: string = '-1';

@@ -3,6 +3,7 @@ import type { AuthObject } from '@clerk/backend/internal';
 import { dark } from '@clerk/themes';
 import { createPinia } from 'pinia';
 import { useRuntimeConfig } from '#app';
+import mixpanel from 'mixpanel-browser';
 
 export default defineNuxtPlugin(async (nuxtApp) => {
     const config = useRuntimeConfig();
@@ -31,6 +32,12 @@ export default defineNuxtPlugin(async (nuxtApp) => {
     });
 
     nuxtApp.vueApp.use(createPinia());
+
+    if (!import.meta.server) {
+        // Enabling the debug mode flag is useful during implementation,
+        // but it's recommended you remove it for production
+        mixpanel.init('ef54b5309bb2ad867ef01d2ddc3f1206', { debug: false });
+    }
 });
 
 function pruneUnserializableFields(authContext: AuthObject) {

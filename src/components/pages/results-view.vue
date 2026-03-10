@@ -72,12 +72,11 @@ const resultsModel: Ref<ResultsModel> =
 
         <div
             v-if="resultsModel.summary.length > 0"
-            class="card bg-dark text-light m-2"
-        >
+            class="card bg-dark text-light m-2">
             <div class="card-body p-2">
-                <p v-for="p of resultsModel.summary">
-                    {{ p }}
-                </p>
+                <div class="container">
+                    <div v-html="resultsModel.summary[0]"></div>
+                </div>
             </div>
         </div>
         <div class="card bg-dark text-light m-2">
@@ -106,7 +105,7 @@ const resultsModel: Ref<ResultsModel> =
             class="card bg-dark text-light m-2"
         >
             <div class="card-body p-2">
-                <div class="container">
+                <!-- <div class="container"> -->
                     <div class="row">
                         <div>Cumulative Delta</div>
                     </div>
@@ -117,7 +116,7 @@ const resultsModel: Ref<ResultsModel> =
                             v-bind:simsession="resultsModel.simsessionId"
                         />
                     </div>
-                </div>
+                <!-- </div> -->
             </div>
         </div>
 
@@ -129,7 +128,7 @@ const resultsModel: Ref<ResultsModel> =
             class="card bg-dark text-light m-2"
         >
             <div class="card-body p-2">
-                <div class="container">
+                <!-- <div class="container"> -->
                     <div class="row">
                         <StartFinishChart
                             v-bind:league="resultsModel.leagueId"
@@ -137,7 +136,7 @@ const resultsModel: Ref<ResultsModel> =
                             v-bind:simsession="resultsModel.simsessionId"
                         />
                     </div>
-                </div>
+                <!-- </div> -->
             </div>
         </div>
 
