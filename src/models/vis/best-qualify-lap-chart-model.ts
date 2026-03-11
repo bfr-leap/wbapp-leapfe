@@ -9,7 +9,7 @@ export interface BestQualifyLapChartModel {
 }
 
 export function getDefaultBestQualifyLapChartModel(): BestQualifyLapChartModel {
-    return JSON.parse(JSON.stringify({ lapTimes: [] }));
+    return { lapTimes: [] };
 }
 
 export async function getBestQualifyLapChartModel(

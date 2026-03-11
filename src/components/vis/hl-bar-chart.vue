@@ -57,7 +57,7 @@ function gettHLBarChartModel(
 ): HLBarChartModel {
     let ret = getDefaultHLBarChartModel();
 
-    data = JSON.parse(JSON.stringify(data));
+    data = structuredClone(data);
     ret.width = width;
     ret.height = height;
     ret.innerHeight = ret.height - ret.margin_top - ret.margin_bottom;

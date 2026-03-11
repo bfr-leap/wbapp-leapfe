@@ -58,7 +58,7 @@ function getBarChartModel(
 ): BarChartModel {
     let ret = getDefaultBarChartModel();
 
-    data = JSON.parse(JSON.stringify(data));
+    data = structuredClone(data);
 
     ret.height = height;
     ret.width = width;

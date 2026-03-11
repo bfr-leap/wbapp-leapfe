@@ -18,7 +18,7 @@ let userProfileModel: Ref<UserProfileModel> = ref(getDefaultUserProfileModel());
 
 let forms = reactive({ custId: '', verificationNum: '' });
 
-async function fectchModel() {
+async function fetchModel() {
     userProfileModel.value = await getUserProfileModel();
     forms.custId = userProfileModel.value.irCustId;
 }
@@ -37,8 +37,8 @@ async function onSubmitVerificationNum(event: MouseEvent) {
     );
 }
 
-watchEffect(fectchModel);
-watch(route, fectchModel);
+watchEffect(fetchModel);
+watch(route, fetchModel);
 </script>
 <template>
     <SignedOut>

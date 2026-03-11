@@ -17,14 +17,12 @@ type LeagueCardSelectorModel = {
 }[];
 
 export function getDefaultLeagueCardSelectorModel(): LeagueCardSelectorModel {
-    return JSON.parse(
-        JSON.stringify([
-            { isActive: false, name: 'iGP', leagueID: 637 },
-            { isActive: false, name: 'iFL', leagueID: 6555 },
-            { isActive: false, name: 'J2iCS', leagueID: 3630 },
-            { isActive: false, name: 'LZ', leagueID: 4534 },
-        ])
-    );
+    return [
+        { isActive: false, name: 'iGP', leagueID: 637 },
+        { isActive: false, name: 'iFL', leagueID: 6555 },
+        { isActive: false, name: 'J2iCS', leagueID: 3630 },
+        { isActive: false, name: 'LZ', leagueID: 4534 },
+    ];
 }
 
 const _knownLeagues = [

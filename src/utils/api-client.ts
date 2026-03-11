@@ -180,10 +180,8 @@ export async function fetchCachedDocument<T>(args: {
     let a = await p;
     let result = a[0];
     if (result) {
-        const parsed = JSON.parse(JSON.stringify(result)) as {
-            doc: T;
-        };
-        return parsed.doc;
+        const parsed = result as { doc: T };
+        return structuredClone(parsed.doc);
     }
     return null;
 }

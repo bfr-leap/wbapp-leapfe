@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref, watch, watchEffect } from 'vue';
 import GenericTable from '../vis/generic-table.vue';
 import {
     getRosterModel,
@@ -11,14 +10,9 @@ const props = defineProps<{
     league: string;
 }>();
 
-// const model = ref<LeagueRosterModel>(getDefaultRosterModel());
-
 async function fetchModel() {
     return await getRosterModel(props.league);
 }
-
-// watchEffect(fetchModel);
-// watch(props, fetchModel);
 
 const model: Ref<LeagueRosterModel> =
     await asyncDataWithReactiveModel<LeagueRosterModel>(

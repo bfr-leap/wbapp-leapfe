@@ -32,7 +32,6 @@ async function fetchModel() {
 }
 
 async function onRemove(event: CdrAdminEvent) {
-    console.log('todo');
     cdrAdminModel.value = await deleteSchedEvent(
         cdrAdminModel.value,
         event.eventId
@@ -40,19 +39,15 @@ async function onRemove(event: CdrAdminEvent) {
 }
 
 function onEdit(event: CdrAdminEvent) {
-    console.log('todo');
     isAdding.value = false;
     forms.time = event.time.toString();
     forms.track = event.trackDisplayName;
     forms.defaultTrack = event.trackDisplayName;
 
     currentEvent = event;
-
-    console.log(event);
 }
 
 function onAdd() {
-    console.log('todo');
     isAdding.value = true;
 
     forms.time = new Date(

@@ -25,7 +25,7 @@ interface DriverResultsModel {
 }
 
 function getDefaultDriverResultsModel(): DriverResultsModel {
-    return JSON.parse(JSON.stringify({ race: {}, sprint: {}, quali: {} }));
+    return { race: {}, sprint: {}, quali: {} };
 }
 
 interface MemberView {
@@ -50,35 +50,25 @@ export interface DriverProfileModel {
 }
 
 export function getDefaultDriverProfileModel(): DriverProfileModel {
-    return JSON.parse(
-        JSON.stringify({
-            singleMemberData: null,
-            leagueSeasons: null,
-            teamsInfo: null,
-            driverStatsMap: null,
-            driverResults: getDefaultDriverResultsModel(),
-            allTimeResults: getDefaultDriverResultsModel(),
-            memberView: {
-                clubId: 0,
-                lastName: '---',
-                firstName: '---',
-                iRating: '---',
-                licenseLevel: '',
-                safetyRating: '---',
-                teamName: '---',
-                teamId: 0,
-            },
-        })
-    );
+    return {
+        singleMemberData: null,
+        leagueSeasons: null,
+        teamsInfo: null,
+        driverStatsMap: null,
+        driverResults: getDefaultDriverResultsModel(),
+        allTimeResults: getDefaultDriverResultsModel(),
+        memberView: {
+            clubId: 0,
+            lastName: '---',
+            firstName: '---',
+            iRating: '---',
+            licenseLevel: '',
+            safetyRating: '---',
+            teamName: '---',
+            teamId: 0,
+        },
+    };
 }
-
-const memberView = computed(() => {
-    return getMemberViewFromM_Member(
-        driverProfileModel?.value?.singleMemberData,
-        {},
-        {}
-    );
-});
 
 function calculateAllTimeResults(
     inDriverResults: DriverResults
