@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted, nextTick, toRaw } from 'vue';
 import { MurmurHashV2 } from '@@/src/utils/hash-util';
 import * as d3 from 'd3';
 
@@ -57,7 +57,7 @@ function gettHLBarChartModel(
 ): HLBarChartModel {
     let ret = getDefaultHLBarChartModel();
 
-    data = structuredClone(data);
+    data = structuredClone(toRaw(data));
     ret.width = width;
     ret.height = height;
     ret.innerHeight = ret.height - ret.margin_top - ret.margin_bottom;

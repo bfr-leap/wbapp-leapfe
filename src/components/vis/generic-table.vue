@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Ref } from 'vue';
+import { type Ref, toRaw } from 'vue';
 import type { GenericTableModel } from '@@/src/models/vis/generic-table-model';
 import {
     getDefaultGenericTableModel,
@@ -18,7 +18,7 @@ const props = defineProps<{
 async function fetchModel() {
     return await getGenericTableModel(
         props.title,
-        props.rows,
+        toRaw(props.rows),
         props.leagueId,
         props.seasonId
     );
