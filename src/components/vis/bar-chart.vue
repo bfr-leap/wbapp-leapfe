@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted, nextTick, toRaw } from 'vue';
 import type { BarChartDatum } from '@@/src/models/vis/bar-chart-model';
 import { MurmurHashV2 } from '@@/src/utils/hash-util';
 import * as d3 from 'd3';
@@ -58,7 +58,7 @@ function getBarChartModel(
 ): BarChartModel {
     let ret = getDefaultBarChartModel();
 
-    data = structuredClone(data);
+    data = structuredClone(toRaw(data));
 
     ret.height = height;
     ret.width = width;
