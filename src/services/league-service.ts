@@ -164,22 +164,42 @@ export async function getCuratedActiveLeagueSchedule(): Promise<ActiveLeagueSche
     });
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function getLeagueRoster(league: string): Promise<any> {
+export interface LeagueRoster {
+    roster: {
+        cust_id: number;
+        car_number: string;
+        display_name: string;
+        [key: string]: unknown;
+    }[];
+}
+
+export async function getLeagueRoster(
+    league: string
+): Promise<LeagueRoster | null> {
     const namespace = 'ldata-irweb';
     const type = 'leagueRoster';
-    return await fetchCachedDocument({ namespace, type, league });
+    return await fetchCachedDocument<LeagueRoster>({
+        namespace,
+        type,
+        league,
+    });
+}
+
+export interface DefaultLeagueContext {
+    league_id: number;
+    season_id: number;
+    subsession_id: number;
+    [key: string]: unknown;
 }
 
 export async function defLgSeasSubCtx(
     league: string = '',
     season: string = '',
     subsession: string = ''
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): Promise<any> {
+): Promise<DefaultLeagueContext | null> {
     const namespace = 'ldata-usrcfg';
     const type = 'defLgSeasSubCtx';
-    return await fetchCachedDocument({
+    return await fetchCachedDocument<DefaultLeagueContext>({
         namespace,
         type,
         league,

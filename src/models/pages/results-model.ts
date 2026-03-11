@@ -1,4 +1,8 @@
-import type { SeasonSimsessionIndex } from 'lplib/endpoint-types/iracing-endpoints';
+import type {
+    SeasonSimsessionIndex,
+    SSI_Session,
+    SSI_Simsession,
+} from 'lplib/endpoint-types/iracing-endpoints';
 import {
     getLeagueSimsessionIndex,
     getLeagueSeasonSessions,
@@ -81,7 +85,7 @@ export async function getResultsModel(
     }
 
     let selectedSubsession = selectedSeason?.sessions?.find(
-        (s: any) => s?.subsession_id?.toString() === subsessionId
+        (s: SSI_Session) => s?.subsession_id?.toString() === subsessionId
     );
 
     let i = (selectedSeason?.sessions?.length || 0) - 1;
@@ -96,7 +100,7 @@ export async function getResultsModel(
     }
 
     let selectedSimsession = selectedSubsession?.simsessions.find(
-        (s: any) => s.simsession_id.toString() === simsessionId
+        (s: SSI_Simsession) => s.simsession_id.toString() === simsessionId
     );
 
     if (!selectedSimsession) {
@@ -145,20 +149,19 @@ export async function getResultsModel(
         simsessionId
     );
 
-    ret.results = <any>simsessionResults?.results.map((row) => {
-        let r: { [name: string]: any } =
-            {
-                pos: row.position,
-                cust_id: row.cust_id,
-                fastest_lap: row.fastest_lap_time,
-                pace_percent:
-                    row.pace_percent || row.pace_percent === 0
-                        ? row.pace_percent + '%'
-                        : '',
-                fast_lap: row.fast_lap,
-                laps: row.laps_completed,
-                inc: row.incidents,
-            } || [];
+    ret.results = (simsessionResults?.results || []).map((row) => {
+        let r: { [name: string]: string | number } = {
+            pos: row.position,
+            cust_id: row.cust_id,
+            fastest_lap: row.fastest_lap_time,
+            pace_percent:
+                row.pace_percent || row.pace_percent === 0
+                    ? row.pace_percent + '%'
+                    : '',
+            fast_lap: row.fast_lap,
+            laps: row.laps_completed,
+            inc: row.incidents,
+        };
 
         if (
             selectedSimsession?.type === 'race' ||

@@ -65,7 +65,9 @@ export async function getTeamProfileModel(
                 driverStatsMap[parseInt(season)]?.[parseInt(driverId)];
 
             for (let statKey of Object.keys(ret.stats)) {
-                (<any>ret.stats)[statKey] += (<any>statRow)?.[statKey] || 0;
+                const key = statKey as keyof DriverStats;
+                (ret.stats[key] as number) +=
+                    (statRow?.[key] as number) || 0;
             }
         }
     }

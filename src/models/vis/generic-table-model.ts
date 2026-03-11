@@ -112,7 +112,7 @@ function formatHeader(name: string): string {
         return 'driver';
     }
 
-    name = <string>(<any>name).replaceAll('_', ' ');
+    name = name.replaceAll('_', ' ');
 
     return name;
 }

@@ -29,11 +29,11 @@ function getDefaultDriverResultsModel(): DriverResultsModel {
 }
 
 interface MemberView {
-    clubId: any;
+    clubId: number;
     lastName: string;
     firstName: string;
     iRating: string;
-    licenseLevel: any;
+    licenseLevel: string;
     safetyRating: string;
     teamName: string;
     teamId: number;

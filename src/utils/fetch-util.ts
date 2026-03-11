@@ -67,6 +67,10 @@ export {
     getUserFeatures,
 } from '@@/src/services/user-service';
 export type { IrLinkState } from '@@/src/services/user-service';
+export type {
+    LeagueRoster,
+    DefaultLeagueContext,
+} from '@@/src/services/league-service';
 
 // Admin service
 export {
