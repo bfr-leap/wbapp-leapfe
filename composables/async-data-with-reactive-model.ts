@@ -114,8 +114,12 @@ export async function asyncDataWithReactiveModelResult<T>(
     diag(dataKey, 'init', {
         hasData: model.value != null,
         error: error.value?.message ?? null,
-        obs: observables.map((o) =>
-            typeof o === 'function' ? (o as () => unknown)() : '(ref)'
+        obs: JSON.stringify(
+            observables.map((o) =>
+                typeof o === 'function'
+                    ? (o as () => unknown)()
+                    : '(ref)'
+            )
         ),
     });
 
@@ -135,30 +139,38 @@ export async function asyncDataWithReactiveModelResult<T>(
         }
     });
 
-    // Resolve observable values for logging
-    function obsValues(): unknown[] {
-        return observables.map((o) =>
-            typeof o === 'function' ? (o as () => unknown)() : o
-        );
+    // Resolve observable values for logging (as JSON string)
+    function obsStr(): string {
+        try {
+            return JSON.stringify(
+                observables.map((o) =>
+                    typeof o === 'function'
+                        ? (o as () => unknown)()
+                        : '(ref)'
+                )
+            );
+        } catch {
+            return '(serialize-err)';
+        }
     }
 
     // Watch for prop changes and refetch data accordingly
     watch(observables, async (_newVal, _oldVal) => {
-        const guard = {
-            hasValue: !!modelRef?.value,
-            refReady,
-            obs: obsValues(),
-        };
+        const ov = obsStr();
         if (modelRef?.value && refReady) {
-            diag(dataKey, 'watch-START', guard);
+            diag(dataKey, 'watch-START', ov);
             pendingRef.value = true;
             errorRef.value = null;
             model.value = (await safeFetch()) as T;
             modelRef.value = model.value as T;
             pendingRef.value = false;
-            diag(dataKey, 'watch-DONE');
+            diag(dataKey, 'watch-DONE', ov);
         } else {
-            diag(dataKey, 'watch-SKIP', guard);
+            diag(dataKey, 'watch-SKIP', {
+                hasValue: !!modelRef?.value,
+                refReady,
+                obs: ov,
+            });
         }
     });
 
