@@ -72,6 +72,7 @@ function onClick(eventInfo: { trackId: string; date: string }) {
 <template>
     <LeagueSeasonMenu
         v-if="homeModel.leagueId && homeModel.seasonId"
+        :key="`lsm-${homeModel.leagueId}-${homeModel.seasonId}`"
         target-page=""
         v-bind:league="homeModel.leagueId"
         v-bind:season="homeModel.seasonId"
@@ -162,6 +163,7 @@ function onClick(eventInfo: { trackId: string; date: string }) {
 
     <DriverStandings
         v-if="homeModel.seasonId && homeModel.leagueId"
+        :key="`ds-${homeModel.leagueId}-${homeModel.seasonId}`"
         summary_mode
         v-bind:season="homeModel.seasonId"
         v-bind:league="homeModel.leagueId"
