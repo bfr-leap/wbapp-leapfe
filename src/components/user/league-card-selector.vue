@@ -7,20 +7,24 @@ import {
     getLeagueCardSelectorModel,
     saveLeagueCardSelectorModel,
 } from '@@/src/models/user/league-card-selector-model';
+import type { LeagueCardSelectorEntry } from '@@/src/models/user/league-card-selector-model';
+import { getBootstrapModal } from '@@/src/utils/bootstrap-utils';
 
 const route = useRoute();
 
 let forms = reactive({ newLeague: '' });
 
-let leagueSelection: Ref<any> = ref(getDefaultLeagueCardSelectorModel());
+let leagueSelection: Ref<LeagueCardSelectorEntry[]> = ref(
+    getDefaultLeagueCardSelectorModel()
+);
 
 async function saveState() {
     await saveLeagueCardSelectorModel(leagueSelection.value);
 }
 
-let _saveTimeout: any = 0;
+let _saveTimeout: ReturnType<typeof setTimeout> | 0 = 0;
 
-function onClick(league: any) {
+function onClick(league: LeagueCardSelectorEntry) {
     league.isActive = !league.isActive;
 
     if (_saveTimeout) {
@@ -31,13 +35,13 @@ function onClick(league: any) {
 
 function onAddLeagueBtn() {
     let i = leagueSelection.value
-        .map((m: any) => m.name)
+        .map((m) => m.name)
         .indexOf(forms.newLeague);
     if (i < 0) return;
 
     var myModalEl = document.getElementById('exampleModal');
-    var modal = (<any>global).bootstrap.Modal.getInstance(myModalEl);
-    modal.hide();
+    var modal = getBootstrapModal(myModalEl);
+    modal?.hide();
     forms.newLeague = '';
 
     let league = leagueSelection.value[i];
@@ -66,7 +70,7 @@ watch(route, fetchModel);
 
             <tbody>
                 <tr
-                    v-for="league in leagueSelection.filter((l: any) => l.isActive)"
+                    v-for="league in leagueSelection.filter((l) => l.isActive)"
                 >
                     <td>❏</td>
                     <td>{{ league.name }}</td>
@@ -138,7 +142,7 @@ watch(route, fetchModel);
                             <datalist id="datalistOptions">
                                 <option
                                     v-for="league in leagueSelection.filter(
-                                    (l: any) => !l.isActive
+                                    (l) => !l.isActive
                                 )"
                                     v-bind:value="league.name"
                                 ></option>
@@ -157,7 +161,7 @@ watch(route, fetchModel);
                     <button
                         type="button"
                         v-bind:class="leagueSelection
-                        .map((m: any) => m.name)
+                        .map((m) => m.name)
                         .indexOf(forms.newLeague) > -1
                         ? 'btn btn-primary'
                         : 'btn btn-primary disabled'

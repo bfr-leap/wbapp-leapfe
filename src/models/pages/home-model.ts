@@ -15,18 +15,16 @@ export interface HomeModel {
 }
 
 export function getDefaultHomeModel(): HomeModel {
-    return JSON.parse(
-        JSON.stringify({
-            leagueName: '----',
-            nextRace: { trackId: '0', date: '', isSelected: false },
-            selectedRace: { trackId: '0', date: '', isSelected: false },
-            futureRaces: [],
-            leagueId: '',
-            seasonId: '',
-            carId: '',
-            allowEditCalendar: false,
-        })
-    );
+    return {
+        leagueName: '----',
+        nextRace: { trackId: '0', date: '', isSelected: false },
+        selectedRace: { trackId: '0', date: '', isSelected: false },
+        futureRaces: [],
+        leagueId: '',
+        seasonId: '',
+        carId: '',
+        allowEditCalendar: false,
+    };
 }
 
 export async function getHomeModel(

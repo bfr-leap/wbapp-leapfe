@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, reactive, watch, watchEffect } from 'vue';
 import type { Ref } from 'vue';
+import { getBootstrapModal } from '@@/src/utils/bootstrap-utils';
 
 import {
     getDefaultCdrAdminModel,
@@ -31,7 +32,6 @@ async function fetchModel() {
 }
 
 async function onRemove(event: CdrAdminEvent) {
-    console.log('todo');
     cdrAdminModel.value = await deleteSchedEvent(
         cdrAdminModel.value,
         event.eventId
@@ -39,19 +39,15 @@ async function onRemove(event: CdrAdminEvent) {
 }
 
 function onEdit(event: CdrAdminEvent) {
-    console.log('todo');
     isAdding.value = false;
     forms.time = event.time.toString();
     forms.track = event.trackDisplayName;
     forms.defaultTrack = event.trackDisplayName;
 
     currentEvent = event;
-
-    console.log(event);
 }
 
 function onAdd() {
-    console.log('todo');
     isAdding.value = true;
 
     forms.time = new Date(
@@ -66,8 +62,8 @@ function onAdd() {
 
 async function onSave() {
     var myModalEl = document.getElementById('cdrEditModal');
-    var modal = (<any>global).bootstrap.Modal.getInstance(myModalEl);
-    modal.hide();
+    var modal = getBootstrapModal(myModalEl);
+    modal?.hide();
 
     const time = new Date(forms.time).getTime().toString();
 
@@ -230,7 +226,7 @@ watchEffect(fetchModel);
                     <button
                         type="button"
                         v-bind:class="cdrAdminModel.tracks
-                        .map((m: any) => m.name)
+                        .map((m) => m.name)
                         .indexOf(forms.track) > -1 && !isNaN(new Date(forms.time).getTime()) && 
                         forms.track !== forms.defaultTrack
                         ? 'btn btn-primary'

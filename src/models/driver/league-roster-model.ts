@@ -4,17 +4,50 @@ import {
     getMembersData,
 } from '@@/src/utils/fetch-util';
 
-export type LeagueRosterModel = any;
+interface RosterEntry {
+    cust_id: number;
+    car_number: string;
+    display_name: string;
+    [key: string]: unknown;
+}
+
+interface RosterRow {
+    'cust id': number;
+    car_number: string;
+    name: string;
+    last_seen: string;
+}
+
+export interface LeagueRosterModel {
+    rows: RosterRow[];
+    leagueId: string | number;
+    season: number;
+    title: string;
+}
+
+const LAST_SEEN_LABELS: Record<string, string> = {
+    '1': 'Current / Latest',
+    '2': 'Previous',
+    '3': 'Previous -1',
+    '4': 'Previous -2',
+    '5': 'Previous -3',
+    '99': 'Unknown',
+};
 
 export function getDefaultRosterModel(): LeagueRosterModel {
-    return JSON.parse(
-        JSON.stringify({
-            rows: [],
-            leagueId: 0,
-            season: 0,
-            title: 'League Driver Roster',
-        })
-    );
+    return {
+        rows: [],
+        leagueId: 0,
+        season: 0,
+        title: 'League Driver Roster',
+    };
+}
+
+interface ScoredRosterEntry {
+    cust_id: number;
+    car_number: string;
+    name: string;
+    code: number;
 }
 
 export async function getRosterModel(
@@ -65,9 +98,9 @@ export async function getRosterModel(
             )
         )?.members.map((m) => m.cust_id) || [];
 
-    const fRoster = (
-        roster?.roster
-            ?.map((m: any) => {
+    const fRoster: RosterRow[] = (
+        (roster?.roster as RosterEntry[])
+            ?.map((m: RosterEntry): ScoredRosterEntry => {
                 return {
                     cust_id: m.cust_id,
                     car_number: m.car_number,
@@ -86,22 +119,20 @@ export async function getRosterModel(
                             : 99,
                 };
             })
-            .sort((a: any, b: any) =>
-                a.code === b.code ? (a.name < b.name ? -1 : 1) : a.code - b.code
+            .sort((a: ScoredRosterEntry, b: ScoredRosterEntry) =>
+                a.code === b.code
+                    ? a.name < b.name
+                        ? -1
+                        : 1
+                    : a.code - b.code
             ) || []
-    ).map((r: any) => {
+    ).map((r: ScoredRosterEntry): RosterRow => {
         return {
             'cust id': r.cust_id,
             car_number: r.car_number,
             name: r.name,
-            last_seen: (<any>{
-                '1': 'Current / Latest',
-                '2': 'Previous',
-                '3': 'Previous -1',
-                '4': 'Previous -2',
-                '5': 'Previous -3',
-                '99': 'Unknown',
-            })[r.code.toString()],
+            last_seen:
+                LAST_SEEN_LABELS[r.code.toString()] || 'Unknown',
         };
     });
 

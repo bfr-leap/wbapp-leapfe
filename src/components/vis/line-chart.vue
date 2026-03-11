@@ -72,24 +72,24 @@ async function getLineChartModel(
         let xScale = d3
             .scaleLinear()
             .domain(
-                d3.extent(props.data[0].data, (d: any) => {
+                d3.extent(props.data[0].data, (d) => {
                     return d.x;
-                })
+                }) as [number, number]
             )
             .range([0, ret.innerWidth]);
 
         let maxY = d3.max(props.data, (sXY: SeriesXY) =>
-            d3.max(sXY.data, (d: any) => d.y)
+            d3.max(sXY.data, (d) => d.y)
         );
         let minY = d3.min(props.data, (sXY: SeriesXY) =>
-            d3.min(sXY.data, (d: any) => d.y)
+            d3.min(sXY.data, (d) => d.y)
         );
 
         let maxX = d3.max(props.data, (sXY: SeriesXY) =>
-            d3.max(sXY.data, (d: any) => d.x)
+            d3.max(sXY.data, (d) => d.x)
         );
         let minX = d3.min(props.data, (sXY: SeriesXY) =>
-            d3.min(sXY.data, (d: any) => d.x)
+            d3.min(sXY.data, (d) => d.x)
         );
 
         ret.xAxisInnerHtml = generateXAxisSvg(
@@ -135,13 +135,13 @@ function generateXAxisSvg(
     maxX: number,
     innerHeight: number,
     innerWidth: number,
-    scaleX: D3_Scale
+    scaleX: D3_LinearScale
 ) {
     const ticks = scaleX.ticks(5);
     const tickFormat = scaleX.tickFormat(5);
 
     const tickElements = ticks
-        .map((tick: any) => {
+        .map((tick: number) => {
             const x = scaleX(tick);
             return `
             <g class="tick" transform="translate(${x},0)">
@@ -173,13 +173,13 @@ function generateYAxisSvg(
     maxY: number,
     innerHeight: number,
     innerWidth: number,
-    scaleY: D3_Scale
+    scaleY: D3_LinearScale
 ) {
     const ticks = scaleY.ticks(5);
     const tickFormat = scaleY.tickFormat(5);
 
     const tickElements = ticks
-        .map((tick: any) => {
+        .map((tick: number) => {
             const y = scaleY(tick);
             return `
               <g class="tick" transform="translate(0,${y})">
@@ -207,22 +207,22 @@ function generateYAxisSvg(
 
 function getDPathAttr(
     series: SeriesXY,
-    scaleX: D3_Scale,
-    scaleY: D3_Scale
+    scaleX: D3_LinearScale,
+    scaleY: D3_LinearScale
 ): string {
     if (!scaleX || !scaleY) {
         return '';
     }
 
     const linePath = d3
-        .line()
-        .x(function (d: any) {
+        .line<{ x: number; y: number }>()
+        .x(function (d) {
             return scaleX(d.x);
         })
-        .y(function (d: any) {
+        .y(function (d) {
             return scaleY(d.y);
         })(series.data);
-    return linePath;
+    return linePath || '';
 }
 
 const baseColors: string[] = [
@@ -280,7 +280,8 @@ function onToggle(seriesIndex: number) {
 }
 function onToggleAll() {
     lineChartModel.value.toggleState.forEach(
-        (ts: any, i: number) => (lineChartModel.value.toggleState[i] = !ts)
+        (ts: boolean, i: number) =>
+            (lineChartModel.value.toggleState[i] = !ts)
     );
 }
 
@@ -305,7 +306,7 @@ const lineChartModel: Ref<LineChartModel> =
         ]
     );
 
-type D3_Scale = any | null;
+type D3_LinearScale = d3.ScaleLinear<number, number>;
 
 interface LineChartModel {
     width: number;

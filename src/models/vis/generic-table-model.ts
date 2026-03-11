@@ -10,15 +10,13 @@ export type GenericTableModel = {
 } & TS_RecordTable;
 
 export function getDefaultGenericTableModel(): GenericTableModel {
-    return JSON.parse(
-        JSON.stringify({
-            title: '---',
-            keys: [],
-            rows: [],
-            columnNames: {},
-            nameToIdMap: {},
-        })
-    );
+    return {
+        title: '---',
+        keys: [],
+        rows: [],
+        columnNames: {},
+        nameToIdMap: {},
+    };
 }
 
 const _nameToIdMap: { [name: string]: string } = {};
@@ -30,7 +28,7 @@ async function formatRows(
     leagueId: string,
     seasonId: string
 ): Promise<{ [name: string]: string }[]> {
-    let ret: { [name: string]: string }[] = JSON.parse(JSON.stringify(rows));
+    let ret: { [name: string]: string }[] = structuredClone(rows);
 
     let collectedCustIds = [];
     let userPromises: Promise<M_Member>[] = [];
@@ -112,7 +110,7 @@ function formatHeader(name: string): string {
         return 'driver';
     }
 
-    name = <string>(<any>name).replaceAll('_', ' ');
+    name = name.replaceAll('_', ' ');
 
     return name;
 }

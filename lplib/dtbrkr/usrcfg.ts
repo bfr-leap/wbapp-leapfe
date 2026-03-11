@@ -84,7 +84,7 @@ async function defLgSeasSubCtx(
 ): Promise<any> {
     console.log('::: defLgSeasSubCtx()', league, season, subsession, 'usrcfg proxy'); 
 
-    const url = `${BASE_URL}/config/context?league=${league}&season=${season}`;
+    const url = `${BASE_URL}/config/context?league=${league}&season=${season}&subsession=${subsession}`;
     try {
         let objs = await fetch(url);
         let obj = await objs.json();

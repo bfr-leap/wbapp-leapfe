@@ -9,23 +9,15 @@ export interface PastEventCardsModel {
     }[];
 }
 
-let _defaultView: PastEventCardsModel = {
-    pastRaces: [],
-};
-
 export function getDefaultPastEventCardsModel(): PastEventCardsModel {
-    return JSON.parse(
-        JSON.stringify({
-            pastRaces: [],
-        })
-    );
+    return { pastRaces: [] };
 }
 
 export async function getPastEventCardsModel(
     league: string,
     season: string
 ): Promise<PastEventCardsModel> {
-    let ret: PastEventCardsModel = JSON.parse(JSON.stringify(_defaultView));
+    let ret: PastEventCardsModel = getDefaultPastEventCardsModel();
 
     if (!league || !season) {
         return ret;

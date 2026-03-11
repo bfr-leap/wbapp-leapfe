@@ -14,7 +14,7 @@ const props = defineProps<{
 }>();
 
 let countdown: Ref<String> = ref('---');
-let timer: any = 0;
+let timer: ReturnType<typeof setTimeout> | 0 = 0;
 
 async function fetchModel() {
     updateTimer();
