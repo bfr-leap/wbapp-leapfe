@@ -22,7 +22,7 @@ function diag(key: string, event: string, detail?: unknown) {
     const entry: DiagEntry = { key, event, ts: Date.now(), detail };
     _diagLog.push(entry);
     if (_diagLog.length > _MAX_DIAG) _diagLog.shift();
-    console.debug(`[DIAG][${event}] ${key}`, detail ?? '');
+    console.log(`[DIAG][${event}] ${key}`, detail ?? '');
 }
 
 /**

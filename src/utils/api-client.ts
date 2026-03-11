@@ -50,6 +50,7 @@ async function fetchObjects(urls: string[]): Promise<unknown[]> {
                 : null;
         }
 
+        const t0 = Date.now();
         const response = await fetch(url, {
             headers: { Authorization: `Bearer ${token}` },
         });
@@ -61,9 +62,18 @@ async function fetchObjects(urls: string[]): Promise<unknown[]> {
         }
 
         const obj = await response.json();
+        if (!import.meta.server) {
+            console.log(
+                `[DIAG][http] ${response.status} ${Date.now() - t0}ms ${urls[0]}`
+            );
+        }
         return [obj];
     } catch (e) {
-        console.error('Error fetching object:', e);
+        if (!import.meta.server) {
+            console.error(`[DIAG][http] FAIL ${urls[0]}`, e);
+        } else {
+            console.error('Error fetching object:', e);
+        }
         return [null];
     }
 }
@@ -185,7 +195,7 @@ export async function fetchCachedDocument<T>(args: {
         try {
             const cloned = structuredClone(parsed.doc);
             if (!import.meta.server) {
-                console.debug(
+                console.log(
                     `[DIAG][cache] ${cacheHit ? 'HIT' : 'MISS'} ${source} → ${cloned == null ? 'null' : 'ok'}`
                 );
             }
@@ -200,7 +210,7 @@ export async function fetchCachedDocument<T>(args: {
         }
     }
     if (!import.meta.server) {
-        console.debug(
+        console.log(
             `[DIAG][cache] ${cacheHit ? 'HIT' : 'MISS'} ${source} → no result`
         );
     }
