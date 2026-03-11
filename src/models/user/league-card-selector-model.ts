@@ -4,6 +4,12 @@ import {
 } from '@@/src/utils/fetch-util';
 import type { UserLeaguesState } from 'lplib/endpoint-types/usrdata';
 
+export type LeagueCardSelectorEntry = {
+    isActive: boolean;
+    name: string;
+    leagueID: number;
+};
+
 type LeagueCardSelectorModel = {
     isActive: boolean;
     name: string;

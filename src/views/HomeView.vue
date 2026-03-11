@@ -14,7 +14,10 @@ import UserProfile from '@@/src/components/pages/user-profile-view.vue';
 import SeasonCdrAdmin from '@@/src/components/pages/season-cdr-admin-view.vue';
 // import { ref, watch } from 'vue';
 import mixpanel from 'mixpanel-browser';
-import { defLgSeasSubCtx } from '@@/src/utils/fetch-util';
+import {
+    defLgSeasSubCtx,
+} from '@@/src/utils/fetch-util';
+import type { DefaultLeagueContext } from '@@/src/utils/fetch-util';
 
 const route = useRoute();
 
@@ -25,13 +28,16 @@ async function track() {
 
 	console.log("from route", route.query.subsession as string);
 
-    const def: any = await defLgSeasSubCtx(
-        route.query.league as string,
-        route.query.season as string,
-        route.query.subsession as string
-    );
+    const def: (DefaultLeagueContext & { simsession_id?: string }) | null =
+        await defLgSeasSubCtx(
+            route.query.league as string,
+            route.query.season as string,
+            route.query.subsession as string
+        );
 
-    def.simsession_id = (route.query.simsession as string) || '';
+    if (def) {
+        def.simsession_id = (route.query.simsession as string) || '';
+    }
 
 	console.log("loaded model", JSON.stringify(def));
 

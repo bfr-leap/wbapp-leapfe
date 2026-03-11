@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, reactive, watch, watchEffect } from 'vue';
 import type { Ref } from 'vue';
+import { getBootstrapModal } from '@@/src/utils/bootstrap-utils';
 
 import {
     getDefaultCdrAdminModel,
@@ -66,8 +67,8 @@ function onAdd() {
 
 async function onSave() {
     var myModalEl = document.getElementById('cdrEditModal');
-    var modal = (<any>global).bootstrap.Modal.getInstance(myModalEl);
-    modal.hide();
+    var modal = getBootstrapModal(myModalEl);
+    modal?.hide();
 
     const time = new Date(forms.time).getTime().toString();
 
@@ -230,7 +231,7 @@ watchEffect(fetchModel);
                     <button
                         type="button"
                         v-bind:class="cdrAdminModel.tracks
-                        .map((m: any) => m.name)
+                        .map((m) => m.name)
                         .indexOf(forms.track) > -1 && !isNaN(new Date(forms.time).getTime()) && 
                         forms.track !== forms.defaultTrack
                         ? 'btn btn-primary'

@@ -112,18 +112,19 @@ function gettHLBarChartModel(
     return ret;
 }
 
-type D3_Scale = any | null;
+type D3_BandScale = d3.ScaleBand<string>;
+type D3_LinearScale = d3.ScaleLinear<number, number>;
 
 function generateXAxisSvg(
     innerHeight: number,
     innerWidth: number,
-    scaleX: D3_Scale
+    scaleX: D3_BandScale
 ) {
     const ticks = scaleX.domain();
     const bandwidth = scaleX.bandwidth() / 2;
 
     const tickElements = ticks
-        .map((tick: any) => {
+        .map((tick: string) => {
             const x = scaleX(tick)!;
 
             return `
@@ -151,13 +152,13 @@ function generateXAxisSvg(
 function generateYAxisSvg(
     innerHeight: number,
     innerWidth: number,
-    scaleY: D3_Scale
+    scaleY: D3_LinearScale
 ) {
     const ticks = scaleY.ticks(5);
     const tickFormat = scaleY.tickFormat(5);
 
     const tickElements = ticks
-        .map((tick: any) => {
+        .map((tick: number) => {
             const y = scaleY(tick);
             return `
               <g class="tick" transform="translate(0,${y})">
