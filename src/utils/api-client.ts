@@ -167,6 +167,7 @@ export async function fetchCachedDocument<T>(args: {
 
     let source: string = prepUrl(args);
     let p = _cacheStorage[source];
+    const cacheHit = !!p;
 
     if (!p) {
         if (DEBUG_PREFETCH) {
@@ -181,7 +182,27 @@ export async function fetchCachedDocument<T>(args: {
     let result = a[0];
     if (result) {
         const parsed = result as { doc: T };
-        return structuredClone(parsed.doc);
+        try {
+            const cloned = structuredClone(parsed.doc);
+            if (!import.meta.server) {
+                console.debug(
+                    `[DIAG][cache] ${cacheHit ? 'HIT' : 'MISS'} ${source} → ${cloned == null ? 'null' : 'ok'}`
+                );
+            }
+            return cloned;
+        } catch (cloneErr) {
+            // structuredClone failure — fall back to JSON round-trip
+            console.error(
+                `[DIAG][cache] structuredClone FAILED for ${source}, falling back to JSON clone`,
+                cloneErr
+            );
+            return JSON.parse(JSON.stringify(parsed.doc)) as T;
+        }
+    }
+    if (!import.meta.server) {
+        console.debug(
+            `[DIAG][cache] ${cacheHit ? 'HIT' : 'MISS'} ${source} → no result`
+        );
     }
     return null;
 }

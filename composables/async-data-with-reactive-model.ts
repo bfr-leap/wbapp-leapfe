@@ -7,6 +7,43 @@ export interface ReactiveModelResult<T> {
     pending: Ref<boolean>;
 }
 
+// --- Diagnostics (temporary) ---
+interface DiagEntry {
+    key: string;
+    event: string;
+    ts: number;
+    detail?: unknown;
+}
+const _diagLog: DiagEntry[] = [];
+const _MAX_DIAG = 200;
+
+function diag(key: string, event: string, detail?: unknown) {
+    if (import.meta.server) return;
+    const entry: DiagEntry = { key, event, ts: Date.now(), detail };
+    _diagLog.push(entry);
+    if (_diagLog.length > _MAX_DIAG) _diagLog.shift();
+    console.debug(`[DIAG][${event}] ${key}`, detail ?? '');
+}
+
+/**
+ * Call `window.__LEAP_DIAG()` in the browser console after reproducing
+ * an issue. It prints and returns the recent reactive-model event log.
+ */
+if (!import.meta.server && typeof window !== 'undefined') {
+    (window as unknown as Record<string, unknown>).__LEAP_DIAG = () => {
+        const out = _diagLog.map((e) => {
+            const age = `${((Date.now() - e.ts) / 1000).toFixed(1)}s ago`;
+            const d = e.detail
+                ? ` | ${JSON.stringify(e.detail)}`
+                : '';
+            return `[${age}] ${e.event.padEnd(16)} ${e.key}${d}`;
+        });
+        console.log(out.join('\n'));
+        return _diagLog;
+    };
+}
+// --- end diagnostics ---
+
 /**
  * Wraps a model fetch function for SSR-safe reactive data.
  *
@@ -46,11 +83,22 @@ export async function asyncDataWithReactiveModelResult<T>(
 
     const safeFetch = async (): Promise<T> => {
         try {
-            return await fetchModelFunction();
+            const t0 = Date.now();
+            const result = await fetchModelFunction();
+            diag(dataKey, 'fetch-ok', {
+                ms: Date.now() - t0,
+                type: Array.isArray(result)
+                    ? `array[${result.length}]`
+                    : typeof result,
+            });
+            return result;
         } catch (e) {
             const msg =
                 e instanceof Error ? e.message : 'Unknown error';
+            const stack =
+                e instanceof Error ? e.stack?.split('\n').slice(0, 4) : [];
             console.error(`[${dataKey}] Model fetch failed:`, msg);
+            diag(dataKey, 'fetch-ERROR', { msg, stack });
             errorRef.value = msg;
             return defaultModelFunction();
         }
@@ -63,6 +111,11 @@ export async function asyncDataWithReactiveModelResult<T>(
         error,
     } = await useAsyncData(dataKey, safeFetch);
 
+    diag(dataKey, 'init', {
+        hasData: model.value != null,
+        error: error.value?.message ?? null,
+    });
+
     if (error.value) {
         errorRef.value = error.value.message;
     }
@@ -74,18 +127,24 @@ export async function asyncDataWithReactiveModelResult<T>(
         }
 
         if (model.value) {
+            diag(dataKey, 'watchEffect', 'syncing model→modelRef');
             modelRef.value = model.value as T;
         }
     });
 
     // Watch for prop changes and refetch data accordingly
     watch(observables, async () => {
+        const guard = { hasValue: !!modelRef?.value, refReady };
         if (modelRef?.value && refReady) {
+            diag(dataKey, 'watch-START', guard);
             pendingRef.value = true;
             errorRef.value = null;
             model.value = (await safeFetch()) as T;
             modelRef.value = model.value as T;
             pendingRef.value = false;
+            diag(dataKey, 'watch-DONE');
+        } else {
+            diag(dataKey, 'watch-SKIP', guard);
         }
     });
 
