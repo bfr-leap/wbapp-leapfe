@@ -114,6 +114,9 @@ export async function asyncDataWithReactiveModelResult<T>(
     diag(dataKey, 'init', {
         hasData: model.value != null,
         error: error.value?.message ?? null,
+        obs: observables.map((o) =>
+            typeof o === 'function' ? (o as () => unknown)() : '(ref)'
+        ),
     });
 
     if (error.value) {
@@ -132,9 +135,20 @@ export async function asyncDataWithReactiveModelResult<T>(
         }
     });
 
+    // Resolve observable values for logging
+    function obsValues(): unknown[] {
+        return observables.map((o) =>
+            typeof o === 'function' ? (o as () => unknown)() : o
+        );
+    }
+
     // Watch for prop changes and refetch data accordingly
-    watch(observables, async () => {
-        const guard = { hasValue: !!modelRef?.value, refReady };
+    watch(observables, async (_newVal, _oldVal) => {
+        const guard = {
+            hasValue: !!modelRef?.value,
+            refReady,
+            obs: obsValues(),
+        };
         if (modelRef?.value && refReady) {
             diag(dataKey, 'watch-START', guard);
             pendingRef.value = true;
