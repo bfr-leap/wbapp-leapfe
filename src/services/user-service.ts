@@ -2,7 +2,7 @@
  * User service — user state, features, and iRacing account linking.
  */
 
-import { fetchUncached, prepUrl } from '@@/src/utils/api-client';
+import { fetchUncached } from '@@/src/utils/api-client';
 import type {
     UserLeaguesState,
     UserFeatures,
@@ -44,8 +44,7 @@ export async function setIrLinkCode(
 // User leagues state (with short-lived cache)
 // ---------------------------------------------------------------------------
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let _userLeagueStateCache: Promise<any> | null = null;
+let _userLeagueStateCache: Promise<UserLeaguesState> | null = null;
 let _userLeagueStateTimer: ReturnType<typeof setTimeout> | null = null;
 let _userLeagueStateTimeout = 1500;
 
@@ -63,7 +62,10 @@ export async function getUserLeaguesState(): Promise<UserLeaguesState> {
     }, _userLeagueStateTimeout);
 
     if (!_userLeagueStateCache) {
-        _userLeagueStateCache = fetchUncached({ namespace, type });
+        _userLeagueStateCache = fetchUncached<UserLeaguesState>({
+            namespace,
+            type,
+        });
     }
 
     return await _userLeagueStateCache;
@@ -82,8 +84,7 @@ export async function setUserLeaguesState(
 // User features (with long-lived cache)
 // ---------------------------------------------------------------------------
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let _userFeaturesCache: Promise<any> | null = null;
+let _userFeaturesCache: Promise<UserFeatures> | null = null;
 let _userFeaturesTimer: ReturnType<typeof setTimeout> | null = null;
 let _userFeaturesTimeout = 1000 * 60 * 60;
 
@@ -101,7 +102,10 @@ export async function getUserFeatures(): Promise<UserFeatures> {
     }, _userFeaturesTimeout);
 
     if (!_userFeaturesCache) {
-        _userFeaturesCache = fetchUncached({ namespace, type });
+        _userFeaturesCache = fetchUncached<UserFeatures>({
+            namespace,
+            type,
+        });
     }
 
     return await _userFeaturesCache;

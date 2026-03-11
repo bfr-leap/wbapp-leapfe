@@ -13,10 +13,12 @@ export function setApiBaseURL(url: string) {
     API_BASE_URL = url;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let _auth: any = null;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function setAuth(auth: any) {
+interface AuthProvider {
+    getToken?: { value: () => Promise<string | null> };
+}
+
+let _auth: AuthProvider | null = null;
+export function setAuth(auth: AuthProvider | null) {
     _auth = auth;
 }
 
@@ -97,13 +99,18 @@ export function prepUrl(args: {
 
 let _prefetchPromise: Promise<unknown> | null = null;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function toPromise(v: any): Promise<unknown[]> {
-    return v;
+async function toPromise(v: unknown): Promise<unknown[]> {
+    return v as unknown[];
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function preFetch(args: any) {
+interface PrefetchArgs {
+    league?: string;
+    season?: string;
+    subsession?: string;
+    [key: string]: string | undefined;
+}
+
+export async function preFetch(args: PrefetchArgs) {
     if (DEBUG_PREFETCH) {
         console.log('preFetch() start');
     }
@@ -129,14 +136,16 @@ export async function preFetch(args: any) {
 
     _prefetchPromise = p;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let x = (await p)[0] as any;
+    let x = (await p)[0] as
+        | { docs: Record<string, unknown> }
+        | null
+        | undefined;
 
     _prefetchPromise = null;
 
     keys = Object.keys(x?.docs || {});
     for (let key of keys) {
-        if (x.docs[key]) {
+        if (x?.docs[key]) {
             _cacheStorage[key] = toPromise([{ doc: x.docs[key] }]);
         }
     }
@@ -171,8 +180,10 @@ export async function fetchCachedDocument<T>(args: {
     let a = await p;
     let result = a[0];
     if (result) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return (JSON.parse(JSON.stringify(result)) as any).doc as T;
+        const parsed = JSON.parse(JSON.stringify(result)) as {
+            doc: T;
+        };
+        return parsed.doc;
     }
     return null;
 }
@@ -181,12 +192,10 @@ export async function fetchCachedDocument<T>(args: {
  * Fetch without caching — used for mutations and user-specific state
  * that should not be cached in the shared document cache.
  */
-export async function fetchUncached(args: {
+export async function fetchUncached<T = unknown>(args: {
     [name: string]: string | number;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-}): Promise<any> {
+}): Promise<T> {
     let source: string = prepUrl(args);
     let ret = await fetchObjects([source]);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (ret[0] as any)?.doc;
+    return (ret[0] as { doc: T } | null)?.doc as T;
 }

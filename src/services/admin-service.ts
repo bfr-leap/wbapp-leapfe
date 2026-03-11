@@ -4,31 +4,51 @@
 
 import { fetchUncached } from '@@/src/utils/api-client';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+interface SchedEventResult {
+    success: boolean;
+    [key: string]: unknown;
+}
+
 export async function crtSchedEvent(
     season: string,
     time: string,
     track: string
-): Promise<any> {
+): Promise<SchedEventResult> {
     const namespace = 'ldata-admcfg';
     const type = 'crtSchedEvent';
-    return await fetchUncached({ namespace, type, season, time, track });
+    return await fetchUncached<SchedEventResult>({
+        namespace,
+        type,
+        season,
+        time,
+        track,
+    });
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function updSchedEvent(
     event: string,
     time: string,
     track: string
-): Promise<any> {
+): Promise<SchedEventResult> {
     const namespace = 'ldata-admcfg';
     const type = 'updSchedEvent';
-    return await fetchUncached({ namespace, type, event, time, track });
+    return await fetchUncached<SchedEventResult>({
+        namespace,
+        type,
+        event,
+        time,
+        track,
+    });
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function delSchedEvent(event: string): Promise<any> {
+export async function delSchedEvent(
+    event: string
+): Promise<SchedEventResult> {
     const namespace = 'ldata-admcfg';
     const type = 'delSchedEvent';
-    return await fetchUncached({ namespace, type, event });
+    return await fetchUncached<SchedEventResult>({
+        namespace,
+        type,
+        event,
+    });
 }

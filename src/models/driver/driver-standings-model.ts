@@ -1,6 +1,6 @@
 import type {
     MembersData,
-    M_License,
+    M_Member,
     SeasonSimsessionIndex,
     CuratedLeagueTeamsInfo,
     CLTI_Team,
@@ -58,23 +58,28 @@ export interface DriverStandingsModel {
 }
 
 export function getDefaultStandingsModel(): DriverStandingsModel {
-    return JSON.parse(
-        JSON.stringify({
-            drivers: [],
-            teams: [],
-        })
-    );
+    return { drivers: [], teams: [] };
 }
 
-function populateTeamInfoMaps(
-    leagueTeamsInfo: CuratedLeagueTeamsInfo,
-    seasonId: number,
-    userTeamIdMap: { [name: number]: number },
-    teamInfoMap: { [name: number]: CLTI_Team }
-) {
-    let season = leagueTeamsInfo?.seasons.find((s) => s.season_id === seasonId);
+/**
+ * Builds maps from custId → teamId and teamId → team info
+ * for a given season. Exported for testing.
+ */
+export function populateTeamInfoMaps(
+    leagueTeamsInfo: CuratedLeagueTeamsInfo | null,
+    seasonId: number
+): {
+    userTeamIdMap: Record<number, number>;
+    teamInfoMap: Record<number, CLTI_Team>;
+} {
+    const userTeamIdMap: Record<number, number> = {};
+    const teamInfoMap: Record<number, CLTI_Team> = {};
+
+    let season = leagueTeamsInfo?.seasons.find(
+        (s) => s.season_id === seasonId
+    );
     if (!season) {
-        return {};
+        return { userTeamIdMap, teamInfoMap };
     }
 
     for (let team of season.teams) {
@@ -83,13 +88,91 @@ function populateTeamInfoMaps(
             userTeamIdMap[member] = team.team_id;
         }
     }
+
+    return { userTeamIdMap, teamInfoMap };
+}
+
+/**
+ * Sorts members by power points (desc), then iRating (desc) as tiebreaker.
+ * Exported for testing.
+ */
+export function sortMembersByStandings(
+    members: M_Member[],
+    seasonStats: DriverStatsMap | undefined
+): M_Member[] {
+    if (!seasonStats) {
+        return [];
+    }
+
+    return [...members].sort((a, b) => {
+        const statsA = seasonStats[a.cust_id];
+        const statsB = seasonStats[b.cust_id];
+
+        if (!statsA || !statsB) {
+            return !statsB ? -1 : 1;
+        }
+
+        if (statsB.power_points !== statsA.power_points) {
+            return statsB.power_points - statsA.power_points;
+        }
+
+        return (
+            (getFormulaLicense(b.licenses).irating | 0) -
+            (getFormulaLicense(a.licenses).irating | 0)
+        );
+    });
+}
+
+/**
+ * Aggregates drivers into teams, sorted by total points (desc).
+ * Exported for testing.
+ */
+export function buildTeamStandings(
+    drivers: DriverModel[],
+    summaryMode: boolean
+): TeamModel[] {
+    let teamViewMap: Record<string, TeamModel> = {};
+
+    for (let driver of drivers) {
+        let team = teamViewMap[driver.teamName];
+        if (!team) {
+            teamViewMap[driver.teamName] = team = {
+                position: -1,
+                points: 0,
+                teamName: driver.teamName,
+                teamId: driver.teamId,
+                drivers: [],
+            };
+        }
+
+        team.drivers.push({
+            name: `${driver.lastName.toUpperCase()}, ${driver.firstName}`,
+            custId: driver.custId,
+        });
+
+        team.points += driver.points;
+    }
+
+    let teamsA = Object.values(teamViewMap).sort(
+        (a, b) => b.points - a.points
+    );
+
+    teamsA.forEach((v, i) => {
+        v.position = i + 1;
+    });
+
+    if (summaryMode) {
+        teamsA = teamsA.filter((v) => v.position <= 3);
+    }
+
+    return teamsA;
 }
 
 export async function getDriverStandingsModel(
     league: string,
     season: string,
     summary_mode: boolean
-) {
+): Promise<DriverStandingsModel> {
     let [
         _driverStatsMap,
         _curatedLeagueTeamsInfo,
@@ -97,10 +180,10 @@ export async function getDriverStandingsModel(
         _seasonSimsessionIndex,
     ] = <
         [
-            { [name: number]: DriverStatsMap },
-            CuratedLeagueTeamsInfo,
-            MembersData,
-            SeasonSimsessionIndex[]
+            { [name: number]: DriverStatsMap } | null,
+            CuratedLeagueTeamsInfo | null,
+            MembersData | null,
+            SeasonSimsessionIndex[] | null,
         ]
     >[
         await getLeagueDriverStats(league),
@@ -111,43 +194,25 @@ export async function getDriverStandingsModel(
 
     let _seasonId = Number.parseInt(season);
 
-    let _userTeamIdMap: { [name: number]: number } = {};
-    let _teamInfoMap: { [name: number]: CLTI_Team } = {};
-    populateTeamInfoMaps(
+    const { userTeamIdMap, teamInfoMap } = populateTeamInfoMaps(
         _curatedLeagueTeamsInfo,
-        _seasonId,
-        _userTeamIdMap,
-        _teamInfoMap
+        _seasonId
     );
 
-    let sortedM = _driverStatsMap
-        ? _membersData?.members.sort((a, b) =>
-              !_driverStatsMap[_seasonId][b.cust_id] ||
-              !_driverStatsMap[_seasonId][a.cust_id]
-                  ? !_driverStatsMap[_seasonId][b.cust_id]
-                      ? -1
-                      : 1
-                  : _driverStatsMap[_seasonId][b.cust_id].power_points !==
-                    _driverStatsMap[_seasonId][a.cust_id].power_points
-                  ? _driverStatsMap[_seasonId][b.cust_id].power_points -
-                    _driverStatsMap[_seasonId][a.cust_id].power_points
-                  : (getFormulaLicense(b.licenses).irating | 0) -
-                    (getFormulaLicense(a.licenses).irating | 0)
-          ) || []
-        : [];
+    let sortedM = sortMembersByStandings(
+        _membersData?.members || [],
+        _driverStatsMap?.[_seasonId]
+    );
 
     let ret: DriverStandingsModel = getDefaultStandingsModel();
-
-    ret.drivers = [];
     let allDrivers: DriverModel[] = [];
-
     let position = 1;
 
     for (let member of sortedM) {
         const memberView = getMemberViewFromM_Member(
             member,
-            _userTeamIdMap,
-            _teamInfoMap
+            userTeamIdMap,
+            teamInfoMap
         );
 
         let dv: DriverModel = {
@@ -176,39 +241,7 @@ export async function getDriverStandingsModel(
         }
     }
 
-    let teamViewMap: { [name: string]: TeamModel } = {};
-    for (let driver of allDrivers) {
-        let team = teamViewMap[driver.teamName];
-        if (!team) {
-            teamViewMap[driver.teamName] = team = {
-                position: -1,
-                points: 0,
-                teamName: driver.teamName,
-                teamId: driver.teamId,
-                drivers: [],
-            };
-        }
-
-        team.drivers.push({
-            name: `${driver.lastName.toUpperCase}, ${driver.firstName}`,
-            custId: driver.custId,
-        });
-
-        team.points += driver.points;
-    }
-    let teamsA = Object.keys(teamViewMap)
-        .map((k) => teamViewMap[k])
-        .sort((a, b) => b.points - a.points);
-
-    teamsA.forEach((v, i) => {
-        v.position = i + 1;
-    });
-
-    if (summary_mode) {
-        teamsA = teamsA.filter((v) => v.position <= 3);
-    }
-
-    ret.teams = teamsA;
+    ret.teams = buildTeamStandings(allDrivers, summary_mode);
 
     return ret;
 }
