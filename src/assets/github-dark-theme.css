@@ -226,29 +226,38 @@ a:hover {
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   Bootstrap Table Overrides → GitHub-style tables
+   Bootstrap Table Overrides → GitHub-style transparent tables
+   GitHub uses transparent bg with subtle horizontal dividers only.
    ══════════════════════════════════════════════════════════════════ */
 
 .table-dark {
-    --bs-table-bg: var(--gh-table-bg) !important;
+    --bs-table-bg: transparent !important;
     --bs-table-color: var(--gh-fg-default);
     --bs-table-hover-bg: var(--gh-table-row-hover);
     --bs-table-hover-color: var(--gh-fg-default);
-    --bs-table-border-color: var(--gh-table-border);
-    --bs-table-striped-bg: var(--gh-canvas-subtle);
-    border-color: var(--gh-table-border) !important;
+    --bs-table-border-color: var(--gh-border-muted);
+    --bs-table-striped-bg: transparent;
+    border-color: var(--gh-border-muted) !important;
 }
 
 .table-dark th {
-    background-color: var(--gh-table-header-bg);
-    color: var(--gh-fg-default);
+    background-color: transparent;
+    color: var(--gh-fg-muted);
     font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
     border-bottom: 1px solid var(--gh-border-default);
+    padding: 8px 12px;
     white-space: nowrap;
 }
 
 .table-dark td {
-    border-color: var(--gh-table-border);
+    border-bottom: 1px solid var(--gh-border-muted);
+    border-top: none;
+    padding: 8px 12px;
+    font-size: 0.875rem;
+    color: var(--gh-fg-default);
 }
 
 .table-dark tbody tr:hover td {

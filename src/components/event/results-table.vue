@@ -97,9 +97,7 @@ watchEffect(fetchModel);
 
 <style scoped>
 .table {
-    border-radius: var(--gh-radius-md);
     width: 100%;
-    padding-bottom: 1rem;
     margin-bottom: 0;
 }
 

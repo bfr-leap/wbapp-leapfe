@@ -44,11 +44,9 @@ const table: Ref<GenericTableModel> =
 </script>
 
 <template>
-    <div v-if="table">
-        <div class="table-responsive border border-secondary rounded m-1">
-            <div class="d-flex justify-content-center">
-                {{ table.title }}
-            </div>
+    <div v-if="table" class="gh-table-wrap">
+        <div class="gh-table-title">{{ table.title }}</div>
+        <div class="table-responsive">
             <table class="table table-dark table-hover">
                 <thead style="position: sticky; top: 0">
                     <tr>
@@ -79,10 +77,21 @@ const table: Ref<GenericTableModel> =
 </template>
 
 <style scoped>
+.gh-table-wrap {
+    margin: 4px;
+    flex: 1;
+    min-width: 200px;
+}
+
+.gh-table-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--gh-fg-default);
+    padding: 8px 12px 4px;
+}
+
 .table {
-    border-radius: var(--gh-radius-md);
     width: 100%;
-    padding-bottom: 1rem;
     margin-bottom: 0;
 }
 
