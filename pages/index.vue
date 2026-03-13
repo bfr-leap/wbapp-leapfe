@@ -71,29 +71,12 @@ const lgSeasSubCtx: Ref<LgSeasSubCtx> =
         class="gh-header"
     >
         <div class="gh-header-inner">
-            <div class="gh-header-left">
-                <button
-                    class="gh-mobile-toggle me-2 d-lg-none"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#navbarNav"
-                    aria-controls="navbarNav"
-                    aria-expanded="false"
-                    aria-label="Toggle navigation"
-                >
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+            <RouterLinkProxy class="gh-header-brand" to="/">
+                <img class="icon" v-bind:src="`blue-frog-racing-s4-icon.png`" />
+                <span class="gh-header-brand-text">LEAP</span>
+            </RouterLinkProxy>
 
-                <RouterLinkProxy class="gh-header-brand" to="/">
-                    <img
-                        class="icon"
-                        v-bind:src="`blue-frog-racing-s4-icon.png`"
-                    />
-                    <span class="gh-header-brand-text">LEAP</span>
-                </RouterLinkProxy>
-            </div>
-
-            <nav class="gh-header-nav collapse navbar-collapse" id="navbarNav">
+            <nav class="gh-header-nav">
                 <RouterLinkProxy
                     class="gh-header-nav-link"
                     v-bind:to="`/?m=results&league=${lgSeasSubCtx.league_id}`"
@@ -139,6 +122,7 @@ const lgSeasSubCtx: Ref<LgSeasSubCtx> =
     position: sticky;
     top: 0;
     z-index: 1030;
+    width: 100%;
 }
 
 .gh-header-inner {
@@ -150,25 +134,19 @@ const lgSeasSubCtx: Ref<LgSeasSubCtx> =
     gap: var(--gh-spacing-md);
 }
 
-.gh-header-left {
-    display: flex;
-    align-items: center;
-    gap: var(--gh-spacing-sm);
-}
-
 .gh-header-brand {
     display: flex;
     align-items: center;
     gap: var(--gh-spacing-sm);
     color: var(--gh-header-text);
-    text-decoration: none;
+    text-decoration: none !important;
     font-weight: 600;
     font-size: 1.1rem;
+    white-space: nowrap;
 }
 
 .gh-header-brand:hover {
     color: var(--gh-header-logo);
-    text-decoration: none;
     opacity: 0.85;
 }
 
@@ -195,29 +173,21 @@ const lgSeasSubCtx: Ref<LgSeasSubCtx> =
     border-radius: var(--gh-radius-md);
     font-size: 0.875rem;
     font-weight: 500;
-    text-decoration: none;
+    text-decoration: none !important;
     transition: background-color 0.12s ease;
+    white-space: nowrap;
 }
 
 .gh-header-nav-link:hover {
     background-color: var(--gh-neutral-subtle);
     color: var(--gh-header-logo);
-    text-decoration: none;
 }
 
 .gh-header-right {
     display: flex;
     align-items: center;
     gap: var(--gh-spacing-sm);
-    margin-left: auto;
-}
-
-.gh-mobile-toggle {
-    background: transparent;
-    border: 1px solid var(--gh-border-default);
-    border-radius: var(--gh-radius-md);
-    padding: 4px 8px;
-    color: var(--gh-fg-default);
+    flex-shrink: 0;
 }
 
 /* ── Page Container ──────────────────────────────────────────── */
