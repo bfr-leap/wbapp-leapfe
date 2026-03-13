@@ -271,26 +271,28 @@ a:hover {
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   Bootstrap Button Overrides
+   Bootstrap Button Overrides → GitHub-style subtle outlined buttons
    ══════════════════════════════════════════════════════════════════ */
 
-.btn-dark {
+.btn-dark,
+.btn-secondary {
     --bs-btn-bg: var(--gh-btn-bg);
-    --bs-btn-border-color: var(--gh-btn-border);
+    --bs-btn-border-color: var(--gh-border-default);
     --bs-btn-color: var(--gh-btn-text);
     --bs-btn-hover-bg: var(--gh-btn-hover-bg);
     --bs-btn-hover-border-color: var(--gh-btn-hover-border);
     --bs-btn-hover-color: var(--gh-fg-default);
     --bs-btn-active-bg: var(--gh-btn-active-bg);
-}
-
-.btn-secondary {
-    --bs-btn-bg: var(--gh-btn-bg);
-    --bs-btn-border-color: var(--gh-btn-border);
-    --bs-btn-color: var(--gh-btn-text);
-    --bs-btn-hover-bg: var(--gh-btn-hover-bg);
-    --bs-btn-hover-border-color: var(--gh-btn-hover-border);
-    --bs-btn-hover-color: var(--gh-fg-default);
+    --bs-btn-active-border-color: var(--gh-btn-hover-border);
+    --bs-btn-active-color: var(--gh-fg-default);
+    --bs-btn-font-size: 0.875rem;
+    --bs-btn-padding-x: 12px;
+    --bs-btn-padding-y: 5px;
+    border-radius: var(--gh-radius-md);
+    font-weight: 500;
+    line-height: 20px;
+    box-shadow: var(--gh-shadow-sm);
+    transition: background-color 0.12s ease, border-color 0.12s ease;
 }
 
 .btn-primary {
@@ -299,6 +301,21 @@ a:hover {
     --bs-btn-color: var(--gh-btn-primary-text);
     --bs-btn-hover-bg: var(--gh-btn-primary-hover-bg);
     --bs-btn-hover-border-color: var(--gh-btn-primary-hover-bg);
+    border-radius: var(--gh-radius-md);
+    font-weight: 500;
+    font-size: 0.875rem;
+    line-height: 20px;
+    box-shadow: var(--gh-shadow-sm);
+}
+
+/* Dropdown toggle caret — subtle GitHub-style */
+.btn.dropdown-toggle::after {
+    margin-left: 6px;
+    vertical-align: 0.15em;
+    border-top-width: 4px;
+    border-right-width: 4px;
+    border-left-width: 4px;
+    opacity: 0.7;
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -311,14 +328,19 @@ a:hover {
     border: 1px solid var(--gh-overlay-border) !important;
     box-shadow: var(--gh-overlay-shadow);
     border-radius: var(--gh-radius-md);
+    padding: 4px 0;
+    font-size: 0.875rem;
+    min-width: 160px;
 }
 
 .dropdown-menu .dropdown-item,
 .dropdown-menu-dark .dropdown-item {
     color: var(--gh-fg-default) !important;
     border-radius: var(--gh-radius-sm);
-    margin: 2px 4px;
+    margin: 0 4px;
     padding: 6px 8px;
+    font-size: 0.875rem;
+    line-height: 20px;
 }
 
 .dropdown-menu .dropdown-item:hover,
