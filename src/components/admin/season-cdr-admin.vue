@@ -245,6 +245,6 @@ watchEffect(fetchModel);
 
 <style>
 .text-bg {
-    color: #888;
+    color: var(--gh-fg-muted);
 }
 </style>

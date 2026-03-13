@@ -120,8 +120,7 @@ updateTimer();
 
 .track-logo {
     object-fit: contain;
-    background: #ffffff44;
-    /* background-position: center; */
+    background: rgba(240, 246, 252, 0.1);
     width: 100%;
     height: 6em;
 }

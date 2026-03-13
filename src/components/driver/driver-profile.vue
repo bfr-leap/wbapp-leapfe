@@ -30,55 +30,75 @@ const driverProfileModel: Ref<DriverProfileModel> =
 </script>
 
 <template>
-    <div class="card bg-dark text-light m-2 sticky-top">
-        <div class="card-body p-2">
-            <div class="row p-3">
-                <div
-                    v-bind:class="`col-1 driver-img club-${driverProfileModel.memberView.clubId}`"
-                ></div>
-                <div class="col">
-                    <DriverTag
-                        class="fs-4"
-                        v-bind:lastName="driverProfileModel.memberView.lastName"
-                        v-bind:firstName="
-                            driverProfileModel.memberView.firstName
-                        "
-                        v-bind:licenseLevel="
-                            driverProfileModel.memberView.licenseLevel
-                        "
-                        v-bind:iRating="driverProfileModel.memberView.iRating"
-                        v-bind:safetyRating="
-                            driverProfileModel.memberView.safetyRating
-                        "
-                        v-bind:teamName="driverProfileModel.memberView.teamName"
-                        v-bind:clubId="driverProfileModel.memberView.clubId"
-                    />
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="card bg-dark text-light m-2">
-        <div class="card-body p-2">
-            <Stats
-                v-if="driverProfileModel.driverStatsMap?.[0]?.[driverId]"
-                :stats="driverProfileModel.driverStatsMap[0][driverId]"
-                :results="driverProfileModel.allTimeResults"
-                seasonName="All Time"
-                v-bind:seasonId="0"
-                v-bind:league-id="props.league"
+    <!-- ── Driver profile header (GitHub org-style) ──────────── -->
+    <div class="gh-profile-header">
+        <div
+            v-bind:class="`driver-img club-${driverProfileModel.memberView.clubId}`"
+        ></div>
+        <div class="gh-profile-info">
+            <DriverTag
+                class="fs-4"
+                v-bind:lastName="driverProfileModel.memberView.lastName"
+                v-bind:firstName="
+                    driverProfileModel.memberView.firstName
+                "
+                v-bind:licenseLevel="
+                    driverProfileModel.memberView.licenseLevel
+                "
+                v-bind:iRating="driverProfileModel.memberView.iRating"
+                v-bind:safetyRating="
+                    driverProfileModel.memberView.safetyRating
+                "
+                v-bind:teamName="driverProfileModel.memberView.teamName"
+                v-bind:clubId="driverProfileModel.memberView.clubId"
             />
         </div>
+    </div>
+
+    <!-- ── Stats & charts panel ──────────────────────────────── -->
+    <div class="gh-content-card">
+        <Stats
+            v-if="driverProfileModel.driverStatsMap?.[0]?.[driverId]"
+            :stats="driverProfileModel.driverStatsMap[0][driverId]"
+            :results="driverProfileModel.allTimeResults"
+            seasonName="All Time"
+            v-bind:seasonId="0"
+            v-bind:league-id="props.league"
+        />
     </div>
 </template>
 
 <style scoped>
+/* ── GitHub org-style profile header ────────────────────────── */
+.gh-profile-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 24px 0 16px;
+}
+
+.gh-profile-info {
+    flex: 1;
+    min-width: 0;
+}
+
+/* ── Content card (bordered panel like GitHub README card) ──── */
+.gh-content-card {
+    border: 1px solid var(--gh-border-default);
+    border-radius: var(--gh-radius-md);
+    padding: 16px;
+    margin-top: 8px;
+}
+
 .driver-img {
-    height: 3em;
-    width: 3em;
-    background-color: aqua;
-    border-radius: 1.5em;
+    height: 64px;
+    width: 64px;
+    flex-shrink: 0;
+    background-color: var(--gh-neutral-emphasis);
+    border-radius: var(--gh-radius-full);
     background-size: cover;
     background-position: center;
+    box-shadow: 0 0 0 1px var(--gh-border-default);
 }
 
 .club-30,
@@ -172,4 +192,3 @@ const driverProfileModel: Ref<DriverProfileModel> =
     background-image: url(/flags/deatch.png);
 }
 </style>
-@/utils/driver-utils

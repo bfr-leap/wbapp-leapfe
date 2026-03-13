@@ -14,6 +14,7 @@ watchEffect(fetchModel);
 <style>
 .helmet-container {
     display: flex;
+    align-items: center;
 }
 
 .helmet {
@@ -26,6 +27,12 @@ watchEffect(fetchModel);
     margin-right: 0.5em;
     height: 1.75em;
     width: 1.75em;
-    border-radius: 1em;
+    border-radius: var(--gh-radius-full);
+    opacity: 0.85;
+    transition: opacity 0.12s ease;
+}
+
+.helmet:hover {
+    opacity: 1;
 }
 </style>

@@ -46,24 +46,5 @@ setApiBaseURL(config.public.API_BASE_URL);
 </template>
 
 <style>
-.bg-toplevel {
-    background-color: rgb(38, 38, 42);
-}
-
-.table-dark {
-    --bs-table-bg: rgb(31, 31, 35);
-}
-
-.bg-nav {
-    background-color: rgb(19, 19, 22);
-}
-
-.btn-dark {
-    --bs-btn-bg: rgb(31, 31, 35);
-    --bs-btn-border-color: rgb(31, 31, 35);
-}
-
-:root {
-    --bs-dark-rgb: 31, 31, 35;
-}
+/* Theme styles are loaded from src/assets/github-dark-theme.css via nuxt.config */
 </style>

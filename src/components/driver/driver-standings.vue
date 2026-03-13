@@ -220,8 +220,8 @@ const view: Ref<DriverStandingsModel> =
 .driver-img {
     height: 3em;
     width: 3em;
-    background-color: aqua;
-    border-radius: 1.5em;
+    background-color: var(--gh-neutral-emphasis);
+    border-radius: var(--gh-radius-full);
     background-size: cover;
     background-position: center;
 }

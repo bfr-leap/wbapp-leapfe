@@ -68,11 +68,11 @@ const driverStatsModel: Ref<DriverStatsModel> =
         ]
     );
 
-const statClasses = 'px-2 py-1 m-1 fs-5';
+
 </script>
 
 <template>
-    <div class="fs-4">
+    <div class="gh-section-title">
         <RouterLinkProxy
             class="link-light"
             v-if="props.seasonId"
@@ -81,38 +81,41 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
         >
         <span v-else>{{ driverStatsModel.seasonName }}</span>
     </div>
-    <div class="d-flex flex-wrap">
-        <div :class="statClasses">
-            <span class="name">Starts: </span
-            ><span class="value"> {{ props.stats.started }}</span>
+
+    <!-- ── Stats grid ────────────────────────────────────────── -->
+    <div class="gh-stats-row">
+        <div class="gh-stat">
+            <span class="gh-stat-value">{{ props.stats.started }}</span>
+            <span class="gh-stat-label">Starts</span>
         </div>
-        <div :class="statClasses">
-            <span class="name">Poles: </span
-            ><span class="value"> {{ props.stats.poles }}</span>
+        <div class="gh-stat">
+            <span class="gh-stat-value">{{ props.stats.poles }}</span>
+            <span class="gh-stat-label">Poles</span>
         </div>
-        <div :class="statClasses">
-            <span class="name">Wins: </span
-            ><span class="value"> {{ props.stats.wins }}</span>
+        <div class="gh-stat">
+            <span class="gh-stat-value">{{ props.stats.wins }}</span>
+            <span class="gh-stat-label">Wins</span>
         </div>
-        <div :class="statClasses">
-            <span class="name">Podiums: </span
-            ><span class="value"> {{ props.stats.podiums }}</span>
+        <div class="gh-stat">
+            <span class="gh-stat-value">{{ props.stats.podiums }}</span>
+            <span class="gh-stat-label">Podiums</span>
         </div>
-        <div :class="statClasses">
-            <span class="name">Top 10: </span
-            ><span class="value"> {{ props.stats.top_10 }}</span>
+        <div class="gh-stat">
+            <span class="gh-stat-value">{{ props.stats.top_10 }}</span>
+            <span class="gh-stat-label">Top 10</span>
         </div>
-        <div :class="statClasses">
-            <span class="name">Top 20: </span
-            ><span class="value"> {{ props.stats.top_20 }}</span>
+        <div class="gh-stat">
+            <span class="gh-stat-value">{{ props.stats.top_20 }}</span>
+            <span class="gh-stat-label">Top 20</span>
         </div>
-        <div :class="statClasses">
-            <span class="name">LEAP Points: </span
-            ><span class="value"> {{ props.stats.power_points }}</span>
+        <div class="gh-stat">
+            <span class="gh-stat-value">{{ props.stats.power_points }}</span>
+            <span class="gh-stat-label">LEAP Points</span>
         </div>
     </div>
 
-    <ul class="nav nav-pills">
+    <!-- ── Charts / Tables nav ───────────────────────────────── -->
+    <ul class="nav nav-pills gh-tab-nav">
         <li class="nav-item dropdown">
             <a
                 class="nav-link dropdown-toggle active show"
@@ -170,59 +173,43 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
             </ul>
         </li>
     </ul>
-    <div class="tab-content" id="nav-tabContent">
+    <div class="tab-content gh-tab-content" id="nav-tabContent">
         <div
             class="tab-pane fade show active"
             v-bind:id="`nav-qpchart-${props.seasonId}`"
             role="tabpanel"
-            aria-labelledby="nav-home-tab"
             tabindex="0"
         >
-            <div class="row">
-                <div class="col-12 m-auto">Qualifying Performance</div>
-            </div>
-            <div class="row">
-                <div class="col-12 m-auto">
-                    <BarChart
-                        v-if="driverStatsModel.qualifyingChartData"
-                        :data="driverStatsModel.qualifyingChartData"
-                    />
-                </div>
-            </div>
+            <div class="gh-chart-title">Qualifying Performance</div>
+            <BarChart
+                v-if="driverStatsModel.qualifyingChartData"
+                :data="driverStatsModel.qualifyingChartData"
+            />
         </div>
         <div
             class="tab-pane fade"
             v-bind:id="`nav-sechart-${seasonId}`"
             role="tabpanel"
-            aria-labelledby="nav-home-tab"
             tabindex="0"
         >
-            <div class="row">
-                <div class="col-12 m-auto">Start / Finish</div>
-            </div>
-            <div class="row">
-                <div class="col-12 m-auto">
-                    <HLBarChart
-                        v-if="driverStatsModel.startFinishChartData"
-                        v-bind:data="driverStatsModel.startFinishChartData"
-                    />
-                </div>
-            </div>
+            <div class="gh-chart-title">Start / Finish</div>
+            <HLBarChart
+                v-if="driverStatsModel.startFinishChartData"
+                v-bind:data="driverStatsModel.startFinishChartData"
+            />
         </div>
         <template v-for="(result, i) in props.results">
             <div
                 class="tab-pane fade"
                 v-bind:id="`nav-${i}-${props.seasonId}`"
                 role="tabpanel"
-                aria-labelledby="nav-profile-tab"
                 tabindex="0"
             >
                 <div
-                    class="row"
-                    style="margin-top: 1em"
+                    class="gh-chart-title"
                     v-if="result && result[props.seasonId]"
                 >
-                    <div class="col">{{ i }}</div>
+                    {{ i }}
                 </div>
                 <ResultsTable
                     :seasonId="props.seasonId"
@@ -232,6 +219,61 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
             </div>
         </template>
     </div>
-
-    <div class="linkbtn-item linkbtn-fullrow"></div>
 </template>
+
+<style scoped>
+.gh-section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--gh-fg-default);
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--gh-border-muted);
+    margin-bottom: 16px;
+}
+
+/* ── Stats row — GitHub contribution-style counters ────────── */
+.gh-stats-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 16px;
+}
+
+.gh-stat {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    padding: 4px 12px;
+    font-size: 0.875rem;
+}
+
+.gh-stat-value {
+    font-weight: 600;
+    font-size: 1.125rem;
+    color: var(--gh-fg-default);
+}
+
+.gh-stat-label {
+    color: var(--gh-fg-muted);
+    font-size: 0.75rem;
+}
+
+/* ── Tab nav — GitHub-style outlined buttons ─────────────── */
+.gh-tab-nav {
+    gap: 8px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--gh-border-muted);
+    margin-bottom: 16px;
+}
+
+.gh-tab-content {
+    min-height: 200px;
+}
+
+.gh-chart-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--gh-fg-muted);
+    margin-bottom: 8px;
+}
+</style>
