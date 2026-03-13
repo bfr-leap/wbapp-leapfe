@@ -415,10 +415,10 @@ function getDefaultLineChartModel(): LineChartModel {
 }
 
 .bg-dark {
-    background-color: #212529;
+    background-color: var(--gh-canvas-subtle);
 }
 
 .text-white {
-    color: white;
+    color: var(--gh-fg-default);
 }
 </style>

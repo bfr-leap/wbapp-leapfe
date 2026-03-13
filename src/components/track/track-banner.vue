@@ -41,8 +41,8 @@ const props = defineProps<{
     height: 8em;
     overflow: hidden;
     position: relative;
-    background-color: aliceblue;
-    overflow: hidden;
+    background-color: var(--gh-canvas-subtle);
+    border-radius: var(--gh-radius-md);
 }
 .bg {
     opacity: 0.5;

@@ -1,0 +1,483 @@
+/*
+ * GitHub Dark Mode Theme
+ * Based on GitHub's Primer design system "Dark default" theme.
+ * All colors are defined as CSS custom properties for easy maintenance.
+ */
+
+:root {
+    /* ── Canvas / Page backgrounds ────────────────────────────── */
+    --gh-canvas-default: #0d1117;
+    --gh-canvas-subtle: #161b22;
+    --gh-canvas-inset: #010409;
+
+    /* ── Foreground / Text ────────────────────────────────────── */
+    --gh-fg-default: #e6edf3;
+    --gh-fg-muted: #8b949e;
+    --gh-fg-subtle: #6e7681;
+    --gh-fg-on-emphasis: #ffffff;
+
+    /* ── Border ───────────────────────────────────────────────── */
+    --gh-border-default: #30363d;
+    --gh-border-muted: #21262d;
+    --gh-border-subtle: rgba(240, 246, 252, 0.1);
+
+    /* ── Accent (blue) ────────────────────────────────────────── */
+    --gh-accent-fg: #58a6ff;
+    --gh-accent-emphasis: #1f6feb;
+    --gh-accent-muted: rgba(56, 139, 253, 0.4);
+    --gh-accent-subtle: rgba(56, 139, 253, 0.15);
+
+    /* ── Success (green) ──────────────────────────────────────── */
+    --gh-success-fg: #3fb950;
+    --gh-success-emphasis: #238636;
+    --gh-success-muted: rgba(46, 160, 67, 0.4);
+    --gh-success-subtle: rgba(46, 160, 67, 0.15);
+
+    /* ── Danger (red) ─────────────────────────────────────────── */
+    --gh-danger-fg: #f85149;
+    --gh-danger-emphasis: #da3633;
+    --gh-danger-muted: rgba(248, 81, 73, 0.4);
+    --gh-danger-subtle: rgba(248, 81, 73, 0.15);
+
+    /* ── Warning (yellow/orange) ──────────────────────────────── */
+    --gh-attention-fg: #d29922;
+    --gh-attention-emphasis: #9e6a03;
+    --gh-attention-muted: rgba(187, 128, 9, 0.4);
+    --gh-attention-subtle: rgba(187, 128, 9, 0.15);
+
+    /* ── Neutral ──────────────────────────────────────────────── */
+    --gh-neutral-emphasis: #6e7681;
+    --gh-neutral-emphasis-plus: #8b949e;
+    --gh-neutral-muted: rgba(110, 118, 129, 0.4);
+    --gh-neutral-subtle: rgba(110, 118, 129, 0.1);
+
+    /* ── Header ───────────────────────────────────────────────── */
+    --gh-header-bg: #161b22;
+    --gh-header-border: #30363d;
+    --gh-header-text: #f0f6fc;
+    --gh-header-logo: #f0f6fc;
+
+    /* ── Buttons ──────────────────────────────────────────────── */
+    --gh-btn-bg: #21262d;
+    --gh-btn-border: rgba(240, 246, 252, 0.1);
+    --gh-btn-text: #c9d1d9;
+    --gh-btn-hover-bg: #30363d;
+    --gh-btn-hover-border: #8b949e;
+    --gh-btn-active-bg: hsla(212, 12%, 18%, 1);
+
+    --gh-btn-primary-bg: #238636;
+    --gh-btn-primary-border: rgba(240, 246, 252, 0.1);
+    --gh-btn-primary-text: #ffffff;
+    --gh-btn-primary-hover-bg: #2ea043;
+
+    /* ── Cards / Panels ───────────────────────────────────────── */
+    --gh-card-bg: #0d1117;
+    --gh-card-border: #30363d;
+
+    /* ── Overlay / Dropdown ───────────────────────────────────── */
+    --gh-overlay-bg: #161b22;
+    --gh-overlay-border: #30363d;
+    --gh-overlay-shadow: 0 8px 24px #010409;
+
+    /* ── Table ─────────────────────────────────────────────────── */
+    --gh-table-bg: #0d1117;
+    --gh-table-row-hover: #161b22;
+    --gh-table-border: #21262d;
+    --gh-table-header-bg: #161b22;
+
+    /* ── Nav / Tabs ────────────────────────────────────────────── */
+    --gh-nav-active-bg: #21262d;
+    --gh-nav-active-text: #f0f6fc;
+    --gh-nav-text: #8b949e;
+    --gh-nav-hover-text: #e6edf3;
+
+    /* ── Badges / Labels ──────────────────────────────────────── */
+    --gh-label-blue-bg: rgba(56, 139, 253, 0.15);
+    --gh-label-blue-text: #58a6ff;
+    --gh-label-green-bg: rgba(46, 160, 67, 0.15);
+    --gh-label-green-text: #3fb950;
+    --gh-label-yellow-bg: rgba(187, 128, 9, 0.15);
+    --gh-label-yellow-text: #d29922;
+    --gh-label-orange-bg: rgba(219, 109, 40, 0.15);
+    --gh-label-orange-text: #db6d28;
+    --gh-label-red-bg: rgba(248, 81, 73, 0.15);
+    --gh-label-red-text: #f85149;
+
+    /* ── Form controls ────────────────────────────────────────── */
+    --gh-input-bg: #0d1117;
+    --gh-input-border: #30363d;
+    --gh-input-text: #e6edf3;
+    --gh-input-placeholder: #6e7681;
+    --gh-input-focus-border: #58a6ff;
+    --gh-input-focus-shadow: 0 0 0 3px rgba(56, 139, 253, 0.3);
+
+    /* ── Scrollbar ────────────────────────────────────────────── */
+    --gh-scrollbar-thumb: #30363d;
+    --gh-scrollbar-track: #0d1117;
+
+    /* ── Typography ───────────────────────────────────────────── */
+    --gh-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans',
+        Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+    --gh-font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
+        'Liberation Mono', monospace;
+
+    /* ── Spacing ──────────────────────────────────────────────── */
+    --gh-spacing-xs: 4px;
+    --gh-spacing-sm: 8px;
+    --gh-spacing-md: 16px;
+    --gh-spacing-lg: 24px;
+    --gh-spacing-xl: 32px;
+
+    /* ── Border radius ────────────────────────────────────────── */
+    --gh-radius-sm: 4px;
+    --gh-radius-md: 6px;
+    --gh-radius-lg: 12px;
+    --gh-radius-full: 100px;
+
+    /* ── Shadows ──────────────────────────────────────────────── */
+    --gh-shadow-sm: 0 1px 0 rgba(1, 4, 9, 0.8);
+    --gh-shadow-md: 0 3px 6px rgba(1, 4, 9, 0.5);
+    --gh-shadow-lg: 0 8px 24px rgba(1, 4, 9, 0.75);
+
+    /* ── Bootstrap dark-rgb override ──────────────────────────── */
+    --bs-dark-rgb: 13, 17, 23;
+    --bs-body-bg: #0d1117;
+    --bs-body-color: #e6edf3;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Global Resets & Base Styles
+   ══════════════════════════════════════════════════════════════════ */
+
+body {
+    background-color: var(--gh-canvas-default) !important;
+    color: var(--gh-fg-default);
+    font-family: var(--gh-font-family);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Scrollbar ──────────────────────────────────────────────────── */
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--gh-scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--gh-scrollbar-thumb);
+    border-radius: var(--gh-radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--gh-neutral-emphasis);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Links
+   ══════════════════════════════════════════════════════════════════ */
+
+a {
+    color: var(--gh-accent-fg);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.link-light {
+    color: var(--gh-accent-fg) !important;
+}
+
+.link-light:hover {
+    color: #79c0ff !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Page Background Classes
+   ══════════════════════════════════════════════════════════════════ */
+
+.bg-toplevel {
+    background-color: var(--gh-canvas-default) !important;
+}
+
+.bg-nav {
+    background-color: var(--gh-header-bg) !important;
+    border-bottom: 1px solid var(--gh-header-border);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Bootstrap Card Overrides → GitHub-style panels
+   ══════════════════════════════════════════════════════════════════ */
+
+.card.bg-dark {
+    background-color: var(--gh-canvas-default) !important;
+    border: 1px solid var(--gh-border-default) !important;
+    border-radius: var(--gh-radius-md) !important;
+}
+
+.card.bg-dark .card-body {
+    background-color: transparent;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Bootstrap Table Overrides → GitHub-style tables
+   ══════════════════════════════════════════════════════════════════ */
+
+.table-dark {
+    --bs-table-bg: var(--gh-table-bg) !important;
+    --bs-table-color: var(--gh-fg-default);
+    --bs-table-hover-bg: var(--gh-table-row-hover);
+    --bs-table-hover-color: var(--gh-fg-default);
+    --bs-table-border-color: var(--gh-table-border);
+    --bs-table-striped-bg: var(--gh-canvas-subtle);
+    border-color: var(--gh-table-border) !important;
+}
+
+.table-dark th {
+    background-color: var(--gh-table-header-bg);
+    color: var(--gh-fg-default);
+    font-weight: 600;
+    border-bottom: 1px solid var(--gh-border-default);
+    white-space: nowrap;
+}
+
+.table-dark td {
+    border-color: var(--gh-table-border);
+}
+
+.table-dark tbody tr:hover td {
+    background-color: var(--gh-table-row-hover);
+}
+
+/* sticky first column inherits row bg */
+.table-dark th:first-child,
+.table-dark td:first-child {
+    background-color: inherit;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Bootstrap Button Overrides
+   ══════════════════════════════════════════════════════════════════ */
+
+.btn-dark {
+    --bs-btn-bg: var(--gh-btn-bg);
+    --bs-btn-border-color: var(--gh-btn-border);
+    --bs-btn-color: var(--gh-btn-text);
+    --bs-btn-hover-bg: var(--gh-btn-hover-bg);
+    --bs-btn-hover-border-color: var(--gh-btn-hover-border);
+    --bs-btn-hover-color: var(--gh-fg-default);
+    --bs-btn-active-bg: var(--gh-btn-active-bg);
+}
+
+.btn-secondary {
+    --bs-btn-bg: var(--gh-btn-bg);
+    --bs-btn-border-color: var(--gh-btn-border);
+    --bs-btn-color: var(--gh-btn-text);
+    --bs-btn-hover-bg: var(--gh-btn-hover-bg);
+    --bs-btn-hover-border-color: var(--gh-btn-hover-border);
+    --bs-btn-hover-color: var(--gh-fg-default);
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--gh-btn-primary-bg);
+    --bs-btn-border-color: var(--gh-btn-primary-border);
+    --bs-btn-color: var(--gh-btn-primary-text);
+    --bs-btn-hover-bg: var(--gh-btn-primary-hover-bg);
+    --bs-btn-hover-border-color: var(--gh-btn-primary-hover-bg);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Bootstrap Dropdown Overrides
+   ══════════════════════════════════════════════════════════════════ */
+
+.dropdown-menu,
+.dropdown-menu-dark {
+    background-color: var(--gh-overlay-bg) !important;
+    border: 1px solid var(--gh-overlay-border) !important;
+    box-shadow: var(--gh-overlay-shadow);
+    border-radius: var(--gh-radius-md);
+}
+
+.dropdown-menu .dropdown-item,
+.dropdown-menu-dark .dropdown-item {
+    color: var(--gh-fg-default) !important;
+    border-radius: var(--gh-radius-sm);
+    margin: 2px 4px;
+    padding: 6px 8px;
+}
+
+.dropdown-menu .dropdown-item:hover,
+.dropdown-menu .dropdown-item:focus,
+.dropdown-menu-dark .dropdown-item:hover,
+.dropdown-menu-dark .dropdown-item:focus {
+    background-color: var(--gh-accent-emphasis) !important;
+    color: var(--gh-fg-on-emphasis) !important;
+}
+
+.dropdown-menu .dropdown-item.active,
+.dropdown-menu-dark .dropdown-item.active {
+    background-color: var(--gh-accent-emphasis) !important;
+    color: var(--gh-fg-on-emphasis) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Bootstrap Nav / Tabs / Pills Overrides
+   ══════════════════════════════════════════════════════════════════ */
+
+.nav-pills .nav-link {
+    color: var(--gh-nav-text);
+    border-radius: var(--gh-radius-md);
+}
+
+.nav-pills .nav-link:hover {
+    color: var(--gh-nav-hover-text);
+    background-color: var(--gh-neutral-subtle);
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+    background-color: var(--gh-nav-active-bg);
+    color: var(--gh-nav-active-text);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Bootstrap Navbar Overrides
+   ══════════════════════════════════════════════════════════════════ */
+
+.navbar-dark {
+    background-color: var(--gh-header-bg) !important;
+    border-bottom: 1px solid var(--gh-header-border);
+}
+
+.navbar-dark .navbar-brand {
+    color: var(--gh-header-text);
+    font-weight: 600;
+}
+
+.navbar-dark .navbar-brand:hover {
+    color: var(--gh-header-logo);
+}
+
+.navbar-dark .nav-link {
+    color: var(--gh-fg-default) !important;
+    font-weight: 500;
+}
+
+.navbar-dark .nav-link:hover {
+    color: var(--gh-header-logo) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Bootstrap Modal Overrides
+   ══════════════════════════════════════════════════════════════════ */
+
+.modal-content {
+    background-color: var(--gh-overlay-bg) !important;
+    border: 1px solid var(--gh-overlay-border);
+    border-radius: var(--gh-radius-lg);
+    color: var(--gh-fg-default);
+    box-shadow: var(--gh-shadow-lg);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--gh-border-default);
+}
+
+.modal-footer {
+    border-top: 1px solid var(--gh-border-default);
+}
+
+.modal-title {
+    color: var(--gh-fg-default) !important;
+}
+
+.btn-close {
+    filter: invert(1);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Bootstrap Form Control Overrides
+   ══════════════════════════════════════════════════════════════════ */
+
+.form-control {
+    background-color: var(--gh-input-bg);
+    border: 1px solid var(--gh-input-border);
+    color: var(--gh-input-text);
+    border-radius: var(--gh-radius-md);
+}
+
+.form-control:focus {
+    background-color: var(--gh-input-bg);
+    border-color: var(--gh-input-focus-border);
+    box-shadow: var(--gh-input-focus-shadow);
+    color: var(--gh-input-text);
+}
+
+.form-control::placeholder {
+    color: var(--gh-input-placeholder);
+}
+
+.col-form-label {
+    color: var(--gh-fg-default);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Bootstrap Badge Overrides
+   ══════════════════════════════════════════════════════════════════ */
+
+.badge.text-bg-primary {
+    background-color: var(--gh-accent-emphasis) !important;
+}
+
+.badge.bg-secondary {
+    background-color: var(--gh-btn-bg) !important;
+    color: var(--gh-fg-default) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Bootstrap Border Overrides
+   ══════════════════════════════════════════════════════════════════ */
+
+.border-secondary {
+    border-color: var(--gh-border-default) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Text utility overrides
+   ══════════════════════════════════════════════════════════════════ */
+
+.text-light {
+    color: var(--gh-fg-default) !important;
+}
+
+.text-bg {
+    color: var(--gh-fg-muted) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Stat name / value styling
+   ══════════════════════════════════════════════════════════════════ */
+
+.name {
+    color: var(--gh-fg-muted);
+}
+
+.value {
+    color: var(--gh-fg-default);
+    font-weight: 600;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Selection / Highlight
+   ══════════════════════════════════════════════════════════════════ */
+
+::selection {
+    background-color: var(--gh-accent-muted);
+    color: var(--gh-fg-on-emphasis);
+}

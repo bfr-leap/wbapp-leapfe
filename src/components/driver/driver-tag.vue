@@ -56,32 +56,38 @@ const props = defineProps<{
 
 <style scoped>
 .license-pill-a {
-    color: #fff !important;
-    background-color: #0d6efd !important;
+    color: var(--gh-label-blue-text) !important;
+    background-color: var(--gh-label-blue-bg) !important;
+    border: 1px solid rgba(56, 139, 253, 0.3);
 }
 
 .license-pill-b {
-    color: #fff !important;
-    background-color: #13795b !important;
+    color: var(--gh-label-green-text) !important;
+    background-color: var(--gh-label-green-bg) !important;
+    border: 1px solid rgba(46, 160, 67, 0.3);
 }
 
 .license-pill-c {
-    color: #fff !important;
-    background-color: #664d03 !important;
+    color: var(--gh-label-yellow-text) !important;
+    background-color: var(--gh-label-yellow-bg) !important;
+    border: 1px solid rgba(187, 128, 9, 0.3);
 }
 
 .license-pill-d {
-    color: #fff !important;
-    background-color: #984c0c !important;
+    color: var(--gh-label-orange-text) !important;
+    background-color: var(--gh-label-orange-bg) !important;
+    border: 1px solid rgba(219, 109, 40, 0.3);
 }
 
 .license-pill-r {
-    color: #fff !important;
-    background-color: #dc3545 !important;
+    color: var(--gh-label-red-text) !important;
+    background-color: var(--gh-label-red-bg) !important;
+    border: 1px solid rgba(248, 81, 73, 0.3);
 }
 
 .license-pill-e {
-    color: #fff !important;
-    background-color: #dc3545 !important;
+    color: var(--gh-label-red-text) !important;
+    background-color: var(--gh-label-red-bg) !important;
+    border: 1px solid rgba(248, 81, 73, 0.3);
 }
 </style>

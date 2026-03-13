@@ -126,6 +126,6 @@ const shortName: Ref<string> = await asyncDataWithReactiveModel<string>(
 }
 .hv:hover,
 .selected {
-    background-color: black;
+    background-color: var(--gh-canvas-inset);
 }
 </style>

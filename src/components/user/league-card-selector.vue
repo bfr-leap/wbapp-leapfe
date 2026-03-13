@@ -196,6 +196,6 @@ watch(route, fetchModel);
 }
 
 .hv:hover {
-    color: rgb(131, 164, 255);
+    color: var(--gh-accent-fg);
 }
 </style>

@@ -80,11 +80,9 @@ const table: Ref<GenericTableModel> =
 
 <style scoped>
 .table {
-    /* background: #ee99a0; */
-    border-radius: 0.2rem;
+    border-radius: var(--gh-radius-md);
     width: 100%;
     padding-bottom: 1rem;
-    /* color: #212529; */
     margin-bottom: 0;
 }
 
@@ -92,7 +90,6 @@ const table: Ref<GenericTableModel> =
 .table td:first-child {
     position: sticky;
     left: 0;
-    /* background-color: #ad6c80;
-    color: #373737; */
+    background-color: inherit;
 }
 </style>
