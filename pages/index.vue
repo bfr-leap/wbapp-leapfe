@@ -96,80 +96,39 @@ const lgSeasSubCtx: Ref<LgSeasSubCtx> =
         <!-- ── Underline tab nav ───────────────────────────────── -->
         <nav class="gh-underline-nav">
             <div class="gh-underline-nav-inner">
-                <RouterLinkProxy
+                <div
                     class="gh-underline-nav-item"
                     v-bind:class="{
                         'gh-underline-nav-item--selected':
                             !route.query.m || route.query.m === 'season',
                     }"
-                    to="/"
                 >
-                    <svg
-                        class="gh-nav-icon"
-                        viewBox="0 0 16 16"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                    >
-                        <path
-                            d="M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Z"
-                        />
-                    </svg>
-                    <span>Home</span>
-                </RouterLinkProxy>
+                    <RouterLinkProxy class="gh-nav-link" to="/">
+                        <svg
+                            class="gh-nav-icon"
+                            viewBox="0 0 16 16"
+                            width="16"
+                            height="16"
+                            fill="currentColor"
+                        >
+                            <path
+                                d="M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Z"
+                            />
+                        </svg>
+                        <span>Home</span>
+                    </RouterLinkProxy>
+                </div>
 
-                <RouterLinkProxy
+                <div
                     class="gh-underline-nav-item"
                     v-bind:class="{
                         'gh-underline-nav-item--selected':
                             route.query.m === 'results',
                     }"
-                    v-bind:to="`/?m=results&league=${lgSeasSubCtx.league_id}`"
                 >
-                    <svg
-                        class="gh-nav-icon"
-                        viewBox="0 0 16 16"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                    >
-                        <path
-                            d="M1.5 1.75V13.5h13.75a.75.75 0 0 1 0 1.5H.75a.75.75 0 0 1-.75-.75V1.75a.75.75 0 0 1 1.5 0Zm14.28 2.53-5.25 5.25a.75.75 0 0 1-1.06 0L7 7.06 4.28 9.78a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042l3.25-3.25a.75.75 0 0 1 1.06 0L10 7.94l4.72-4.72a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042Z"
-                        />
-                    </svg>
-                    <span>Results</span>
-                </RouterLinkProxy>
-
-                <RouterLinkProxy
-                    class="gh-underline-nav-item"
-                    v-bind:class="{
-                        'gh-underline-nav-item--selected':
-                            route.query.m === 'standings',
-                    }"
-                    v-bind:to="`/?m=standings&league=${lgSeasSubCtx.league_id}`"
-                >
-                    <svg
-                        class="gh-nav-icon"
-                        viewBox="0 0 16 16"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                    >
-                        <path
-                            d="M5.75 7.5a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5a.75.75 0 0 1 .75-.75Zm5.25-2.25a.75.75 0 0 0-1.5 0v4.5a.75.75 0 0 0 1.5 0v-4.5ZM8 6.5a.75.75 0 0 1 .75.75v2.5a.75.75 0 0 1-1.5 0v-2.5A.75.75 0 0 1 8 6.5ZM1.5 0h13A1.5 1.5 0 0 1 16 1.5v13a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 14.5v-13A1.5 1.5 0 0 1 1.5 0Zm0 1.5v13h13v-13h-13Z"
-                        />
-                    </svg>
-                    <span>Standings</span>
-                </RouterLinkProxy>
-
-                <SignedIn>
                     <RouterLinkProxy
-                        class="gh-underline-nav-item"
-                        v-bind:class="{
-                            'gh-underline-nav-item--selected':
-                                route.query.m === 'profile',
-                        }"
-                        to="/?m=profile"
+                        class="gh-nav-link"
+                        v-bind:to="`/?m=results&league=${lgSeasSubCtx.league_id}`"
                     >
                         <svg
                             class="gh-nav-icon"
@@ -179,11 +138,62 @@ const lgSeasSubCtx: Ref<LgSeasSubCtx> =
                             fill="currentColor"
                         >
                             <path
-                                d="M10.561 8.073a6.005 6.005 0 0 1 3.432 5.142.75.75 0 1 1-1.498.07 4.5 4.5 0 0 0-8.99 0 .75.75 0 0 1-1.498-.07 6.004 6.004 0 0 1 3.431-5.142 3.999 3.999 0 1 1 5.123 0ZM10.5 5a2.5 2.5 0 1 0-5 0 2.5 2.5 0 0 0 5 0Z"
+                                d="M1.5 1.75V13.5h13.75a.75.75 0 0 1 0 1.5H.75a.75.75 0 0 1-.75-.75V1.75a.75.75 0 0 1 1.5 0Zm14.28 2.53-5.25 5.25a.75.75 0 0 1-1.06 0L7 7.06 4.28 9.78a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042l3.25-3.25a.75.75 0 0 1 1.06 0L10 7.94l4.72-4.72a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042Z"
                             />
                         </svg>
-                        <span>Profile</span>
+                        <span>Results</span>
                     </RouterLinkProxy>
+                </div>
+
+                <div
+                    class="gh-underline-nav-item"
+                    v-bind:class="{
+                        'gh-underline-nav-item--selected':
+                            route.query.m === 'standings',
+                    }"
+                >
+                    <RouterLinkProxy
+                        class="gh-nav-link"
+                        v-bind:to="`/?m=standings&league=${lgSeasSubCtx.league_id}`"
+                    >
+                        <svg
+                            class="gh-nav-icon"
+                            viewBox="0 0 16 16"
+                            width="16"
+                            height="16"
+                            fill="currentColor"
+                        >
+                            <path
+                                d="M5.75 7.5a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5a.75.75 0 0 1 .75-.75Zm5.25-2.25a.75.75 0 0 0-1.5 0v4.5a.75.75 0 0 0 1.5 0v-4.5ZM8 6.5a.75.75 0 0 1 .75.75v2.5a.75.75 0 0 1-1.5 0v-2.5A.75.75 0 0 1 8 6.5ZM1.5 0h13A1.5 1.5 0 0 1 16 1.5v13a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 14.5v-13A1.5 1.5 0 0 1 1.5 0Zm0 1.5v13h13v-13h-13Z"
+                            />
+                        </svg>
+                        <span>Standings</span>
+                    </RouterLinkProxy>
+                </div>
+
+                <SignedIn>
+                    <div
+                        class="gh-underline-nav-item"
+                        v-bind:class="{
+                            'gh-underline-nav-item--selected':
+                                route.query.m === 'profile',
+                        }"
+                    >
+                        <RouterLinkProxy class="gh-nav-link" to="/?m=profile">
+                            <svg
+                                class="gh-nav-icon"
+                                viewBox="0 0 16 16"
+                                width="16"
+                                height="16"
+                                fill="currentColor"
+                            >
+                                <path
+                                    d="M10.561 8.073a6.005 6.005 0 0 1 3.432 5.142.75.75 0 1 1-1.498.07 4.5 4.5 0 0 0-8.99 0 .75.75 0 0 1-1.498-.07 6.004 6.004 0 0 1 3.431-5.142 3.999 3.999 0 1 1 5.123 0ZM10.5 5a2.5 2.5 0 1 0-5 0 2.5 2.5 0 0 0 5 0Z"
+                                />
+                            </svg>
+                            <span>Profile</span>
+                        </RouterLinkProxy>
+                    </div>
                 </SignedIn>
             </div>
         </nav>
@@ -236,7 +246,7 @@ const lgSeasSubCtx: Ref<LgSeasSubCtx> =
     gap: var(--gh-spacing-md);
 }
 
-.gh-header-brand {
+.gh-header-inner :deep(.gh-header-brand) {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -247,7 +257,7 @@ const lgSeasSubCtx: Ref<LgSeasSubCtx> =
     line-height: 1;
 }
 
-.gh-header-brand:hover {
+.gh-header-inner :deep(.gh-header-brand:hover) {
     color: var(--gh-header-logo);
     opacity: 0.85;
 }
@@ -283,52 +293,61 @@ const lgSeasSubCtx: Ref<LgSeasSubCtx> =
     overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
-}
-
-/* hide scrollbar but keep scrollable */
-.gh-underline-nav::-webkit-scrollbar {
-    display: none;
-}
-.gh-underline-nav {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
 
+.gh-underline-nav::-webkit-scrollbar {
+    display: none;
+}
+
 .gh-underline-nav-inner {
     display: flex;
-    align-items: center;
+    align-items: stretch;
     gap: 0;
     max-width: 1280px;
     margin: 0 auto;
 }
 
+/* Tab wrapper div — owns the underline indicator */
 .gh-underline-nav-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 16px;
-    font-size: 0.875rem;
-    font-weight: 400;
-    color: var(--gh-fg-muted);
-    text-decoration: none !important;
     border-bottom: 2px solid transparent;
-    white-space: nowrap;
-    transition: color 0.12s ease, border-color 0.12s ease;
+    transition: border-color 0.12s ease;
 }
 
 .gh-underline-nav-item:hover {
-    color: var(--gh-fg-default);
     border-bottom-color: var(--gh-neutral-emphasis);
 }
 
 .gh-underline-nav-item--selected {
-    font-weight: 600;
-    color: var(--gh-fg-default);
     border-bottom-color: #f78166;
 }
 
 .gh-underline-nav-item--selected:hover {
     border-bottom-color: #f78166;
+}
+
+/* The <a> inside RouterLinkProxy — use :deep to pierce the component */
+.gh-underline-nav-item :deep(.gh-nav-link) {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: var(--gh-fg-muted);
+    text-decoration: none !important;
+    white-space: nowrap;
+    transition: color 0.12s ease;
+}
+
+.gh-underline-nav-item:hover :deep(.gh-nav-link) {
+    color: var(--gh-fg-default);
+}
+
+.gh-underline-nav-item--selected :deep(.gh-nav-link) {
+    font-weight: 600;
+    color: var(--gh-fg-default);
 }
 
 .gh-nav-icon {
