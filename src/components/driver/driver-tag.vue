@@ -55,6 +55,12 @@ const props = defineProps<{
 </template>
 
 <style scoped>
+.last-name,
+.firt-name {
+    color: var(--gh-header-text);
+    font-weight: 600;
+}
+
 .license-pill-a {
     color: var(--gh-label-blue-text) !important;
     background-color: var(--gh-label-blue-bg) !important;

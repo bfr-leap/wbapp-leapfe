@@ -95,7 +95,7 @@ const driverProfileModel: Ref<DriverProfileModel> =
     width: 64px;
     flex-shrink: 0;
     background-color: var(--gh-neutral-emphasis);
-    border-radius: var(--gh-radius-md);
+    border-radius: var(--gh-radius-full);
     background-size: cover;
     background-position: center;
     box-shadow: 0 0 0 1px var(--gh-border-default);
