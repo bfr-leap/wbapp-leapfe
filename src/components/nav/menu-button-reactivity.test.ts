@@ -250,11 +250,10 @@ describe('Menu button reactivity after model updates', () => {
             expect(callLog.length).toBeGreaterThanOrEqual(6);
         });
 
-        it('detects double-fetch from watchEffect + watch overlap', async () => {
-            // This test specifically documents the double-fetch pattern
-            // in track-results-menu.vue. Both watchEffect(fectchModel)
-            // and watch(props, fectchModel) fire when props change,
-            // causing redundant API calls.
+        it('single prop change triggers exactly one fetch (no double-fetch)', async () => {
+            // Verifies the fix: using watch(props, ..., { immediate })
+            // instead of watchEffect + watch means each prop change
+            // triggers exactly one refetch.
             setupMockUseAsyncData();
 
             let fetchCount = 0;
@@ -283,14 +282,9 @@ describe('Menu button reactivity after model updates', () => {
 
             const fetchesAfterOneChange = fetchCount - initialFetchCount;
 
-            // Document: a single prop change triggers >= 2 fetches
-            // because both watchEffect and watch(props) fire.
-            // This is a performance concern and a potential source
-            // of race conditions with the "stops working" bug.
-            expect(fetchesAfterOneChange).toBeGreaterThanOrEqual(1);
+            // After fix: exactly 1 fetch per prop change
+            expect(fetchesAfterOneChange).toBe(1);
 
-            // The component should still show the correct final state
-            // regardless of how many times it fetched
             expect(
                 wrapper.findAll('.dropdown-toggle')[0].text()
             ).toBe('Car 2');

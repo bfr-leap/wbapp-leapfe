@@ -2,6 +2,7 @@
 import {
     ref,
     onMounted,
+    onUnmounted,
     nextTick,
     computed,
     reactive,
@@ -29,17 +30,23 @@ const props = defineProps<{
 const svgRoot = ref<SVGGElement | null>(null);
 const divRoot = ref<HTMLElement | null>(null);
 const startSize = 500;
+let resizeObserver: ResizeObserver | null = null;
 
 onMounted(async () => {
     await nextTick();
     if (ResizeObserver && divRoot.value) {
-        let resizeObserver = new ResizeObserver(() => {
+        resizeObserver = new ResizeObserver(() => {
             window.requestAnimationFrame(async () => {
                 lineChartModel.value = await fetchModel();
             });
         });
         resizeObserver.observe(divRoot.value);
     }
+});
+
+onUnmounted(() => {
+    resizeObserver?.disconnect();
+    resizeObserver = null;
 });
 
 async function fetchModel() {

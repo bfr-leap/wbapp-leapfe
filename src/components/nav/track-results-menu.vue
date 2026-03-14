@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
-import { ref, watchEffect, watch } from 'vue';
+import { ref, watch } from 'vue';
 import type { Ref } from 'vue';
 import type { TrackResultsMenuModel } from '@@/src/models/nav/track-results-menu-model';
 import {
@@ -19,15 +19,14 @@ let trackResultsMenuModel: Ref<TrackResultsMenuModel> = ref(
     getDefaultTrackResultsMenuModel()
 );
 
-async function fectchModel() {
+async function fetchModel() {
     trackResultsMenuModel.value = await getTrackResultsMenuModel(
         props.league,
         props.car,
         props.track
     );
 }
-watchEffect(fectchModel);
-watch(props, fectchModel);
+watch(props, fetchModel, { immediate: true });
 </script>
 
 <template>
