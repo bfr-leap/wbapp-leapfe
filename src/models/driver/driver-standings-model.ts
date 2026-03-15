@@ -53,12 +53,14 @@ export interface DriverModel {
 }
 
 export interface DriverStandingsModel {
+    leagueId: string;
+    seasonId: string;
     drivers: DriverModel[];
     teams: TeamModel[];
 }
 
 export function getDefaultStandingsModel(): DriverStandingsModel {
-    return { drivers: [], teams: [] };
+    return { leagueId: '', seasonId: '', drivers: [], teams: [] };
 }
 
 /**
@@ -192,6 +194,24 @@ export async function getDriverStandingsModel(
         await getSeasonSimsessionIndex(league),
     ];
 
+    if (isNaN(Number.parseInt(season))) {
+        season = '';
+    }
+
+    let selectedSeason = _seasonSimsessionIndex?.find(
+        (s) => s.season_id.toString() === season
+    );
+
+    if (!selectedSeason) {
+        for (let i = 0; i < (_seasonSimsessionIndex?.length || 0); ++i) {
+            if (_seasonSimsessionIndex?.[i].sessions.length > 0) {
+                selectedSeason = _seasonSimsessionIndex?.[i];
+                break;
+            }
+        }
+        season = selectedSeason?.season_id?.toString() || '';
+    }
+
     let _seasonId = Number.parseInt(season);
 
     const { userTeamIdMap, teamInfoMap } = populateTeamInfoMaps(
@@ -205,6 +225,8 @@ export async function getDriverStandingsModel(
     );
 
     let ret: DriverStandingsModel = getDefaultStandingsModel();
+    ret.leagueId = league;
+    ret.seasonId = season;
     let allDrivers: DriverModel[] = [];
     let position = 1;
 
