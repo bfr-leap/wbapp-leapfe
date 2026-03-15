@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Ref } from 'vue';
-import BarChart from '@@/src/components/vis/bar-chart-unovis.vue';
+import BarChart from '@@/src/components/vis/bar-chart.vue';
+import BarChartUnovis from '@@/src/components/vis/bar-chart-unovis.vue';
 
 import type { PaceChartModel } from '@@/src/models/vis/pace-chart-model';
 import {
@@ -36,7 +37,13 @@ const paceChartModel: Ref<PaceChartModel> =
 </script>
 
 <template>
+    <div class="poc-label">Original (D3)</div>
     <BarChart
+        :title="paceChartModel.title"
+        :data="paceChartModel.barChartData"
+    />
+    <div class="poc-label">Unovis PoC</div>
+    <BarChartUnovis
         :title="paceChartModel.title"
         :data="paceChartModel.barChartData"
     />

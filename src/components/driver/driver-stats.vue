@@ -5,8 +5,10 @@ import type {
     DriverStats,
     DriverResults,
 } from '@@/lplib/endpoint-types/iracing-endpoints';
-import BarChart from '@@/src/components/vis/bar-chart-unovis.vue';
-import HLBarChart from '../vis/hl-bar-chart-unovis.vue';
+import BarChart from '@@/src/components/vis/bar-chart.vue';
+import BarChartUnovis from '@@/src/components/vis/bar-chart-unovis.vue';
+import HLBarChart from '../vis/hl-bar-chart.vue';
+import HLBarChartUnovis from '../vis/hl-bar-chart-unovis.vue';
 import { ref, watchEffect } from 'vue';
 import type { Ref } from 'vue';
 import {
@@ -67,8 +69,6 @@ const driverStatsModel: Ref<DriverStatsModel> =
             () => props.seasonId,
         ]
     );
-
-
 </script>
 
 <template>
@@ -77,7 +77,7 @@ const driverStatsModel: Ref<DriverStatsModel> =
             class="link-light"
             v-if="props.seasonId"
             :to="`/?m=standings&league=${props.leagueId}&season=${props.seasonId}`"
-            >{{ props.seasonName+" "+props.seasonId }}</RouterLinkProxy
+            >{{ props.seasonName + ' ' + props.seasonId }}</RouterLinkProxy
         >
         <span v-else>{{ driverStatsModel.seasonName }}</span>
     </div>
@@ -181,7 +181,13 @@ const driverStatsModel: Ref<DriverStatsModel> =
             tabindex="0"
         >
             <div class="gh-chart-title">Qualifying Performance</div>
+            <div class="poc-label">Original (D3)</div>
             <BarChart
+                v-if="driverStatsModel.qualifyingChartData"
+                :data="driverStatsModel.qualifyingChartData"
+            />
+            <div class="poc-label">Unovis PoC</div>
+            <BarChartUnovis
                 v-if="driverStatsModel.qualifyingChartData"
                 :data="driverStatsModel.qualifyingChartData"
             />
@@ -193,7 +199,13 @@ const driverStatsModel: Ref<DriverStatsModel> =
             tabindex="0"
         >
             <div class="gh-chart-title">Start / Finish</div>
+            <div class="poc-label">Original (D3)</div>
             <HLBarChart
+                v-if="driverStatsModel.startFinishChartData"
+                v-bind:data="driverStatsModel.startFinishChartData"
+            />
+            <div class="poc-label">Unovis PoC</div>
+            <HLBarChartUnovis
                 v-if="driverStatsModel.startFinishChartData"
                 v-bind:data="driverStatsModel.startFinishChartData"
             />

@@ -102,47 +102,48 @@ function tooltipTemplate(d: ChartDatum): string {
 <template>
     <div>
         <div v-if="title" class="chart-title">{{ title }}</div>
-        <VisXYContainer
-            :data="chartData"
-            :height="300"
-            :xDomain="[-0.5, Math.max(chartData.length - 0.5, 0.5)]"
-            :yDomain="[0, undefined]"
-            :margin="{ top: 10, right: 10, bottom: 60, left: 50 }"
-        >
-            <VisGroupedBar
-                :x="(d: ChartDatum) => d.x"
-                :y="yAccessors"
-                :color="barColors"
-                :roundedCorners="2"
-                :barMinHeight="1"
-                :groupPadding="0.1"
-            />
+        <div class="chart-aspect-bar">
+            <VisXYContainer
+                :data="chartData"
+                :xDomain="[-0.5, Math.max(chartData.length - 0.5, 0.5)]"
+                :yDomain="[0, undefined]"
+                :margin="{ top: 10, right: 10, bottom: 60, left: 50 }"
+            >
+                <VisGroupedBar
+                    :x="(d: ChartDatum) => d.x"
+                    :y="yAccessors"
+                    :color="barColors"
+                    :roundedCorners="2"
+                    :barMinHeight="1"
+                    :groupPadding="0.1"
+                />
 
-            <!-- Mean line -->
-            <VisPlotline
-                :value="average"
-                color="rgba(170, 170, 255, 0.27)"
-                :lineWidth="1"
-            />
+                <!-- Mean line -->
+                <VisPlotline
+                    :value="average"
+                    color="rgba(170, 170, 255, 0.27)"
+                    :lineWidth="1"
+                />
 
-            <!-- Stdev band (mean ± 1 stdev) -->
-            <VisPlotband
-                :from="average - stdev"
-                :to="average + stdev"
-                color="rgba(170, 170, 170, 0.08)"
-            />
+                <!-- Stdev band (mean ± 1 stdev) -->
+                <VisPlotband
+                    :from="average - stdev"
+                    :to="average + stdev"
+                    color="rgba(170, 170, 170, 0.08)"
+                />
 
-            <VisAxis
-                type="x"
-                :tickFormat="xTickFormat"
-                :tickTextAngle="-35"
-                :gridLine="false"
-            />
-            <VisAxis type="y" :gridLine="false" />
+                <VisAxis
+                    type="x"
+                    :tickFormat="xTickFormat"
+                    :tickTextAngle="-35"
+                    :gridLine="false"
+                />
+                <VisAxis type="y" :gridLine="false" />
 
-            <VisCrosshair :template="tooltipTemplate" />
-            <VisTooltip />
-        </VisXYContainer>
+                <VisCrosshair :template="tooltipTemplate" />
+                <VisTooltip />
+            </VisXYContainer>
+        </div>
     </div>
 </template>
 
@@ -150,5 +151,10 @@ function tooltipTemplate(d: ChartDatum): string {
 .chart-title {
     color: var(--gh-fg-default, #e6edf3);
     margin-bottom: 4px;
+}
+
+.chart-aspect-bar {
+    aspect-ratio: 1 / 0.37;
+    width: 100%;
 }
 </style>

@@ -523,3 +523,15 @@ a:hover {
     background-color: var(--gh-accent-muted);
     color: var(--gh-fg-on-emphasis);
 }
+
+/* ── PoC comparison label (temporary) ──────────────────────────── */
+.poc-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--gh-fg-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 8px 0 2px;
+    border-top: 1px dashed var(--gh-border-muted);
+    margin-top: 8px;
+}

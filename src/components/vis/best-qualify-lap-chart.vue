@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { watchEffect, ref, watch } from 'vue';
 import type { Ref } from 'vue';
-import LineChart from '@@/src/components/vis/line-chart-unovis.vue';
+import LineChart from '@@/src/components/vis/line-chart.vue';
+import LineChartUnovis from '@@/src/components/vis/line-chart-unovis.vue';
 import type { BestQualifyLapChartModel } from '@@/src/models/vis/best-qualify-lap-chart-model';
 import {
     getDefaultBestQualifyLapChartModel,
@@ -38,5 +39,8 @@ const bestQualifyLapChartModel: Ref<BestQualifyLapChartModel> =
 </script>
 
 <template>
+    <div class="poc-label">Original (D3)</div>
     <LineChart :data="bestQualifyLapChartModel.lapTimes" />
+    <div class="poc-label">Unovis PoC</div>
+    <LineChartUnovis :data="bestQualifyLapChartModel.lapTimes" />
 </template>

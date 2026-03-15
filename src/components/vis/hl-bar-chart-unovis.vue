@@ -119,37 +119,38 @@ function tooltipTemplate(d: ChartDatum): string {
 <template>
     <div>
         <div v-if="title" class="chart-title">{{ title }}</div>
-        <VisXYContainer
-            :data="chartData"
-            :height="220"
-            :xDomain="[-0.5, Math.max(chartData.length - 0.5, 0.5)]"
-            :margin="{ top: 10, right: 10, bottom: 60, left: 50 }"
-        >
-            <VisStackedBar
-                :x="(d: ChartDatum) => d.x"
-                :y="[
+        <div class="chart-aspect-bar">
+            <VisXYContainer
+                :data="chartData"
+                :xDomain="[-0.5, Math.max(chartData.length - 0.5, 0.5)]"
+                :margin="{ top: 10, right: 10, bottom: 60, left: 50 }"
+            >
+                <VisStackedBar
+                    :x="(d: ChartDatum) => d.x"
+                    :y="[
                     (d: ChartDatum) => d.base,
                     (d: ChartDatum) => d.span,
                 ]"
-                :color="[
+                    :color="[
                     'transparent',
                     (d: ChartDatum) => d.isPositive ? '#1aa179' : '#a1791a',
                 ]"
-                :roundedCorners="2"
-                :barMinHeight1Px="true"
-            />
+                    :roundedCorners="2"
+                    :barMinHeight1Px="true"
+                />
 
-            <VisAxis
-                type="x"
-                :tickFormat="xTickFormat"
-                :tickTextAngle="-35"
-                :gridLine="false"
-            />
-            <VisAxis type="y" :gridLine="false" />
+                <VisAxis
+                    type="x"
+                    :tickFormat="xTickFormat"
+                    :tickTextAngle="-35"
+                    :gridLine="false"
+                />
+                <VisAxis type="y" :gridLine="false" />
 
-            <VisCrosshair :template="tooltipTemplate" />
-            <VisTooltip />
-        </VisXYContainer>
+                <VisCrosshair :template="tooltipTemplate" />
+                <VisTooltip />
+            </VisXYContainer>
+        </div>
     </div>
 </template>
 
@@ -157,5 +158,10 @@ function tooltipTemplate(d: ChartDatum): string {
 .chart-title {
     color: var(--gh-fg-default, #e6edf3);
     margin-bottom: 4px;
+}
+
+.chart-aspect-bar {
+    aspect-ratio: 1 / 0.37;
+    width: 100%;
 }
 </style>

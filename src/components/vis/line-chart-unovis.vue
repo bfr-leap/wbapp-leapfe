@@ -154,10 +154,9 @@ function onLegendItemClick(_: unknown, i: number) {
 <template>
     <div>
         <div v-if="title" class="chart-title">{{ title }}</div>
-        <div>
+        <div class="chart-aspect-line">
             <VisXYContainer
                 :data="flatData"
-                :height="300"
                 :yDomain="yDomain"
                 :margin="{ top: 10, right: 10, bottom: 30, left: 50 }"
             >
@@ -201,6 +200,11 @@ function onLegendItemClick(_: unknown, i: number) {
 .chart-title {
     color: var(--gh-fg-default, #e6edf3);
     margin-bottom: 4px;
+}
+
+.chart-aspect-line {
+    aspect-ratio: 1 / 0.5;
+    width: 100%;
 }
 
 .legend-area {
