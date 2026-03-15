@@ -156,6 +156,53 @@ describe('asyncDataWithReactiveModel - watch behavior', () => {
         });
     });
 
+    it('fires watch when query-style getter observables change (route.query pattern)', async () => {
+        setupMockUseAsyncData();
+        // Simulate the route.query pattern used in HomeView
+        const query = reactive({
+            m: '' as string,
+            league: '4534',
+            season: '128679',
+            subsession: '83319765',
+            simsession: '0',
+        });
+        const fetchFn = vi.fn(async () => ({
+            league_id: Number(query.league),
+            season_id: Number(query.season),
+            subsession_id: Number(query.subsession),
+            simsession_id: Number(query.simsession),
+        }));
+
+        const model = await asyncDataWithReactiveModel(
+            'test-route-query',
+            fetchFn,
+            () => ({
+                league_id: 0,
+                season_id: 0,
+                subsession_id: 0,
+                simsession_id: 0,
+            }),
+            [
+                () => query.m,
+                () => query.league,
+                () => query.season,
+                () => query.subsession,
+                () => query.simsession,
+            ]
+        );
+
+        expect(fetchFn).toHaveBeenCalledTimes(1);
+        expect(model.value.subsession_id).toBe(83319765);
+
+        // Navigate to a different subsession (simulates clicking a past event)
+        query.m = 'results';
+        query.subsession = '84059465';
+        await flushWatchers();
+
+        expect(fetchFn).toHaveBeenCalledTimes(2);
+        expect(model.value.subsession_id).toBe(84059465);
+    });
+
     it('multiple independent instances all fire their watches', async () => {
         setupMockUseAsyncData();
         const props = reactive({

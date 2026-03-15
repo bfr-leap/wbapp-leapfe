@@ -65,7 +65,13 @@ const lgSeasSubCtx: Ref<LgSeasSubCtx> =
         ].join('-')}`,
         track,
         getDefaultModel,
-        [route]
+        [
+            () => route.query.m as string,
+            () => route.query.league as string,
+            () => route.query.season as string,
+            () => route.query.subsession as string,
+            () => route.query.simsession as string,
+        ]
     );
 
 track();
