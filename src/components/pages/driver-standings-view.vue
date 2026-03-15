@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { useRoute } from 'vue-router';
 import DriverStandings from '@@/src/components/driver/driver-standings.vue';
 
-const route = useRoute();
+const props = defineProps<{
+    league: string;
+    season: string;
+}>();
 </script>
 
 <template>
     <DriverStandings
-        v-bind:season="(route.query.season as string)"
-        v-bind:league="(route.query.league as string)"
+        v-bind:season="props.season"
+        v-bind:league="props.league"
     />
 </template>

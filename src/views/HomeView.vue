@@ -88,6 +88,8 @@ track();
     ></ResultsView>
     <DriverStandingsView
         v-if="route.query.m === 'standings'"
+        v-bind:league="lgSeasSubCtx.league_id?.toString()"
+        v-bind:season="lgSeasSubCtx.season_id?.toString()"
     ></DriverStandingsView>
     <DriverView v-if="route.query.m === 'driver'"></DriverView>
     <TeamView v-if="route.query.m === 'team'"></TeamView>
