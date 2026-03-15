@@ -37,7 +37,7 @@ const pastEventCardsModel: Ref<PastEventCardsModel> =
                     <RouterLinkProxy
                         :style="{ textDecoration: 'none' }"
                         class="link-light"
-                        v-bind:to="`?m=results&league=${props.league}&season=${props.season}&subsession=${race.sessionId}&simsession=0`"
+                        v-bind:to="`?m=results&league=${props.league}&season=${props.season}&subsession=${race.sessionId}&simsession=${race.simsessionId}`"
                     >
                         <EventCardSm
                             class="h-100"
