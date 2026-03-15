@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick, toRaw } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick, toRaw } from 'vue';
 import { MurmurHashV2 } from '@@/src/utils/hash-util';
 import * as d3 from 'd3';
 
@@ -25,17 +25,23 @@ const props = withDefaults(
 const svgRoot = ref<SVGGElement | null>(null);
 const divRoot = ref<HTMLElement | null>(null);
 const startSize = 500;
+let resizeObserver: ResizeObserver | null = null;
 
 onMounted(async () => {
     await nextTick();
     if (ResizeObserver && divRoot.value) {
-        let resizeObserver = new ResizeObserver(() => {
+        resizeObserver = new ResizeObserver(() => {
             window.requestAnimationFrame(async () => {
                 hlBarChartModel.value = await fetchModel();
             });
         });
         resizeObserver.observe(divRoot.value);
     }
+});
+
+onUnmounted(() => {
+    resizeObserver?.disconnect();
+    resizeObserver = null;
 });
 
 async function fetchModel(): Promise<HLBarChartModel> {

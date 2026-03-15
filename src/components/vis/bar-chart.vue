@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick, toRaw } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick, toRaw } from 'vue';
 import type { BarChartDatum } from '@@/src/models/vis/bar-chart-model';
 import { MurmurHashV2 } from '@@/src/utils/hash-util';
 import * as d3 from 'd3';
@@ -23,17 +23,23 @@ const props = withDefaults(
 
 const svgRoot = ref<SVGGElement | null>(null);
 const divRoot = ref<HTMLElement | null>(null);
+let resizeObserver: ResizeObserver | null = null;
 
 onMounted(async () => {
     await nextTick();
     if (ResizeObserver && divRoot.value) {
-        let resizeObserver = new ResizeObserver(() => {
+        resizeObserver = new ResizeObserver(() => {
             window.requestAnimationFrame(async () => {
                 barChartModel.value = await fetchModel();
             });
         });
         resizeObserver.observe(divRoot.value);
     }
+});
+
+onUnmounted(() => {
+    resizeObserver?.disconnect();
+    resizeObserver = null;
 });
 
 const minBarHeight = ref<number>(0.02);

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { SignedIn, SignedOut, RedirectToSignUp } from 'vue-clerk';
-import { watchEffect, ref } from 'vue';
+import { watch, ref } from 'vue';
 import type { Ref } from 'vue';
 
 const props = defineProps<{
@@ -13,13 +13,17 @@ const props = defineProps<{
 let forward: Ref<boolean> = ref(false);
 let isClient: Ref<boolean> = ref(false);
 
-async function fetchModel() {}
-
 function onClick() {
     forward.value = true;
 }
 
-watchEffect(fetchModel);
+// Reset redirect state when navigating to a different target
+watch(
+    () => props.to,
+    () => {
+        forward.value = false;
+    }
+);
 
 // Determine if we're on the client-side
 onMounted(() => {
