@@ -37,10 +37,10 @@ const view: Ref<DriverStandingsModel> =
 
 <template>
     <LeagueSeasonMenu
-        v-if="!summary_mode"
+        v-if="!summary_mode && view.leagueId && view.seasonId"
         targetPage="standings"
-        v-bind:league="props.league"
-        v-bind:season="props.season"
+        v-bind:league="view.leagueId"
+        v-bind:season="view.seasonId"
     ></LeagueSeasonMenu>
 
     <div class="card bg-dark text-light m-2">
@@ -106,7 +106,7 @@ const view: Ref<DriverStandingsModel> =
                                 v-bind:clubId="member.clubId"
                                 v-bind:driverId="member.custId"
                                 v-bind:teamId="member.teamId?.toString()"
-                                v-bind:leagueId="props.league"
+                                v-bind:leagueId="view.leagueId"
                             />
                         </div>
                     </div>
@@ -122,7 +122,7 @@ const view: Ref<DriverStandingsModel> =
                     <RouterLinkProxy
                         class="dropdown-item"
                         type="button"
-                        v-bind:to="`?m=standings&league=${props.league}&season=${props.season}`"
+                        v-bind:to="`?m=standings&league=${view.leagueId}&season=${view.seasonId}`"
                         >See all Standings
                     </RouterLinkProxy>
                 </div>
@@ -194,7 +194,7 @@ const view: Ref<DriverStandingsModel> =
                                 {{ team.teamName }}</RouterLinkProxy
                             > -->
                             <TeamTag
-                                v-bind:league-id="props.league"
+                                v-bind:league-id="view.leagueId"
                                 v-bind:team-id="team.teamId"
                             ></TeamTag>
                         </div>
@@ -207,7 +207,7 @@ const view: Ref<DriverStandingsModel> =
                     <RouterLinkProxy
                         class="dropdown-item"
                         type="button"
-                        v-bind:to="`?m=standings&league=${props.league}&season=${props.season}`"
+                        v-bind:to="`?m=standings&league=${view.leagueId}&season=${view.seasonId}`"
                         >See all Standings
                     </RouterLinkProxy>
                 </div>
