@@ -5,8 +5,8 @@ import type {
     DriverStats,
     DriverResults,
 } from '@@/lplib/endpoint-types/iracing-endpoints';
-import BarChart from '@@/src/components/vis/bar-chart.vue';
-import HLBarChart from '../vis/hl-bar-chart.vue';
+import BarChart from '@@/src/components/vis/bar-chart-unovis.vue';
+import HLBarChart from '../vis/hl-bar-chart-unovis.vue';
 import { ref, watchEffect } from 'vue';
 import type { Ref } from 'vue';
 import {

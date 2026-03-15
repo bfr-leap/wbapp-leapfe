@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { watchEffect, ref, watch } from 'vue';
 import type { Ref } from 'vue';
-import LineChart from '@@/src/components/vis/line-chart.vue';
+import LineChart from '@@/src/components/vis/line-chart-unovis.vue';
 import type { BestQualifyLapChartModel } from '@@/src/models/vis/best-qualify-lap-chart-model';
 import {
     getDefaultBestQualifyLapChartModel,

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Ref } from 'vue';
-import BarChart from '@@/src/components/vis/bar-chart.vue';
+import BarChart from '@@/src/components/vis/bar-chart-unovis.vue';
 
 import type { PaceChartModel } from '@@/src/models/vis/pace-chart-model';
 import {
