@@ -34,6 +34,9 @@ async function track() {
         );
 
     if (def) {
+        if (route.query.subsession) {
+            def.subsession_id = Number(route.query.subsession);
+        }
         def.simsession_id = (route.query.simsession as string) || '';
     }
 

@@ -203,6 +203,131 @@ describe('asyncDataWithReactiveModel - watch behavior', () => {
         expect(model.value.subsession_id).toBe(84059465);
     });
 
+    it('reproduces stale subsession when API returns default context (HomeView bug)', async () => {
+        setupMockUseAsyncData();
+        // Simulate route.query — home page has no subsession in URL
+        const query = reactive({
+            m: '' as string,
+            league: '4534',
+            season: '128679',
+            subsession: '' as string, // no subsession on home page
+            simsession: '' as string,
+        });
+
+        // Simulate defLgSeasSubCtx: API always returns the LATEST
+        // subsession as the default, regardless of the subsession param.
+        // This is the "default context" endpoint behavior.
+        const LATEST_SUBSESSION = 84059465;
+        const CLICKED_SUBSESSION = 83319765;
+
+        // BUG version: fetch returns API default, does NOT override from URL
+        const buggyFetchFn = vi.fn(async () => ({
+            league_id: 4534,
+            season_id: 128679,
+            subsession_id: LATEST_SUBSESSION, // API always returns latest
+            simsession_id: 0,
+        }));
+
+        const buggyModel = await asyncDataWithReactiveModel(
+            'test-stale-buggy',
+            buggyFetchFn,
+            () => ({
+                league_id: 0,
+                season_id: 0,
+                subsession_id: 0,
+                simsession_id: 0,
+            }),
+            [
+                () => query.m,
+                () => query.league,
+                () => query.season,
+                () => query.subsession,
+                () => query.simsession,
+            ]
+        );
+
+        // Initial: API returns latest subsession (correct for home page)
+        expect(buggyModel.value.subsession_id).toBe(LATEST_SUBSESSION);
+
+        // User clicks past event → URL changes
+        query.m = 'results';
+        query.subsession = CLICKED_SUBSESSION.toString();
+        query.simsession = '0';
+        await flushWatchers();
+
+        // Watch fired, but API still returned the latest subsession!
+        // The model is STALE — this is the bug the user reported.
+        expect(buggyFetchFn).toHaveBeenCalledTimes(2);
+        expect(buggyModel.value.subsession_id).toBe(LATEST_SUBSESSION);
+        expect(buggyModel.value.subsession_id).not.toBe(CLICKED_SUBSESSION);
+    });
+
+    it('fixed: fetch overrides subsession_id from URL query params', async () => {
+        setupMockUseAsyncData();
+        const query = reactive({
+            m: '' as string,
+            league: '4534',
+            season: '128679',
+            subsession: '' as string,
+            simsession: '' as string,
+        });
+
+        const LATEST_SUBSESSION = 84059465;
+        const CLICKED_SUBSESSION = 83319765;
+
+        // FIXED version: after fetching default context, override
+        // subsession_id and simsession_id from the URL query params
+        // (mirrors what HomeView's track() function should do)
+        const fixedFetchFn = vi.fn(async () => {
+            // Simulate defLgSeasSubCtx returning the default context
+            const def = {
+                league_id: 4534,
+                season_id: 128679,
+                subsession_id: LATEST_SUBSESSION,
+                simsession_id: 0,
+            };
+            // Override from URL params (the fix)
+            if (query.subsession) {
+                def.subsession_id = Number(query.subsession);
+            }
+            if (query.simsession) {
+                def.simsession_id = Number(query.simsession);
+            }
+            return def;
+        });
+
+        const fixedModel = await asyncDataWithReactiveModel(
+            'test-stale-fixed',
+            fixedFetchFn,
+            () => ({
+                league_id: 0,
+                season_id: 0,
+                subsession_id: 0,
+                simsession_id: 0,
+            }),
+            [
+                () => query.m,
+                () => query.league,
+                () => query.season,
+                () => query.subsession,
+                () => query.simsession,
+            ]
+        );
+
+        // Initial: no subsession in URL, so API default is used
+        expect(fixedModel.value.subsession_id).toBe(LATEST_SUBSESSION);
+
+        // User clicks past event → URL changes
+        query.m = 'results';
+        query.subsession = CLICKED_SUBSESSION.toString();
+        query.simsession = '0';
+        await flushWatchers();
+
+        // Now the model reflects the clicked subsession, not the API default
+        expect(fixedFetchFn).toHaveBeenCalledTimes(2);
+        expect(fixedModel.value.subsession_id).toBe(CLICKED_SUBSESSION);
+    });
+
     it('multiple independent instances all fire their watches', async () => {
         setupMockUseAsyncData();
         const props = reactive({
