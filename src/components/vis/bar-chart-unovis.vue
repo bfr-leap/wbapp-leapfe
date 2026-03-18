@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, toRaw } from 'vue';
+import { computed, ref, toRaw, onMounted, onUnmounted, nextTick } from 'vue';
 import type { BarChartDatum } from '@@/src/models/vis/bar-chart-model';
 import {
     VisXYContainer,
@@ -10,7 +10,26 @@ import {
     VisTooltip,
     VisCrosshair,
 } from '@unovis/vue';
-import { GroupedBar, Axis, Crosshair } from '@unovis/ts';
+const containerRef = ref<HTMLElement | null>(null);
+const containerWidth = ref(500);
+let resizeObserver: ResizeObserver | null = null;
+
+onMounted(async () => {
+    await nextTick();
+    if (containerRef.value) {
+        containerWidth.value = containerRef.value.clientWidth;
+        resizeObserver = new ResizeObserver(() => {
+            if (containerRef.value) {
+                containerWidth.value = containerRef.value.clientWidth;
+            }
+        });
+        resizeObserver.observe(containerRef.value);
+    }
+});
+
+onUnmounted(() => {
+    resizeObserver?.disconnect();
+});
 
 const props = withDefaults(
     defineProps<{
@@ -79,12 +98,15 @@ const stdev = computed(() => {
 
 const xTickValues = computed(() => chartData.value.map((_, i) => i));
 
+// Match D3's width-based label filtering: 1 label per ~25px of width
 const xTickFormat = computed(() => {
     const data = chartData.value;
+    const n = 0.04 * containerWidth.value;
+    const mod = Math.max(1, Math.ceil(data.length / n));
     return (tick: number) => {
         const i = Math.round(tick);
         if (i < 0 || i >= data.length) return '';
-        return data[i].name;
+        return i % mod === 0 ? data[i].name : '';
     };
 });
 
@@ -103,7 +125,7 @@ function tooltipTemplate(d: ChartDatum): string {
 <template>
     <div>
         <div v-if="title" class="chart-title">{{ title }}</div>
-        <div class="chart-container">
+        <div ref="containerRef" class="chart-container">
             <VisXYContainer
                 :data="chartData"
                 :xDomain="[-0.5, Math.max(chartData.length - 0.5, 0.5)]"
