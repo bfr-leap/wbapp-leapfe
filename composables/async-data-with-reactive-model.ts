@@ -104,6 +104,25 @@ export async function asyncDataWithReactiveModelResult<T>(
         }
     };
 
+    // Resolve observable values as a JSON snapshot for comparison
+    function obsStr(): string {
+        try {
+            return JSON.stringify(
+                observables.map((o) =>
+                    typeof o === 'function'
+                        ? (o as () => unknown)()
+                        : '(ref)'
+                )
+            );
+        } catch {
+            return '(serialize-err)';
+        }
+    }
+
+    // Snapshot observable values BEFORE the async fetch so we can
+    // detect changes that occur during the await.
+    const preAwaitObs = obsStr();
+
     // Using useAsyncData to fetch the model during SSR and client-side
     const {
         data: model,
@@ -114,13 +133,7 @@ export async function asyncDataWithReactiveModelResult<T>(
     diag(dataKey, 'init', {
         hasData: model.value != null,
         error: error.value?.message ?? null,
-        obs: JSON.stringify(
-            observables.map((o) =>
-                typeof o === 'function'
-                    ? (o as () => unknown)()
-                    : '(ref)'
-            )
-        ),
+        obs: obsStr(),
     });
 
     if (error.value) {
@@ -138,21 +151,6 @@ export async function asyncDataWithReactiveModelResult<T>(
             modelRef.value = model.value as T;
         }
     });
-
-    // Resolve observable values for logging (as JSON string)
-    function obsStr(): string {
-        try {
-            return JSON.stringify(
-                observables.map((o) =>
-                    typeof o === 'function'
-                        ? (o as () => unknown)()
-                        : '(ref)'
-                )
-            );
-        } catch {
-            return '(serialize-err)';
-        }
-    }
 
     // Watch for prop changes and refetch data accordingly
     watch(observables, async (_newVal, _oldVal) => {
@@ -178,6 +176,25 @@ export async function asyncDataWithReactiveModelResult<T>(
         model.value as T
     ) as Ref<T>;
     refReady = true;
+
+    // Detect observables that changed during the await (race condition).
+    // This happens when a parent model updates props while this model's
+    // initial fetch is in flight (e.g. navigating to a past event:
+    // ResultsView mounts with stale lgSeasSubCtx, then props update
+    // before the watcher is created). The watcher won't fire because
+    // it never saw the old values, so we refetch here.
+    const postAwaitObs = obsStr();
+    if (preAwaitObs !== postAwaitObs) {
+        diag(dataKey, 'stale-init-refetch', {
+            before: preAwaitObs,
+            after: postAwaitObs,
+        });
+        pendingRef.value = true;
+        errorRef.value = null;
+        model.value = (await safeFetch()) as T;
+        modelRef.value = model.value as T;
+        pendingRef.value = false;
+    }
 
     return {
         model: modelRef,

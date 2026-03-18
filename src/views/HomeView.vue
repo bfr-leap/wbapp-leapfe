@@ -34,6 +34,9 @@ async function track() {
         );
 
     if (def) {
+        if (route.query.subsession) {
+            def.subsession_id = Number(route.query.subsession);
+        }
         def.simsession_id = (route.query.simsession as string) || '';
     }
 
@@ -65,7 +68,13 @@ const lgSeasSubCtx: Ref<LgSeasSubCtx> =
         ].join('-')}`,
         track,
         getDefaultModel,
-        [route]
+        [
+            () => route.query.m as string,
+            () => route.query.league as string,
+            () => route.query.season as string,
+            () => route.query.subsession as string,
+            () => route.query.simsession as string,
+        ]
     );
 
 track();
