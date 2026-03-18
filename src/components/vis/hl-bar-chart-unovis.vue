@@ -25,13 +25,12 @@ const props = withDefaults(
     }
 );
 
-// Unovis StackedBar stacks positive/negative separately and colors
-// by stack index (not per-datum). To get green=gained / gold=lost,
-// we use 3 stacks:
+// Unovis StackedBar colors by stack index (confirmed via getColor
+// using d.stackIndex). We use 3 stacks:
 //   [0] base (transparent) — offset so all values are positive
 //   [1] positive span (green #1aa179) — only when hi >= lo
 //   [2] negative span (gold #a1791a) — only when hi < lo
-// For zero-change bars we use a tiny minimum span so they stay visible.
+// MIN_SPAN keeps zero-change bars visible.
 
 type ChartDatum = {
     x: number;
@@ -72,13 +71,15 @@ const chartData = computed<ChartDatum[]>(() => {
     });
 });
 
+// Provide an explicit tick position for every bar so all labels show
+const xTickValues = computed(() => chartData.value.map((_, i) => i));
+
 const xTickFormat = computed(() => {
     const data = chartData.value;
-    const n = Math.max(1, Math.ceil(data.length / 20));
     return (tick: number) => {
         const i = Math.round(tick);
         if (i < 0 || i >= data.length) return '';
-        return i % n === 0 ? data[i].name : '';
+        return data[i].name;
     };
 });
 
@@ -90,7 +91,7 @@ const yTickFormat = computed(() => {
 function tooltipTemplate(d: ChartDatum): string {
     return `<div style="padding: 4px 8px; background: #1e1e2e; border: 1px solid #444; border-radius: 4px; color: #eee;">
         <strong>${d.name}</strong><br/>
-        Start: ${d.hi} | Finish: ${d.lo}
+        Start: ${Math.abs(d.lo)} | Finish: ${Math.abs(d.hi)}
     </div>`;
 }
 </script>
@@ -98,7 +99,7 @@ function tooltipTemplate(d: ChartDatum): string {
 <template>
     <div>
         <div v-if="title" class="chart-title">{{ title }}</div>
-        <div class="chart-aspect-bar">
+        <div class="chart-container">
             <VisXYContainer
                 :data="chartData"
                 :xDomain="[-0.5, Math.max(chartData.length - 0.5, 0.5)]"
@@ -114,13 +115,16 @@ function tooltipTemplate(d: ChartDatum): string {
                     ]"
                     :color="['transparent', '#1aa179', '#a1791a']"
                     :roundedCorners="2"
-                    :barMinHeight1Px="true"
                 />
 
                 <VisAxis
                     type="x"
+                    :tickValues="xTickValues"
+                    :numTicks="chartData.length"
                     :tickFormat="xTickFormat"
                     :tickTextAngle="-35"
+                    :tickTextWidth="120"
+                    tickTextFitMode="trim"
                     :gridLine="false"
                 />
                 <VisAxis type="y" :gridLine="false" :tickFormat="yTickFormat" />
@@ -138,8 +142,13 @@ function tooltipTemplate(d: ChartDatum): string {
     margin-bottom: 4px;
 }
 
-.chart-aspect-bar {
-    aspect-ratio: 1 / 0.37;
+.chart-container {
     width: 100%;
+    aspect-ratio: 1 / 0.5;
+}
+
+.chart-container :deep(.unovis-xy-container) {
+    width: 100% !important;
+    height: 100% !important;
 }
 </style>
