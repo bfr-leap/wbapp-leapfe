@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { computed, ref, toRaw } from 'vue';
+import {
+    computed,
+    ref,
+    toRaw,
+    onMounted,
+    onUnmounted,
+    nextTick,
+} from 'vue';
 import type { SeriesXY } from '@@/src/models/vis/line-chart-model';
 import {
     VisXYContainer,
@@ -10,11 +17,41 @@ import {
 } from '@unovis/vue';
 import { CurveType } from '@unovis/ts';
 
+const containerRef = ref<HTMLElement | null>(null);
+const containerWidth = ref(500);
+let resizeObserver: ResizeObserver | null = null;
+
+onMounted(async () => {
+    await nextTick();
+    if (containerRef.value) {
+        containerWidth.value = containerRef.value.clientWidth;
+        resizeObserver = new ResizeObserver(() => {
+            if (containerRef.value) {
+                containerWidth.value = containerRef.value.clientWidth;
+            }
+        });
+        resizeObserver.observe(containerRef.value);
+    }
+});
+
+onUnmounted(() => {
+    resizeObserver?.disconnect();
+});
+
 const props = defineProps<{
     data: SeriesXY[];
     title?: string;
     yRange?: [number, number];
 }>();
+
+const isNarrow = computed(() => containerWidth.value < 576);
+
+const chartMargin = computed(() => ({
+    top: 10,
+    right: 10,
+    bottom: isNarrow.value ? 20 : 30,
+    left: isNarrow.value ? 35 : 50,
+}));
 
 // Unovis expects a flat data array with one entry per x-value, where
 // each series' y-value is a separate field. We pivot the series-based
@@ -151,11 +188,15 @@ function onToggleAll() {
 <template>
     <div>
         <div v-if="title" class="chart-title">{{ title }}</div>
-        <div class="chart-container">
+        <div
+            ref="containerRef"
+            class="chart-container"
+            :class="{ narrow: isNarrow }"
+        >
             <VisXYContainer
                 :data="flatData"
                 :yDomain="yDomain"
-                :margin="{ top: 10, right: 10, bottom: 30, left: 50 }"
+                :margin="chartMargin"
                 :height="'100%'"
             >
                 <VisLine
@@ -211,6 +252,10 @@ function onToggleAll() {
     height: 100% !important;
 }
 
+.chart-container.narrow :deep(text) {
+    font-size: 10px !important;
+}
+
 .legend-area {
     display: flex;
     flex-wrap: wrap;
@@ -238,5 +283,21 @@ function onToggleAll() {
     display: inline-block;
     width: 10px;
     height: 10px;
+}
+
+@media (max-width: 576px) {
+    .toggle-btn {
+        font-size: 0.75rem;
+        padding: 2px 5px;
+    }
+
+    .legend-item {
+        padding: 0.125rem;
+    }
+
+    .color-swatch {
+        width: 8px;
+        height: 8px;
+    }
 }
 </style>
