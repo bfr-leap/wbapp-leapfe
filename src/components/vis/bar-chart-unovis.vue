@@ -77,13 +77,14 @@ const stdev = computed(() => {
     return Math.sqrt(variance);
 });
 
+const xTickValues = computed(() => chartData.value.map((_, i) => i));
+
 const xTickFormat = computed(() => {
     const data = chartData.value;
-    const n = Math.max(1, Math.ceil(data.length / 20));
     return (tick: number) => {
         const i = Math.round(tick);
         if (i < 0 || i >= data.length) return '';
-        return i % n === 0 ? data[i].name : '';
+        return data[i].name;
     };
 });
 
@@ -102,12 +103,12 @@ function tooltipTemplate(d: ChartDatum): string {
 <template>
     <div>
         <div v-if="title" class="chart-title">{{ title }}</div>
-        <div class="chart-aspect-bar">
+        <div class="chart-container">
             <VisXYContainer
                 :data="chartData"
                 :xDomain="[-0.5, Math.max(chartData.length - 0.5, 0.5)]"
                 :yDomain="[0, undefined]"
-                :margin="{ top: 10, right: 10, bottom: 60, left: 50 }"
+                :margin="{ top: 10, right: 10, bottom: 80, left: 50 }"
             >
                 <VisGroupedBar
                     :x="(d: ChartDatum) => d.x"
@@ -134,8 +135,12 @@ function tooltipTemplate(d: ChartDatum): string {
 
                 <VisAxis
                     type="x"
+                    :tickValues="xTickValues"
+                    :numTicks="chartData.length"
                     :tickFormat="xTickFormat"
                     :tickTextAngle="-35"
+                    :tickTextWidth="120"
+                    tickTextFitMode="trim"
                     :gridLine="false"
                 />
                 <VisAxis type="y" :gridLine="false" />
@@ -153,8 +158,13 @@ function tooltipTemplate(d: ChartDatum): string {
     margin-bottom: 4px;
 }
 
-.chart-aspect-bar {
-    aspect-ratio: 1 / 0.37;
+.chart-container {
     width: 100%;
+    aspect-ratio: 1 / 0.5;
+}
+
+.chart-container :deep(.unovis-xy-container) {
+    width: 100% !important;
+    height: 100% !important;
 }
 </style>
