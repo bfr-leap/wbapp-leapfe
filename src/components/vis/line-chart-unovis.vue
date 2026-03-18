@@ -7,7 +7,6 @@ import {
     VisAxis,
     VisTooltip,
     VisCrosshair,
-    VisBulletLegend,
 } from '@unovis/vue';
 import { CurveType } from '@unovis/ts';
 
@@ -102,16 +101,26 @@ const flatData = computed<FlatDatum[]>(() => {
     return Array.from(xMap.values()).sort((a, b) => a.x - b.x);
 });
 
-// Build y-accessor array — one per series, returning null when toggled off
+// Build y-accessor array — always return the data value (never null
+// for toggle). Toggling only changes color opacity so the line fades
+// instead of disappearing, matching the original D3 behavior.
 const yAccessors = computed(() => {
     return props.data.map((_, i) => {
-        return (d: FlatDatum) => {
-            if (!toggleState.value[i]) return null;
-            return d[`y${i}`] ?? null;
-        };
+        return (d: FlatDatum) => d[`y${i}`] ?? undefined;
     });
 });
 
+// Build defined-accessor array — tells Unovis where each series has
+// actual data points so lines end properly when a driver drops out
+// instead of connecting through 0.
+const definedAccessors = computed(() => {
+    return props.data.map((_, i) => {
+        return (d: FlatDatum) =>
+            d[`y${i}`] !== null && d[`y${i}`] !== undefined;
+    });
+});
+
+// Toggle changes color opacity (0.03 when off) instead of hiding data
 const lineColors = computed(() => {
     return props.data.map((_, i) => {
         const base = baseColors[i % baseColors.length];
@@ -130,14 +139,6 @@ const yDomain = computed<[number | undefined, number | undefined]>(() => {
     return [undefined, undefined];
 });
 
-const legendItems = computed(() => {
-    return props.data.map((s, i) => ({
-        name: s.name,
-        color: baseColors[i % baseColors.length],
-        inactive: !toggleState.value[i],
-    }));
-});
-
 function onToggle(seriesIndex: number) {
     toggleState.value[seriesIndex] = !toggleState.value[seriesIndex];
 }
@@ -145,26 +146,24 @@ function onToggle(seriesIndex: number) {
 function onToggleAll() {
     toggleState.value = toggleState.value.map((v) => !v);
 }
-
-function onLegendItemClick(_: unknown, i: number) {
-    onToggle(i);
-}
 </script>
 
 <template>
     <div>
         <div v-if="title" class="chart-title">{{ title }}</div>
-        <div class="chart-aspect-line">
+        <div class="chart-container">
             <VisXYContainer
                 :data="flatData"
                 :yDomain="yDomain"
                 :margin="{ top: 10, right: 10, bottom: 30, left: 50 }"
+                :height="'100%'"
             >
                 <VisLine
                     v-for="(accessor, i) in yAccessors"
                     :key="i"
                     :x="(d: FlatDatum) => d.x"
                     :y="accessor"
+                    :defined="definedAccessors[i]"
                     :color="lineColors[i]"
                     :lineWidth="1.5"
                     :lineDashArray="lineDashArrays[i]"
@@ -202,9 +201,14 @@ function onLegendItemClick(_: unknown, i: number) {
     margin-bottom: 4px;
 }
 
-.chart-aspect-line {
-    aspect-ratio: 1 / 0.5;
+.chart-container {
     width: 100%;
+    aspect-ratio: 1 / 0.5;
+}
+
+.chart-container :deep(.unovis-xy-container) {
+    width: 100% !important;
+    height: 100% !important;
 }
 
 .legend-area {

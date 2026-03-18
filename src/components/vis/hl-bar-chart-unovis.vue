@@ -25,20 +25,25 @@ const props = withDefaults(
     }
 );
 
-// Unovis StackedBar splits positive/negative into separate stacks,
-// so we can't directly render floating bars from lo to hi when values
-// cross zero. Fix: offset all values so they're positive, then
-// adjust Y-axis labels to show the original values.
+// Unovis StackedBar stacks positive/negative separately and colors
+// by stack index (not per-datum). To get green=gained / gold=lost,
+// we use 3 stacks:
+//   [0] base (transparent) — offset so all values are positive
+//   [1] positive span (green #1aa179) — only when hi >= lo
+//   [2] negative span (gold #a1791a) — only when hi < lo
+// For zero-change bars we use a tiny minimum span so they stay visible.
 
 type ChartDatum = {
     x: number;
     base: number;
-    span: number;
+    posSpan: number;
+    negSpan: number;
     hi: number;
     lo: number;
     name: string;
-    isPositive: boolean;
 };
+
+const MIN_SPAN = 0.3;
 
 const globalMin = computed(() => {
     const allVals = props.data.flatMap((d) => [d.hi, d.lo]);
@@ -50,15 +55,21 @@ const offset = computed(() => -globalMin.value);
 const chartData = computed<ChartDatum[]>(() => {
     const raw = toRaw(props.data);
     const off = offset.value;
-    return raw.map((d, i) => ({
-        x: i,
-        base: Math.min(d.hi, d.lo) + off,
-        span: Math.abs(d.hi - d.lo),
-        hi: d.hi,
-        lo: d.lo,
-        name: d.name,
-        isPositive: d.hi >= d.lo,
-    }));
+    return raw.map((d, i) => {
+        const span = Math.abs(d.hi - d.lo);
+        const isPositive = d.hi >= d.lo;
+        const isZero = d.hi === d.lo;
+        const effectiveSpan = Math.max(span, MIN_SPAN);
+        return {
+            x: i,
+            base: Math.min(d.hi, d.lo) + off - (isZero ? MIN_SPAN / 2 : 0),
+            posSpan: isPositive ? effectiveSpan : 0,
+            negSpan: !isPositive ? effectiveSpan : 0,
+            hi: d.hi,
+            lo: d.lo,
+            name: d.name,
+        };
+    });
 });
 
 const xTickFormat = computed(() => {
@@ -79,7 +90,7 @@ const yTickFormat = computed(() => {
 function tooltipTemplate(d: ChartDatum): string {
     return `<div style="padding: 4px 8px; background: #1e1e2e; border: 1px solid #444; border-radius: 4px; color: #eee;">
         <strong>${d.name}</strong><br/>
-        High: ${d.hi} | Low: ${d.lo}
+        Start: ${d.hi} | Finish: ${d.lo}
     </div>`;
 }
 </script>
@@ -92,19 +103,16 @@ function tooltipTemplate(d: ChartDatum): string {
                 :data="chartData"
                 :xDomain="[-0.5, Math.max(chartData.length - 0.5, 0.5)]"
                 :yDomain="[0, undefined]"
-                :margin="{ top: 10, right: 10, bottom: 60, left: 50 }"
+                :margin="{ top: 10, right: 10, bottom: 80, left: 50 }"
             >
                 <VisStackedBar
                     :x="(d: ChartDatum) => d.x"
                     :y="[
                         (d: ChartDatum) => d.base,
-                        (d: ChartDatum) => d.span,
+                        (d: ChartDatum) => d.posSpan,
+                        (d: ChartDatum) => d.negSpan,
                     ]"
-                    :color="[
-                        'transparent',
-                        (d: ChartDatum) =>
-                            d.isPositive ? '#1aa179' : '#a1791a',
-                    ]"
+                    :color="['transparent', '#1aa179', '#a1791a']"
                     :roundedCorners="2"
                     :barMinHeight1Px="true"
                 />
