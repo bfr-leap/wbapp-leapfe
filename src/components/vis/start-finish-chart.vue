@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { watchEffect, ref } from 'vue';
 import type { Ref } from 'vue';
-import BarChart from './hl-bar-chart.vue';
+import BarChartUnovis from './hl-bar-chart-unovis.vue';
 import type { HLBarChartDatum } from '@@/src/models/vis/hl-bar-chart-model';
 import { getStartFinishData } from '@@/src/models/vis/start-finish-chart-model';
 
@@ -43,5 +43,5 @@ const barChartData: Ref<HLBarChartDatum[]> = await asyncDataWithReactiveModel<
 </script>
 
 <template>
-    <BarChart :title="title" :data="barChartData" />
+    <BarChartUnovis :title="title" :data="barChartData" />
 </template>

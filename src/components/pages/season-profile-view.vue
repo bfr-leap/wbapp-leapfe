@@ -4,7 +4,7 @@ import type { Ref } from 'vue';
 import GenericTable from '../vis/generic-table.vue';
 import { useRoute } from 'vue-router';
 
-import BarChart from '@@/src/components/vis/bar-chart.vue';
+import BarChartUnovis from '@@/src/components/vis/bar-chart-unovis.vue';
 import EventCardLg from '@@/src/components/event/event-card-lg.vue';
 import EventCardSm from '@@/src/components/event/event-card-sm.vue';
 import DriverStandings from '@@/src/components/driver/driver-standings.vue';
@@ -170,7 +170,7 @@ function onClick(eventInfo: { trackId: string; date: string }) {
                         </div>
                         <div class="row">
                             <div class="col-12 m-auto">
-                                <BarChart
+                                <BarChartUnovis
                                     v-if="
                                         getChartDataFromStats(
                                             seasonProfileModel.stats,
@@ -204,7 +204,7 @@ function onClick(eventInfo: { trackId: string; date: string }) {
                         </div>
                         <div class="row">
                             <div class="col-12 m-auto">
-                                <BarChart
+                                <BarChartUnovis
                                     v-if="
                                         getChartDataFromStats(
                                             seasonProfileModel.stats,
