@@ -25,13 +25,10 @@ const props = withDefaults(
     }
 );
 
-// For HL bars we need to show a bar from lo to hi. Unovis StackedBar
-// stacks from 0, so we use a baseline approach: render a bar of
-// height (hi - lo) with a y-offset equal to lo.
-// We can do this with two stacked y-accessors:
-//   y[0] = min(hi, lo)  (the invisible base)
-//   y[1] = abs(hi - lo) (the visible bar)
-// Then we make the base color transparent.
+// Unovis StackedBar splits positive/negative into separate stacks,
+// so we can't directly render floating bars from lo to hi when values
+// cross zero. Fix: offset all values so they're positive, then
+// adjust Y-axis labels to show the original values.
 
 type ChartDatum = {
     x: number;
@@ -43,11 +40,19 @@ type ChartDatum = {
     isPositive: boolean;
 };
 
+const globalMin = computed(() => {
+    const allVals = props.data.flatMap((d) => [d.hi, d.lo]);
+    return Math.min(...allVals, 0);
+});
+
+const offset = computed(() => -globalMin.value);
+
 const chartData = computed<ChartDatum[]>(() => {
     const raw = toRaw(props.data);
+    const off = offset.value;
     return raw.map((d, i) => ({
         x: i,
-        base: Math.min(d.hi, d.lo, 0),
+        base: Math.min(d.hi, d.lo) + off,
         span: Math.abs(d.hi - d.lo),
         hi: d.hi,
         lo: d.lo,
@@ -55,48 +60,6 @@ const chartData = computed<ChartDatum[]>(() => {
         isPositive: d.hi >= d.lo,
     }));
 });
-
-// For HL bars, we need the bar to span from lo to hi.
-// We achieve this by using the GroupedBar with a single bar per group,
-// positioning via the y-domain and using the absolute values.
-// Alternative: render as rects. But let's use StackedBar with a base.
-
-// Actually, VisStackedBar stacks values. If we provide:
-//   y[0] = min(hi, lo)  <- base segment
-//   y[1] = |hi - lo|    <- visible segment
-// The bar goes from 0 to min + span = max(hi,lo). But we want
-// bars centered around 0 for negative values.
-
-// Simpler approach: use two y values where the first is the offset
-// from 0 to the bottom of the visible bar, and the second is the
-// height. But StackedBar doesn't support transparent segments easily.
-
-// Best approach for PoC: use the GroupedBar with custom y domain
-// and render each bar as value = max(hi,lo), with color based on
-// direction. The issue is we lose the lo->hi range visual.
-
-// Let me use a different approach: render positive and negative
-// components separately. For start-finish charts, hi=start, lo=finish,
-// and the bar shows positions gained/lost.
-
-// Actually, looking at the original: it renders a single rect per
-// datum from lo to hi. The simplest Unovis equivalent is using
-// VisGroupedBar with y = [d => d.hi] and yDomain starting from the
-// minimum value. But that renders from 0.
-
-// For true lo-hi bars, we need to set a baseline. Unovis doesn't
-// have a built-in baseline prop on bars. Let's render this as two
-// overlapping bars: a full bar to max(hi,lo) that's transparent,
-// and the visible portion. Actually this is getting complex.
-
-// Simplest PoC approach: render the net change (hi - lo) as a bar,
-// which is what start-finish chart actually shows (positions gained).
-// The original renders from lo to hi visually, but the key info
-// is the direction and magnitude.
-
-const barColor = (d: ChartDatum) => {
-    return d.isPositive ? '#1aa179' : '#a1791a';
-};
 
 const xTickFormat = computed(() => {
     const data = chartData.value;
@@ -106,6 +69,11 @@ const xTickFormat = computed(() => {
         if (i < 0 || i >= data.length) return '';
         return i % n === 0 ? data[i].name : '';
     };
+});
+
+const yTickFormat = computed(() => {
+    const off = offset.value;
+    return (v: number) => String(Math.round(v - off));
 });
 
 function tooltipTemplate(d: ChartDatum): string {
@@ -123,18 +91,20 @@ function tooltipTemplate(d: ChartDatum): string {
             <VisXYContainer
                 :data="chartData"
                 :xDomain="[-0.5, Math.max(chartData.length - 0.5, 0.5)]"
+                :yDomain="[0, undefined]"
                 :margin="{ top: 10, right: 10, bottom: 60, left: 50 }"
             >
                 <VisStackedBar
                     :x="(d: ChartDatum) => d.x"
                     :y="[
-                    (d: ChartDatum) => d.base,
-                    (d: ChartDatum) => d.span,
-                ]"
+                        (d: ChartDatum) => d.base,
+                        (d: ChartDatum) => d.span,
+                    ]"
                     :color="[
-                    'transparent',
-                    (d: ChartDatum) => d.isPositive ? '#1aa179' : '#a1791a',
-                ]"
+                        'transparent',
+                        (d: ChartDatum) =>
+                            d.isPositive ? '#1aa179' : '#a1791a',
+                    ]"
                     :roundedCorners="2"
                     :barMinHeight1Px="true"
                 />
@@ -145,7 +115,7 @@ function tooltipTemplate(d: ChartDatum): string {
                     :tickTextAngle="-35"
                     :gridLine="false"
                 />
-                <VisAxis type="y" :gridLine="false" />
+                <VisAxis type="y" :gridLine="false" :tickFormat="yTickFormat" />
 
                 <VisCrosshair :template="tooltipTemplate" />
                 <VisTooltip />
