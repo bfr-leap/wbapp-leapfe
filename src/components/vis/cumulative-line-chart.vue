@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { watchEffect, ref } from 'vue';
 import type { Ref } from 'vue';
-import LineChart from './line-chart.vue';
 import LineChartUnovis from './line-chart-unovis.vue';
 import type { SeriesXY } from '@@/src/models/vis/line-chart-model';
 import type { CumulativeLineChartModel } from '@@/src/models/vis/cumulative-line-chart-model';
@@ -24,16 +23,6 @@ watchEffect(async () => {
 </script>
 
 <template>
-    <div class="poc-label">Original (D3)</div>
-    <LineChart
-        :title="cumulativeLineChartModel.titleOut"
-        :data="cumulativeLineChartModel.seriesOut"
-        :y-range="[
-            cumulativeLineChartModel.yRange[0],
-            cumulativeLineChartModel.yRange[1],
-        ]"
-    />
-    <div class="poc-label">Unovis PoC</div>
     <LineChartUnovis
         :title="cumulativeLineChartModel.titleOut"
         :data="cumulativeLineChartModel.seriesOut"

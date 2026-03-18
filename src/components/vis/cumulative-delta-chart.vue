@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { watchEffect, watch, ref } from 'vue';
 import type { Ref } from 'vue';
-import LineChart from '@@/src/components/vis/line-chart.vue';
 import LineChartUnovis from '@@/src/components/vis/line-chart-unovis.vue';
 import type { SeriesXY } from '@@/src/models/vis/line-chart-model';
 import { getCumulativeDeltaChartModel } from '@@/src/models/vis/cumulative-delta-chart-model';
@@ -66,13 +65,6 @@ const lapTimesNew: Ref<CumulativeDeltaChartModel> =
 </script>
 
 <template>
-    <div class="poc-label">Original (D3)</div>
-    <LineChart
-        :title="''"
-        :data="lapTimesNew.series"
-        :y-range="[lapTimesNew.range[0], lapTimesNew.range[1]]"
-    />
-    <div class="poc-label">Unovis PoC</div>
     <LineChartUnovis
         :title="''"
         :data="lapTimesNew.series"

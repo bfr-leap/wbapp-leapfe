@@ -4,7 +4,6 @@ import type { Ref } from 'vue';
 import GenericTable from '../vis/generic-table.vue';
 import { useRoute } from 'vue-router';
 
-import BarChart from '@@/src/components/vis/bar-chart.vue';
 import BarChartUnovis from '@@/src/components/vis/bar-chart-unovis.vue';
 import EventCardLg from '@@/src/components/event/event-card-lg.vue';
 import EventCardSm from '@@/src/components/event/event-card-sm.vue';
@@ -171,24 +170,6 @@ function onClick(eventInfo: { trackId: string; date: string }) {
                         </div>
                         <div class="row">
                             <div class="col-12 m-auto">
-                                <div class="poc-label">Original (D3)</div>
-                                <BarChart
-                                    v-if="
-                                        getChartDataFromStats(
-                                            seasonProfileModel.stats,
-                                            'incidents_per_lap',
-                                            split
-                                        ).length
-                                    "
-                                    :data="
-                                        getChartDataFromStats(
-                                            seasonProfileModel.stats,
-                                            'incidents_per_lap',
-                                            split
-                                        )
-                                    "
-                                />
-                                <div class="poc-label">Unovis PoC</div>
                                 <BarChartUnovis
                                     v-if="
                                         getChartDataFromStats(
@@ -223,24 +204,6 @@ function onClick(eventInfo: { trackId: string; date: string }) {
                         </div>
                         <div class="row">
                             <div class="col-12 m-auto">
-                                <div class="poc-label">Original (D3)</div>
-                                <BarChart
-                                    v-if="
-                                        getChartDataFromStats(
-                                            seasonProfileModel.stats,
-                                            'number_of_participants',
-                                            split
-                                        ).length
-                                    "
-                                    :data="
-                                        getChartDataFromStats(
-                                            seasonProfileModel.stats,
-                                            'number_of_participants',
-                                            split
-                                        )
-                                    "
-                                />
-                                <div class="poc-label">Unovis PoC</div>
                                 <BarChartUnovis
                                     v-if="
                                         getChartDataFromStats(
