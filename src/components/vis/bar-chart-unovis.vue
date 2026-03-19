@@ -96,6 +96,17 @@ const stdev = computed(() => {
     return Math.sqrt(variance);
 });
 
+const isNarrow = computed(() => containerWidth.value < 576);
+
+const tickTextWidth = computed(() => (isNarrow.value ? 70 : 120));
+
+const chartMargin = computed(() => ({
+    top: 10,
+    right: 10,
+    bottom: isNarrow.value ? 60 : 80,
+    left: isNarrow.value ? 35 : 50,
+}));
+
 const xTickValues = computed(() => chartData.value.map((_, i) => i));
 
 // Match D3's width-based label filtering: 1 label per ~25px of width
@@ -125,12 +136,16 @@ function tooltipTemplate(d: ChartDatum): string {
 <template>
     <div>
         <div v-if="title" class="chart-title">{{ title }}</div>
-        <div ref="containerRef" class="chart-container">
+        <div
+            ref="containerRef"
+            class="chart-container"
+            :class="{ narrow: isNarrow }"
+        >
             <VisXYContainer
                 :data="chartData"
                 :xDomain="[-0.5, Math.max(chartData.length - 0.5, 0.5)]"
                 :yDomain="[0, undefined]"
-                :margin="{ top: 10, right: 10, bottom: 80, left: 50 }"
+                :margin="chartMargin"
             >
                 <VisGroupedBar
                     :x="(d: ChartDatum) => d.x"
@@ -161,7 +176,7 @@ function tooltipTemplate(d: ChartDatum): string {
                     :numTicks="chartData.length"
                     :tickFormat="xTickFormat"
                     :tickTextAngle="-35"
-                    :tickTextWidth="120"
+                    :tickTextWidth="tickTextWidth"
                     tickTextFitMode="trim"
                     :gridLine="false"
                 />
@@ -188,5 +203,9 @@ function tooltipTemplate(d: ChartDatum): string {
 .chart-container :deep(.unovis-xy-container) {
     width: 100% !important;
     height: 100% !important;
+}
+
+.chart-container.narrow :deep(text) {
+    font-size: 10px !important;
 }
 </style>

@@ -101,4 +101,20 @@ const table: Ref<GenericTableModel> =
     left: 0;
     background-color: inherit;
 }
+
+@media (max-width: 576px) {
+    .gh-table-title {
+        font-size: 0.75rem;
+        padding: 6px 8px 2px;
+    }
+
+    .table {
+        font-size: 0.75rem;
+    }
+
+    .table th,
+    .table td {
+        padding: 0.25rem 0.4rem;
+    }
+}
 </style>
