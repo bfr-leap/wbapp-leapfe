@@ -95,20 +95,20 @@ async function preFetchHome(query: { [name: string]: string | number }) {
     let season = query.season;
 
     let queries: { [name: string]: string | number }[] = [
-        /*   { namespace: `ldata-usrcfg`, type: `activeLeagueSchedule` },
-           { namespace: `ldata-irweb`, type: `blockedSeasons` },
+        { namespace: `ldata-usrcfg`, type: `activeLeagueSchedule` },
+        /*   { namespace: `ldata-irweb`, type: `blockedSeasons` },
            { namespace: `ldata-rsltsts`, type: `leagueDriverStats`, league },
            {
                namespace: `ldata-irweb`,
                type: `leagueSeasonSessions`,
                league,
                season,
-           },
-           { namespace: `ldata-usrcfg`, type: `leagueTeamsInfo`, league },
-           { namespace: `ldata-rsltsts`, type: `leagueSimsessionIndex`, league },
+           },*/
+        { namespace: `ldata-usrcfg`, type: `leagueTeamsInfo`, league },
+        /*   { namespace: `ldata-rsltsts`, type: `leagueSimsessionIndex`, league },
            { namespace: `ldata-irweb`, type: `leagueSeasons`, league },
-           { namespace: `ldata-irweb`, type: `membersData`, league, season },
-           { namespace: `ldata-usrcfg`, type: `trackDisplayInfo` },*/
+           { namespace: `ldata-irweb`, type: `membersData`, league, season },*/
+        { namespace: `ldata-usrcfg`, type: `trackDisplayInfo` },
     ];
 
     let urlKeys = [
