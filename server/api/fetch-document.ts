@@ -23,6 +23,7 @@ async function handler(req: any): Promise<any> {
         await authMiddleware(req, async (rq) => {
             const q: { [name: string]: string | number } = {
                 userID: req?.user?.id,
+                _authHeader: req?.headers?.authorization || '',
             };
 
             for (let key of Object.keys(req?.query || {})) {

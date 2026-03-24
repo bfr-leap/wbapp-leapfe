@@ -1,94 +1,131 @@
-import { getXataClient, XataClient } from './xata';
-import { featureMiddleware as fmw } from './feature-middleware';
+const BASE_URL = 'http://98.116.118.25:3030/api';
 
-async function crtSchedEvent(season: string, time: string, track: string) {
-    console.log('::: crtSchedEvent():', season, time, track);
-    const seasonId = Number.parseInt(season, 10);
-    const trackId = Number.parseInt(track, 10);
-    const timeNum = Number.parseInt(time, 10);
-    const timeDate = isNaN(timeNum) ? null : new Date(timeNum);
+async function crtSchedEvent(
+    season: string,
+    time: string,
+    track: string,
+    authHeader: string
+) {
+    console.log('::: crtSchedEvent(): proxy', season, time, track);
 
-    const isValidInputs = !isNaN(trackId) && timeDate !== null;
-
-    console.log(isValidInputs);
-
-    if (isValidInputs) {
-        const xata = getXataClient();
-        const ret = await xata.db.sched_subsessions.create({
-            time: timeDate,
-            track_id: trackId,
-            season_id: seasonId,
-            display_name: 'NA',
+    const url = `${BASE_URL}/admin/schedule/events`;
+    try {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: authHeader,
+            },
+            body: JSON.stringify({
+                season: Number.parseInt(season, 10),
+                time: Number.parseInt(time, 10),
+                track: Number.parseInt(track, 10),
+            }),
         });
 
-        console.log(ret);
-
-        return ret;
-    }
-
-    return {};
-}
-
-async function updSchedEvent(event: string, time: string, track: string) {
-    console.log('::: updSchedEvent():', event, time, track);
-    const trackId = Number.parseInt(track, 10);
-    const timeNum = Number.parseInt(time, 10);
-    const timeDate = isNaN(timeNum) ? null : new Date(timeNum);
-
-    const isValidInputs = !isNaN(trackId) && timeDate !== null;
-
-    if (isValidInputs) {
-        try {
-            const xata = getXataClient();
-
-            let r = await xata.sql`
-        UPDATE "sched_subsessions"
-        SET "track_id" = ${trackId.toString()}, "time" = ${timeDate}
-        WHERE "sched_subsessions"."id"=${event}`;
-
-            console.log(r);
-        } catch (e) {
-            console.log(e);
+        if (!res.ok) {
+            const err = await res.text();
+            console.log('crtSchedEvent proxy error:', res.status, err);
+            return {};
         }
-    }
 
-    return {};
+        return await res.json();
+    } catch (e) {
+        console.log('error reaching proxy', e);
+        return {};
+    }
 }
 
-async function delSchedEvent(event: string) {
-    console.log('::: delSchedEvent():', event);
-    const xata = getXataClient();
+async function updSchedEvent(
+    event: string,
+    time: string,
+    track: string,
+    authHeader: string
+) {
+    console.log('::: updSchedEvent(): proxy', event, time, track);
 
-    await xata.sql`DELETE FROM "sched_subsessions" WHERE "id"=${event}`;
+    const url = `${BASE_URL}/admin/schedule/events/${event}`;
+    try {
+        const res = await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: authHeader,
+            },
+            body: JSON.stringify({
+                time: Number.parseInt(time, 10),
+                track: Number.parseInt(track, 10),
+            }),
+        });
 
-    return {};
+        if (!res.ok) {
+            const err = await res.text();
+            console.log('updSchedEvent proxy error:', res.status, err);
+            return {};
+        }
+
+        return await res.json();
+    } catch (e) {
+        console.log('error reaching proxy', e);
+        return {};
+    }
+}
+
+async function delSchedEvent(event: string, authHeader: string) {
+    console.log('::: delSchedEvent(): proxy', event);
+
+    const url = `${BASE_URL}/admin/schedule/events/${event}`;
+    try {
+        const res = await fetch(url, {
+            method: 'DELETE',
+            headers: {
+                Authorization: authHeader,
+            },
+        });
+
+        if (!res.ok) {
+            const err = await res.text();
+            console.log('delSchedEvent proxy error:', res.status, err);
+            return {};
+        }
+
+        return await res.json();
+    } catch (e) {
+        console.log('error reaching proxy', e);
+        return {};
+    }
 }
 
 export async function adminConfigHandler(
     namespace: string,
     query: any
 ): Promise<any> {
-    console.log(':: adminConfigHandler()');
+    console.log(':: adminConfigHandler() proxy');
 
     const q = query;
+    const authHeader = q?._authHeader || '';
 
     let doc: any = null;
 
     switch (q?.type) {
         case 'crtSchedEvent':
-            doc = await fmw(['league_cdr_admin'], q?.userID, async () => {
-                return await crtSchedEvent(q?.season, q?.time, q?.track);
-            });
+            doc = await crtSchedEvent(
+                q?.season,
+                q?.time,
+                q?.track,
+                authHeader
+            );
             break;
         case 'updSchedEvent':
-            doc = await fmw(['league_cdr_admin'], q?.userID, async () => {
-                return await updSchedEvent(q?.event, q?.time, q?.track);
-            });
+            doc = await updSchedEvent(
+                q?.event,
+                q?.time,
+                q?.track,
+                authHeader
+            );
             break;
         case 'delSchedEvent':
-            doc = await fmw(['league_cdr_admin'], q?.userID, async () => {
-                return await delSchedEvent(q?.event);
-            });
+            doc = await delSchedEvent(q?.event, authHeader);
             break;
     }
 
