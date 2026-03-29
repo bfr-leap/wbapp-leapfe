@@ -122,6 +122,16 @@ function onAdd() {
     currentEvent = null;
 
     const events = cdrAdminModel.value.events;
+    console.log(
+        '[CDR-ADMIN] onAdd events:',
+        events.map((e) => ({
+            eventId: e.eventId,
+            time: e.time,
+            timeMs: e.time?.getTime?.() ?? e.time,
+            type: typeof e.time,
+            isDate: e.time instanceof Date,
+        }))
+    );
     const maxReasonable = Date.now() + 1000 * 60 * 60 * 24 * 365;
     const reasonable = events.filter(
         (e) => e.time.getTime() <= maxReasonable
@@ -131,6 +141,13 @@ function onAdd() {
             ? reasonable[reasonable.length - 1].time.getTime()
             : Date.now();
     const nextTime = new Date(lastTime + 1000 * 60 * 60 * 24 * 7);
+    console.log('[CDR-ADMIN] onAdd result:', {
+        totalEvents: events.length,
+        reasonableEvents: reasonable.length,
+        lastTime,
+        nextTime: nextTime.toISOString(),
+        formsTime: toDatetimeLocal(nextTime),
+    });
 
     forms.time = toDatetimeLocal(nextTime);
     forms.originalTime = '';
