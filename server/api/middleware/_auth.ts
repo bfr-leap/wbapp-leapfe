@@ -5,7 +5,10 @@ export async function middleware(req: any, next: (req: any) => Promise<void>) {
         req.auth = token;
         return await next(req);
     } catch (error) {
-        // console.log(error);
+        console.error(
+            '[AUTH] token extraction failed:',
+            error instanceof Error ? error.message : error
+        );
     }
 
     return null;

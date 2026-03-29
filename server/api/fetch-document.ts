@@ -12,6 +12,7 @@ export default defineEventHandler(async (event) => {
 
 async function handler(req: any): Promise<any> {
     const namespace = req?.query?.namespace?.toLocaleString() || '';
+    const type = req?.query?.type?.toLocaleString() || '';
 
     async function authMwAdapter(
         n_: string,
@@ -19,8 +20,10 @@ async function handler(req: any): Promise<any> {
         next: (n__: string, q__: any) => Promise<any>
     ): Promise<any> {
         let ret: any = null;
+        let callbackReached = false;
 
         await authMiddleware(req, async (rq) => {
+            callbackReached = true;
             const q: { [name: string]: string | number } = {
                 userID: req?.user?.id,
                 _authHeader: req?.headers?.authorization || '',
@@ -32,6 +35,17 @@ async function handler(req: any): Promise<any> {
 
             ret = await next(namespace, q);
         });
+
+        if (!callbackReached) {
+            console.error(
+                `[FETCH-DOC] auth middleware blocked request: namespace=${namespace} type=${type}`
+            );
+            return {
+                _error: true,
+                _source: 'authMiddleware',
+                _message: `Auth failed for ${namespace}/${type} — callback never reached`,
+            };
+        }
 
         return ret;
     }
