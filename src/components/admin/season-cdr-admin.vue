@@ -87,7 +87,7 @@ async function onSave() {
         );
     }
 
-    // updateSchedEvent(model: CdrAdminModel, event: string, time: string, track: string)
+    // updateSchedEvent(model, event, time, track)
 }
 
 watchEffect(fetchModel);
