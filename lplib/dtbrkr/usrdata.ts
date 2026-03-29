@@ -2,7 +2,9 @@ import { getDocument as getDataLakeDocument } from './dtlkdata';
 import { getXataClient, XataClient } from './xata';
 import type { UsersLeaguesInterestRecord } from './xata';
 
-const BASE_URL = 'http://98.116.118.25:3030/api';
+const BASE_URL =
+    process.env.LEAP_DATA_BROKER_BASE_URL ||
+    'http://98.116.118.25:3030/api';
 
 export async function getDefaultLeagueSeason(user_id: string): Promise<any> {
     console.log('::: getDefaultLeagueSeason()', user_id); // this is next

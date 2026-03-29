@@ -1,4 +1,6 @@
-const BASE_URL = 'http://98.116.118.25:3030/api';
+const BASE_URL =
+    process.env.LEAP_DATA_BROKER_BASE_URL ||
+    'http://98.116.118.25:3030/api';
 
 export async function userConfigHandler(
     namespace: string,
