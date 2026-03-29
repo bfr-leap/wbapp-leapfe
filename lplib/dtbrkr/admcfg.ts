@@ -35,7 +35,12 @@ async function crtSchedEvent(
                 `[ADMCFG] crtSchedEvent FAILED: ${res.status} ${Date.now() - t0}ms`,
                 err
             );
-            return {};
+            return {
+                _error: true,
+                _source: 'crtSchedEvent',
+                _message: `HTTP ${res.status}: ${err}`,
+                _url: url,
+            };
         }
 
         const json = await res.json();
@@ -44,11 +49,18 @@ async function crtSchedEvent(
         );
         return json;
     } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
         console.error(
             `[ADMCFG] crtSchedEvent NETWORK ERROR (BASE_URL=${BASE_URL}):`,
-            e instanceof Error ? e.message : e
+            msg
         );
-        return {};
+        return {
+            _error: true,
+            _source: 'crtSchedEvent',
+            _message: `NETWORK ERROR: ${msg}`,
+            _url: url,
+            _baseUrl: BASE_URL,
+        };
     }
 }
 
@@ -86,7 +98,12 @@ async function updSchedEvent(
                 `[ADMCFG] updSchedEvent FAILED: ${res.status} ${Date.now() - t0}ms`,
                 err
             );
-            return {};
+            return {
+                _error: true,
+                _source: 'updSchedEvent',
+                _message: `HTTP ${res.status}: ${err}`,
+                _url: url,
+            };
         }
 
         const json = await res.json();
@@ -95,11 +112,18 @@ async function updSchedEvent(
         );
         return json;
     } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
         console.error(
             `[ADMCFG] updSchedEvent NETWORK ERROR (BASE_URL=${BASE_URL}):`,
-            e instanceof Error ? e.message : e
+            msg
         );
-        return {};
+        return {
+            _error: true,
+            _source: 'updSchedEvent',
+            _message: `NETWORK ERROR: ${msg}`,
+            _url: url,
+            _baseUrl: BASE_URL,
+        };
     }
 }
 
@@ -125,7 +149,12 @@ async function delSchedEvent(event: string, authHeader: string) {
                 `[ADMCFG] delSchedEvent FAILED: ${res.status} ${Date.now() - t0}ms`,
                 err
             );
-            return {};
+            return {
+                _error: true,
+                _source: 'delSchedEvent',
+                _message: `HTTP ${res.status}: ${err}`,
+                _url: url,
+            };
         }
 
         const json = await res.json();
@@ -134,11 +163,18 @@ async function delSchedEvent(event: string, authHeader: string) {
         );
         return json;
     } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
         console.error(
             `[ADMCFG] delSchedEvent NETWORK ERROR (BASE_URL=${BASE_URL}):`,
-            e instanceof Error ? e.message : e
+            msg
         );
-        return {};
+        return {
+            _error: true,
+            _source: 'delSchedEvent',
+            _message: `NETWORK ERROR: ${msg}`,
+            _url: url,
+            _baseUrl: BASE_URL,
+        };
     }
 }
 
