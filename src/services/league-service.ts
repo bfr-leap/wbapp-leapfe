@@ -158,25 +158,34 @@ export async function getLeagueSeasonSessions(
 
         const preFilterCount = ret.sessions.length;
         ret.sessions = ret.sessions.filter((v) => {
-            let simsessions =
-                season_?.sessions.find(
-                    (ses) => ses.subsession_id === v.subsession_id
-                )?.simsessions || [];
-            let hasRace = simsessions.reduce((p, c) => {
-                return p || c.type === 'race';
-            }, false);
+            // Keep any session that has a subsession_id (i.e. it
+            // actually ran) even when the simsession index hasn't
+            // caught up yet.
+            if (v.subsession_id) {
+                let simsessions =
+                    season_?.sessions.find(
+                        (ses) =>
+                            ses.subsession_id ===
+                            v.subsession_id
+                    )?.simsessions || [];
+                let hasRace = simsessions.reduce((p, c) => {
+                    return p || c.type === 'race';
+                }, false);
 
-            if (!hasRace) {
-                console.log(
-                    `[DEBUG:getLeagueSeasonSessions] FILTERED OUT subsession_id=${v.subsession_id}:`,
-                    {
-                        simsessionsFound: simsessions.length,
-                        simsessions,
-                    }
-                );
+                if (!hasRace) {
+                    console.log(
+                        `[DEBUG:getLeagueSeasonSessions] KEEPING subsession_id=${v.subsession_id} despite no race simsession (relaxed filter):`,
+                        {
+                            simsessionsFound: simsessions.length,
+                            simsessions,
+                        }
+                    );
+                }
+
+                return true;
             }
 
-            return hasRace;
+            return false;
         });
 
         console.log(
