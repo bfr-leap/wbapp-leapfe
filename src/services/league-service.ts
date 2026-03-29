@@ -99,13 +99,64 @@ export async function getLeagueSeasonSessions(
         season,
     });
 
+    console.log(
+        `[DEBUG:getLeagueSeasonSessions] raw response for league=${league} season=${season}:`,
+        ret
+            ? {
+                  success: ret.success,
+                  league_id: ret.league_id,
+                  season_id: ret.season_id,
+                  sessionCount: ret.sessions?.length ?? 'NO .sessions',
+                  firstSession: ret.sessions?.[0]
+                      ? {
+                            subsession_id:
+                                ret.sessions[0].subsession_id,
+                            session_id: ret.sessions[0].session_id,
+                            track: ret.sessions[0].track,
+                            launch_at: ret.sessions[0].launch_at,
+                            has_results: ret.sessions[0].has_results,
+                        }
+                      : 'EMPTY',
+                  sessionKeys: ret.sessions?.[0]
+                      ? Object.keys(ret.sessions[0])
+                      : [],
+              }
+            : 'NULL RESPONSE'
+    );
+
     // TODO: move this to the backend
     if (ret) {
         let ss = await getLeagueSimsessionIndex(league);
+
+        console.log(
+            `[DEBUG:getLeagueSeasonSessions] simsessionIndex for league=${league}:`,
+            ss
+                ? {
+                      seasonCount: ss.length,
+                      seasons: ss.map((s) => ({
+                          season_id: s.season_id,
+                          sessionCount: s.sessions?.length ?? 0,
+                      })),
+                  }
+                : 'NULL'
+        );
+
         let season_ = ss?.find(
             (v) => v.season_id.toString() === season
         );
 
+        console.log(
+            `[DEBUG:getLeagueSeasonSessions] matched season index for season=${season}:`,
+            season_
+                ? {
+                      season_id: season_.season_id,
+                      sessionCount: season_.sessions?.length ?? 0,
+                      firstSession: season_.sessions?.[0] ?? 'EMPTY',
+                  }
+                : 'NO MATCH'
+        );
+
+        const preFilterCount = ret.sessions.length;
         ret.sessions = ret.sessions.filter((v) => {
             let simsessions =
                 season_?.sessions.find(
@@ -115,8 +166,22 @@ export async function getLeagueSeasonSessions(
                 return p || c.type === 'race';
             }, false);
 
+            if (!hasRace) {
+                console.log(
+                    `[DEBUG:getLeagueSeasonSessions] FILTERED OUT subsession_id=${v.subsession_id}:`,
+                    {
+                        simsessionsFound: simsessions.length,
+                        simsessions,
+                    }
+                );
+            }
+
             return hasRace;
         });
+
+        console.log(
+            `[DEBUG:getLeagueSeasonSessions] filter result: ${preFilterCount} -> ${ret.sessions.length} sessions`
+        );
     }
 
     return ret;
