@@ -100,7 +100,7 @@ watchEffect(fetchModel);
                 <table class="table table-dark table-hover">
                     <thead style="position: sticky; top: 0">
                         <tr>
-                            <th>❏</th>
+                            <th></th>
                             <th>Time</th>
                             <th>Track</th>
                             <th></th>
