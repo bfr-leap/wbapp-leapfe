@@ -7,6 +7,7 @@ import {
     getCuratedActiveLeagueSchedule,
     getUserLeaguesState,
 } from '@@/src/utils/fetch-util';
+import { deriveSimsessions } from '@@/src/services/league-service';
 import type { SeasonSimsessionIndex } from 'lplib/endpoint-types/iracing-endpoints';
 //
 
@@ -138,9 +139,7 @@ export async function getLeagueIndexModel(
                 subsession_id: lss.subsession_id,
                 session_id: lss.session_id,
                 session_title: `Race ${lss.track.track_name || lss.subsession_id}`,
-                simsessions: [
-                    { simsession_id: 0, type: 'race' },
-                ],
+                simsessions: deriveSimsessions(lss),
             });
         }
     }

@@ -10,6 +10,7 @@ import {
     getTelemetrySubsessionIds,
     getGeneratedSimsessionSummary,
 } from '@@/src/utils/fetch-util';
+import { deriveSimsessions } from '@@/src/services/league-service';
 import MarkdownIt from 'markdown-it';
 
 export interface ResultsModel {
@@ -84,27 +85,35 @@ export async function getResultsModel(
         subsessionId = '';
     }
 
+    let leagueSeasonSessions = await getLeagueSeasonSessions(
+        leagueId,
+        seasonId
+    );
+
     let selectedSubsession = selectedSeason?.sessions?.find(
         (s: SSI_Session) => s?.subsession_id?.toString() === subsessionId
     );
 
     // If the subsession isn't in the simsession index but the caller
-    // passed a valid subsessionId, synthesize an entry so the results
-    // page can still render.
+    // passed a valid subsessionId, synthesize an entry using the
+    // LSS_Session config to derive proper simsession types/IDs.
     if (!selectedSubsession && subsessionId) {
+        let lssSession = leagueSeasonSessions?.sessions.find(
+            (s) => s.subsession_id?.toString() === subsessionId
+        );
+        let simsessions = lssSession
+            ? deriveSimsessions(lssSession)
+            : [{ simsession_id: 0 as number, type: 'race' as const }];
+
         console.log(
-            `[DEBUG:getResultsModel] subsession_id=${subsessionId} not in simsession index, synthesizing entry`
+            `[DEBUG:getResultsModel] subsession_id=${subsessionId} not in simsession index, synthesizing entry:`,
+            { simsessions, fromLSS: !!lssSession }
         );
         selectedSubsession = {
             subsession_id: parseInt(subsessionId, 10),
-            session_id: 0,
+            session_id: lssSession?.session_id || 0,
             session_title: '',
-            simsessions: [
-                {
-                    simsession_id: parseInt(simsessionId, 10) || 0,
-                    type: 'race',
-                },
-            ],
+            simsessions,
         };
     }
 
@@ -133,11 +142,6 @@ export async function getResultsModel(
     }
 
     ret.simsessionType = selectedSimsession.type;
-
-    let leagueSeasonSessions = await getLeagueSeasonSessions(
-        leagueId,
-        seasonId
-    );
 
     let simsessionSummary = await getGeneratedSimsessionSummary(
         selectedSubsession?.subsession_id || 0,

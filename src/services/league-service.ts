@@ -10,10 +10,30 @@ import type {
     ActiveLeagueSchedule,
     SeasonSimsessionIndex,
     LeagueSeasonSessions,
+    LSS_Session,
+    SSI_Simsession,
     MembersData,
     CuratedLeagueTeamsInfo,
     CuratedTrackDisplayhInfo,
 } from '@@/lplib/endpoint-types/iracing-endpoints';
+
+/**
+ * Derive simsession entries from an LSS_Session's config fields.
+ * iRacing assigns simsession IDs sequentially: qualify = 0, race = 1, etc.
+ */
+export function deriveSimsessions(session: LSS_Session): SSI_Simsession[] {
+    let simsessions: SSI_Simsession[] = [];
+    let id = 0;
+
+    if (session.qualify_laps > 0 || session.qualify_length > 0) {
+        simsessions.push({ simsession_id: id++, type: 'qualify' });
+    }
+
+    // Race is always present for league sessions with results
+    simsessions.push({ simsession_id: id++, type: 'race' });
+
+    return simsessions;
+}
 
 export async function getLeagueSeasons(
     league: string
