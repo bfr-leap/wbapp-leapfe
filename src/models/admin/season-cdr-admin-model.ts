@@ -89,6 +89,8 @@ export async function createSchedEvent(
 ): Promise<CdrAdminModel> {
     let e = await crtSchedEvent(season, time, track);
 
+    console.log('[CDR-ADMIN] crtSchedEvent returned:', JSON.stringify(e));
+
     if (e?._error) {
         console.error(
             `[CDR-ADMIN] createSchedEvent server error:`,
@@ -122,6 +124,8 @@ export async function updateSchedEvent(
 ): Promise<CdrAdminModel> {
     const result = await updSchedEvent(event, time, track);
 
+    console.log('[CDR-ADMIN] updSchedEvent returned:', JSON.stringify(result));
+
     if (result?._error) {
         console.error(
             `[CDR-ADMIN] updateSchedEvent server error:`,
@@ -150,6 +154,8 @@ export async function deleteSchedEvent(
     event: string
 ): Promise<CdrAdminModel> {
     const result = await delSchedEvent(event);
+
+    console.log('[CDR-ADMIN] delSchedEvent returned:', JSON.stringify(result));
 
     if (result?._error) {
         console.error(
