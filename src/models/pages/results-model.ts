@@ -88,6 +88,26 @@ export async function getResultsModel(
         (s: SSI_Session) => s?.subsession_id?.toString() === subsessionId
     );
 
+    // If the subsession isn't in the simsession index but the caller
+    // passed a valid subsessionId, synthesize an entry so the results
+    // page can still render.
+    if (!selectedSubsession && subsessionId) {
+        console.log(
+            `[DEBUG:getResultsModel] subsession_id=${subsessionId} not in simsession index, synthesizing entry`
+        );
+        selectedSubsession = {
+            subsession_id: parseInt(subsessionId, 10),
+            session_id: 0,
+            session_title: '',
+            simsessions: [
+                {
+                    simsession_id: parseInt(simsessionId, 10) || 0,
+                    type: 'race',
+                },
+            ],
+        };
+    }
+
     let i = (selectedSeason?.sessions?.length || 0) - 1;
 
     while (

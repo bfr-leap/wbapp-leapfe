@@ -3,6 +3,7 @@ import { getDefaultDropdownModel } from '@@/src/models/dropdown-model';
 import {
     getCuratedBlockedSeasons,
     getLeagueSimsessionIndex,
+    getLeagueSeasonSessions,
     getCuratedActiveLeagueSchedule,
     getUserLeaguesState,
 } from '@@/src/utils/fetch-util';
@@ -113,6 +114,33 @@ export async function getLeagueIndexModel(
             ret.seasonOptions.options.push({
                 display: seasonIt.season_title,
                 href: `?m=results&league=${leagueId}&season=${seasonIt.season_id}&subsession=${seasonIt.sessions[0]?.subsession_id}&simsession=${seasonIt.sessions[0]?.simsessions[0]?.simsession_id}`,
+            });
+        }
+    }
+
+    // Merge sessions from leagueSeasonSessions that have a
+    // subsession_id but are missing from the simsession index.
+    let leagueSeasonSessions = await getLeagueSeasonSessions(
+        leagueId,
+        selectedSeason.season_id.toString()
+    );
+
+    let indexedSubsessionIds = new Set(
+        selectedSeason.sessions.map((s) => s.subsession_id)
+    );
+
+    for (let lss of leagueSeasonSessions?.sessions || []) {
+        if (lss.subsession_id && !indexedSubsessionIds.has(lss.subsession_id)) {
+            console.log(
+                `[DEBUG:getLeagueIndexModel] adding missing session to index: subsession_id=${lss.subsession_id}`
+            );
+            selectedSeason.sessions.push({
+                subsession_id: lss.subsession_id,
+                session_id: lss.session_id,
+                session_title: `Race ${lss.track.track_name || lss.subsession_id}`,
+                simsessions: [
+                    { simsession_id: 0, type: 'race' },
+                ],
             });
         }
     }
