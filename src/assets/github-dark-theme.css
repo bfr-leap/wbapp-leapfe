@@ -308,6 +308,33 @@ a:hover {
     box-shadow: var(--gh-shadow-sm);
 }
 
+.btn-danger {
+    --bs-btn-bg: var(--gh-danger-emphasis);
+    --bs-btn-border-color: var(--gh-danger-emphasis);
+    --bs-btn-color: var(--gh-fg-on-emphasis);
+    --bs-btn-hover-bg: var(--gh-danger-fg);
+    --bs-btn-hover-border-color: var(--gh-danger-fg);
+    --bs-btn-hover-color: var(--gh-fg-on-emphasis);
+    border-radius: var(--gh-radius-md);
+    font-weight: 500;
+    font-size: 0.875rem;
+    line-height: 20px;
+    box-shadow: var(--gh-shadow-sm);
+}
+
+.btn-outline-danger {
+    --bs-btn-bg: transparent;
+    --bs-btn-border-color: var(--gh-danger-muted);
+    --bs-btn-color: var(--gh-danger-fg);
+    --bs-btn-hover-bg: var(--gh-danger-subtle);
+    --bs-btn-hover-border-color: var(--gh-danger-fg);
+    --bs-btn-hover-color: var(--gh-danger-fg);
+    border-radius: var(--gh-radius-md);
+    font-weight: 500;
+    font-size: 0.875rem;
+    line-height: 20px;
+}
+
 /* Dropdown toggle caret — subtle GitHub-style */
 .btn.dropdown-toggle::after {
     margin-left: 6px;

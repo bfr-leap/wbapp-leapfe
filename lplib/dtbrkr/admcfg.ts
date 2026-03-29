@@ -1,4 +1,6 @@
-const BASE_URL = 'http://98.116.118.25:3030/api';
+const BASE_URL =
+    process.env.LEAP_DATA_BROKER_BASE_URL ||
+    'http://98.116.118.25:3030/api';
 
 async function crtSchedEvent(
     season: string,
@@ -6,10 +8,16 @@ async function crtSchedEvent(
     track: string,
     authHeader: string
 ) {
-    console.log('::: crtSchedEvent(): proxy', season, time, track);
-
     const url = `${BASE_URL}/admin/schedule/events`;
+    console.log('[ADMCFG] crtSchedEvent → POST', url, {
+        season,
+        time,
+        track,
+        hasAuth: !!authHeader,
+    });
+
     try {
+        const t0 = Date.now();
         const res = await fetch(url, {
             method: 'POST',
             headers: {
@@ -25,14 +33,36 @@ async function crtSchedEvent(
 
         if (!res.ok) {
             const err = await res.text();
-            console.log('crtSchedEvent proxy error:', res.status, err);
-            return {};
+            console.error(
+                `[ADMCFG] crtSchedEvent FAILED: ${res.status} ${Date.now() - t0}ms`,
+                err
+            );
+            return {
+                _error: true,
+                _source: 'crtSchedEvent',
+                _message: `HTTP ${res.status}: ${err}`,
+                _url: url,
+            };
         }
 
-        return await res.json();
+        const json = await res.json();
+        console.log(
+            `[ADMCFG] crtSchedEvent OK: ${res.status} ${Date.now() - t0}ms`
+        );
+        return json;
     } catch (e) {
-        console.log('error reaching proxy', e);
-        return {};
+        const msg = e instanceof Error ? e.message : String(e);
+        console.error(
+            `[ADMCFG] crtSchedEvent NETWORK ERROR (BASE_URL=${BASE_URL}):`,
+            msg
+        );
+        return {
+            _error: true,
+            _source: 'crtSchedEvent',
+            _message: `NETWORK ERROR: ${msg}`,
+            _url: url,
+            _baseUrl: BASE_URL,
+        };
     }
 }
 
@@ -42,10 +72,16 @@ async function updSchedEvent(
     track: string,
     authHeader: string
 ) {
-    console.log('::: updSchedEvent(): proxy', event, time, track);
-
     const url = `${BASE_URL}/admin/schedule/events/${event}`;
+    console.log('[ADMCFG] updSchedEvent → PUT', url, {
+        event,
+        time,
+        track,
+        hasAuth: !!authHeader,
+    });
+
     try {
+        const t0 = Date.now();
         const res = await fetch(url, {
             method: 'PUT',
             headers: {
@@ -60,22 +96,48 @@ async function updSchedEvent(
 
         if (!res.ok) {
             const err = await res.text();
-            console.log('updSchedEvent proxy error:', res.status, err);
-            return {};
+            console.error(
+                `[ADMCFG] updSchedEvent FAILED: ${res.status} ${Date.now() - t0}ms`,
+                err
+            );
+            return {
+                _error: true,
+                _source: 'updSchedEvent',
+                _message: `HTTP ${res.status}: ${err}`,
+                _url: url,
+            };
         }
 
-        return await res.json();
+        const json = await res.json();
+        console.log(
+            `[ADMCFG] updSchedEvent OK: ${res.status} ${Date.now() - t0}ms`
+        );
+        return json;
     } catch (e) {
-        console.log('error reaching proxy', e);
-        return {};
+        const msg = e instanceof Error ? e.message : String(e);
+        console.error(
+            `[ADMCFG] updSchedEvent NETWORK ERROR (BASE_URL=${BASE_URL}):`,
+            msg
+        );
+        return {
+            _error: true,
+            _source: 'updSchedEvent',
+            _message: `NETWORK ERROR: ${msg}`,
+            _url: url,
+            _baseUrl: BASE_URL,
+        };
     }
 }
 
 async function delSchedEvent(event: string, authHeader: string) {
-    console.log('::: delSchedEvent(): proxy', event);
-
     const url = `${BASE_URL}/admin/schedule/events/${event}`;
+    console.log('[ADMCFG] delSchedEvent → DELETE', url, {
+        event,
+        hasAuth: !!authHeader,
+    });
+
     try {
+        const t0 = Date.now();
         const res = await fetch(url, {
             method: 'DELETE',
             headers: {
@@ -85,14 +147,36 @@ async function delSchedEvent(event: string, authHeader: string) {
 
         if (!res.ok) {
             const err = await res.text();
-            console.log('delSchedEvent proxy error:', res.status, err);
-            return {};
+            console.error(
+                `[ADMCFG] delSchedEvent FAILED: ${res.status} ${Date.now() - t0}ms`,
+                err
+            );
+            return {
+                _error: true,
+                _source: 'delSchedEvent',
+                _message: `HTTP ${res.status}: ${err}`,
+                _url: url,
+            };
         }
 
-        return await res.json();
+        const json = await res.json();
+        console.log(
+            `[ADMCFG] delSchedEvent OK: ${res.status} ${Date.now() - t0}ms`
+        );
+        return json;
     } catch (e) {
-        console.log('error reaching proxy', e);
-        return {};
+        const msg = e instanceof Error ? e.message : String(e);
+        console.error(
+            `[ADMCFG] delSchedEvent NETWORK ERROR (BASE_URL=${BASE_URL}):`,
+            msg
+        );
+        return {
+            _error: true,
+            _source: 'delSchedEvent',
+            _message: `NETWORK ERROR: ${msg}`,
+            _url: url,
+            _baseUrl: BASE_URL,
+        };
     }
 }
 
@@ -100,7 +184,10 @@ export async function adminConfigHandler(
     namespace: string,
     query: any
 ): Promise<any> {
-    console.log(':: adminConfigHandler() proxy');
+    console.log('[ADMCFG] adminConfigHandler()', {
+        type: query?.type,
+        BASE_URL,
+    });
 
     const q = query;
     const authHeader = q?._authHeader || '';

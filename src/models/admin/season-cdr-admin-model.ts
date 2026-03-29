@@ -89,6 +89,17 @@ export async function createSchedEvent(
 ): Promise<CdrAdminModel> {
     let e = await crtSchedEvent(season, time, track);
 
+    if (e?._error) {
+        console.error(
+            `[CDR-ADMIN] createSchedEvent server error:`,
+            e._source,
+            e._message,
+            e._url,
+            e._baseUrl
+        );
+        return model;
+    }
+
     const ev = {
         trackDisplayName: await getTrackName(e.track_id.toString()),
         trackId: e.track_id,
@@ -109,7 +120,18 @@ export async function updateSchedEvent(
     time: string,
     track: string
 ): Promise<CdrAdminModel> {
-    await updSchedEvent(event, time, track);
+    const result = await updSchedEvent(event, time, track);
+
+    if (result?._error) {
+        console.error(
+            `[CDR-ADMIN] updateSchedEvent server error:`,
+            result._source,
+            result._message,
+            result._url,
+            result._baseUrl
+        );
+        return model;
+    }
 
     const e = model.events.find((e) => e.eventId === event);
     if (e) {
@@ -127,7 +149,18 @@ export async function deleteSchedEvent(
     model: CdrAdminModel,
     event: string
 ): Promise<CdrAdminModel> {
-    await delSchedEvent(event);
+    const result = await delSchedEvent(event);
+
+    if (result?._error) {
+        console.error(
+            `[CDR-ADMIN] deleteSchedEvent server error:`,
+            result._source,
+            result._message,
+            result._url,
+            result._baseUrl
+        );
+        return model;
+    }
 
     model.events = model.events.filter((e) => e.eventId !== event);
 

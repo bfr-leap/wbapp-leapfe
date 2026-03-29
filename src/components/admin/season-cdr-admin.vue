@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { ref, reactive, watch, watchEffect } from 'vue';
+import { ref, reactive, computed, watchEffect, nextTick } from 'vue';
 import type { Ref } from 'vue';
-import { getBootstrapModal } from '@@/src/utils/bootstrap-utils';
+import {
+    getBootstrapModal,
+    createBootstrapToast,
+} from '@@/src/utils/bootstrap-utils';
 
 import {
     getDefaultCdrAdminModel,
@@ -20,74 +23,199 @@ const props = defineProps<{
     season: string;
 }>();
 
-let forms = reactive({ time: '', track: '', defaultTrack: '' });
-
 let cdrAdminModel: Ref<CdrAdminModel> = ref(getDefaultCdrAdminModel());
 
 let isAdding: Ref<boolean> = ref(false);
+let isSaving: Ref<boolean> = ref(false);
 let currentEvent: CdrAdminEvent | null = null;
+let pendingDeleteEvent: Ref<CdrAdminEvent | null> = ref(null);
+
+let forms = reactive({
+    time: '',
+    track: '',
+    trackSearch: '',
+    originalTime: '',
+    originalTrack: '',
+});
+
+const toastRef = ref<HTMLElement | null>(null);
+const toastMessage = ref('');
+const toastIsError = ref(false);
+
+// -- Track filtering --
+
+const filteredTracks = computed(() => {
+    const q = forms.trackSearch.toLowerCase();
+    if (!q) return cdrAdminModel.value.tracks;
+    return cdrAdminModel.value.tracks.filter((t) =>
+        t.name.toLowerCase().includes(q)
+    );
+});
+
+// -- Validation --
+
+const canSave = computed(() => {
+    const validTrack = cdrAdminModel.value.tracks.some(
+        (t) => t.name === forms.track
+    );
+    const validTime = !isNaN(new Date(forms.time).getTime());
+    const hasChanges =
+        isAdding.value ||
+        forms.time !== forms.originalTime ||
+        forms.track !== forms.originalTrack;
+    return validTrack && validTime && hasChanges;
+});
+
+// -- Date formatting --
+
+function formatDate(d: Date): string {
+    return d.toLocaleDateString('en-US', {
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+    });
+}
+
+function toDatetimeLocal(d: Date): string {
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return (
+        `${d.getFullYear()}-${pad(d.getMonth() + 1)}` +
+        `-${pad(d.getDate())}T${pad(d.getHours())}` +
+        `:${pad(d.getMinutes())}`
+    );
+}
+
+// -- Toast --
+
+function showToast(message: string, isError: boolean) {
+    toastMessage.value = message;
+    toastIsError.value = isError;
+    nextTick(() => {
+        const toast = createBootstrapToast(toastRef.value);
+        toast?.show();
+    });
+}
+
+// -- Actions --
 
 async function fetchModel() {
     cdrAdminModel.value = await getCdrAdminModel(props.league, props.season);
 }
 
-async function onRemove(event: CdrAdminEvent) {
-    cdrAdminModel.value = await deleteSchedEvent(
-        cdrAdminModel.value,
-        event.eventId
-    );
-}
-
 function onEdit(event: CdrAdminEvent) {
     isAdding.value = false;
-    forms.time = event.time.toString();
-    forms.track = event.trackDisplayName;
-    forms.defaultTrack = event.trackDisplayName;
-
     currentEvent = event;
+
+    const dtLocal = toDatetimeLocal(event.time);
+    forms.time = dtLocal;
+    forms.originalTime = dtLocal;
+    forms.track = event.trackDisplayName;
+    forms.originalTrack = event.trackDisplayName;
+    forms.trackSearch = '';
 }
 
 function onAdd() {
     isAdding.value = true;
+    currentEvent = null;
 
-    forms.time = new Date(
-        cdrAdminModel.value.events[
-            cdrAdminModel.value.events.length - 1
-        ].time.getTime() +
-            1000 * 60 * 60 * 24 * 7
-    ).toString();
+    const events = cdrAdminModel.value.events;
+    const lastTime =
+        events.length > 0
+            ? events[events.length - 1].time.getTime()
+            : Date.now();
+    const nextTime = new Date(lastTime + 1000 * 60 * 60 * 24 * 7);
 
+    forms.time = toDatetimeLocal(nextTime);
+    forms.originalTime = '';
     forms.track = '';
+    forms.originalTrack = '';
+    forms.trackSearch = '';
+}
+
+function onSelectTrack(trackName: string) {
+    forms.track = trackName;
+    forms.trackSearch = '';
+}
+
+function confirmDelete(event: CdrAdminEvent) {
+    pendingDeleteEvent.value = event;
+}
+
+async function onConfirmDelete() {
+    if (!pendingDeleteEvent.value) return;
+
+    const event = pendingDeleteEvent.value;
+    const modal = getBootstrapModal(
+        document.getElementById('cdrDeleteConfirmModal')
+    );
+    modal?.hide();
+    pendingDeleteEvent.value = null;
+
+    const before = cdrAdminModel.value.events.length;
+    cdrAdminModel.value = await deleteSchedEvent(
+        cdrAdminModel.value,
+        event.eventId
+    );
+    const after = cdrAdminModel.value.events.length;
+
+    if (after < before) {
+        showToast('Event deleted.', false);
+    } else {
+        showToast('Failed to delete event.', true);
+    }
 }
 
 async function onSave() {
-    var myModalEl = document.getElementById('cdrEditModal');
-    var modal = getBootstrapModal(myModalEl);
-    modal?.hide();
+    const editModal = getBootstrapModal(
+        document.getElementById('cdrEditModal')
+    );
+    editModal?.hide();
 
+    isSaving.value = true;
     const time = new Date(forms.time).getTime().toString();
-
     const tID =
         cdrAdminModel.value.tracks.find((t) => t.name === forms.track)?.id ||
         '';
 
-    if (isAdding.value) {
-        cdrAdminModel.value = await createSchedEvent(
-            cdrAdminModel.value,
-            props.season,
-            time,
-            tID.toString()
-        );
-    } else {
-        cdrAdminModel.value = await updateSchedEvent(
-            cdrAdminModel.value,
-            currentEvent?.eventId || '',
-            time,
-            tID.toString()
-        );
+    try {
+        if (isAdding.value) {
+            const before = cdrAdminModel.value.events.length;
+            cdrAdminModel.value = await createSchedEvent(
+                cdrAdminModel.value,
+                props.season,
+                time,
+                tID.toString()
+            );
+            const after = cdrAdminModel.value.events.length;
+            if (after > before) {
+                showToast('Event created.', false);
+            } else {
+                showToast('Failed to create event.', true);
+            }
+        } else {
+            const eventId = currentEvent?.eventId || '';
+            const prevModel = JSON.stringify(cdrAdminModel.value.events);
+            cdrAdminModel.value = await updateSchedEvent(
+                cdrAdminModel.value,
+                eventId,
+                time,
+                tID.toString()
+            );
+            const newModel = JSON.stringify(cdrAdminModel.value.events);
+            if (newModel !== prevModel) {
+                showToast('Event updated.', false);
+            } else {
+                showToast('Failed to update event.', true);
+            }
+        }
+    } catch (e) {
+        showToast('An unexpected error occurred.', true);
+    } finally {
+        isSaving.value = false;
     }
-
-    // updateSchedEvent(model: CdrAdminModel, event: string, time: string, track: string)
 }
 
 watchEffect(fetchModel);
@@ -100,7 +228,7 @@ watchEffect(fetchModel);
                 <table class="table table-dark table-hover">
                     <thead style="position: sticky; top: 0">
                         <tr>
-                            <th>❏</th>
+                            <th></th>
                             <th>Time</th>
                             <th>Track</th>
                             <th></th>
@@ -113,22 +241,24 @@ watchEffect(fetchModel);
                                 <button
                                     @click="onEdit(event)"
                                     type="button"
-                                    class="btn btn-secondary"
+                                    class="btn btn-secondary btn-sm"
                                     data-bs-toggle="modal"
                                     data-bs-target="#cdrEditModal"
                                 >
-                                    ✎
+                                    Edit
                                 </button>
                             </td>
-                            <td>{{ event.time }}</td>
+                            <td>{{ formatDate(event.time) }}</td>
                             <td>{{ event.trackDisplayName }}</td>
                             <td>
                                 <button
-                                    @click="onRemove(event)"
+                                    @click="confirmDelete(event)"
                                     type="button"
-                                    class="btn btn-secondary"
+                                    class="btn btn-outline-danger btn-sm"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#cdrDeleteConfirmModal"
                                 >
-                                    ❌
+                                    Delete
                                 </button>
                             </td>
                         </tr>
@@ -137,12 +267,12 @@ watchEffect(fetchModel);
                             <td>
                                 <button
                                     type="button"
-                                    class="btn btn-primary"
+                                    class="btn btn-primary btn-sm"
                                     data-bs-toggle="modal"
                                     data-bs-target="#cdrEditModal"
                                     @click="onAdd()"
                                 >
-                                    ✚
+                                    Add Event
                                 </button>
                             </td>
                             <td></td>
@@ -155,7 +285,7 @@ watchEffect(fetchModel);
         </div>
     </div>
 
-    <!-- Modal -->
+    <!-- Edit / Add Modal -->
     <div
         class="modal fade"
         id="cdrEditModal"
@@ -164,10 +294,10 @@ watchEffect(fetchModel);
         aria-hidden="true"
     >
         <div class="modal-dialog">
-            <div class="bg-toplevel modal-content">
+            <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title text-bg" id="cdrEditModalLabel">
-                        Event Details
+                    <h5 class="modal-title" id="cdrEditModalLabel">
+                        {{ isAdding ? 'Add Event' : 'Edit Event' }}
                     </h5>
                     <button
                         type="button"
@@ -177,41 +307,66 @@ watchEffect(fetchModel);
                     ></button>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <form @submit.prevent>
                         <div class="mb-3">
-                            <label
-                                for="recipient-name"
-                                class="col-form-label text-bg"
-                                >Time:</label
+                            <label for="eventTime" class="col-form-label"
+                                >Date &amp; Time</label
                             >
                             <input
+                                type="datetime-local"
                                 class="form-control"
-                                list="datalistOptions"
-                                id="exampleDataList"
-                                placeholder="Type to search..."
+                                id="eventTime"
                                 v-model="forms.time"
                             />
                         </div>
 
                         <div class="mb-3">
-                            <label
-                                for="recipient-name"
-                                class="col-form-label text-bg"
-                                >Track:</label
+                            <label for="trackSearch" class="col-form-label"
+                                >Track</label
                             >
                             <input
-                                class="form-control"
-                                list="trackOptions"
-                                id="trackDataList"
-                                placeholder="Type to search..."
-                                v-model="forms.track"
+                                type="text"
+                                class="form-control mb-2"
+                                id="trackSearch"
+                                placeholder="Search tracks..."
+                                v-model="forms.trackSearch"
                             />
-                            <datalist id="trackOptions">
-                                <option
-                                    v-for="track in cdrAdminModel.tracks"
-                                    v-bind:value="track.name"
-                                ></option>
-                            </datalist>
+                            <div
+                                v-if="forms.track"
+                                class="mb-2"
+                                style="
+                                    font-size: 0.85rem;
+                                    color: var(--gh-success-fg);
+                                "
+                            >
+                                Selected: {{ forms.track }}
+                            </div>
+                            <div
+                                class="list-group"
+                                style="max-height: 200px; overflow-y: auto"
+                            >
+                                <button
+                                    v-for="t in filteredTracks"
+                                    :key="t.id"
+                                    type="button"
+                                    class="list-group-item list-group-item-action"
+                                    :class="{
+                                        active: forms.track === t.name,
+                                    }"
+                                    @click="onSelectTrack(t.name)"
+                                    style="
+                                        background-color: var(
+                                            --gh-canvas-subtle
+                                        );
+                                        color: var(--gh-fg-default);
+                                        border-color: var(--gh-border-muted);
+                                        font-size: 0.85rem;
+                                        padding: 6px 10px;
+                                    "
+                                >
+                                    {{ t.name }}
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -225,26 +380,84 @@ watchEffect(fetchModel);
                     </button>
                     <button
                         type="button"
-                        v-bind:class="cdrAdminModel.tracks
-                        .map((m) => m.name)
-                        .indexOf(forms.track) > -1 && !isNaN(new Date(forms.time).getTime()) && 
-                        forms.track !== forms.defaultTrack
-                        ? 'btn btn-primary'
-                        : 'btn btn-primary disabled'
-                        "
+                        class="btn btn-primary"
+                        :disabled="!canSave || isSaving"
                         @click="onSave()"
                     >
-                        <span v-if="isAdding">Add Event</span>
-                        <span v-if="!isAdding">Save Event</span>
+                        <span
+                            v-if="isSaving"
+                            class="spinner-border spinner-border-sm me-1"
+                        ></span>
+                        {{ isAdding ? 'Add Event' : 'Save Changes' }}
                     </button>
                 </div>
             </div>
         </div>
     </div>
-</template>
 
-<style>
-.text-bg {
-    color: var(--gh-fg-muted);
-}
-</style>
+    <!-- Delete Confirmation Modal -->
+    <div
+        class="modal fade"
+        id="cdrDeleteConfirmModal"
+        tabindex="-1"
+        aria-labelledby="cdrDeleteConfirmLabel"
+        aria-hidden="true"
+    >
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cdrDeleteConfirmLabel">
+                        Confirm Delete
+                    </h5>
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"
+                    ></button>
+                </div>
+                <div class="modal-body" v-if="pendingDeleteEvent">
+                    Delete the event on
+                    <strong>{{ formatDate(pendingDeleteEvent.time) }}</strong>
+                    at
+                    <strong>{{ pendingDeleteEvent.trackDisplayName }}</strong
+                    >?
+                </div>
+                <div class="modal-footer">
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-danger"
+                        @click="onConfirmDelete()"
+                    >
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div
+            ref="toastRef"
+            class="toast"
+            role="alert"
+            :class="toastIsError ? 'border-danger' : 'border-success'"
+            style="
+                background-color: var(--gh-canvas-subtle);
+                color: var(--gh-fg-default);
+            "
+        >
+            <div class="toast-body">
+                {{ toastMessage }}
+            </div>
+        </div>
+    </div>
+</template>

@@ -11,8 +11,18 @@ async function handler(req: any, next: (req: any) => Promise<void>) {
 
         try {
             return await next(req);
-        } catch (e) {}
-    } catch (error) {}
+        } catch (e) {
+            console.error(
+                '[AUTH-USER] handler callback failed:',
+                e instanceof Error ? e.message : e
+            );
+        }
+    } catch (error) {
+        console.error(
+            '[AUTH-USER] token verification failed:',
+            error instanceof Error ? error.message : error
+        );
+    }
 }
 
 export async function middleware(req: any, next: (req: any) => Promise<void>) {
