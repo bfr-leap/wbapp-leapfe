@@ -122,9 +122,13 @@ function onAdd() {
     currentEvent = null;
 
     const events = cdrAdminModel.value.events;
+    const maxReasonable = Date.now() + 1000 * 60 * 60 * 24 * 365;
+    const reasonable = events.filter(
+        (e) => e.time.getTime() <= maxReasonable
+    );
     const lastTime =
-        events.length > 0
-            ? events[events.length - 1].time.getTime()
+        reasonable.length > 0
+            ? reasonable[reasonable.length - 1].time.getTime()
             : Date.now();
     const nextTime = new Date(lastTime + 1000 * 60 * 60 * 24 * 7);
 
