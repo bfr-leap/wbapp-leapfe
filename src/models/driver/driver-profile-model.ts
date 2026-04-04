@@ -107,6 +107,7 @@ export async function getDriverProfileModel(league: string, driver: string) {
 
     const leagueSeasons = await getLeagueSeasons(league);
     const dotdProfile = await getDotdProfile(league, driver);
+    console.log('[dotdProfile] fetch', { league, driver, dotdProfile });
 
     const driverSessionResultsRace = await getDriverResults(
         league,
@@ -133,6 +134,13 @@ export async function getDriverProfileModel(league: string, driver: string) {
         !driverSessionResultsSprint ||
         !driverSessionResultsQuali
     ) {
+        console.warn('[dotdProfile] early return — missing session results', {
+            race: !!driverSessionResultsRace,
+            sprint: !!driverSessionResultsSprint,
+            quali: !!driverSessionResultsQuali,
+            dotdProfile,
+        });
+        ret.dotdProfile = dotdProfile;
         return ret;
     }
 

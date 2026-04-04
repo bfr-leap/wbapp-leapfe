@@ -110,12 +110,11 @@ export async function getDotdProfile(
 ): Promise<DotdProfile | null> {
     const namespace = 'ldata-gentxt';
     const type = 'dotdProfile';
-    return await fetchCachedDocument<DotdProfile>({
-        namespace,
-        type,
-        league,
-        custId,
-    });
+    const params = { namespace, type, league, custId };
+    console.log('[dotdProfile] requesting', params);
+    const result = await fetchCachedDocument<DotdProfile>(params);
+    console.log('[dotdProfile] response', result);
+    return result;
 }
 
 export async function getGeneratedSimsessionSummary(
