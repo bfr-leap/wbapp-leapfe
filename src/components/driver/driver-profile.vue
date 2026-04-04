@@ -54,9 +54,17 @@ const driverProfileModel: Ref<DriverProfileModel> =
         v-if="driverProfileModel.dotdProfile?.blurb"
         class="dotd-profile"
     >
+        <h6 class="dotd-profile-header">Driver of the Day Profile</h6>
         <p class="dotd-profile-text">
             {{ driverProfileModel.dotdProfile.blurb }}
         </p>
+        <small
+            v-if="driverProfileModel.dotdProfile.generated_on"
+            class="dotd-profile-footer"
+        >
+            Generated on:
+            {{ driverProfileModel.dotdProfile.generated_on }}
+        </small>
     </div>
 
     <!-- ── Stats & charts panel ──────────────────────────────── -->
@@ -92,10 +100,22 @@ const driverProfileModel: Ref<DriverProfileModel> =
     margin-top: 8px;
 }
 
+.dotd-profile-header {
+    margin: 0 0 6px;
+    font-weight: 600;
+    color: var(--gh-text-muted, #8b949e);
+}
+
 .dotd-profile-text {
     margin: 0;
     line-height: 1.5;
     color: var(--gh-text-primary, #e6edf3);
+}
+
+.dotd-profile-footer {
+    display: block;
+    margin-top: 6px;
+    color: var(--gh-text-muted, #8b949e);
 }
 
 /* ── Content card (bordered panel like GitHub README card) ──── */

@@ -460,6 +460,7 @@ export interface DotdProfile {
     subsession_id: number;
     round: number;
     blurb: string;
+    generated_on?: string;
 }
 
 export interface ET_DriverTelemetryDatum {
