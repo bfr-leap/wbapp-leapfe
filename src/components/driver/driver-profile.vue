@@ -51,11 +51,11 @@ const driverProfileModel: Ref<DriverProfileModel> =
 
     <!-- ── DOTD profile blurb ─────────────────────────────────── -->
     <div
-        v-if="driverProfileModel.dotdProfile?.text"
+        v-if="driverProfileModel.dotdProfile?.blurb"
         class="gh-content-card dotd-profile"
     >
         <p class="dotd-profile-text">
-            {{ driverProfileModel.dotdProfile.text }}
+            {{ driverProfileModel.dotdProfile.blurb }}
         </p>
     </div>
 
