@@ -114,6 +114,9 @@ export async function getDotdProfile(
     console.log('[dotdProfile] requesting', params);
     const result = await fetchCachedDocument<DotdProfile>(params);
     console.log('[dotdProfile] response', result);
+    if (!result?.blurb?.trim()) {
+        return null;
+    }
     return result;
 }
 
