@@ -41,9 +41,7 @@ export async function updSchedEvent(
     });
 }
 
-export async function delSchedEvent(
-    event: string
-): Promise<SchedEventResult> {
+export async function delSchedEvent(event: string): Promise<SchedEventResult> {
     const namespace = 'ldata-admcfg';
     const type = 'delSchedEvent';
     return await fetchUncached<SchedEventResult>({

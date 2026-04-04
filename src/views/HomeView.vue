@@ -14,9 +14,7 @@ import UserProfile from '@@/src/components/pages/user-profile-view.vue';
 import SeasonCdrAdmin from '@@/src/components/pages/season-cdr-admin-view.vue';
 // import { ref, watch } from 'vue';
 import mixpanel from 'mixpanel-browser';
-import {
-    defLgSeasSubCtx,
-} from '@@/src/utils/fetch-util';
+import { defLgSeasSubCtx } from '@@/src/utils/fetch-util';
 import type { DefaultLeagueContext } from '@@/src/utils/fetch-util';
 
 const route = useRoute();

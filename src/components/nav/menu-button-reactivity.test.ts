@@ -61,11 +61,7 @@ async function flushWatchers(ms = 150) {
 }
 
 // Helper: create a model based on car/track args (mirrors real model)
-function makeTrackModel(
-    league: string,
-    car: string,
-    track: string
-) {
+function makeTrackModel(league: string, car: string, track: string) {
     return {
         currentLeague: `League ${league}`,
         carOptions: {
@@ -185,9 +181,7 @@ describe('Menu button reactivity after model updates', () => {
             await flushWatchers();
 
             // Verify initial state
-            expect(wrapper.find('.dropdown-toggle').text()).toBe(
-                'Car 1'
-            );
+            expect(wrapper.find('.dropdown-toggle').text()).toBe('Car 1');
 
             // Simulate prop change (user navigated)
             await wrapper.setProps({ car: '2', track: '2' });
@@ -285,9 +279,7 @@ describe('Menu button reactivity after model updates', () => {
             // After fix: exactly 1 fetch per prop change
             expect(fetchesAfterOneChange).toBe(1);
 
-            expect(
-                wrapper.findAll('.dropdown-toggle')[0].text()
-            ).toBe('Car 2');
+            expect(wrapper.findAll('.dropdown-toggle')[0].text()).toBe('Car 2');
         });
     });
 });

@@ -60,9 +60,11 @@ async function prefetch(req: any): Promise<any> {
             q.userID = req?.user?.id;
         }
 
-        const ctxKey = `/api/fetch-document?namespace=ldata-usrcfg&type=defLgSeasSubCtx&league=${req?.query?.league || ''
-            }&season=${req?.query?.season || ''}&subsession=${req?.query?.subsession || ''
-            }`;
+        const ctxKey = `/api/fetch-document?namespace=ldata-usrcfg&type=defLgSeasSubCtx&league=${
+            req?.query?.league || ''
+        }&season=${req?.query?.season || ''}&subsession=${
+            req?.query?.subsession || ''
+        }`;
 
         console.log('prefetch ctxKey: ', ctxKey);
 
@@ -80,7 +82,6 @@ async function prefetch(req: any): Promise<any> {
         console.log('prefetch(): done');
 
         r[ctxKey] = lgSeasSubCtx;
-
 
         return { docs: r };
     } catch (e) {
@@ -126,8 +127,6 @@ async function preFetchHome(query: { [name: string]: string | number }) {
     const hc = await Promise.all(
         queries.map((q) => getDocument(q.namespace.toString(), q))
     );
-
-
 
     let r: { [namea: string]: any } = {};
 

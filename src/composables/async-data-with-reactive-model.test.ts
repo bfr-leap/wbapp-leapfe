@@ -76,11 +76,7 @@ describe('asyncDataWithReactiveModel - watch behavior', () => {
             'test-3obs',
             fetchFn,
             () => ({ leagueId: '', seasonId: '' }),
-            [
-                () => props.league,
-                () => props.season,
-                () => props.targetPage,
-            ]
+            [() => props.league, () => props.season, () => props.targetPage]
         );
 
         expect(fetchFn).toHaveBeenCalledTimes(1);
@@ -109,11 +105,7 @@ describe('asyncDataWithReactiveModel - watch behavior', () => {
             'test-3obs-bool',
             fetchFn,
             () => ({ leagueId: '', seasonId: '' }),
-            [
-                () => props.league,
-                () => props.season,
-                () => props.summaryMode,
-            ]
+            [() => props.league, () => props.season, () => props.summaryMode]
         );
 
         expect(fetchFn).toHaveBeenCalledTimes(1);
@@ -504,9 +496,7 @@ describe('asyncDataWithReactiveModel - watch behavior', () => {
         expect(childModel.value.subsession_id).toBe(
             CLICKED_SUBSESSION.toString()
         );
-        expect(childModel.value.data).toBe(
-            `results-for-${CLICKED_SUBSESSION}`
-        );
+        expect(childModel.value.data).toBe(`results-for-${CLICKED_SUBSESSION}`);
     });
 
     it('multiple independent instances all fire their watches', async () => {

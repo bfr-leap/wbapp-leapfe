@@ -102,9 +102,7 @@ export async function getLeagueSeasonSessions(
     // TODO: move this to the backend
     if (ret) {
         let ss = await getLeagueSimsessionIndex(league);
-        let season_ = ss?.find(
-            (v) => v.season_id.toString() === season
-        );
+        let season_ = ss?.find((v) => v.season_id.toString() === season);
 
         ret.sessions = ret.sessions.filter((v) => {
             let simsessions =

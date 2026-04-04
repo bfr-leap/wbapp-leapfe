@@ -47,9 +47,7 @@ function makeMember(
     } as M_Member;
 }
 
-function makeDriver(
-    overrides: Partial<DriverModel> = {}
-): DriverModel {
+function makeDriver(overrides: Partial<DriverModel> = {}): DriverModel {
     return {
         position: 1,
         points: 100,
@@ -134,10 +132,7 @@ describe('populateTeamInfoMaps', () => {
     });
 
     it('handles null input gracefully', () => {
-        const { userTeamIdMap, teamInfoMap } = populateTeamInfoMaps(
-            null,
-            1
-        );
+        const { userTeamIdMap, teamInfoMap } = populateTeamInfoMaps(null, 1);
         expect(Object.keys(userTeamIdMap)).toHaveLength(0);
         expect(Object.keys(teamInfoMap)).toHaveLength(0);
     });
@@ -201,10 +196,7 @@ describe('sortMembersByStandings', () => {
     });
 
     it('handles members without stats (pushes them to end)', () => {
-        const members = [
-            makeMember(1, 'No Stats'),
-            makeMember(2, 'Has Stats'),
-        ];
+        const members = [makeMember(1, 'No Stats'), makeMember(2, 'Has Stats')];
 
         const stats: DriverStatsMap = {
             2: {
@@ -219,10 +211,7 @@ describe('sortMembersByStandings', () => {
     });
 
     it('does not mutate the original array', () => {
-        const members = [
-            makeMember(2, 'B'),
-            makeMember(1, 'A'),
-        ];
+        const members = [makeMember(2, 'B'), makeMember(1, 'A')];
 
         const stats: DriverStatsMap = {
             1: {
@@ -338,11 +327,7 @@ describe('buildTeamStandings', () => {
 
         const teams = buildTeamStandings(drivers, true);
         expect(teams).toHaveLength(3);
-        expect(teams.map((t) => t.teamName)).toEqual([
-            'T1',
-            'T2',
-            'T3',
-        ]);
+        expect(teams.map((t) => t.teamName)).toEqual(['T1', 'T2', 'T3']);
     });
 
     it('groups multiple drivers into the same team', () => {

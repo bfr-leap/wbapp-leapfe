@@ -34,9 +34,7 @@ function onClick(league: LeagueCardSelectorEntry) {
 }
 
 function onAddLeagueBtn() {
-    let i = leagueSelection.value
-        .map((m) => m.name)
-        .indexOf(forms.newLeague);
+    let i = leagueSelection.value.map((m) => m.name).indexOf(forms.newLeague);
     if (i < 0) return;
 
     var myModalEl = document.getElementById('exampleModal');
@@ -69,9 +67,7 @@ watch(route, fetchModel);
             </thead>
 
             <tbody>
-                <tr
-                    v-for="league in leagueSelection.filter((l) => l.isActive)"
-                >
+                <tr v-for="league in leagueSelection.filter((l) => l.isActive)">
                     <td>❏</td>
                     <td>{{ league.name }}</td>
                     <td>{{ league.leagueID }}</td>
@@ -142,8 +138,8 @@ watch(route, fetchModel);
                             <datalist id="datalistOptions">
                                 <option
                                     v-for="league in leagueSelection.filter(
-                                    (l) => !l.isActive
-                                )"
+                                        (l) => !l.isActive
+                                    )"
                                     v-bind:value="league.name"
                                 ></option>
                             </datalist>
@@ -160,11 +156,12 @@ watch(route, fetchModel);
                     </button>
                     <button
                         type="button"
-                        v-bind:class="leagueSelection
-                        .map((m) => m.name)
-                        .indexOf(forms.newLeague) > -1
-                        ? 'btn btn-primary'
-                        : 'btn btn-primary disabled'
+                        v-bind:class="
+                            leagueSelection
+                                .map((m) => m.name)
+                                .indexOf(forms.newLeague) > -1
+                                ? 'btn btn-primary'
+                                : 'btn btn-primary disabled'
                         "
                         @click="onAddLeagueBtn()"
                     >

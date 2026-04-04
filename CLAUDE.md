@@ -6,15 +6,15 @@ iRacing league analytics application built with **Nuxt 3** (Vue 3). Displays dri
 
 ## Tech Stack
 
-- **Framework:** Nuxt 3.12 (Vue 3, Nitro server, file-based routing)
-- **Auth:** Clerk (vue-clerk frontend, h3-clerk server middleware)
-- **Database:** Xata (serverless, accessed via `@xata.io/client`)
-- **State:** Pinia (underutilized - most state lives in api-client cache)
-- **Visualization:** D3.js v7
-- **Styling:** Bootstrap 5 via CDN with custom dark theme
-- **Analytics:** Mixpanel
-- **Testing:** Vitest + @vue/test-utils + happy-dom
-- **Linting:** ESLint via @nuxt/eslint + Prettier
+-   **Framework:** Nuxt 3.12 (Vue 3, Nitro server, file-based routing)
+-   **Auth:** Clerk (vue-clerk frontend, h3-clerk server middleware)
+-   **Database:** Xata (serverless, accessed via `@xata.io/client`)
+-   **State:** Pinia (underutilized - most state lives in api-client cache)
+-   **Visualization:** D3.js v7
+-   **Styling:** Bootstrap 5 via CDN with custom dark theme
+-   **Analytics:** Mixpanel
+-   **Testing:** Vitest + @vue/test-utils + happy-dom
+-   **Linting:** ESLint via @nuxt/eslint + Prettier
 
 ## Architecture
 
@@ -31,11 +31,11 @@ Vue Component → Model function → Service module → api-client.ts → /api/f
 
 ### Key Patterns
 
-- **Model-first:** Components delegate data fetching/transformation to `src/models/**/*-model.ts` files. Models return typed objects that components render.
-- **Service layer:** Domain-specific data accessors in `src/services/` wrap the core `api-client.ts`.
-- **Namespace-based queries:** All data fetched via `fetchCachedDocument({ namespace, type, ...params })`.
-- **SSR composable:** `asyncDataWithReactiveModel()` wraps model functions for SSR-safe reactive data.
-- **Path alias:** Use `@@/src/` for imports from the src directory.
+-   **Model-first:** Components delegate data fetching/transformation to `src/models/**/*-model.ts` files. Models return typed objects that components render.
+-   **Service layer:** Domain-specific data accessors in `src/services/` wrap the core `api-client.ts`.
+-   **Namespace-based queries:** All data fetched via `fetchCachedDocument({ namespace, type, ...params })`.
+-   **SSR composable:** `asyncDataWithReactiveModel()` wraps model functions for SSR-safe reactive data.
+-   **Path alias:** Use `@@/src/` for imports from the src directory.
 
 ### Directory Structure
 
@@ -60,22 +60,22 @@ lplib/           # Shared types and data broker
 
 Data access is organized by domain in `src/services/`:
 
-| Module | Responsibility |
-|--------|---------------|
-| `league-service.ts` | League metadata, seasons, members, teams, tracks |
-| `results-service.ts` | Race results, driver stats, charts, telemetry |
-| `user-service.ts` | User state, features, iRacing account linking |
-| `admin-service.ts` | Admin schedule CRUD operations |
+| Module               | Responsibility                                   |
+| -------------------- | ------------------------------------------------ |
+| `league-service.ts`  | League metadata, seasons, members, teams, tracks |
+| `results-service.ts` | Race results, driver stats, charts, telemetry    |
+| `user-service.ts`    | User state, features, iRacing account linking    |
+| `admin-service.ts`   | Admin schedule CRUD operations                   |
 
 `src/utils/fetch-util.ts` re-exports everything for backwards compatibility. **New code should import from specific service modules.**
 
 ### Conventions
 
-- **Formatting:** Prettier - 4-space indent, single quotes, trailing commas, semicolons, 80-char width
-- **Linting:** ESLint via @nuxt/eslint (config in `eslint.config.mjs`)
-- **Component naming:** kebab-case filenames (e.g., `driver-standings.vue`)
-- **Model naming:** `*-model.ts` files export a `get*Model()` async function
-- **Test naming:** Co-located `*.test.ts` files next to the source file
+-   **Formatting:** Prettier - 4-space indent, single quotes, trailing commas, semicolons, 80-char width
+-   **Linting:** ESLint via @nuxt/eslint (config in `eslint.config.mjs`)
+-   **Component naming:** kebab-case filenames (e.g., `driver-standings.vue`)
+-   **Model naming:** `*-model.ts` files export a `get*Model()` async function
+-   **Test naming:** Co-located `*.test.ts` files next to the source file
 
 ## Common Commands
 
@@ -96,7 +96,8 @@ npm run prettier-check # Check formatting
 ## Environment Variables
 
 Required in `.env`:
-- `CLERK_PUBLISHABLE_KEY` - Clerk frontend key
-- `CLERK_SECRET_KEY` - Clerk backend key
-- `CLERK_JWT_KEY` - JWT verification key
-- `API_BASE_URL` - API base URL (defaults to http://localhost:3000)
+
+-   `CLERK_PUBLISHABLE_KEY` - Clerk frontend key
+-   `CLERK_SECRET_KEY` - Clerk backend key
+-   `CLERK_JWT_KEY` - JWT verification key
+-   `API_BASE_URL` - API base URL (defaults to http://localhost:3000)

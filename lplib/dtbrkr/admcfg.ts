@@ -1,6 +1,5 @@
 const BASE_URL =
-    process.env.LEAP_DATA_BROKER_BASE_URL ||
-    'http://98.116.118.25:3030/api';
+    process.env.LEAP_DATA_BROKER_BASE_URL || 'http://98.116.118.25:3030/api';
 
 async function crtSchedEvent(
     season: string,
@@ -34,7 +33,9 @@ async function crtSchedEvent(
         if (!res.ok) {
             const err = await res.text();
             console.error(
-                `[ADMCFG] crtSchedEvent FAILED: ${res.status} ${Date.now() - t0}ms`,
+                `[ADMCFG] crtSchedEvent FAILED: ${res.status} ${
+                    Date.now() - t0
+                }ms`,
                 err
             );
             return {
@@ -97,7 +98,9 @@ async function updSchedEvent(
         if (!res.ok) {
             const err = await res.text();
             console.error(
-                `[ADMCFG] updSchedEvent FAILED: ${res.status} ${Date.now() - t0}ms`,
+                `[ADMCFG] updSchedEvent FAILED: ${res.status} ${
+                    Date.now() - t0
+                }ms`,
                 err
             );
             return {
@@ -148,7 +151,9 @@ async function delSchedEvent(event: string, authHeader: string) {
         if (!res.ok) {
             const err = await res.text();
             console.error(
-                `[ADMCFG] delSchedEvent FAILED: ${res.status} ${Date.now() - t0}ms`,
+                `[ADMCFG] delSchedEvent FAILED: ${res.status} ${
+                    Date.now() - t0
+                }ms`,
                 err
             );
             return {
@@ -196,20 +201,10 @@ export async function adminConfigHandler(
 
     switch (q?.type) {
         case 'crtSchedEvent':
-            doc = await crtSchedEvent(
-                q?.season,
-                q?.time,
-                q?.track,
-                authHeader
-            );
+            doc = await crtSchedEvent(q?.season, q?.time, q?.track, authHeader);
             break;
         case 'updSchedEvent':
-            doc = await updSchedEvent(
-                q?.event,
-                q?.time,
-                q?.track,
-                authHeader
-            );
+            doc = await updSchedEvent(q?.event, q?.time, q?.track, authHeader);
             break;
         case 'delSchedEvent':
             doc = await delSchedEvent(q?.event, authHeader);

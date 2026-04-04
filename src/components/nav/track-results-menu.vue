@@ -69,8 +69,8 @@ watch(props, fetchModel, { immediate: true });
             </button>
             <ul class="dropdown-menu">
                 <li
-                    v-for="trackOption in trackResultsMenuModel
-                        .trackOptions.options"
+                    v-for="trackOption in trackResultsMenuModel.trackOptions
+                        .options"
                 >
                     <RouterLinkProxy
                         class="dropdown-item"

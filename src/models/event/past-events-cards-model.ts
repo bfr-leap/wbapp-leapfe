@@ -41,8 +41,7 @@ export async function getPastEventCardsModel(
         if (session?.subsession_id) {
             let ssiSession: SSI_Session | undefined =
                 seasonIndex?.sessions.find(
-                    (s) =>
-                        s.subsession_id === session.subsession_id
+                    (s) => s.subsession_id === session.subsession_id
                 );
             let raceSimsession = ssiSession?.simsessions.find(
                 (s) => s.type === 'race'
@@ -55,8 +54,7 @@ export async function getPastEventCardsModel(
                 trackId: session.track.track_id.toString(),
                 date: session.launch_at,
                 isSelected: false,
-                sessionId:
-                    session?.subsession_id?.toString() || '',
+                sessionId: session?.subsession_id?.toString() || '',
                 simsessionId: simsessionId?.toString() || '',
             });
         }

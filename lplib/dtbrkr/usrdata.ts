@@ -3,12 +3,10 @@ import { getXataClient, XataClient } from './xata';
 import type { UsersLeaguesInterestRecord } from './xata';
 
 const BASE_URL =
-    process.env.LEAP_DATA_BROKER_BASE_URL ||
-    'http://98.116.118.25:3030/api';
+    process.env.LEAP_DATA_BROKER_BASE_URL || 'http://98.116.118.25:3030/api';
 
 export async function getDefaultLeagueSeason(user_id: string): Promise<any> {
     console.log('::: getDefaultLeagueSeason()', user_id); // this is next
-
 
     const url = `${BASE_URL}/user/${user_id}/default-league-season`;
     try {
@@ -23,7 +21,7 @@ export async function getDefaultLeagueSeason(user_id: string): Promise<any> {
 }
 
 export async function userFeatures(user_id: string): Promise<any> {
-    console.log('::: userFeatures(): ', user_id, 'proxy'); 
+    console.log('::: userFeatures(): ', user_id, 'proxy');
     const url = `${BASE_URL}/user/${user_id}/features`;
     try {
         let objs = await fetch(url);
@@ -115,7 +113,7 @@ export async function updIrLinkCode(
 }
 
 async function getUserLeaguesState(user_id: string): Promise<any> {
-    console.log('::: getUserLeaguesState():', user_id, 'proxy'); 
+    console.log('::: getUserLeaguesState():', user_id, 'proxy');
     const url = `${BASE_URL}/user/${user_id}/leagues`;
     try {
         let objs = await fetch(url);
@@ -176,14 +174,13 @@ async function updUserLeaguesState(
     return await getUserLeaguesState(user_id);
 }
 
-
 async function defLgSeasSubCtx(
     userID: string,
     league: string,
     season: string,
     subsession: string
 ): Promise<any> {
-    console.log('::: defLgSeasSubCtx()', userID, league, subsession, 'proxy'); 
+    console.log('::: defLgSeasSubCtx()', userID, league, subsession, 'proxy');
     const url = `${BASE_URL}/user/${userID}/context?league=${league}&season=${season}&subsession=${subsession}`;
     try {
         let objs = await fetch(url);
@@ -191,7 +188,12 @@ async function defLgSeasSubCtx(
         return obj;
     } catch (e) {
         console.log('::: error reaching proxy');
-        return { league_id: '4534', season_id: '111025', subsession_id: '', simsession_id: '' }; 
+        return {
+            league_id: '4534',
+            season_id: '111025',
+            subsession_id: '',
+            simsession_id: '',
+        };
     }
 }
 

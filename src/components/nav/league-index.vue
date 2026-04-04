@@ -59,8 +59,8 @@ const leagueIndexModel: Ref<LeagueIndexModel> =
             </button>
             <ul class="dropdown-menu">
                 <li
-                    v-for="leagueOption in leagueIndexModel
-                        .leagueOptions.options"
+                    v-for="leagueOption in leagueIndexModel.leagueOptions
+                        .options"
                 >
                     <RouterLinkProxy
                         class="dropdown-item"
@@ -83,8 +83,8 @@ const leagueIndexModel: Ref<LeagueIndexModel> =
             </button>
             <ul class="dropdown-menu">
                 <li
-                    v-for="seasonOption in leagueIndexModel
-                        .seasonOptions.options"
+                    v-for="seasonOption in leagueIndexModel.seasonOptions
+                        .options"
                 >
                     <RouterLinkProxy
                         class="dropdown-item"

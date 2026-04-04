@@ -66,8 +66,7 @@ export async function getTeamProfileModel(
 
             for (let statKey of Object.keys(ret.stats)) {
                 const key = statKey as keyof DriverStats;
-                (ret.stats[key] as number) +=
-                    (statRow?.[key] as number) || 0;
+                (ret.stats[key] as number) += (statRow?.[key] as number) || 0;
             }
         }
     }

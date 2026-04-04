@@ -31,10 +31,7 @@ describe('getFirstLastNames', () => {
 });
 
 describe('getFormulaLicense', () => {
-    function makeLicense(
-        category: string,
-        irating: number
-    ): M_License {
+    function makeLicense(category: string, irating: number): M_License {
         return {
             category,
             irating,

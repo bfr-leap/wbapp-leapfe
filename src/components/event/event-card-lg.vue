@@ -60,7 +60,10 @@ updateTimer();
 <template>
     <div class="">
         <div class="wrap">
-            <img class="bg track-bg" v-bind:src="`./tracks/${track_id.replace('-', 'n')}.jpg`" />
+            <img
+                class="bg track-bg"
+                v-bind:src="`./tracks/${track_id.replace('-', 'n')}.jpg`"
+            />
             <img
                 class="bg track-logo"
                 v-bind:src="`./tracks/${track_id.replace('-', 'n')}_logo.png`"
