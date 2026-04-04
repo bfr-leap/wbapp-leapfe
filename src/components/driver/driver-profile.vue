@@ -52,7 +52,7 @@ const driverProfileModel: Ref<DriverProfileModel> =
     <!-- ── DOTD profile blurb ─────────────────────────────────── -->
     <div
         v-if="driverProfileModel.dotdProfile?.blurb"
-        class="gh-content-card dotd-profile"
+        class="dotd-profile"
     >
         <p class="dotd-profile-text">
             {{ driverProfileModel.dotdProfile.blurb }}
@@ -87,10 +87,15 @@ const driverProfileModel: Ref<DriverProfileModel> =
 }
 
 /* ── DOTD profile blurb ─────────────────────────────────────── */
+.dotd-profile {
+    padding: 8px 0;
+    margin-top: 8px;
+}
+
 .dotd-profile-text {
     margin: 0;
     line-height: 1.5;
-    color: var(--gh-text-secondary);
+    color: var(--gh-text-primary, #e6edf3);
 }
 
 /* ── Content card (bordered panel like GitHub README card) ──── */
