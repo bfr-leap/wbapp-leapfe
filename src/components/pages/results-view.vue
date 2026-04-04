@@ -72,7 +72,8 @@ const resultsModel: Ref<ResultsModel> =
 
         <div
             v-if="resultsModel.summary.length > 0"
-            class="card bg-dark text-light m-2">
+            class="card bg-dark text-light m-2"
+        >
             <div class="card-body p-2">
                 <div class="container">
                     <div v-html="resultsModel.summary[0]"></div>
@@ -106,16 +107,16 @@ const resultsModel: Ref<ResultsModel> =
         >
             <div class="card-body p-2">
                 <!-- <div class="container"> -->
-                    <div class="row">
-                        <div>Cumulative Delta</div>
-                    </div>
-                    <div class="row">
-                        <CumulativeDeltaChart
-                            v-bind:league="resultsModel.leagueId"
-                            v-bind:subsession="resultsModel.subsessionId"
-                            v-bind:simsession="resultsModel.simsessionId"
-                        />
-                    </div>
+                <div class="row">
+                    <div>Cumulative Delta</div>
+                </div>
+                <div class="row">
+                    <CumulativeDeltaChart
+                        v-bind:league="resultsModel.leagueId"
+                        v-bind:subsession="resultsModel.subsessionId"
+                        v-bind:simsession="resultsModel.simsessionId"
+                    />
+                </div>
                 <!-- </div> -->
             </div>
         </div>
@@ -129,13 +130,13 @@ const resultsModel: Ref<ResultsModel> =
         >
             <div class="card-body p-2">
                 <!-- <div class="container"> -->
-                    <div class="row">
-                        <StartFinishChart
-                            v-bind:league="resultsModel.leagueId"
-                            v-bind:subsession="resultsModel.subsessionId"
-                            v-bind:simsession="resultsModel.simsessionId"
-                        />
-                    </div>
+                <div class="row">
+                    <StartFinishChart
+                        v-bind:league="resultsModel.leagueId"
+                        v-bind:subsession="resultsModel.subsessionId"
+                        v-bind:simsession="resultsModel.simsessionId"
+                    />
+                </div>
                 <!-- </div> -->
             </div>
         </div>

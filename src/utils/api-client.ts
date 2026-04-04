@@ -45,9 +45,7 @@ async function fetchObjects(urls: string[]): Promise<unknown[]> {
             token = _token;
             url = API_BASE_URL + url;
         } else {
-            token = _auth?.getToken
-                ? await _auth.getToken.value()
-                : null;
+            token = _auth?.getToken ? await _auth.getToken.value() : null;
         }
 
         const t0 = Date.now();
@@ -56,15 +54,15 @@ async function fetchObjects(urls: string[]): Promise<unknown[]> {
         });
 
         if (!response.ok) {
-            throw new Error(
-                `Failed to fetch ${url}: ${response.statusText}`
-            );
+            throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
         }
 
         const obj = await response.json();
         if (!import.meta.server) {
             console.log(
-                `[DIAG][http] ${response.status} ${Date.now() - t0}ms ${urls[0]}`
+                `[DIAG][http] ${response.status} ${Date.now() - t0}ms ${
+                    urls[0]
+                }`
             );
         }
         return [obj];
@@ -92,9 +90,7 @@ export function clearCache() {
     _cacheStorage = {};
 }
 
-export function prepUrl(args: {
-    [name: string]: string | number;
-}): string {
+export function prepUrl(args: { [name: string]: string | number }): string {
     let ret = [];
     let keys = Object.keys(args);
     for (let key of keys) {
@@ -196,7 +192,9 @@ export async function fetchCachedDocument<T>(args: {
             const cloned = structuredClone(parsed.doc);
             if (!import.meta.server) {
                 console.log(
-                    `[DIAG][cache] ${cacheHit ? 'HIT' : 'MISS'} ${source} → ${cloned == null ? 'null' : 'ok'}`
+                    `[DIAG][cache] ${cacheHit ? 'HIT' : 'MISS'} ${source} → ${
+                        cloned == null ? 'null' : 'ok'
+                    }`
                 );
             }
             return cloned;

@@ -454,6 +454,16 @@ export interface GeneratedSimsessionSummary {
     highlightWord?: string;
 }
 
+export interface DotdProfile {
+    cust_id: number;
+    display_name: string;
+    subsession_id: number;
+    round: number;
+    blurb: string;
+    generated_on?: string;
+    generated_at?: string;
+}
+
 export interface ET_DriverTelemetryDatum {
     driverId: number;
     perc: number;

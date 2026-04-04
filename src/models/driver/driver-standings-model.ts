@@ -77,9 +77,7 @@ export function populateTeamInfoMaps(
     const userTeamIdMap: Record<number, number> = {};
     const teamInfoMap: Record<number, CLTI_Team> = {};
 
-    let season = leagueTeamsInfo?.seasons.find(
-        (s) => s.season_id === seasonId
-    );
+    let season = leagueTeamsInfo?.seasons.find((s) => s.season_id === seasonId);
     if (!season) {
         return { userTeamIdMap, teamInfoMap };
     }
@@ -155,9 +153,7 @@ export function buildTeamStandings(
         team.points += driver.points;
     }
 
-    let teamsA = Object.values(teamViewMap).sort(
-        (a, b) => b.points - a.points
-    );
+    let teamsA = Object.values(teamViewMap).sort((a, b) => b.points - a.points);
 
     teamsA.forEach((v, i) => {
         v.position = i + 1;
@@ -185,7 +181,7 @@ export async function getDriverStandingsModel(
             { [name: number]: DriverStatsMap } | null,
             CuratedLeagueTeamsInfo | null,
             MembersData | null,
-            SeasonSimsessionIndex[] | null,
+            SeasonSimsessionIndex[] | null
         ]
     >[
         await getLeagueDriverStats(league),

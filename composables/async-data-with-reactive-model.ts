@@ -33,9 +33,7 @@ if (!import.meta.server && typeof window !== 'undefined') {
     (window as unknown as Record<string, unknown>).__LEAP_DIAG = () => {
         const out = _diagLog.map((e) => {
             const age = `${((Date.now() - e.ts) / 1000).toFixed(1)}s ago`;
-            const d = e.detail
-                ? ` | ${JSON.stringify(e.detail)}`
-                : '';
+            const d = e.detail ? ` | ${JSON.stringify(e.detail)}` : '';
             return `[${age}] ${e.event.padEnd(16)} ${e.key}${d}`;
         });
         console.log(out.join('\n'));
@@ -93,8 +91,7 @@ export async function asyncDataWithReactiveModelResult<T>(
             });
             return result;
         } catch (e) {
-            const msg =
-                e instanceof Error ? e.message : 'Unknown error';
+            const msg = e instanceof Error ? e.message : 'Unknown error';
             const stack =
                 e instanceof Error ? e.stack?.split('\n').slice(0, 4) : [];
             console.error(`[${dataKey}] Model fetch failed:`, msg);
@@ -109,9 +106,7 @@ export async function asyncDataWithReactiveModelResult<T>(
         try {
             return JSON.stringify(
                 observables.map((o) =>
-                    typeof o === 'function'
-                        ? (o as () => unknown)()
-                        : '(ref)'
+                    typeof o === 'function' ? (o as () => unknown)() : '(ref)'
                 )
             );
         } catch {
@@ -172,9 +167,7 @@ export async function asyncDataWithReactiveModelResult<T>(
         }
     });
 
-    const modelRef: Ref<T> = ref<T>(
-        model.value as T
-    ) as Ref<T>;
+    const modelRef: Ref<T> = ref<T>(model.value as T) as Ref<T>;
     refReady = true;
 
     // Detect observables that changed during the await (race condition).

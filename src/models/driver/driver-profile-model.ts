@@ -6,6 +6,7 @@ import type {
     LeagueSeasons,
     DriverResults,
     SSR_ResultsEntry,
+    DotdProfile,
 } from '@@/lplib/endpoint-types/iracing-endpoints';
 
 import {
@@ -14,6 +15,7 @@ import {
     getLeagueDriverStats,
     getLeagueSeasons,
     getSingleMemberData,
+    getDotdProfile,
 } from '@@/src/utils/fetch-util';
 
 import { getMemberViewFromM_Member } from '@@/src/utils/driver-utils';
@@ -47,6 +49,7 @@ export interface DriverProfileModel {
     driverResults: DriverResultsModel;
     allTimeResults: DriverResultsModel;
     memberView: MemberView;
+    dotdProfile: DotdProfile | null;
 }
 
 export function getDefaultDriverProfileModel(): DriverProfileModel {
@@ -67,6 +70,7 @@ export function getDefaultDriverProfileModel(): DriverProfileModel {
             teamName: '---',
             teamId: 0,
         },
+        dotdProfile: null,
     };
 }
 
@@ -102,6 +106,8 @@ export async function getDriverProfileModel(league: string, driver: string) {
     const singleMemberData = await getSingleMemberData(driver);
 
     const leagueSeasons = await getLeagueSeasons(league);
+    const dotdProfile = await getDotdProfile(league, driver);
+    console.log('[dotdProfile] fetch', { league, driver, dotdProfile });
 
     const driverSessionResultsRace = await getDriverResults(
         league,
@@ -128,6 +134,13 @@ export async function getDriverProfileModel(league: string, driver: string) {
         !driverSessionResultsSprint ||
         !driverSessionResultsQuali
     ) {
+        console.warn('[dotdProfile] early return — missing session results', {
+            race: !!driverSessionResultsRace,
+            sprint: !!driverSessionResultsSprint,
+            quali: !!driverSessionResultsQuali,
+            dotdProfile,
+        });
+        ret.dotdProfile = dotdProfile;
         return ret;
     }
 
@@ -141,6 +154,7 @@ export async function getDriverProfileModel(league: string, driver: string) {
     ret.teamsInfo = leagueTeamsInfo;
     ret.singleMemberData = singleMemberData;
     ret.leagueSeasons = leagueSeasons;
+    ret.dotdProfile = dotdProfile;
 
     ret.allTimeResults = {
         race: calculateAllTimeResults(driverSessionResultsRace),

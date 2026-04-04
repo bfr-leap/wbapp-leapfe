@@ -40,11 +40,7 @@ describe('getDefaultPaceChartModel', () => {
 
 describe('getPaceChartModel', () => {
     it('returns empty barChartData when subsession is undefined', async () => {
-        const model = await getPaceChartModel(
-            undefined as any,
-            '0',
-            '4534'
-        );
+        const model = await getPaceChartModel(undefined as any, '0', '4534');
         expect(model.barChartData).toEqual([]);
     });
 

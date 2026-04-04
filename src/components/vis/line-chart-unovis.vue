@@ -1,12 +1,5 @@
 <script setup lang="ts">
-import {
-    computed,
-    ref,
-    toRaw,
-    onMounted,
-    onUnmounted,
-    nextTick,
-} from 'vue';
+import { computed, ref, toRaw, onMounted, onUnmounted, nextTick } from 'vue';
 import type { SeriesXY } from '@@/src/models/vis/line-chart-model';
 import {
     VisXYContainer,

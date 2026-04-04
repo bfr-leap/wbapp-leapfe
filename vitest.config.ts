@@ -7,7 +7,7 @@ export default defineConfig({
     resolve: {
         alias: {
             '@@': resolve(__dirname, '.'),
-            'lplib': resolve(__dirname, 'lplib'),
+            lplib: resolve(__dirname, 'lplib'),
         },
     },
     test: {

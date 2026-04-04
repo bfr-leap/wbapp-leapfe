@@ -120,19 +120,14 @@ export async function getRosterModel(
                 };
             })
             .sort((a: ScoredRosterEntry, b: ScoredRosterEntry) =>
-                a.code === b.code
-                    ? a.name < b.name
-                        ? -1
-                        : 1
-                    : a.code - b.code
+                a.code === b.code ? (a.name < b.name ? -1 : 1) : a.code - b.code
             ) || []
     ).map((r: ScoredRosterEntry): RosterRow => {
         return {
             'cust id': r.cust_id,
             car_number: r.car_number,
             name: r.name,
-            last_seen:
-                LAST_SEEN_LABELS[r.code.toString()] || 'Unknown',
+            last_seen: LAST_SEEN_LABELS[r.code.toString()] || 'Unknown',
         };
     });
 

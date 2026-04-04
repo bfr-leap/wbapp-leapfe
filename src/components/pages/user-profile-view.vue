@@ -54,15 +54,15 @@ watch(route, fetchModel);
         <div class="card bg-dark text-light m-2">
             <div class="card-body p-2">
                 <table>
-					<tbody>
-						<tr>
-							<td>
-								<UserButton />
-							</td>
-							<td></td>
-							<td>Manage user account</td>
-						</tr>
-					</tbody>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <UserButton />
+                            </td>
+                            <td></td>
+                            <td>Manage user account</td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </div>

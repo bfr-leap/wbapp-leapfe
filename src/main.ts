@@ -12,7 +12,6 @@ if (!PUBLISHABLE_KEY) {
     throw new Error('Missing Publishable Key');
 }
 
-
 const app = createApp(App);
 
 app.use(clerkPlugin, {

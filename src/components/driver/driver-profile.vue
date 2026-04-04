@@ -39,20 +39,40 @@ const driverProfileModel: Ref<DriverProfileModel> =
             <DriverTag
                 class="fs-4"
                 v-bind:lastName="driverProfileModel.memberView.lastName"
-                v-bind:firstName="
-                    driverProfileModel.memberView.firstName
-                "
-                v-bind:licenseLevel="
-                    driverProfileModel.memberView.licenseLevel
-                "
+                v-bind:firstName="driverProfileModel.memberView.firstName"
+                v-bind:licenseLevel="driverProfileModel.memberView.licenseLevel"
                 v-bind:iRating="driverProfileModel.memberView.iRating"
-                v-bind:safetyRating="
-                    driverProfileModel.memberView.safetyRating
-                "
+                v-bind:safetyRating="driverProfileModel.memberView.safetyRating"
                 v-bind:teamName="driverProfileModel.memberView.teamName"
                 v-bind:clubId="driverProfileModel.memberView.clubId"
             />
         </div>
+    </div>
+
+    <!-- ── DOTD profile blurb ─────────────────────────────────── -->
+    <div
+        v-if="driverProfileModel.dotdProfile?.blurb"
+        class="dotd-profile"
+    >
+        <h6 class="dotd-profile-header">Driver of the Day Profile</h6>
+        <p class="dotd-profile-text">
+            {{ driverProfileModel.dotdProfile.blurb }}
+        </p>
+        <small
+            v-if="driverProfileModel.dotdProfile.generated_at"
+            class="dotd-profile-footer"
+        >
+            Generated on:
+            {{
+                new Date(
+                    driverProfileModel.dotdProfile.generated_at
+                ).toLocaleDateString(undefined, {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                })
+            }}
+        </small>
     </div>
 
     <!-- ── Stats & charts panel ──────────────────────────────── -->
@@ -80,6 +100,31 @@ const driverProfileModel: Ref<DriverProfileModel> =
 .gh-profile-info {
     flex: 1;
     min-width: 0;
+}
+
+/* ── DOTD profile blurb ─────────────────────────────────────── */
+.dotd-profile {
+    padding: 8px 0;
+    margin-top: 8px;
+}
+
+.dotd-profile-header {
+    margin: 0 0 6px;
+    font-weight: 600;
+    color: var(--gh-text-muted, #8b949e);
+}
+
+.dotd-profile-text {
+    margin: 0;
+    line-height: 1.5;
+    color: var(--gh-text-primary, #e6edf3);
+}
+
+.dotd-profile-footer {
+    display: block;
+    margin-top: 6px;
+    text-align: right;
+    color: var(--gh-text-muted, #8b949e);
 }
 
 /* ── Content card (bordered panel like GitHub README card) ──── */

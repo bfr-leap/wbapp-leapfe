@@ -53,8 +53,8 @@ const leagueSeasonMenuModel: Ref<LeagueSeasonMenuModel> =
             </button>
             <ul class="dropdown-menu">
                 <li
-                    v-for="leagueOption in leagueSeasonMenuModel
-                        .leagueOptions.options"
+                    v-for="leagueOption in leagueSeasonMenuModel.leagueOptions
+                        .options"
                 >
                     <RouterLinkProxy
                         class="dropdown-item"
@@ -77,8 +77,8 @@ const leagueSeasonMenuModel: Ref<LeagueSeasonMenuModel> =
             </button>
             <ul class="dropdown-menu">
                 <li
-                    v-for="seasonOption in leagueSeasonMenuModel
-                        .seasonOptions.options"
+                    v-for="seasonOption in leagueSeasonMenuModel.seasonOptions
+                        .options"
                 >
                     <RouterLinkProxy
                         class="dropdown-item"

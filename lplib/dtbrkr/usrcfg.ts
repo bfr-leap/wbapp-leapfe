@@ -1,6 +1,5 @@
 const BASE_URL =
-    process.env.LEAP_DATA_BROKER_BASE_URL ||
-    'http://98.116.118.25:3030/api';
+    process.env.LEAP_DATA_BROKER_BASE_URL || 'http://98.116.118.25:3030/api';
 
 export async function userConfigHandler(
     namespace: string,
@@ -38,7 +37,7 @@ export async function userConfigHandler(
 async function getActiveLeagueSchedule(
     incJournalist: boolean = false
 ): Promise<any> {
-    console.log('::: getActiveLeagueSchedule(): proxy'); 
+    console.log('::: getActiveLeagueSchedule(): proxy');
 
     const url = `${BASE_URL}/config/active-league-schedule`;
     try {
@@ -47,12 +46,12 @@ async function getActiveLeagueSchedule(
         return obj;
     } catch (e) {
         console.log('error reaching proxy');
-        return {leagues:[]};
+        return { leagues: [] };
     }
 }
 
 async function getLeagueTeamsInfo(league: string): Promise<any> {
-    console.log('::: getLeagueTeamsInfo(): [', league, '] proxy'); 
+    console.log('::: getLeagueTeamsInfo(): [', league, '] proxy');
 
     const url = `${BASE_URL}/config/leagues/${league}/teams`;
     try {
@@ -61,7 +60,7 @@ async function getLeagueTeamsInfo(league: string): Promise<any> {
         return obj;
     } catch (e) {
         console.log('error reaching proxy');
-        return { leageu_id: Number.parseInt(league, 10), seasons: []};
+        return { leageu_id: Number.parseInt(league, 10), seasons: [] };
     }
 }
 
@@ -84,7 +83,13 @@ async function defLgSeasSubCtx(
     season: string,
     subsession: string
 ): Promise<any> {
-    console.log('::: defLgSeasSubCtx()', league, season, subsession, 'usrcfg proxy'); 
+    console.log(
+        '::: defLgSeasSubCtx()',
+        league,
+        season,
+        subsession,
+        'usrcfg proxy'
+    );
 
     const url = `${BASE_URL}/config/context?league=${league}&season=${season}&subsession=${subsession}`;
     try {
@@ -94,7 +99,11 @@ async function defLgSeasSubCtx(
         return obj;
     } catch (e) {
         console.log('error reaching proxy');
-        return { league_id: '4534', season_id: '111025', subsession_id: '', simsession_id: '' }; 
+        return {
+            league_id: '4534',
+            season_id: '111025',
+            subsession_id: '',
+            simsession_id: '',
+        };
     }
 }
-

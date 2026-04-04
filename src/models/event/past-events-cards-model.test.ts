@@ -111,9 +111,7 @@ describe('getPastEventCardsModel', () => {
     });
 
     it('maps session data correctly', async () => {
-        mockGetLeagueSeasonSessions.mockResolvedValue(
-            makeSessions() as any
-        );
+        mockGetLeagueSeasonSessions.mockResolvedValue(makeSessions() as any);
         mockGetLeagueSimsessionIndex.mockResolvedValue(
             makeSimsessionIndex() as any
         );
@@ -128,9 +126,7 @@ describe('getPastEventCardsModel', () => {
     });
 
     it('includes the correct first race simsession ID for each event', async () => {
-        mockGetLeagueSeasonSessions.mockResolvedValue(
-            makeSessions() as any
-        );
+        mockGetLeagueSeasonSessions.mockResolvedValue(makeSessions() as any);
         mockGetLeagueSimsessionIndex.mockResolvedValue(
             makeSimsessionIndex() as any
         );
@@ -150,12 +146,8 @@ describe('getPastEventCardsModel', () => {
             { simsession_id: 0, type: 'qualify' as const },
         ];
 
-        mockGetLeagueSeasonSessions.mockResolvedValue(
-            makeSessions() as any
-        );
-        mockGetLeagueSimsessionIndex.mockResolvedValue(
-            simsessionIndex as any
-        );
+        mockGetLeagueSeasonSessions.mockResolvedValue(makeSessions() as any);
+        mockGetLeagueSimsessionIndex.mockResolvedValue(simsessionIndex as any);
 
         const model = await getPastEventCardsModel(LEAGUE, SEASON);
 
@@ -168,12 +160,8 @@ describe('getPastEventCardsModel', () => {
         // Remove all sessions from the index
         simsessionIndex[0].sessions = [];
 
-        mockGetLeagueSeasonSessions.mockResolvedValue(
-            makeSessions() as any
-        );
-        mockGetLeagueSimsessionIndex.mockResolvedValue(
-            simsessionIndex as any
-        );
+        mockGetLeagueSeasonSessions.mockResolvedValue(makeSessions() as any);
+        mockGetLeagueSimsessionIndex.mockResolvedValue(simsessionIndex as any);
 
         const model = await getPastEventCardsModel(LEAGUE, SEASON);
 
