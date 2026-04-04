@@ -63,7 +63,15 @@ const driverProfileModel: Ref<DriverProfileModel> =
             class="dotd-profile-footer"
         >
             Generated on:
-            {{ driverProfileModel.dotdProfile.generated_at }}
+            {{
+                new Date(
+                    driverProfileModel.dotdProfile.generated_at
+                ).toLocaleDateString(undefined, {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                })
+            }}
         </small>
     </div>
 
@@ -115,6 +123,7 @@ const driverProfileModel: Ref<DriverProfileModel> =
 .dotd-profile-footer {
     display: block;
     margin-top: 6px;
+    text-align: right;
     color: var(--gh-text-muted, #8b949e);
 }
 
