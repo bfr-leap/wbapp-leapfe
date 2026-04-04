@@ -59,11 +59,11 @@ const driverProfileModel: Ref<DriverProfileModel> =
             {{ driverProfileModel.dotdProfile.blurb }}
         </p>
         <small
-            v-if="driverProfileModel.dotdProfile.generated_on"
+            v-if="driverProfileModel.dotdProfile.generated_at"
             class="dotd-profile-footer"
         >
             Generated on:
-            {{ driverProfileModel.dotdProfile.generated_on }}
+            {{ driverProfileModel.dotdProfile.generated_at }}
         </small>
     </div>
 

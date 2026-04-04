@@ -461,6 +461,7 @@ export interface DotdProfile {
     round: number;
     blurb: string;
     generated_on?: string;
+    generated_at?: string;
 }
 
 export interface ET_DriverTelemetryDatum {
