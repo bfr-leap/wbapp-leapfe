@@ -12,6 +12,7 @@ import type {
     LapChartData,
     ST_DriverTelemetry,
     GeneratedSimsessionSummary,
+    DotdProfile,
     ChartTable,
 } from '@@/lplib/endpoint-types/iracing-endpoints';
 
@@ -100,6 +101,20 @@ export async function getLapChartData(
         type,
         subsession,
         simsession,
+    });
+}
+
+export async function getDotdProfile(
+    league: string,
+    custId: string
+): Promise<DotdProfile | null> {
+    const namespace = 'ldata-gentxt';
+    const type = 'dotdProfile';
+    return await fetchCachedDocument<DotdProfile>({
+        namespace,
+        type,
+        league,
+        custId,
     });
 }
 

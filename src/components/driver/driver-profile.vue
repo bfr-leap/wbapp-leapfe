@@ -39,20 +39,24 @@ const driverProfileModel: Ref<DriverProfileModel> =
             <DriverTag
                 class="fs-4"
                 v-bind:lastName="driverProfileModel.memberView.lastName"
-                v-bind:firstName="
-                    driverProfileModel.memberView.firstName
-                "
-                v-bind:licenseLevel="
-                    driverProfileModel.memberView.licenseLevel
-                "
+                v-bind:firstName="driverProfileModel.memberView.firstName"
+                v-bind:licenseLevel="driverProfileModel.memberView.licenseLevel"
                 v-bind:iRating="driverProfileModel.memberView.iRating"
-                v-bind:safetyRating="
-                    driverProfileModel.memberView.safetyRating
-                "
+                v-bind:safetyRating="driverProfileModel.memberView.safetyRating"
                 v-bind:teamName="driverProfileModel.memberView.teamName"
                 v-bind:clubId="driverProfileModel.memberView.clubId"
             />
         </div>
+    </div>
+
+    <!-- ── DOTD profile blurb ─────────────────────────────────── -->
+    <div
+        v-if="driverProfileModel.dotdProfile?.text"
+        class="gh-content-card dotd-profile"
+    >
+        <p class="dotd-profile-text">
+            {{ driverProfileModel.dotdProfile.text }}
+        </p>
     </div>
 
     <!-- ── Stats & charts panel ──────────────────────────────── -->
@@ -80,6 +84,13 @@ const driverProfileModel: Ref<DriverProfileModel> =
 .gh-profile-info {
     flex: 1;
     min-width: 0;
+}
+
+/* ── DOTD profile blurb ─────────────────────────────────────── */
+.dotd-profile-text {
+    margin: 0;
+    line-height: 1.5;
+    color: var(--gh-text-secondary);
 }
 
 /* ── Content card (bordered panel like GitHub README card) ──── */

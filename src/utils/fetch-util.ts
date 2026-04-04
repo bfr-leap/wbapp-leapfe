@@ -48,6 +48,7 @@ export {
     getSimsessionResults,
     getTrackStats,
     getLapChartData,
+    getDotdProfile,
     getGeneratedSimsessionSummary,
     getTelemetrySubsessionIds,
     getCumulativeDeltaBestLapChartData,
