@@ -1,8 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import type { StewardRuling } from '@@/lplib/endpoint-types/iracing-endpoints';
 import {
+    buildDriverNameMapFromRoster,
     championshipPointsDeducted,
     computeDriverStandings,
+    resolveRulingDriverName,
     sortRulingsByDateDesc,
 } from './steward-rulings-model';
 
@@ -111,6 +113,33 @@ describe('computeDriverStandings', () => {
         expect(standings[0].totalRulings).toBe(2);
     });
 
+    it('resolves driver names from the roster name map', () => {
+        const rulings: StewardRuling[] = [
+            makeRuling({
+                ruling_id: 'x1',
+                driver_id: 12345,
+                license_points: 2,
+            }),
+        ];
+        const nameMap = { 12345: 'Ayrton Senna' };
+        const standings = computeDriverStandings(rulings, nameMap);
+        expect(standings[0].driverName).toBe('Ayrton Senna');
+    });
+
+    it('prefers explicit driver_name over the roster map', () => {
+        const rulings: StewardRuling[] = [
+            makeRuling({
+                ruling_id: 'x1',
+                driver_id: 12345,
+                driver_name: 'Backend Name',
+                license_points: 1,
+            }),
+        ];
+        const nameMap = { 12345: 'Roster Name' };
+        const standings = computeDriverStandings(rulings, nameMap);
+        expect(standings[0].driverName).toBe('Backend Name');
+    });
+
     it('keeps drivers separate when only one has a discord id', () => {
         const rulings: StewardRuling[] = [
             makeRuling({
@@ -128,6 +157,64 @@ describe('computeDriverStandings', () => {
 
         const standings = computeDriverStandings(rulings);
         expect(standings).toHaveLength(2);
+    });
+});
+
+describe('buildDriverNameMapFromRoster', () => {
+    it('returns an empty map when given null', () => {
+        expect(buildDriverNameMapFromRoster(null)).toEqual({});
+    });
+
+    it('builds a cust_id → display_name map', () => {
+        const roster = [
+            { cust_id: 1, display_name: 'Alice' },
+            { cust_id: 2, display_name: 'Bob' },
+        ];
+        expect(buildDriverNameMapFromRoster(roster)).toEqual({
+            1: 'Alice',
+            2: 'Bob',
+        });
+    });
+
+    it('skips entries missing cust_id or display_name', () => {
+        const roster = [
+            { cust_id: 1, display_name: 'Alice' },
+            { cust_id: 2, display_name: '' },
+            // @ts-expect-error intentionally malformed
+            { display_name: 'Orphan' },
+        ];
+        expect(buildDriverNameMapFromRoster(roster)).toEqual({ 1: 'Alice' });
+    });
+});
+
+describe('resolveRulingDriverName', () => {
+    it('prefers an explicit driver_name', () => {
+        const r = makeRuling({
+            driver_name: 'Explicit',
+            driver_id: 1,
+            discord_user_id: 'd',
+        });
+        expect(resolveRulingDriverName(r, { 1: 'Roster' })).toBe('Explicit');
+    });
+
+    it('uses the roster name when driver_id is known', () => {
+        const r = makeRuling({ driver_id: 1, discord_user_id: 'd' });
+        expect(resolveRulingDriverName(r, { 1: 'Roster' })).toBe('Roster');
+    });
+
+    it('falls back to discord_user_id when the roster does not know the driver', () => {
+        const r = makeRuling({ driver_id: 99, discord_user_id: 'd' });
+        expect(resolveRulingDriverName(r, { 1: 'Roster' })).toBe('d');
+    });
+
+    it('falls back to a Driver <id> placeholder when nothing else is available', () => {
+        const r = makeRuling({ driver_id: 42 });
+        expect(resolveRulingDriverName(r, {})).toBe('Driver 42');
+    });
+
+    it('returns Unknown when no identifier is present', () => {
+        const r = makeRuling({});
+        expect(resolveRulingDriverName(r, {})).toBe('Unknown');
     });
 });
 

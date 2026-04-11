@@ -9,6 +9,7 @@
 
 import type { StewardRuling } from '@@/lplib/endpoint-types/iracing-endpoints';
 import { getRulings } from '@@/src/services/steward-service';
+import { getLeagueRoster } from '@@/src/services/league-service';
 
 export interface DriverLicenseStanding {
     /** Stable identifier — discord_user_id when present, else driver_id. */
@@ -21,13 +22,42 @@ export interface DriverLicenseStanding {
     totalChampionshipPointDeduction: number;
 }
 
+export type DriverNameMap = { [custId: number]: string };
+
 export interface StewardRulingsModel {
     rulings: StewardRuling[];
     standings: DriverLicenseStanding[];
+    /**
+     * iRacing cust_id → display name, built from the league roster.
+     * Used to show real driver names on rulings that only carry a
+     * `driver_id` and no `driver_name`.
+     */
+    driverNameMap: DriverNameMap;
 }
 
 export function getDefaultStewardRulingsModel(): StewardRulingsModel {
-    return { rulings: [], standings: [] };
+    return { rulings: [], standings: [], driverNameMap: {} };
+}
+
+/**
+ * Resolve a ruling's best available driver name. Precedence:
+ *   1. Explicit `driver_name` on the ruling
+ *   2. League roster lookup by `driver_id` (iRacing cust_id)
+ *   3. Discord user id
+ *   4. `Driver <id>` placeholder
+ *   5. "Unknown"
+ */
+export function resolveRulingDriverName(
+    r: StewardRuling,
+    nameMap: DriverNameMap
+): string {
+    if (r.driver_name) return r.driver_name;
+    if (r.driver_id != null && nameMap[r.driver_id]) {
+        return nameMap[r.driver_id];
+    }
+    if (r.discord_user_id) return r.discord_user_id;
+    if (r.driver_id != null) return `Driver ${r.driver_id}`;
+    return 'Unknown';
 }
 
 /**
@@ -58,10 +88,13 @@ export function championshipPointsDeducted(r: StewardRuling): number {
 
 /**
  * Aggregate a list of rulings into per-driver license standings,
- * sorted by total license points descending.
+ * sorted by total license points descending. A `driverNameMap`
+ * (iRacing cust_id → display name) supplies real names for rulings
+ * that only carry `driver_id`.
  */
 export function computeDriverStandings(
-    rulings: StewardRuling[]
+    rulings: StewardRuling[],
+    driverNameMap: DriverNameMap = {}
 ): DriverLicenseStanding[] {
     const map = new Map<string, DriverLicenseStanding>();
 
@@ -73,10 +106,7 @@ export function computeDriverStandings(
                 key,
                 discordUserId: r.discord_user_id,
                 driverId: r.driver_id,
-                driverName:
-                    r.driver_name ||
-                    r.discord_user_id ||
-                    (r.driver_id != null ? `Driver ${r.driver_id}` : 'Unknown'),
+                driverName: resolveRulingDriverName(r, driverNameMap),
                 totalLicensePoints: 0,
                 totalRulings: 0,
                 totalChampionshipPointDeduction: 0,
@@ -86,8 +116,15 @@ export function computeDriverStandings(
         entry.totalLicensePoints += r.license_points || 0;
         entry.totalRulings += 1;
         entry.totalChampionshipPointDeduction += championshipPointsDeducted(r);
-        // Prefer a real driver_name when later rulings carry one.
-        if (r.driver_name && entry.driverName !== r.driver_name) {
+        // Upgrade the name if a later ruling has a better source
+        // (e.g. the first ruling had only driver_id but a later one
+        // carries an explicit driver_name from the backend).
+        const resolved = resolveRulingDriverName(r, driverNameMap);
+        if (
+            r.driver_name &&
+            entry.driverName !== r.driver_name &&
+            resolved === r.driver_name
+        ) {
             entry.driverName = r.driver_name;
         }
     }
@@ -111,6 +148,24 @@ export function sortRulingsByDateDesc(
     });
 }
 
+/**
+ * Build a cust_id → display name map from a league roster response.
+ * Exported for use by other steward views that need to resolve names
+ * without re-running the full model.
+ */
+export function buildDriverNameMapFromRoster(
+    roster: { cust_id: number; display_name: string }[] | null | undefined
+): DriverNameMap {
+    const ret: DriverNameMap = {};
+    if (!roster) return ret;
+    for (const m of roster) {
+        if (m && typeof m.cust_id === 'number' && m.display_name) {
+            ret[m.cust_id] = m.display_name;
+        }
+    }
+    return ret;
+}
+
 export async function getStewardRulingsModel(
     league: string,
     season: string
@@ -118,10 +173,18 @@ export async function getStewardRulingsModel(
     const ret = getDefaultStewardRulingsModel();
     if (!league || !season) return ret;
 
-    const rulings = await getRulings(league, season);
+    // Fetch rulings and the league roster in parallel. Missing roster
+    // is not fatal — standings and the ledger still render with
+    // fallback identifiers.
+    const [rulings, rosterDoc] = await Promise.all([
+        getRulings(league, season),
+        getLeagueRoster(league),
+    ]);
+
     if (!rulings || !Array.isArray(rulings)) return ret;
 
+    ret.driverNameMap = buildDriverNameMapFromRoster(rosterDoc?.roster);
     ret.rulings = sortRulingsByDateDesc(rulings);
-    ret.standings = computeDriverStandings(rulings);
+    ret.standings = computeDriverStandings(rulings, ret.driverNameMap);
     return ret;
 }

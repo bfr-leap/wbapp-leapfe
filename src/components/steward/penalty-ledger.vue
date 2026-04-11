@@ -8,6 +8,7 @@ import type {
 import {
     getDefaultStewardRulingsModel,
     getStewardRulingsModel,
+    resolveRulingDriverName,
 } from '@@/src/models/steward/steward-rulings-model';
 import type {
     StewardRulingsModel,
@@ -57,10 +58,7 @@ const classifications = computed(() => {
 });
 
 function rulingDriverName(r: StewardRuling): string {
-    if (r.driver_name) return r.driver_name;
-    if (r.discord_user_id) return r.discord_user_id;
-    if (r.driver_id != null) return `Driver ${r.driver_id}`;
-    return 'Unknown';
+    return resolveRulingDriverName(r, model.value.driverNameMap);
 }
 
 const filteredRulings = computed(() => {
