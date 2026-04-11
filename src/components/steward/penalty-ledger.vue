@@ -8,6 +8,7 @@ import type {
 import {
     getDefaultStewardRulingsModel,
     getStewardRulingsModel,
+    parseRulingDate,
     resolveRulingDriverName,
 } from '@@/src/models/steward/steward-rulings-model';
 import type {
@@ -79,8 +80,9 @@ const filteredRulings = computed(() => {
 
 function formatDate(iso: string): string {
     if (!iso) return '';
-    const d = new Date(iso);
-    if (isNaN(d.getTime())) return iso;
+    const d = parseRulingDate(iso);
+    if (!d) return iso;
+    // Formats the UTC instant in the user's locale and time zone.
     return d.toLocaleString(undefined, {
         year: 'numeric',
         month: 'short',

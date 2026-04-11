@@ -4,6 +4,7 @@ import {
     buildDriverNameMapFromRoster,
     championshipPointsDeducted,
     computeDriverStandings,
+    parseRulingDate,
     resolveRulingDriverName,
     sortRulingsByDateDesc,
 } from './steward-rulings-model';
@@ -215,6 +216,49 @@ describe('resolveRulingDriverName', () => {
     it('returns Unknown when no identifier is present', () => {
         const r = makeRuling({});
         expect(resolveRulingDriverName(r, {})).toBe('Unknown');
+    });
+});
+
+describe('parseRulingDate', () => {
+    it('returns null for empty or missing input', () => {
+        expect(parseRulingDate(null)).toBeNull();
+        expect(parseRulingDate(undefined)).toBeNull();
+        expect(parseRulingDate('')).toBeNull();
+        expect(parseRulingDate('   ')).toBeNull();
+    });
+
+    it('returns null for unparseable input', () => {
+        expect(parseRulingDate('not a date')).toBeNull();
+    });
+
+    it('treats date+time strings with no timezone as UTC', () => {
+        // Without the fix, this string would be interpreted as local
+        // time, which would shift the Unix timestamp by the runtime
+        // offset. We pin the expected value to the UTC instant.
+        const d = parseRulingDate('2026-01-01T12:00:00');
+        expect(d).not.toBeNull();
+        expect(d!.getTime()).toBe(Date.UTC(2026, 0, 1, 12, 0, 0));
+    });
+
+    it('respects an explicit Z suffix', () => {
+        const d = parseRulingDate('2026-01-01T12:00:00Z');
+        expect(d!.getTime()).toBe(Date.UTC(2026, 0, 1, 12, 0, 0));
+    });
+
+    it('respects an explicit numeric offset', () => {
+        // 12:00 at +05:00 is 07:00 UTC.
+        const d = parseRulingDate('2026-01-01T12:00:00+05:00');
+        expect(d!.getTime()).toBe(Date.UTC(2026, 0, 1, 7, 0, 0));
+    });
+
+    it('handles date-only strings as UTC (ES spec default)', () => {
+        const d = parseRulingDate('2026-01-01');
+        expect(d!.getTime()).toBe(Date.UTC(2026, 0, 1, 0, 0, 0));
+    });
+
+    it('handles fractional seconds', () => {
+        const d = parseRulingDate('2026-01-01T12:00:00.123');
+        expect(d!.getTime()).toBe(Date.UTC(2026, 0, 1, 12, 0, 0, 123));
     });
 });
 

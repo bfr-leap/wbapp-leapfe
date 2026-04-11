@@ -10,6 +10,7 @@ import {
     getDriverPenaltySummaryModel,
 } from '@@/src/models/steward/driver-penalty-summary-model';
 import type { DriverPenaltySummaryModel } from '@@/src/models/steward/driver-penalty-summary-model';
+import { parseRulingDate } from '@@/src/models/steward/steward-rulings-model';
 
 const props = defineProps<{
     league: string;
@@ -36,8 +37,9 @@ const hasRulings = computed(() => model.value.rulings.length > 0);
 
 function formatDate(iso: string): string {
     if (!iso) return '';
-    const d = new Date(iso);
-    if (isNaN(d.getTime())) return iso;
+    const d = parseRulingDate(iso);
+    if (!d) return iso;
+    // Formats the UTC instant in the user's locale and time zone.
     return d.toLocaleDateString(undefined, {
         year: 'numeric',
         month: 'short',

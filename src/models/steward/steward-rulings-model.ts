@@ -135,6 +135,31 @@ export function computeDriverStandings(
 }
 
 /**
+ * Parse an ISO-8601 ruling date string sent by the backend.
+ *
+ * The backend always sends rulings in UTC, but per the ECMAScript spec
+ * an ISO string with a time component and no timezone marker
+ * (e.g. "2026-01-01T12:00:00") is interpreted as **local time**, not
+ * UTC. To avoid silently offsetting every displayed time by the user's
+ * UTC offset, we append a trailing "Z" when no timezone is present.
+ *
+ * Returns null for empty input or strings that can't be parsed.
+ */
+export function parseRulingDate(iso: string | null | undefined): Date | null {
+    if (!iso) return null;
+    const trimmed = iso.trim();
+    if (!trimmed) return null;
+    // Look for an explicit UTC marker or a numeric offset at the end.
+    const hasTimezone = /(Z|[+-]\d{2}:?\d{2})$/.test(trimmed);
+    // Date-only strings ("2026-01-01") are already UTC per the ES spec;
+    // only date+time strings need the UTC suffix applied.
+    const needsUtcSuffix = !hasTimezone && trimmed.includes('T');
+    const normalized = needsUtcSuffix ? trimmed + 'Z' : trimmed;
+    const d = new Date(normalized);
+    return isNaN(d.getTime()) ? null : d;
+}
+
+/**
  * Sort rulings by date descending (most recent first). Returns a new
  * array; the input is not mutated.
  */
@@ -142,8 +167,8 @@ export function sortRulingsByDateDesc(
     rulings: StewardRuling[]
 ): StewardRuling[] {
     return [...rulings].sort((a, b) => {
-        const ta = Date.parse(a.ruling_date) || 0;
-        const tb = Date.parse(b.ruling_date) || 0;
+        const ta = parseRulingDate(a.ruling_date)?.getTime() || 0;
+        const tb = parseRulingDate(b.ruling_date)?.getTime() || 0;
         return tb - ta;
     });
 }
