@@ -10,6 +10,7 @@
 import type { StewardRuling } from '@@/lplib/endpoint-types/iracing-endpoints';
 import { getRulings } from '@@/src/services/steward-service';
 import { getLeagueRoster } from '@@/src/services/league-service';
+import { getSingleMemberData } from '@@/src/services/results-service';
 
 export interface DriverLicenseStanding {
     /** Stable identifier — discord_user_id when present, else driver_id. */
@@ -267,6 +268,52 @@ function _describeShape(v: unknown): string {
     return 'object';
 }
 
+/**
+ * For each unique driver_id on a ruling that is not present in
+ * `nameMap`, fetch that member's display name via the per-member
+ * endpoint and fold the result into the map. The per-member endpoint
+ * resolves drivers that are no longer on the league roster (e.g.
+ * former members) which is the common case for historical rulings.
+ *
+ * Mutates `nameMap` in place and returns the list of ids we looked up
+ * for diagnostics.
+ */
+export async function enrichNameMapWithMemberFallback(
+    rulings: StewardRuling[],
+    nameMap: DriverNameMap
+): Promise<{ id: number; resolved: string | null }[]> {
+    const missing = new Set<number>();
+    for (const r of rulings) {
+        if (r.driver_name) continue;
+        const id = coerceDriverId(r.driver_id);
+        if (id != null && !nameMap[id]) {
+            missing.add(id);
+        }
+    }
+    if (missing.size === 0) return [];
+
+    const ids = Array.from(missing);
+    const results = await Promise.all(
+        ids.map(async (id) => {
+            try {
+                const m = await getSingleMemberData(id.toString());
+                const name = m?.display_name || null;
+                if (name) nameMap[id] = name;
+                return { id, resolved: name };
+            } catch (e) {
+                if (!import.meta.server) {
+                    console.warn(
+                        `[STWD-DIAG] member fallback failed for cust_id=${id}`,
+                        e
+                    );
+                }
+                return { id, resolved: null };
+            }
+        })
+    );
+    return results;
+}
+
 export async function getStewardRulingsModel(
     league: string,
     season: string
@@ -334,38 +381,76 @@ export async function getStewardRulingsModel(
             size: mapKeys.length,
             firstKeys: mapKeys.slice(0, 3),
         });
+    }
 
-        // Flag rulings that have a driver_id but couldn't be resolved
-        // against the roster. This is the signal we're after for the
-        // "displayed as a number" bug — it tells us whether the
-        // backend sent a driver_id we don't have a roster entry for,
-        // a driver_id in an unexpected type, or something else.
-        const unresolved: {
-            driver_id: unknown;
-            driver_id_type: string;
-            discord_user_id: unknown;
-            in_map: boolean;
-        }[] = [];
+    // Fall back to the per-member endpoint for any driver_id not on
+    // the roster. This catches ex-members who still appear in the
+    // historical rulings but are no longer on the league roster.
+    const fallback = await enrichNameMapWithMemberFallback(
+        rulings,
+        ret.driverNameMap
+    );
+
+    if (!import.meta.server && fallback.length > 0) {
+        const resolved = fallback.filter((f) => f.resolved);
+        const unresolved = fallback.filter((f) => !f.resolved);
+        console.log(
+            `[STWD-DIAG] member fallback resolved ${resolved.length}/${fallback.length} cust_id(s)`,
+            resolved
+                .slice(0, 10)
+                .map((r) => `${r.id}→${r.resolved}`)
+                .join(', ')
+        );
+        if (unresolved.length > 0) {
+            console.warn(
+                `[STWD-DIAG] ${
+                    unresolved.length
+                } cust_id(s) still unresolved after fallback: ${unresolved
+                    .map((u) => u.id)
+                    .join(', ')}`
+            );
+        }
+    }
+
+    if (!import.meta.server) {
+        // Final sanity check: log rulings whose driver_id we still
+        // cannot resolve. Prints values inline so they're visible
+        // without expanding collapsed console objects.
+        const lines: string[] = [];
         for (const r of rulings) {
             if (r.driver_name) continue;
             if (r.driver_id == null) continue;
             const id = coerceDriverId(r.driver_id);
             const inMap = id != null && !!ret.driverNameMap[id];
             if (!inMap) {
-                unresolved.push({
-                    driver_id: r.driver_id,
-                    driver_id_type: typeof r.driver_id,
-                    discord_user_id: r.discord_user_id,
-                    in_map: inMap,
-                });
+                lines.push(
+                    `  driver_id=${JSON.stringify(
+                        r.driver_id
+                    )} (${typeof r.driver_id}) discord_user_id=${JSON.stringify(
+                        r.discord_user_id
+                    )}`
+                );
             }
         }
-        if (unresolved.length > 0) {
+        if (lines.length > 0) {
             console.warn(
-                `[STWD-DIAG] ${unresolved.length} ruling(s) have driver_id but no roster match`,
-                unresolved.slice(0, 5)
+                `[STWD-DIAG] ${
+                    lines.length
+                } ruling(s) still have driver_id but no resolved name:\n${lines
+                    .slice(0, 10)
+                    .join('\n')}`
             );
         }
+
+        // Expose a devtools helper for ad-hoc lookups.
+        (window as unknown as Record<string, unknown>).__STWD_DIAG = {
+            driverNameMap: ret.driverNameMap,
+            rulings,
+            lookup: (custId: number | string) => {
+                const id = coerceDriverId(custId);
+                return id != null ? ret.driverNameMap[id] : undefined;
+            },
+        };
     }
 
     ret.rulings = sortRulingsByDateDesc(rulings);
