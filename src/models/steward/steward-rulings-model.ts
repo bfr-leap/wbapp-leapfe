@@ -9,7 +9,10 @@
 
 import type { StewardRuling } from '@@/lplib/endpoint-types/iracing-endpoints';
 import { getRulings } from '@@/src/services/steward-service';
-import { getLeagueRoster } from '@@/src/services/league-service';
+import {
+    getLeagueRoster,
+    getMembersData,
+} from '@@/src/services/league-service';
 import { getSingleMemberData } from '@@/src/services/results-service';
 
 export interface DriverLicenseStanding {
@@ -223,23 +226,21 @@ export function sortRulingsByDateDesc(
 }
 
 /**
- * Build a cust_id → display name map from a league roster response.
- * Exported for use by other steward views that need to resolve names
- * without re-running the full model.
- *
- * Coerces string cust_ids to numbers so the map lookup still works
- * when the backend happens to serialise iRacing customer ids as
+ * Add every `{cust_id, display_name}` entry from `source` into `into`.
+ * Existing keys are not overwritten — call with the highest-quality
+ * source first. Coerces string cust_ids to numbers so the lookup
+ * still works when the backend serialises iRacing customer ids as
  * numeric strings.
  */
-export function buildDriverNameMapFromRoster(
-    roster:
+function mergeDriverNames(
+    into: DriverNameMap,
+    source:
         | { cust_id: number | string; display_name: string }[]
         | null
         | undefined
-): DriverNameMap {
-    const ret: DriverNameMap = {};
-    if (!roster) return ret;
-    for (const m of roster) {
+): void {
+    if (!source) return;
+    for (const m of source) {
         if (!m || !m.display_name) continue;
         const raw = m.cust_id as unknown;
         let id: number | null = null;
@@ -248,10 +249,25 @@ export function buildDriverNameMapFromRoster(
         } else if (typeof raw === 'string' && /^\d+$/.test(raw)) {
             id = Number.parseInt(raw, 10);
         }
-        if (id != null) {
-            ret[id] = m.display_name;
+        if (id != null && into[id] == null) {
+            into[id] = m.display_name;
         }
     }
+}
+
+/**
+ * Build a cust_id → display name map from a league roster response.
+ * Exported for use by other steward views that need to resolve names
+ * without re-running the full model.
+ */
+export function buildDriverNameMapFromRoster(
+    roster:
+        | { cust_id: number | string; display_name: string }[]
+        | null
+        | undefined
+): DriverNameMap {
+    const ret: DriverNameMap = {};
+    mergeDriverNames(ret, roster);
     return ret;
 }
 
@@ -321,11 +337,15 @@ export async function getStewardRulingsModel(
     const ret = getDefaultStewardRulingsModel();
     if (!league || !season) return ret;
 
-    // Fetch rulings and the league roster in parallel. Missing roster
-    // is not fatal — standings and the ledger still render with
-    // fallback identifiers.
-    const [rulings, rosterDoc] = await Promise.all([
+    // Fetch rulings, the season members list, and the league roster
+    // in parallel. Season members is the primary source — it contains
+    // everyone who raced this season, so it's a superset of drivers
+    // who could have picked up a ruling. The league roster is a
+    // secondary source in case a driver appears in rulings without
+    // racing the season (rare). Missing either is not fatal.
+    const [rulings, membersDoc, rosterDoc] = await Promise.all([
         getRulings(league, season),
+        getMembersData(league, season),
         getLeagueRoster(league),
     ]);
 
@@ -334,22 +354,15 @@ export async function getStewardRulingsModel(
             league,
             season,
             rulings: _describeShape(rulings),
+            membersDoc: _describeShape(membersDoc),
+            membersEntries: _describeShape(
+                (membersDoc as { members?: unknown } | null)?.members
+            ),
             rosterDoc: _describeShape(rosterDoc),
             rosterEntries: _describeShape(
                 (rosterDoc as { roster?: unknown } | null)?.roster
             ),
         });
-
-        const rosterArr = (rosterDoc as { roster?: unknown[] } | null)?.roster;
-        if (Array.isArray(rosterArr) && rosterArr.length > 0) {
-            const sample = rosterArr[0] as Record<string, unknown>;
-            console.log('[STWD-DIAG] roster[0] sample', {
-                keys: Object.keys(sample || {}),
-                cust_id: sample?.cust_id,
-                cust_id_type: typeof sample?.cust_id,
-                display_name: sample?.display_name,
-            });
-        }
 
         if (Array.isArray(rulings) && rulings.length > 0) {
             const sample = rulings[0] as Record<string, unknown>;
@@ -367,7 +380,20 @@ export async function getStewardRulingsModel(
 
     if (!rulings || !Array.isArray(rulings)) return ret;
 
-    ret.driverNameMap = buildDriverNameMapFromRoster(
+    // Merge name sources into the map in priority order. Since
+    // mergeDriverNames does not overwrite existing keys, entries from
+    // the members list win over the roster if they disagree.
+    ret.driverNameMap = {};
+    mergeDriverNames(
+        ret.driverNameMap,
+        (
+            membersDoc as {
+                members?: { cust_id: number; display_name: string }[];
+            } | null
+        )?.members
+    );
+    mergeDriverNames(
+        ret.driverNameMap,
         (
             rosterDoc as {
                 roster?: { cust_id: number; display_name: string }[];
@@ -379,6 +405,12 @@ export async function getStewardRulingsModel(
         const mapKeys = Object.keys(ret.driverNameMap);
         console.log('[STWD-DIAG] built driverNameMap', {
             size: mapKeys.length,
+            fromMembers: (
+                (membersDoc as { members?: unknown[] } | null)?.members || []
+            ).length,
+            fromRoster: (
+                (rosterDoc as { roster?: unknown[] } | null)?.roster || []
+            ).length,
             firstKeys: mapKeys.slice(0, 3),
         });
     }
