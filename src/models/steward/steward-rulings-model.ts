@@ -40,6 +40,19 @@ export function getDefaultStewardRulingsModel(): StewardRulingsModel {
 }
 
 /**
+ * Coerce a possibly-stringified driver id to a number, or null.
+ */
+function coerceDriverId(driverId: unknown): number | null {
+    if (typeof driverId === 'number' && Number.isFinite(driverId)) {
+        return driverId;
+    }
+    if (typeof driverId === 'string' && /^\d+$/.test(driverId)) {
+        return Number.parseInt(driverId, 10);
+    }
+    return null;
+}
+
+/**
  * Resolve a ruling's best available driver name. Precedence:
  *   1. Explicit `driver_name` on the ruling
  *   2. League roster lookup by `driver_id` (iRacing cust_id)
@@ -52,8 +65,9 @@ export function resolveRulingDriverName(
     nameMap: DriverNameMap
 ): string {
     if (r.driver_name) return r.driver_name;
-    if (r.driver_id != null && nameMap[r.driver_id]) {
-        return nameMap[r.driver_id];
+    const id = coerceDriverId(r.driver_id);
+    if (id != null && nameMap[id]) {
+        return nameMap[id];
     }
     if (r.discord_user_id) return r.discord_user_id;
     if (r.driver_id != null) return `Driver ${r.driver_id}`;
@@ -140,15 +154,33 @@ export function computeDriverStandings(
  * The backend always sends rulings in UTC, but per the ECMAScript spec
  * an ISO string with a time component and no timezone marker
  * (e.g. "2026-01-01T12:00:00") is interpreted as **local time**, not
- * UTC. To avoid silently offsetting every displayed time by the user's
- * UTC offset, we append a trailing "Z" when no timezone is present.
+ * UTC. Some backends also use a space separator instead of `T`
+ * ("2026-01-01 12:00:00"), which V8 accepts but again parses as local
+ * time. To avoid silently offsetting every displayed time by the
+ * user's UTC offset we normalise both cases to an explicit UTC
+ * timestamp before handing the string to `new Date()`.
  *
  * Returns null for empty input or strings that can't be parsed.
  */
+// Only log the first handful of distinct raw inputs so diagnostics
+// don't spam the console when a page has many rulings.
+const _rulingDateSamples = new Set<string>();
+const _MAX_RULING_DATE_SAMPLES = 5;
+
 export function parseRulingDate(iso: string | null | undefined): Date | null {
-    if (!iso) return null;
-    const trimmed = iso.trim();
+    if (iso == null) return null;
+    const raw = typeof iso === 'string' ? iso : String(iso);
+    let trimmed = raw.trim();
     if (!trimmed) return null;
+
+    // Normalise "YYYY-MM-DD HH:MM:SS" → "YYYY-MM-DDTHH:MM:SS" so the
+    // downstream regex/suffix logic treats it like a standard ISO
+    // date+time string.
+    const spaceSepMatch = /^(\d{4}-\d{2}-\d{2}) (\d{2}(?::\d{2})?(?::\d{2})?)/;
+    if (spaceSepMatch.test(trimmed)) {
+        trimmed = trimmed.replace(' ', 'T');
+    }
+
     // Look for an explicit UTC marker or a numeric offset at the end.
     const hasTimezone = /(Z|[+-]\d{2}:?\d{2})$/.test(trimmed);
     // Date-only strings ("2026-01-01") are already UTC per the ES spec;
@@ -156,6 +188,22 @@ export function parseRulingDate(iso: string | null | undefined): Date | null {
     const needsUtcSuffix = !hasTimezone && trimmed.includes('T');
     const normalized = needsUtcSuffix ? trimmed + 'Z' : trimmed;
     const d = new Date(normalized);
+
+    if (
+        !import.meta.server &&
+        _rulingDateSamples.size < _MAX_RULING_DATE_SAMPLES
+    ) {
+        const key = `${raw}→${normalized}`;
+        if (!_rulingDateSamples.has(key)) {
+            _rulingDateSamples.add(key);
+            console.log(
+                `[STWD-DIAG] parseRulingDate raw=${JSON.stringify(raw)} ` +
+                    `normalized=${JSON.stringify(normalized)} ` +
+                    `iso=${isNaN(d.getTime()) ? 'INVALID' : d.toISOString()}`
+            );
+        }
+    }
+
     return isNaN(d.getTime()) ? null : d;
 }
 
@@ -177,18 +225,46 @@ export function sortRulingsByDateDesc(
  * Build a cust_id → display name map from a league roster response.
  * Exported for use by other steward views that need to resolve names
  * without re-running the full model.
+ *
+ * Coerces string cust_ids to numbers so the map lookup still works
+ * when the backend happens to serialise iRacing customer ids as
+ * numeric strings.
  */
 export function buildDriverNameMapFromRoster(
-    roster: { cust_id: number; display_name: string }[] | null | undefined
+    roster:
+        | { cust_id: number | string; display_name: string }[]
+        | null
+        | undefined
 ): DriverNameMap {
     const ret: DriverNameMap = {};
     if (!roster) return ret;
     for (const m of roster) {
-        if (m && typeof m.cust_id === 'number' && m.display_name) {
-            ret[m.cust_id] = m.display_name;
+        if (!m || !m.display_name) continue;
+        const raw = m.cust_id as unknown;
+        let id: number | null = null;
+        if (typeof raw === 'number' && Number.isFinite(raw)) {
+            id = raw;
+        } else if (typeof raw === 'string' && /^\d+$/.test(raw)) {
+            id = Number.parseInt(raw, 10);
+        }
+        if (id != null) {
+            ret[id] = m.display_name;
         }
     }
     return ret;
+}
+
+/**
+ * Describe the shape of a value for diagnostic logging. Safe against
+ * circular references and huge payloads.
+ */
+function _describeShape(v: unknown): string {
+    if (v === null) return 'null';
+    if (v === undefined) return 'undefined';
+    const t = typeof v;
+    if (t !== 'object') return t;
+    if (Array.isArray(v)) return `array(${v.length})`;
+    return 'object';
 }
 
 export async function getStewardRulingsModel(
@@ -206,9 +282,92 @@ export async function getStewardRulingsModel(
         getLeagueRoster(league),
     ]);
 
+    if (!import.meta.server) {
+        console.log('[STWD-DIAG] getStewardRulingsModel fetched', {
+            league,
+            season,
+            rulings: _describeShape(rulings),
+            rosterDoc: _describeShape(rosterDoc),
+            rosterEntries: _describeShape(
+                (rosterDoc as { roster?: unknown } | null)?.roster
+            ),
+        });
+
+        const rosterArr = (rosterDoc as { roster?: unknown[] } | null)?.roster;
+        if (Array.isArray(rosterArr) && rosterArr.length > 0) {
+            const sample = rosterArr[0] as Record<string, unknown>;
+            console.log('[STWD-DIAG] roster[0] sample', {
+                keys: Object.keys(sample || {}),
+                cust_id: sample?.cust_id,
+                cust_id_type: typeof sample?.cust_id,
+                display_name: sample?.display_name,
+            });
+        }
+
+        if (Array.isArray(rulings) && rulings.length > 0) {
+            const sample = rulings[0] as Record<string, unknown>;
+            console.log('[STWD-DIAG] rulings[0] sample', {
+                keys: Object.keys(sample || {}),
+                ruling_date: sample?.ruling_date,
+                ruling_date_type: typeof sample?.ruling_date,
+                driver_id: sample?.driver_id,
+                driver_id_type: typeof sample?.driver_id,
+                discord_user_id: sample?.discord_user_id,
+                driver_name: sample?.driver_name,
+            });
+        }
+    }
+
     if (!rulings || !Array.isArray(rulings)) return ret;
 
-    ret.driverNameMap = buildDriverNameMapFromRoster(rosterDoc?.roster);
+    ret.driverNameMap = buildDriverNameMapFromRoster(
+        (
+            rosterDoc as {
+                roster?: { cust_id: number; display_name: string }[];
+            } | null
+        )?.roster
+    );
+
+    if (!import.meta.server) {
+        const mapKeys = Object.keys(ret.driverNameMap);
+        console.log('[STWD-DIAG] built driverNameMap', {
+            size: mapKeys.length,
+            firstKeys: mapKeys.slice(0, 3),
+        });
+
+        // Flag rulings that have a driver_id but couldn't be resolved
+        // against the roster. This is the signal we're after for the
+        // "displayed as a number" bug — it tells us whether the
+        // backend sent a driver_id we don't have a roster entry for,
+        // a driver_id in an unexpected type, or something else.
+        const unresolved: {
+            driver_id: unknown;
+            driver_id_type: string;
+            discord_user_id: unknown;
+            in_map: boolean;
+        }[] = [];
+        for (const r of rulings) {
+            if (r.driver_name) continue;
+            if (r.driver_id == null) continue;
+            const id = coerceDriverId(r.driver_id);
+            const inMap = id != null && !!ret.driverNameMap[id];
+            if (!inMap) {
+                unresolved.push({
+                    driver_id: r.driver_id,
+                    driver_id_type: typeof r.driver_id,
+                    discord_user_id: r.discord_user_id,
+                    in_map: inMap,
+                });
+            }
+        }
+        if (unresolved.length > 0) {
+            console.warn(
+                `[STWD-DIAG] ${unresolved.length} ruling(s) have driver_id but no roster match`,
+                unresolved.slice(0, 5)
+            );
+        }
+    }
+
     ret.rulings = sortRulingsByDateDesc(rulings);
     ret.standings = computeDriverStandings(rulings, ret.driverNameMap);
     return ret;

@@ -186,6 +186,27 @@ describe('buildDriverNameMapFromRoster', () => {
         ];
         expect(buildDriverNameMapFromRoster(roster)).toEqual({ 1: 'Alice' });
     });
+
+    it('coerces numeric string cust_ids to numbers', () => {
+        const roster = [
+            // @ts-expect-error intentionally string-typed to simulate backend
+            { cust_id: '986846', display_name: 'Stringified Sam' },
+            { cust_id: 42, display_name: 'Numeric Nancy' },
+        ];
+        expect(buildDriverNameMapFromRoster(roster)).toEqual({
+            986846: 'Stringified Sam',
+            42: 'Numeric Nancy',
+        });
+    });
+
+    it('skips non-numeric cust_id strings', () => {
+        const roster = [
+            // @ts-expect-error intentionally bad
+            { cust_id: 'abc', display_name: 'Bad' },
+            { cust_id: 1, display_name: 'Good' },
+        ];
+        expect(buildDriverNameMapFromRoster(roster)).toEqual({ 1: 'Good' });
+    });
 });
 
 describe('resolveRulingDriverName', () => {
@@ -216,6 +237,14 @@ describe('resolveRulingDriverName', () => {
     it('returns Unknown when no identifier is present', () => {
         const r = makeRuling({});
         expect(resolveRulingDriverName(r, {})).toBe('Unknown');
+    });
+
+    it('coerces a stringified driver_id during the roster lookup', () => {
+        // @ts-expect-error intentionally string-typed to simulate backend
+        const r = makeRuling({ driver_id: '986846' });
+        expect(resolveRulingDriverName(r, { 986846: 'Roster Sam' })).toBe(
+            'Roster Sam'
+        );
     });
 });
 
@@ -259,6 +288,19 @@ describe('parseRulingDate', () => {
     it('handles fractional seconds', () => {
         const d = parseRulingDate('2026-01-01T12:00:00.123');
         expect(d!.getTime()).toBe(Date.UTC(2026, 0, 1, 12, 0, 0, 123));
+    });
+
+    it('treats SQL-style space-separated strings as UTC', () => {
+        // This is the bug the diagnostics turned up: Postgres-style
+        // timestamps use a space instead of a T. V8 accepts them but
+        // parses them as local time, so we normalise first.
+        const d = parseRulingDate('2026-01-01 12:00:00');
+        expect(d!.getTime()).toBe(Date.UTC(2026, 0, 1, 12, 0, 0));
+    });
+
+    it('keeps an explicit timezone on a space-separated string', () => {
+        const d = parseRulingDate('2026-01-01 12:00:00+05:00');
+        expect(d!.getTime()).toBe(Date.UTC(2026, 0, 1, 7, 0, 0));
     });
 });
 
