@@ -4,7 +4,7 @@
  */
 
 import type { StewardRuling } from '@@/lplib/endpoint-types/iracing-endpoints';
-import { getDriverRulings, getRulings } from '@@/src/services/steward-service';
+import { getRulings } from '@@/src/services/steward-service';
 import {
     championshipPointsDeducted,
     sortRulingsByDateDesc,
@@ -38,9 +38,10 @@ function summarise(rulings: StewardRuling[]): DriverPenaltySummaryModel {
 }
 
 /**
- * Build the per-driver penalty summary. Tries the driver-scoped endpoint
- * first; if the driver is identified by iRacing customer id rather than
- * Discord id, falls back to filtering the season-wide rulings list.
+ * Build the per-driver penalty summary. The app identifies drivers by
+ * iRacing cust_id rather than Discord user id, so we fetch the
+ * season-wide rulings list and filter client-side. The data broker
+ * only exposes the season-wide rulings endpoint anyway.
  */
 export async function getDriverPenaltySummaryModel(
     league: string,
@@ -51,9 +52,6 @@ export async function getDriverPenaltySummaryModel(
         return getDefaultDriverPenaltySummaryModel();
     }
 
-    // The driver param on this app is an iRacing cust_id (numeric).
-    // The rulings API keys drivers by Discord user id, so we always
-    // filter the league/season rulings array client-side here.
     const rulings = await getRulings(league, season);
     if (!rulings || !Array.isArray(rulings)) {
         return getDefaultDriverPenaltySummaryModel();
@@ -71,23 +69,4 @@ export async function getDriverPenaltySummaryModel(
     });
 
     return summarise(filtered);
-}
-
-/**
- * Variant for callers that already know a driver's discord user id.
- * Uses the dedicated single-driver endpoint.
- */
-export async function getDriverPenaltySummaryByDiscordId(
-    league: string,
-    season: string,
-    discordUserId: string
-): Promise<DriverPenaltySummaryModel> {
-    if (!league || !season || !discordUserId) {
-        return getDefaultDriverPenaltySummaryModel();
-    }
-    const rulings = await getDriverRulings(league, season, discordUserId);
-    if (!rulings || !Array.isArray(rulings)) {
-        return getDefaultDriverPenaltySummaryModel();
-    }
-    return summarise(rulings);
 }

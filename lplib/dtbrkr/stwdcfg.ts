@@ -3,12 +3,12 @@
  *
  * Backed by wbsvc-dtbrkrrd REST endpoints:
  *   GET  /api/rulings/:leagueId/:seasonId
- *   GET  /api/rulings/:leagueId/:seasonId/driver/:discordUserId
  *   GET  /api/steward-config/:leagueId
  *   PUT  /api/steward-config/:leagueId
  *
  * The frontend never accesses the data store directly — every read and
- * write goes through these endpoints.
+ * write goes through these endpoints. Per-driver rulings are computed
+ * client-side by filtering the season-wide list.
  */
 
 const BASE_URL =
@@ -62,48 +62,6 @@ async function getRulings(league: string, season: string, authHeader: string) {
         const msg = e instanceof Error ? e.message : String(e);
         console.error(`[STWDCFG] getRulings NETWORK ERROR:`, msg);
         return makeError('getRulings', `NETWORK ERROR: ${msg}`, url);
-    }
-}
-
-async function getDriverRulings(
-    league: string,
-    season: string,
-    discordUserId: string,
-    authHeader: string
-) {
-    const url = `${BASE_URL}/rulings/${league}/${season}/driver/${discordUserId}`;
-    console.log('[STWDCFG] getDriverRulings → GET', url);
-    try {
-        const t0 = Date.now();
-        const res = await fetch(url, {
-            method: 'GET',
-            headers: { Authorization: authHeader },
-        });
-
-        if (!res.ok) {
-            const err = await res.text();
-            console.error(
-                `[STWDCFG] getDriverRulings FAILED: ${res.status} ${
-                    Date.now() - t0
-                }ms`,
-                err
-            );
-            return makeError(
-                'getDriverRulings',
-                `HTTP ${res.status}: ${err}`,
-                url
-            );
-        }
-
-        const json = await res.json();
-        console.log(
-            `[STWDCFG] getDriverRulings OK: ${res.status} ${Date.now() - t0}ms`
-        );
-        return json;
-    } catch (e) {
-        const msg = e instanceof Error ? e.message : String(e);
-        console.error(`[STWDCFG] getDriverRulings NETWORK ERROR:`, msg);
-        return makeError('getDriverRulings', `NETWORK ERROR: ${msg}`, url);
     }
 }
 
@@ -209,13 +167,6 @@ export async function stewardConfigHandler(
     switch (q?.type) {
         case 'getRulings':
             return await getRulings(q?.league, q?.season, authHeader);
-        case 'getDriverRulings':
-            return await getDriverRulings(
-                q?.league,
-                q?.season,
-                q?.discordUserId,
-                authHeader
-            );
         case 'getStewardConfig':
             return await getStewardConfig(q?.league, authHeader);
         case 'updStewardConfig':

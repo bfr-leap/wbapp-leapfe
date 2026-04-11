@@ -30,25 +30,6 @@ export async function getRulings(
 }
 
 /**
- * Fetch steward rulings for a single driver in a league/season.
- */
-export async function getDriverRulings(
-    league: string,
-    season: string,
-    discordUserId: string
-): Promise<StewardRuling[] | null> {
-    const namespace = 'ldata-stwdcfg';
-    const type = 'getDriverRulings';
-    return await fetchCachedDocument<StewardRuling[]>({
-        namespace,
-        type,
-        league,
-        season,
-        discordUserId,
-    });
-}
-
-/**
  * Fetch the steward configuration for a league. Cached because admins
  * may navigate away and back; the cache is small.
  */
