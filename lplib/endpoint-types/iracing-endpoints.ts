@@ -504,3 +504,60 @@ export interface PodcastScriptedSrc {
 }
 
 export type ChartTable = { [key: string]: number | string }[];
+
+// ---------------------------------------------------------------------------
+// Steward rulings — penalty ledger and driver license tracking
+//
+// Sourced from wbsvc-dtbrkrrd. The frontend never hardcodes rulebook
+// thresholds (e.g. ban points) — the raw license point counts are displayed
+// and any threshold-based UI must come from configuration on the backend.
+// ---------------------------------------------------------------------------
+
+export interface Sanction {
+    /**
+     * Sanction type identifier — e.g. 'championship_point_deduction',
+     * 'qualifying_ban', 'race_ban', 'license_points', 'grid_penalty'.
+     * The frontend must not assume any fixed set of types.
+     */
+    type: string;
+    /** Numeric value associated with the sanction, when applicable. */
+    value?: number;
+    /** Optional pre-formatted description from the backend. */
+    description?: string;
+}
+
+export interface StewardRuling {
+    ruling_id: string;
+    league_id: number;
+    season_id: number;
+    /** ISO-8601 timestamp string. */
+    ruling_date: string;
+    /** Discord user id of the penalised driver, when known. */
+    discord_user_id?: string;
+    /** iRacing customer id of the penalised driver, when known. */
+    driver_id?: number;
+    /** Display name of the penalised driver, when the backend resolves it. */
+    driver_name?: string;
+    /** Session type — e.g. 'race', 'sprint', 'qualify', 'feature'. */
+    session_type?: string;
+    /** Lap number of the incident, when applicable. */
+    lap_number?: number;
+    /** Severity classification — e.g. 'Minor', 'Major', 'Severe'. */
+    classification?: string;
+    /** Infraction description — e.g. 'Causing a Collision'. */
+    infraction?: string;
+    /** License points assigned by this single ruling. */
+    license_points: number;
+    /** Variable list of sanctions applied; rendered as a flexible list. */
+    sanctions: Sanction[];
+    /** Evidence URLs (videos, screenshots, replays). */
+    evidence_urls?: string[];
+    /** Free-form steward notes for the ruling. */
+    steward_notes?: string;
+}
+
+export interface StewardConfig {
+    league_id: number;
+    /** Discord channel id where stewards post penalty announcements. */
+    race_control_channel_id: string;
+}

@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import Stats from './driver-stats.vue';
 import DriverTag from './driver-tag.vue';
+import DriverPenaltySummary from './driver-penalty-summary.vue';
 import { computed } from 'vue';
 import type { Ref } from 'vue';
+import { useRoute } from 'vue-router';
 import type { DriverProfileModel } from '@@/src/models/driver/driver-profile-model';
 import {
     getDefaultDriverProfileModel,
@@ -13,6 +15,8 @@ const props = defineProps<{
     league: string;
     driver: string;
 }>();
+
+const route = useRoute();
 
 async function fetchModelData() {
     return await getDriverProfileModel(props.league, props.driver);
@@ -27,6 +31,20 @@ const driverProfileModel: Ref<DriverProfileModel> =
         getDefaultDriverProfileModel,
         [() => props.league, () => props.driver]
     );
+
+/**
+ * Season for the penalty summary. Prefers an explicit season from the
+ * route, otherwise falls back to the most recent season the driver
+ * profile model has loaded.
+ */
+const penaltySeason = computed<string>(() => {
+    const fromRoute = route.query.season as string | undefined;
+    if (fromRoute) return fromRoute;
+    const seasons = driverProfileModel.value?.leagueSeasons?.seasons || [];
+    if (seasons.length === 0) return '';
+    const newest = [...seasons].sort((a, b) => b.season_id - a.season_id)[0];
+    return newest?.season_id?.toString() || '';
+});
 </script>
 
 <template>
@@ -50,10 +68,7 @@ const driverProfileModel: Ref<DriverProfileModel> =
     </div>
 
     <!-- ── DOTD profile blurb ─────────────────────────────────── -->
-    <div
-        v-if="driverProfileModel.dotdProfile?.blurb"
-        class="dotd-profile"
-    >
+    <div v-if="driverProfileModel.dotdProfile?.blurb" class="dotd-profile">
         <h6 class="dotd-profile-header">Driver of the Day Profile</h6>
         <p class="dotd-profile-text">
             {{ driverProfileModel.dotdProfile.blurb }}
@@ -86,6 +101,14 @@ const driverProfileModel: Ref<DriverProfileModel> =
             v-bind:league-id="props.league"
         />
     </div>
+
+    <!-- ── Steward rulings panel (hidden when no rulings) ────── -->
+    <DriverPenaltySummary
+        v-if="penaltySeason"
+        v-bind:league="props.league"
+        v-bind:season="penaltySeason"
+        v-bind:driver="props.driver"
+    />
 </template>
 
 <style scoped>
