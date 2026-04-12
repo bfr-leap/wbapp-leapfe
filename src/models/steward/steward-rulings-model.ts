@@ -166,11 +166,6 @@ export function computeDriverStandings(
  *
  * Returns null for empty input or strings that can't be parsed.
  */
-// Only log the first handful of distinct raw inputs so diagnostics
-// don't spam the console when a page has many rulings.
-const _rulingDateSamples = new Set<string>();
-const _MAX_RULING_DATE_SAMPLES = 5;
-
 export function parseRulingDate(iso: string | null | undefined): Date | null {
     if (iso == null) return null;
     const raw = typeof iso === 'string' ? iso : String(iso);
@@ -192,22 +187,6 @@ export function parseRulingDate(iso: string | null | undefined): Date | null {
     const needsUtcSuffix = !hasTimezone && trimmed.includes('T');
     const normalized = needsUtcSuffix ? trimmed + 'Z' : trimmed;
     const d = new Date(normalized);
-
-    if (
-        !import.meta.server &&
-        _rulingDateSamples.size < _MAX_RULING_DATE_SAMPLES
-    ) {
-        const key = `${raw}→${normalized}`;
-        if (!_rulingDateSamples.has(key)) {
-            _rulingDateSamples.add(key);
-            console.log(
-                `[STWD-DIAG] parseRulingDate raw=${JSON.stringify(raw)} ` +
-                    `normalized=${JSON.stringify(normalized)} ` +
-                    `iso=${isNaN(d.getTime()) ? 'INVALID' : d.toISOString()}`
-            );
-        }
-    }
-
     return isNaN(d.getTime()) ? null : d;
 }
 
@@ -272,32 +251,19 @@ export function buildDriverNameMapFromRoster(
 }
 
 /**
- * Describe the shape of a value for diagnostic logging. Safe against
- * circular references and huge payloads.
- */
-function _describeShape(v: unknown): string {
-    if (v === null) return 'null';
-    if (v === undefined) return 'undefined';
-    const t = typeof v;
-    if (t !== 'object') return t;
-    if (Array.isArray(v)) return `array(${v.length})`;
-    return 'object';
-}
-
-/**
  * For each unique driver_id on a ruling that is not present in
  * `nameMap`, fetch that member's display name via the per-member
- * endpoint and fold the result into the map. The per-member endpoint
- * resolves drivers that are no longer on the league roster (e.g.
- * former members) which is the common case for historical rulings.
+ * endpoint and fold the result into the map. Handles drivers who
+ * are missing from the season/league batch sources — e.g. when the
+ * league roster endpoint is incomplete or a driver picked up a
+ * ruling without appearing in `membersData` for the season.
  *
- * Mutates `nameMap` in place and returns the list of ids we looked up
- * for diagnostics.
+ * Mutates `nameMap` in place.
  */
 export async function enrichNameMapWithMemberFallback(
     rulings: StewardRuling[],
     nameMap: DriverNameMap
-): Promise<{ id: number; resolved: string | null }[]> {
+): Promise<void> {
     const missing = new Set<number>();
     for (const r of rulings) {
         if (r.driver_name) continue;
@@ -306,28 +272,15 @@ export async function enrichNameMapWithMemberFallback(
             missing.add(id);
         }
     }
-    if (missing.size === 0) return [];
+    if (missing.size === 0) return;
 
-    const ids = Array.from(missing);
-    const results = await Promise.all(
-        ids.map(async (id) => {
-            try {
-                const m = await getSingleMemberData(id.toString());
-                const name = m?.display_name || null;
-                if (name) nameMap[id] = name;
-                return { id, resolved: name };
-            } catch (e) {
-                if (!import.meta.server) {
-                    console.warn(
-                        `[STWD-DIAG] member fallback failed for cust_id=${id}`,
-                        e
-                    );
-                }
-                return { id, resolved: null };
-            }
+    await Promise.all(
+        Array.from(missing).map(async (id) => {
+            const m = await getSingleMemberData(id.toString());
+            const name = m?.display_name;
+            if (name) nameMap[id] = name;
         })
     );
-    return results;
 }
 
 export async function getStewardRulingsModel(
@@ -338,52 +291,22 @@ export async function getStewardRulingsModel(
     if (!league || !season) return ret;
 
     // Fetch rulings, the season members list, and the league roster
-    // in parallel. Season members is the primary source — it contains
-    // everyone who raced this season, so it's a superset of drivers
-    // who could have picked up a ruling. The league roster is a
-    // secondary source in case a driver appears in rulings without
-    // racing the season (rare). Missing either is not fatal.
+    // in parallel. membersData is season-scoped (every driver who
+    // raced the season); the league roster is a secondary source in
+    // case a driver appears in rulings without racing the season.
+    // Missing either is not fatal — the per-member fallback below
+    // covers the remainder.
     const [rulings, membersDoc, rosterDoc] = await Promise.all([
         getRulings(league, season),
         getMembersData(league, season),
         getLeagueRoster(league),
     ]);
 
-    if (!import.meta.server) {
-        console.log('[STWD-DIAG] getStewardRulingsModel fetched', {
-            league,
-            season,
-            rulings: _describeShape(rulings),
-            membersDoc: _describeShape(membersDoc),
-            membersEntries: _describeShape(
-                (membersDoc as { members?: unknown } | null)?.members
-            ),
-            rosterDoc: _describeShape(rosterDoc),
-            rosterEntries: _describeShape(
-                (rosterDoc as { roster?: unknown } | null)?.roster
-            ),
-        });
-
-        if (Array.isArray(rulings) && rulings.length > 0) {
-            const sample = rulings[0] as Record<string, unknown>;
-            console.log('[STWD-DIAG] rulings[0] sample', {
-                keys: Object.keys(sample || {}),
-                ruling_date: sample?.ruling_date,
-                ruling_date_type: typeof sample?.ruling_date,
-                driver_id: sample?.driver_id,
-                driver_id_type: typeof sample?.driver_id,
-                discord_user_id: sample?.discord_user_id,
-                driver_name: sample?.driver_name,
-            });
-        }
-    }
-
     if (!rulings || !Array.isArray(rulings)) return ret;
 
-    // Merge name sources into the map in priority order. Since
-    // mergeDriverNames does not overwrite existing keys, entries from
-    // the members list win over the roster if they disagree.
-    ret.driverNameMap = {};
+    // Merge name sources into the map in priority order. mergeDriverNames
+    // does not overwrite existing keys, so entries from membersData win
+    // over the roster when they disagree.
     mergeDriverNames(
         ret.driverNameMap,
         (
@@ -401,89 +324,9 @@ export async function getStewardRulingsModel(
         )?.roster
     );
 
-    if (!import.meta.server) {
-        const mapKeys = Object.keys(ret.driverNameMap);
-        console.log('[STWD-DIAG] built driverNameMap', {
-            size: mapKeys.length,
-            fromMembers: (
-                (membersDoc as { members?: unknown[] } | null)?.members || []
-            ).length,
-            fromRoster: (
-                (rosterDoc as { roster?: unknown[] } | null)?.roster || []
-            ).length,
-            firstKeys: mapKeys.slice(0, 3),
-        });
-    }
-
-    // Fall back to the per-member endpoint for any driver_id not on
-    // the roster. This catches ex-members who still appear in the
-    // historical rulings but are no longer on the league roster.
-    const fallback = await enrichNameMapWithMemberFallback(
-        rulings,
-        ret.driverNameMap
-    );
-
-    if (!import.meta.server && fallback.length > 0) {
-        const resolved = fallback.filter((f) => f.resolved);
-        const unresolved = fallback.filter((f) => !f.resolved);
-        console.log(
-            `[STWD-DIAG] member fallback resolved ${resolved.length}/${fallback.length} cust_id(s)`,
-            resolved
-                .slice(0, 10)
-                .map((r) => `${r.id}→${r.resolved}`)
-                .join(', ')
-        );
-        if (unresolved.length > 0) {
-            console.warn(
-                `[STWD-DIAG] ${
-                    unresolved.length
-                } cust_id(s) still unresolved after fallback: ${unresolved
-                    .map((u) => u.id)
-                    .join(', ')}`
-            );
-        }
-    }
-
-    if (!import.meta.server) {
-        // Final sanity check: log rulings whose driver_id we still
-        // cannot resolve. Prints values inline so they're visible
-        // without expanding collapsed console objects.
-        const lines: string[] = [];
-        for (const r of rulings) {
-            if (r.driver_name) continue;
-            if (r.driver_id == null) continue;
-            const id = coerceDriverId(r.driver_id);
-            const inMap = id != null && !!ret.driverNameMap[id];
-            if (!inMap) {
-                lines.push(
-                    `  driver_id=${JSON.stringify(
-                        r.driver_id
-                    )} (${typeof r.driver_id}) discord_user_id=${JSON.stringify(
-                        r.discord_user_id
-                    )}`
-                );
-            }
-        }
-        if (lines.length > 0) {
-            console.warn(
-                `[STWD-DIAG] ${
-                    lines.length
-                } ruling(s) still have driver_id but no resolved name:\n${lines
-                    .slice(0, 10)
-                    .join('\n')}`
-            );
-        }
-
-        // Expose a devtools helper for ad-hoc lookups.
-        (window as unknown as Record<string, unknown>).__STWD_DIAG = {
-            driverNameMap: ret.driverNameMap,
-            rulings,
-            lookup: (custId: number | string) => {
-                const id = coerceDriverId(custId);
-                return id != null ? ret.driverNameMap[id] : undefined;
-            },
-        };
-    }
+    // Final safety net: fetch per-member data for any driver_id on a
+    // ruling that neither batch source knew about.
+    await enrichNameMapWithMemberFallback(rulings, ret.driverNameMap);
 
     ret.rulings = sortRulingsByDateDesc(rulings);
     ret.standings = computeDriverStandings(rulings, ret.driverNameMap);
