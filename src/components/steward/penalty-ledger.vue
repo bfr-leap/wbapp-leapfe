@@ -190,18 +190,32 @@ const standings = computed<DriverLicenseStanding[]>(
 
             <!-- ── Penalty Ledger Tab ──────────────────────────────── -->
             <div v-if="activeTab === 'ledger'">
-                <div class="row g-2 mb-3">
-                    <div class="col-md-6">
+                <div class="ledger-filters">
+                    <div class="ledger-filter">
+                        <label
+                            for="ledgerDriverFilter"
+                            class="ledger-filter-label"
+                        >
+                            Driver
+                        </label>
                         <input
+                            id="ledgerDriverFilter"
                             type="text"
-                            class="form-control"
-                            placeholder="Filter by driver name or Discord id..."
+                            class="form-control form-control-sm"
+                            placeholder="Filter by name or Discord id..."
                             v-model="driverFilter"
                         />
                     </div>
-                    <div class="col-md-6">
+                    <div class="ledger-filter">
+                        <label
+                            for="ledgerClassFilter"
+                            class="ledger-filter-label"
+                        >
+                            Classification
+                        </label>
                         <select
-                            class="form-select"
+                            id="ledgerClassFilter"
+                            class="form-select form-select-sm"
                             v-model="classificationFilter"
                         >
                             <option value="">All classifications</option>
@@ -214,6 +228,17 @@ const standings = computed<DriverLicenseStanding[]>(
                             </option>
                         </select>
                     </div>
+                    <button
+                        v-if="driverFilter || classificationFilter"
+                        type="button"
+                        class="btn btn-sm btn-outline-secondary ledger-filter-clear"
+                        @click="
+                            driverFilter = '';
+                            classificationFilter = '';
+                        "
+                    >
+                        Clear
+                    </button>
                 </div>
 
                 <div
@@ -350,6 +375,84 @@ const standings = computed<DriverLicenseStanding[]>(
 </template>
 
 <style scoped>
+/* ── Filter bar ─────────────────────────────────────────────── */
+.ledger-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px;
+    padding: 12px;
+    margin-bottom: 16px;
+    background-color: var(--gh-canvas-subtle);
+    border: 1px solid var(--gh-border-default);
+    border-radius: var(--gh-radius-md);
+}
+
+.ledger-filter {
+    flex: 1 1 220px;
+    min-width: 0;
+}
+
+.ledger-filter-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--gh-fg-muted);
+    margin-bottom: 4px;
+}
+
+.ledger-filter-clear {
+    flex: 0 0 auto;
+    align-self: flex-end;
+    height: calc(1.5em + 0.5rem + 2px); /* match form-control-sm height */
+}
+
+/* The global theme already styles .form-control; fill in the gap
+   for .form-select, which Bootstrap ships with a hardcoded dark
+   chevron SVG that vanishes against a dark background. */
+.ledger-filters :deep(.form-control),
+.ledger-filters :deep(.form-select) {
+    background-color: var(--gh-input-bg);
+    border: 1px solid var(--gh-input-border);
+    color: var(--gh-input-text);
+    border-radius: var(--gh-radius-md);
+}
+
+.ledger-filters :deep(.form-control::placeholder) {
+    color: var(--gh-input-placeholder);
+}
+
+.ledger-filters :deep(.form-control:focus),
+.ledger-filters :deep(.form-select:focus) {
+    background-color: var(--gh-input-bg);
+    border-color: var(--gh-input-focus-border);
+    box-shadow: var(--gh-input-focus-shadow);
+    color: var(--gh-input-text);
+    outline: none;
+}
+
+/* Light-coloured chevron for the select dropdown. URL-encoded so we
+   don't need an external asset. Stroke is --gh-fg-muted (#8b949e). */
+.ledger-filters :deep(.form-select) {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%238b949e' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 14px 10px;
+    padding-right: 2rem;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+/* Native option list uses browser chrome, but most engines honour
+   this background so the dropdown at least doesn't flash white. */
+.ledger-filters :deep(.form-select option) {
+    background-color: var(--gh-canvas-default);
+    color: var(--gh-fg-default);
+}
+
 .ruling-card {
     border: 1px solid var(--gh-border-default);
     border-radius: var(--gh-radius-md);
