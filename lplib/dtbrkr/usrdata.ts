@@ -1,12 +1,8 @@
-import { getDocument as getDataLakeDocument } from './dtlkdata';
-import { getXataClient, XataClient } from './xata';
-import type { UsersLeaguesInterestRecord } from './xata';
-
 const BASE_URL =
     process.env.LEAP_DATA_BROKER_BASE_URL || 'http://98.116.118.25:3030/api';
 
 export async function getDefaultLeagueSeason(user_id: string): Promise<any> {
-    console.log('::: getDefaultLeagueSeason()', user_id); // this is next
+    console.log('::: getDefaultLeagueSeason()', user_id);
 
     const url = `${BASE_URL}/user/${user_id}/default-league-season`;
     try {
@@ -34,7 +30,7 @@ export async function userFeatures(user_id: string): Promise<any> {
 }
 
 export async function getIrLinkState(user_id: string): Promise<any> {
-    console.log('::: getIrLinkState():', user_id, 'proxy'); // this is next
+    console.log('::: getIrLinkState():', user_id, 'proxy');
     const url = `${BASE_URL}/user/${user_id}/ir-link-state`;
     try {
         let objs = await fetch(url);
@@ -50,66 +46,118 @@ export async function getIrLinkState(user_id: string): Promise<any> {
     }
 }
 
-export async function updIrLinkDriver(
-    user_id: string,
-    ir_cust_id: string
+async function updIrLinkDriver(
+    ir_cust_id: string,
+    authHeader: string
 ): Promise<any> {
-    console.log('::: updIrLinkDriver():', user_id);
-    const xata: XataClient = getXataClient();
-    const userLink = await xata.db.user_ir_cust_mappings
-        .select(['user_id', 'try_count'])
-        .filter({ user_id })
-        .getFirst();
-
-    let try_count = -1;
-
-    if (userLink) {
-        try_count = userLink.try_count;
-        await userLink.delete();
-    }
-
-    ++try_count;
-
-    const numDigits = 6;
-    const verify_code =
-        Number.parseInt(
-            new Array(numDigits)
-                .fill(0)
-                .map((v) => Math.round(Math.random() * 9).toString())
-                .join('')
-        ) || 0;
-
-    await xata.db.user_ir_cust_mappings.create({
-        user_id,
-        verify_code,
-        ir_cust_id,
-        try_count,
+    const url = `${BASE_URL}/user/ir-link/driver`;
+    console.log('[USRDATA] updIrLinkDriver → PUT', url, {
+        hasAuth: !!authHeader,
     });
 
-    return {};
+    try {
+        const t0 = Date.now();
+        const res = await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: authHeader,
+            },
+            body: JSON.stringify({ driver: ir_cust_id }),
+        });
+
+        if (!res.ok) {
+            const err = await res.text();
+            console.error(
+                `[USRDATA] updIrLinkDriver FAILED: ${res.status} ${
+                    Date.now() - t0
+                }ms`,
+                err
+            );
+            return {
+                _error: true,
+                _source: 'updIrLinkDriver',
+                _message: `HTTP ${res.status}: ${err}`,
+                _url: url,
+            };
+        }
+
+        const json = await res.json();
+        console.log(
+            `[USRDATA] updIrLinkDriver OK: ${res.status} ${Date.now() - t0}ms`
+        );
+        return json;
+    } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        console.error(
+            `[USRDATA] updIrLinkDriver NETWORK ERROR (BASE_URL=${BASE_URL}):`,
+            msg
+        );
+        return {
+            _error: true,
+            _source: 'updIrLinkDriver',
+            _message: `NETWORK ERROR: ${msg}`,
+            _url: url,
+            _baseUrl: BASE_URL,
+        };
+    }
 }
 
-export async function updIrLinkCode(
-    user_id: string,
-    verify_code: string
+async function updIrLinkCode(
+    verify_code: string,
+    authHeader: string
 ): Promise<any> {
-    console.log('::: updIrLinkCode():', user_id);
-    const xata: XataClient = getXataClient();
-    const userLink = await xata.db.user_ir_cust_mappings
-        .select(['id', 'user_id', 'verify_code', 'is_verified', 'try_count'])
-        .filter({ user_id })
-        .getFirst();
+    const url = `${BASE_URL}/user/ir-link/verify`;
+    console.log('[USRDATA] updIrLinkCode → PUT', url, {
+        hasAuth: !!authHeader,
+    });
 
-    if (null !== userLink && userLink.verify_code?.toString() === verify_code) {
-        console.log('::: updIrLinkCode() Success');
-        await userLink.update({ is_verified: true });
-    } else {
-        console.log('::: updIrLinkCode() Fail');
-        let try_count = 1 + (userLink?.try_count || 0);
-        await userLink?.update({ try_count });
+    try {
+        const t0 = Date.now();
+        const res = await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: authHeader,
+            },
+            body: JSON.stringify({ code: verify_code }),
+        });
+
+        if (!res.ok) {
+            const err = await res.text();
+            console.error(
+                `[USRDATA] updIrLinkCode FAILED: ${res.status} ${
+                    Date.now() - t0
+                }ms`,
+                err
+            );
+            return {
+                _error: true,
+                _source: 'updIrLinkCode',
+                _message: `HTTP ${res.status}: ${err}`,
+                _url: url,
+            };
+        }
+
+        const json = await res.json();
+        console.log(
+            `[USRDATA] updIrLinkCode OK: ${res.status} ${Date.now() - t0}ms`
+        );
+        return json;
+    } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        console.error(
+            `[USRDATA] updIrLinkCode NETWORK ERROR (BASE_URL=${BASE_URL}):`,
+            msg
+        );
+        return {
+            _error: true,
+            _source: 'updIrLinkCode',
+            _message: `NETWORK ERROR: ${msg}`,
+            _url: url,
+            _baseUrl: BASE_URL,
+        };
     }
-
-    return {};
 }
 
 async function getUserLeaguesState(user_id: string): Promise<any> {
@@ -126,52 +174,63 @@ async function getUserLeaguesState(user_id: string): Promise<any> {
 }
 
 async function updUserLeaguesState(
-    user_id: string,
-    code: string
+    code: string,
+    authHeader: string
 ): Promise<any> {
-    console.log('::: updUserLeaguesState():', user_id, code);
+    const url = `${BASE_URL}/user/leagues`;
+    console.log('[USRDATA] updUserLeaguesState → PUT', url, {
+        code,
+        hasAuth: !!authHeader,
+    });
 
-    const codes = code.split('-').map((c) => Number.parseInt(c));
+    try {
+        const t0 = Date.now();
+        const res = await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: authHeader,
+            },
+            body: JSON.stringify({ code }),
+        });
 
-    let isValidInput: boolean = true;
-    for (let c of codes) {
-        if (isNaN(c)) {
-            isValidInput = false;
-            break;
+        if (!res.ok) {
+            const err = await res.text();
+            console.error(
+                `[USRDATA] updUserLeaguesState FAILED: ${res.status} ${
+                    Date.now() - t0
+                }ms`,
+                err
+            );
+            return {
+                _error: true,
+                _source: 'updUserLeaguesState',
+                _message: `HTTP ${res.status}: ${err}`,
+                _url: url,
+            };
         }
-    }
 
-    if (isValidInput) {
-        const xata: XataClient = getXataClient();
-
-        let s = {
-            statement: `
-                DELETE FROM "users_leagues_interest"
-                WHERE "user_id" = '${user_id}'
-                AND "league_id" NOT IN (${codes.join(', ')})
-            `,
+        const json = await res.json();
+        console.log(
+            `[USRDATA] updUserLeaguesState OK: ${res.status} ${
+                Date.now() - t0
+            }ms`
+        );
+        return json;
+    } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        console.error(
+            `[USRDATA] updUserLeaguesState NETWORK ERROR (BASE_URL=${BASE_URL}):`,
+            msg
+        );
+        return {
+            _error: true,
+            _source: 'updUserLeaguesState',
+            _message: `NETWORK ERROR: ${msg}`,
+            _url: url,
+            _baseUrl: BASE_URL,
         };
-
-        await xata.sql<UsersLeaguesInterestRecord>(s, []);
-
-        s = {
-            statement: `
-                INSERT INTO "users_leagues_interest" ("user_id", "league_id")
-                SELECT '${user_id}', "league_id"
-                FROM (VALUES ${codes
-                    .map((c) => `(${c})`)
-                    .join(', ')}) AS ids("league_id")
-                WHERE "league_id" NOT IN (
-                    SELECT "league_id"
-                    FROM "users_leagues_interest"
-                    WHERE "user_id" = '${user_id}'
-                );`,
-        };
-
-        await xata.sql<UsersLeaguesInterestRecord>(s, []);
     }
-
-    return await getUserLeaguesState(user_id);
 }
 
 async function defLgSeasSubCtx(
@@ -204,6 +263,7 @@ export async function userDataHandler(
     console.log(':: userDataHandler()');
 
     const q = query;
+    const authHeader = q?._authHeader || '';
 
     let doc: any = null;
 
@@ -212,16 +272,16 @@ export async function userDataHandler(
             doc = await getIrLinkState(q?.userID || '');
             break;
         case 'irLinkDriverUpd':
-            doc = await updIrLinkDriver(q?.userID || '', q?.driver || '');
+            doc = await updIrLinkDriver(q?.driver || '', authHeader);
             break;
         case 'irLinkCodeUpd':
-            doc = await updIrLinkCode(q?.userID || '', q?.code || '');
+            doc = await updIrLinkCode(q?.code || '', authHeader);
             break;
         case 'userLeagues':
             doc = await getUserLeaguesState(q?.userID || '');
             break;
         case 'userLeaguesUpd':
-            doc = await updUserLeaguesState(q?.userID || '', q?.code || '');
+            doc = await updUserLeaguesState(q?.code || '', authHeader);
             break;
         case 'defaultLeagueSeason':
             doc = await getDefaultLeagueSeason(q?.userID);
