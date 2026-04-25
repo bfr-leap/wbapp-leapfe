@@ -31,7 +31,6 @@
         "@clerk/themes": "^2.1.10",
         "@unovis/ts": "^1.6.4",
         "@unovis/vue": "^1.6.4",
-        "@xata.io/client": "^0.29.5",
         "h3": "^1.12.0",
         "h3-clerk": "^0.4.8",
         "markdown-it": "^14.1.0",

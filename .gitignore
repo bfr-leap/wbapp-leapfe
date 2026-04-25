@@ -25,6 +25,4 @@ logs
 
 .vercel
 .vscode/*
-!.vscode/extensions.json
-.xata
-.xatarc 
+!.vscode/extensions.json 

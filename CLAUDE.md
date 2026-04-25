@@ -8,7 +8,7 @@ iRacing league analytics application built with **Nuxt 3** (Vue 3). Displays dri
 
 -   **Framework:** Nuxt 3.12 (Vue 3, Nitro server, file-based routing)
 -   **Auth:** Clerk (vue-clerk frontend, h3-clerk server middleware)
--   **Database:** Xata (serverless, accessed via `@xata.io/client`)
+-   **Backend data:** LEAP Data Broker REST service (read + write), plus a static JSON "data lake" on GitHub Pages
 -   **State:** Pinia (underutilized - most state lives in api-client cache)
 -   **Visualization:** D3.js v7
 -   **Styling:** Bootstrap 5 via CDN with custom dark theme
@@ -26,7 +26,8 @@ Vue Component → Model function → Service module → api-client.ts → /api/f
                                                                          ↓
                                                                lplib/dtbrkr/ftchdata.ts
                                                                          ↓
-                                                               External APIs (iRacing, Xata)
+                                                               LEAP Data Broker REST API
+                                                               + static data lake (GitHub Pages JSON)
 ```
 
 ### Key Patterns
