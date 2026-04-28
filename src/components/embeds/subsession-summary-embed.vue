@@ -15,7 +15,8 @@ async function fetchModel() {
         (route.query.league as string) || '',
         (route.query.season as string) || '',
         (route.query.subsession as string) || '',
-        (route.query.isLight as string) === 'true'
+        (route.query.isLight as string) === 'true',
+        (route.query.font as string) || ''
     );
 }
 
@@ -51,6 +52,11 @@ function navigate(subsession: string) {
             subsessionSummaryEmbedModel.isLight
                 ? 'bg-light text-dark'
                 : 'bg-dark text-light'
+        "
+        :style="
+            subsessionSummaryEmbedModel.font
+                ? { fontFamily: subsessionSummaryEmbedModel.font }
+                : {}
         "
     >
         <div class="card-body p-2">

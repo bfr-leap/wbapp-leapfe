@@ -9,6 +9,7 @@ export interface SubsessionSummaryEmbedModel {
     title: string;
     summaryText: string[];
     isLight: boolean;
+    font: string;
     league: string;
     season: string;
     subsession: string;
@@ -24,6 +25,7 @@ export function getDefaultSubsessionSummaryEmbedModel(): SubsessionSummaryEmbedM
         title: '',
         summaryText: [''],
         isLight: false,
+        font: '',
         league: '',
         season: '',
         subsession: '',
@@ -35,14 +37,23 @@ export function getDefaultSubsessionSummaryEmbedModel(): SubsessionSummaryEmbedM
     };
 }
 
+// Restrict the font value to characters valid in a CSS font-family
+// declaration (letters, digits, spaces, hyphens, commas, quotes) and
+// cap the length so the URL param can't be used to inject arbitrary CSS.
+function sanitizeFont(font: string): string {
+    return font.replace(/[^a-zA-Z0-9\s,'"\-]/g, '').slice(0, 200);
+}
+
 export async function getSubsessionSummaryEmbedModel(
     league: string,
     season: string,
     subsession: string,
-    isLight: boolean
+    isLight: boolean,
+    font: string
 ): Promise<SubsessionSummaryEmbedModel> {
     const ret = getDefaultSubsessionSummaryEmbedModel();
     ret.isLight = isLight;
+    ret.font = sanitizeFont(font);
     ret.league = league;
 
     if (!league) {
