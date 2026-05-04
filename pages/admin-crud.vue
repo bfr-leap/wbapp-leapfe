@@ -4,7 +4,7 @@
  *
  * Surfaces the LEAP Data Broker's seven global admin CRUD endpoints so
  * we can probe them and learn their request/response shapes. Gated
- * client-side by the `admin_crud` feature flag (the broker enforces
+ * client-side by the `global_admin` feature flag (the broker enforces
  * the same gate server-side).
  *
  * Every action logs a `[ADMCRUD-UI]` group with inputs, the resolved
@@ -27,7 +27,7 @@ import {
     type CrudResult,
 } from '@@/src/services/admin-crud-service';
 
-const FEATURE_FLAG = 'admin_crud';
+const FEATURE_FLAG = 'global_admin';
 
 const auth = useAuth();
 setAuth(auth);
