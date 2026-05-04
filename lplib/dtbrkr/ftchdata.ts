@@ -2,6 +2,7 @@ import { getDocument as getDataLakeDocument } from './dtlkdata';
 import { userDataHandler } from './usrdata';
 import { userConfigHandler } from './usrcfg';
 import { adminConfigHandler } from './admcfg';
+import { adminCrudHandler } from './admcrud';
 import { stewardConfigHandler } from './stwdcfg';
 
 type Query = { [name: string]: number | string };
@@ -32,6 +33,10 @@ export async function getDocument(
 
     if ('ldata-admcfg' === namespace) {
         return await authMiddleware(namespace, query, adminConfigHandler);
+    }
+
+    if ('ldata-admcrud' === namespace) {
+        return await authMiddleware(namespace, query, adminCrudHandler);
     }
 
     if ('ldata-stwdcfg' === namespace) {

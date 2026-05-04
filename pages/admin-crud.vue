@@ -1,0 +1,547 @@
+<script setup lang="ts">
+/**
+ * Admin CRUD placeholder page.
+ *
+ * Surfaces the LEAP Data Broker's seven global admin CRUD endpoints so
+ * we can probe them and learn their request/response shapes. Gated
+ * client-side by the `admin_crud` feature flag (the broker enforces
+ * the same gate server-side).
+ *
+ * Every action logs a `[ADMCRUD-UI]` group with inputs, the resolved
+ * envelope, and the embedded data. Share the console output from a
+ * preview deployment so we can iterate on a real admin UI from there.
+ */
+import { ref, computed } from 'vue';
+import type { Ref } from 'vue';
+import { useAuth, SignedIn, SignedOut, SignInButton } from 'vue-clerk';
+import { setAuth, setToken } from '@@/src/utils/api-client';
+import { getUserFeatures } from '@@/src/services/user-service';
+import {
+    listCrudTables,
+    getCrudSchema,
+    listCrudRows,
+    lookupCrudRow,
+    createCrudRow,
+    updateCrudRow,
+    deleteCrudRow,
+    type CrudResult,
+} from '@@/src/services/admin-crud-service';
+
+const FEATURE_FLAG = 'admin_crud';
+
+const auth = useAuth();
+setAuth(auth);
+
+const serverInitialState = useState<AuthObject | undefined>(
+    'clerk-initial-state'
+);
+if (import.meta.server) {
+    setToken(serverInitialState.value?.token);
+}
+
+const featureChecked = ref(false);
+const featureEnabled = ref(false);
+const featureList: Ref<string[]> = ref([]);
+
+const tableName = ref('');
+const bodyJson = ref('{\n    \n}');
+const lastAction = ref<string>('');
+const lastResult: Ref<CrudResult | null> = ref(null);
+const isLoading = ref(false);
+const errorBanner = ref<string>('');
+
+async function ensureFeatures() {
+    if (featureChecked.value) return;
+    try {
+        const features = await getUserFeatures();
+        featureList.value = Array.isArray(features) ? features : [];
+        featureEnabled.value = featureList.value.includes(FEATURE_FLAG);
+        console.log('[ADMCRUD-UI] feature check', {
+            flag: FEATURE_FLAG,
+            enabled: featureEnabled.value,
+            features: featureList.value,
+        });
+    } catch (e) {
+        console.error('[ADMCRUD-UI] feature check failed', e);
+        featureEnabled.value = false;
+    } finally {
+        featureChecked.value = true;
+    }
+}
+
+if (import.meta.client) {
+    ensureFeatures();
+}
+
+function parseBody(): unknown {
+    const raw = bodyJson.value.trim();
+    if (!raw) return undefined;
+    try {
+        return JSON.parse(raw);
+    } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        errorBanner.value = `Body is not valid JSON: ${msg}`;
+        throw e;
+    }
+}
+
+async function run(
+    name: string,
+    fn: () => Promise<CrudResult>,
+    inputs: Record<string, unknown>
+) {
+    errorBanner.value = '';
+    isLoading.value = true;
+    lastAction.value = name;
+    const t0 = Date.now();
+    console.groupCollapsed(`[ADMCRUD-UI] ${name}`);
+    console.log('inputs', inputs);
+    try {
+        const result = await fn();
+        lastResult.value = result;
+        console.log('envelope', result);
+        console.log('data', result?._data);
+        console.log(`elapsed ${Date.now() - t0}ms`);
+    } catch (e) {
+        console.error('threw', e);
+        lastResult.value = {
+            _error: true,
+            _source: name,
+            _message: e instanceof Error ? e.message : String(e),
+        };
+    } finally {
+        console.groupEnd();
+        isLoading.value = false;
+    }
+}
+
+function callListTables() {
+    run('listTables', () => listCrudTables(), {});
+}
+
+function callGetSchema() {
+    if (!tableName.value) {
+        errorBanner.value = 'table name is required';
+        return;
+    }
+    run('getSchema', () => getCrudSchema(tableName.value), {
+        table: tableName.value,
+    });
+}
+
+function callListRows() {
+    if (!tableName.value) {
+        errorBanner.value = 'table name is required';
+        return;
+    }
+    run('listRows', () => listCrudRows(tableName.value), {
+        table: tableName.value,
+    });
+}
+
+function callLookup() {
+    if (!tableName.value) {
+        errorBanner.value = 'table name is required';
+        return;
+    }
+    let body: unknown;
+    try {
+        body = parseBody();
+    } catch {
+        return;
+    }
+    run('lookup', () => lookupCrudRow(tableName.value, body), {
+        table: tableName.value,
+        body,
+    });
+}
+
+function callCreate() {
+    if (!tableName.value) {
+        errorBanner.value = 'table name is required';
+        return;
+    }
+    let body: unknown;
+    try {
+        body = parseBody();
+    } catch {
+        return;
+    }
+    run('create', () => createCrudRow(tableName.value, body), {
+        table: tableName.value,
+        body,
+    });
+}
+
+function callUpdate() {
+    if (!tableName.value) {
+        errorBanner.value = 'table name is required';
+        return;
+    }
+    let body: unknown;
+    try {
+        body = parseBody();
+    } catch {
+        return;
+    }
+    run('update', () => updateCrudRow(tableName.value, body), {
+        table: tableName.value,
+        body,
+    });
+}
+
+function callDelete() {
+    if (!tableName.value) {
+        errorBanner.value = 'table name is required';
+        return;
+    }
+    let body: unknown;
+    try {
+        body = parseBody();
+    } catch {
+        return;
+    }
+    run('delete', () => deleteCrudRow(tableName.value, body), {
+        table: tableName.value,
+        body,
+    });
+}
+
+const prettyResult = computed(() => {
+    if (!lastResult.value) return '';
+    try {
+        return JSON.stringify(lastResult.value, null, 2);
+    } catch {
+        return String(lastResult.value);
+    }
+});
+</script>
+
+<template>
+    <div class="admcrud-page">
+        <header class="admcrud-header">
+            <h1>Admin · Data Broker CRUD</h1>
+            <p class="admcrud-subtitle">
+                Placeholder probe for
+                <code>/api/admin/crud/*</code> — open the browser console to see
+                <code>[ADMCRUD-UI]</code> and server <code>[ADMCRUD]</code> logs
+                (the latter appear in the dev / Vercel server log).
+            </p>
+        </header>
+
+        <SignedOut>
+            <div class="admcrud-callout">
+                You must be signed in to use admin CRUD.
+                <SignInButton />
+            </div>
+        </SignedOut>
+
+        <SignedIn>
+            <div v-if="!featureChecked" class="admcrud-callout">
+                Checking feature flag…
+            </div>
+
+            <div
+                v-else-if="!featureEnabled"
+                class="admcrud-callout admcrud-callout--warn"
+            >
+                <strong
+                    >Feature flag <code>{{ FEATURE_FLAG }}</code> is not enabled
+                    for your account.</strong
+                >
+                <div>
+                    Features seen for this user:
+                    <code>{{ JSON.stringify(featureList) }}</code>
+                </div>
+                <div>
+                    The page is otherwise wired up — once the broker enables the
+                    flag, the buttons below will fire real requests.
+                </div>
+            </div>
+
+            <div v-else>
+                <div v-if="errorBanner" class="admcrud-error">
+                    {{ errorBanner }}
+                </div>
+
+                <section class="admcrud-section">
+                    <h2>1. List tables</h2>
+                    <button
+                        type="button"
+                        class="admcrud-btn"
+                        v-bind:disabled="isLoading"
+                        v-on:click="callListTables"
+                    >
+                        GET /admin/crud/tables
+                    </button>
+                </section>
+
+                <section class="admcrud-section">
+                    <h2>2. Pick a table</h2>
+                    <label class="admcrud-label">
+                        Table name
+                        <input
+                            v-model="tableName"
+                            type="text"
+                            class="admcrud-input"
+                            placeholder="e.g. users"
+                        />
+                    </label>
+                    <div class="admcrud-button-row">
+                        <button
+                            type="button"
+                            class="admcrud-btn"
+                            v-bind:disabled="isLoading"
+                            v-on:click="callGetSchema"
+                        >
+                            GET …/:table/schema
+                        </button>
+                        <button
+                            type="button"
+                            class="admcrud-btn"
+                            v-bind:disabled="isLoading"
+                            v-on:click="callListRows"
+                        >
+                            GET …/:table
+                        </button>
+                    </div>
+                </section>
+
+                <section class="admcrud-section">
+                    <h2>
+                        3. JSON body (for lookup / create / update / delete)
+                    </h2>
+                    <textarea
+                        v-model="bodyJson"
+                        class="admcrud-textarea"
+                        rows="8"
+                        spellcheck="false"
+                    ></textarea>
+                    <div class="admcrud-button-row">
+                        <button
+                            type="button"
+                            class="admcrud-btn"
+                            v-bind:disabled="isLoading"
+                            v-on:click="callLookup"
+                        >
+                            POST …/lookup
+                        </button>
+                        <button
+                            type="button"
+                            class="admcrud-btn admcrud-btn--primary"
+                            v-bind:disabled="isLoading"
+                            v-on:click="callCreate"
+                        >
+                            POST …/:table (create)
+                        </button>
+                        <button
+                            type="button"
+                            class="admcrud-btn"
+                            v-bind:disabled="isLoading"
+                            v-on:click="callUpdate"
+                        >
+                            PATCH …/:table (update)
+                        </button>
+                        <button
+                            type="button"
+                            class="admcrud-btn admcrud-btn--danger"
+                            v-bind:disabled="isLoading"
+                            v-on:click="callDelete"
+                        >
+                            DELETE …/:table
+                        </button>
+                    </div>
+                </section>
+
+                <section class="admcrud-section">
+                    <h2>Last response</h2>
+                    <div v-if="lastAction" class="admcrud-meta">
+                        action: <code>{{ lastAction }}</code>
+                        <span v-if="lastResult?._method">
+                            · {{ lastResult._method }}
+                        </span>
+                        <span v-if="lastResult?._url">
+                            · <code>{{ lastResult._url }}</code>
+                        </span>
+                        <span v-if="lastResult?._status">
+                            · status {{ lastResult._status }}
+                        </span>
+                        <span
+                            v-if="
+                                lastResult?._durationMs !== undefined &&
+                                lastResult?._durationMs !== null
+                            "
+                        >
+                            · {{ lastResult._durationMs }}ms
+                        </span>
+                    </div>
+                    <pre
+                        v-if="prettyResult"
+                        class="admcrud-result"
+                    ><code>{{ prettyResult }}</code></pre>
+                    <p v-else class="admcrud-meta">
+                        No response yet — click a button above.
+                    </p>
+                </section>
+            </div>
+        </SignedIn>
+    </div>
+</template>
+
+<style scoped>
+.admcrud-page {
+    max-width: 1024px;
+    margin: 0 auto;
+    padding: 24px 16px 64px;
+    color: var(--gh-fg-default, #e6edf3);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.admcrud-header h1 {
+    margin: 0 0 4px;
+    font-size: 1.5rem;
+}
+
+.admcrud-subtitle {
+    color: var(--gh-fg-muted, #8b949e);
+    font-size: 0.875rem;
+    margin: 0 0 24px;
+}
+
+.admcrud-callout {
+    padding: 16px;
+    border: 1px solid var(--gh-border-default, #30363d);
+    border-radius: 6px;
+    background: var(--gh-canvas-subtle, #161b22);
+    margin-bottom: 16px;
+}
+
+.admcrud-callout--warn {
+    border-color: #9e6a03;
+    background: #1f1500;
+}
+
+.admcrud-error {
+    padding: 8px 12px;
+    border: 1px solid #f85149;
+    background: #2a0f10;
+    color: #ffa198;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    font-size: 0.875rem;
+}
+
+.admcrud-section {
+    border: 1px solid var(--gh-border-default, #30363d);
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 16px;
+    background: var(--gh-canvas-subtle, #161b22);
+}
+
+.admcrud-section h2 {
+    margin: 0 0 12px;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.admcrud-label {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--gh-fg-muted, #8b949e);
+    margin-bottom: 12px;
+}
+
+.admcrud-input,
+.admcrud-textarea {
+    display: block;
+    width: 100%;
+    margin-top: 4px;
+    padding: 6px 10px;
+    border: 1px solid var(--gh-border-default, #30363d);
+    background: var(--gh-canvas-default, #0d1117);
+    color: inherit;
+    border-radius: 6px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        monospace;
+    font-size: 0.875rem;
+}
+
+.admcrud-textarea {
+    min-height: 140px;
+    resize: vertical;
+}
+
+.admcrud-button-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.admcrud-btn {
+    padding: 6px 12px;
+    border: 1px solid var(--gh-border-default, #30363d);
+    background: var(--gh-btn-bg, #21262d);
+    color: inherit;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.admcrud-btn:hover:not(:disabled) {
+    background: #30363d;
+}
+
+.admcrud-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.admcrud-btn--primary {
+    background: #238636;
+    border-color: #2ea043;
+}
+
+.admcrud-btn--primary:hover:not(:disabled) {
+    background: #2ea043;
+}
+
+.admcrud-btn--danger {
+    background: #6e2222;
+    border-color: #8e3a3a;
+}
+
+.admcrud-btn--danger:hover:not(:disabled) {
+    background: #8e3a3a;
+}
+
+.admcrud-meta {
+    font-size: 0.8125rem;
+    color: var(--gh-fg-muted, #8b949e);
+    margin-bottom: 8px;
+}
+
+.admcrud-meta code {
+    word-break: break-all;
+}
+
+.admcrud-result {
+    background: var(--gh-canvas-default, #0d1117);
+    border: 1px solid var(--gh-border-default, #30363d);
+    border-radius: 6px;
+    padding: 12px;
+    overflow-x: auto;
+    max-height: 480px;
+    font-size: 0.8125rem;
+    white-space: pre;
+    margin: 0;
+}
+
+code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        monospace;
+    font-size: 0.875em;
+}
+</style>
