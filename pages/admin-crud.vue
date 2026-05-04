@@ -50,6 +50,135 @@ const lastResult: Ref<CrudResult | null> = ref(null);
 const isLoading = ref(false);
 const errorBanner = ref<string>('');
 
+const probeOutput = ref<string>('');
+const probeRunning = ref(false);
+const probeCopied = ref(false);
+
+function trimmedJson(v: unknown, max = 8000): string {
+    if (v === undefined) return '(undefined)';
+    if (v === null) return 'null';
+    let s: string;
+    try {
+        s = JSON.stringify(v, null, 2);
+    } catch {
+        s = String(v);
+    }
+    if (s.length > max) {
+        return s.slice(0, max) + `\n…[truncated ${s.length - max} chars]`;
+    }
+    return s;
+}
+
+function extractTableNames(data: unknown): string[] {
+    if (!data) return [];
+    if (Array.isArray(data)) {
+        const names: string[] = [];
+        for (const item of data) {
+            if (typeof item === 'string') {
+                names.push(item);
+            } else if (item && typeof item === 'object') {
+                const o = item as Record<string, unknown>;
+                const n = o.name ?? o.table ?? o.table_name ?? o.id;
+                if (n !== undefined && n !== null) names.push(String(n));
+            }
+        }
+        return names;
+    }
+    if (typeof data === 'object') {
+        const o = data as Record<string, unknown>;
+        if (Array.isArray(o.tables)) return extractTableNames(o.tables);
+        if (Array.isArray(o.data)) return extractTableNames(o.data);
+        if (Array.isArray(o.rows)) return extractTableNames(o.rows);
+        return Object.keys(o);
+    }
+    return [];
+}
+
+async function runProbe() {
+    probeRunning.value = true;
+    probeCopied.value = false;
+    const lines: string[] = [];
+    const push = (s = '') => lines.push(s);
+
+    function dump(label: string, result: CrudResult) {
+        push(`--- ${label} ---`);
+        push(`> ${result._method ?? '?'} ${result._url ?? '(no url)'}`);
+        if (result._status !== undefined) {
+            push(
+                `< HTTP ${result._status} in ${result._durationMs ?? '?'}ms${
+                    result._error ? '  (ERROR)' : ''
+                }`
+            );
+        } else if (result._error) {
+            push(`< (no HTTP response) ERROR`);
+        }
+        if (result._message) push(`! ${result._message}`);
+        push(trimmedJson(result._data));
+        push();
+    }
+
+    push(`=== ADMCRUD discovery probe @ ${new Date().toISOString()} ===`);
+    push(`user features: ${JSON.stringify(featureList.value)}`);
+    push(`page origin: ${window.location.origin}`);
+    push();
+
+    try {
+        const tablesResult = await listCrudTables();
+        dump('1. crudTables (GET /admin/crud/tables)', tablesResult);
+
+        const tableNames = extractTableNames(tablesResult._data);
+        push(
+            `extracted ${tableNames.length} table name(s): ${JSON.stringify(
+                tableNames
+            )}`
+        );
+        push();
+
+        const probeTables = tableNames.slice(0, 5);
+        for (const name of probeTables) {
+            const schema = await getCrudSchema(name);
+            dump(`2. crudSchema (table=${name})`, schema);
+
+            const list = await listCrudRows(name);
+            dump(`3. crudList (table=${name})`, list);
+        }
+
+        if (probeTables.length > 0) {
+            const lookup = await lookupCrudRow(probeTables[0], {});
+            dump(
+                `4. crudGet w/ empty body (table=${probeTables[0]}) — probing for required-field error shape`,
+                lookup
+            );
+        }
+
+        push('=== probe complete ===');
+        push(
+            'NOTE: create / update / delete were NOT exercised — share the above and we can pick a safe table for mutation tests.'
+        );
+    } catch (e) {
+        push(`!!! probe threw: ${e instanceof Error ? e.message : String(e)}`);
+    } finally {
+        probeOutput.value = lines.join('\n');
+        probeRunning.value = false;
+        console.log('[ADMCRUD-UI] probe output ready', {
+            length: probeOutput.value.length,
+        });
+    }
+}
+
+async function copyProbe() {
+    if (!probeOutput.value) return;
+    try {
+        await navigator.clipboard.writeText(probeOutput.value);
+        probeCopied.value = true;
+        setTimeout(() => (probeCopied.value = false), 2000);
+    } catch (e) {
+        console.warn('[ADMCRUD-UI] clipboard write failed', e);
+        errorBanner.value =
+            'Could not write to clipboard — select the text manually.';
+    }
+}
+
 async function ensureFeatures() {
     if (featureChecked.value) return;
     try {
@@ -264,6 +393,45 @@ const prettyResult = computed(() => {
                     {{ errorBanner }}
                 </div>
 
+                <section class="admcrud-section admcrud-section--probe">
+                    <h2>One-click discovery probe</h2>
+                    <p class="admcrud-meta">
+                        Hits every read-only endpoint (tables, schema for the
+                        first 5 tables, list rows for each, and an empty-body
+                        lookup) and dumps the full envelopes into the textarea.
+                        Nothing is created, updated, or deleted.
+                    </p>
+                    <div class="admcrud-button-row">
+                        <button
+                            type="button"
+                            class="admcrud-btn admcrud-btn--primary"
+                            v-bind:disabled="probeRunning"
+                            v-on:click="runProbe"
+                        >
+                            {{
+                                probeRunning
+                                    ? 'Running probe…'
+                                    : 'Run discovery probe'
+                            }}
+                        </button>
+                        <button
+                            type="button"
+                            class="admcrud-btn"
+                            v-bind:disabled="!probeOutput"
+                            v-on:click="copyProbe"
+                        >
+                            {{ probeCopied ? 'Copied ✓' : 'Copy to clipboard' }}
+                        </button>
+                    </div>
+                    <textarea
+                        class="admcrud-textarea admcrud-probe-output"
+                        readonly
+                        spellcheck="false"
+                        placeholder="Click 'Run discovery probe' above — output appears here, then 'Copy to clipboard' and paste back."
+                        v-bind:value="probeOutput"
+                    ></textarea>
+                </section>
+
                 <section class="admcrud-section">
                     <h2>1. List tables</h2>
                     <button
@@ -470,6 +638,17 @@ const prettyResult = computed(() => {
 .admcrud-textarea {
     min-height: 140px;
     resize: vertical;
+}
+
+.admcrud-section--probe {
+    border-color: #2ea043;
+}
+
+.admcrud-probe-output {
+    margin-top: 12px;
+    min-height: 280px;
+    font-size: 0.75rem;
+    line-height: 1.4;
 }
 
 .admcrud-button-row {
