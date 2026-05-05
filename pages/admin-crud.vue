@@ -2,12 +2,15 @@
 /**
  * Admin CRUD probe — single-button placeholder.
  *
- * Hits every endpoint and tries multiple body shapes for the mutating
- * verbs so we can discover which one the broker accepts in one round
- * trip. Output is dumped to a copyable textarea and auto-copied to the
- * clipboard. Self-cleans the test rows it creates.
+ * Exercises the full create → lookup → update → lookup → delete →
+ * verify lifecycle against `app_features` using a self-cleaning
+ * `_admcrud_probe_*` row, plus a pre-run sweep of any leaked rows
+ * from previous attempts. Output is dumped to a copyable textarea
+ * and auto-copied to the clipboard.
  *
- * Gated client-side by the `global_admin` feature flag.
+ * Body shapes match the broker's documented contract — see
+ * `src/services/admin-crud-service.ts`. Gated client-side by the
+ * `global_admin` feature flag.
  */
 import { ref, computed } from 'vue';
 import type { Ref } from 'vue';
@@ -105,60 +108,23 @@ function shapeOf(data: unknown): string {
 
 const PROBE_TABLE = 'app_features';
 
-interface ProbeAttempt {
-    label: string;
-    body: unknown;
-    fn: (body: unknown) => Promise<CrudResult>;
-}
-
-async function tryAttempts(
-    out: string[],
-    section: string,
-    attempts: ProbeAttempt[]
-): Promise<{ winner: ProbeAttempt | null; result: CrudResult | null }> {
+function dump(out: string[], section: string, r: CrudResult) {
     out.push(`========== ${section} ==========`);
-    let winner: ProbeAttempt | null = null;
-    let winningResult: CrudResult | null = null;
-    for (const a of attempts) {
-        out.push(`--- attempt: ${a.label}`);
-        out.push(`request body: ${trimmedJson(a.body)}`);
-        let r: CrudResult | null = null;
-        try {
-            r = await a.fn(a.body);
-        } catch (e) {
-            out.push(`! threw: ${e instanceof Error ? e.message : String(e)}`);
-            out.push('');
-            continue;
-        }
-        out.push(`> ${r._method ?? '?'} ${r._url ?? '?'}`);
-        if (r._status !== undefined) {
-            out.push(
-                `< HTTP ${r._status} in ${r._durationMs ?? '?'}ms${
-                    r._error ? '  (ERROR)' : '  (OK)'
-                }`
-            );
-        }
-        if (r._requestBody !== undefined) {
-            out.push(`echoed _requestBody: ${trimmedJson(r._requestBody)}`);
-        } else {
-            out.push(`echoed _requestBody: (missing — old build?)`);
-        }
-        if (r._message) out.push(`! ${r._message}`);
-        out.push(`response shape: ${shapeOf(r._data)}`);
-        out.push(trimmedJson(r._data));
-        out.push('');
-        if (r._ok && !winner) {
-            winner = a;
-            winningResult = r;
-        }
+    out.push(`> ${r._method ?? '?'} ${r._url ?? '?'}`);
+    if (r._status !== undefined) {
+        out.push(
+            `< HTTP ${r._status} in ${r._durationMs ?? '?'}ms${
+                r._error ? '  (ERROR)' : '  (OK)'
+            }`
+        );
     }
-    if (winner) {
-        out.push(`>>> ${section} winner: "${winner.label}"`);
-    } else {
-        out.push(`>>> ${section}: no shape succeeded`);
+    if (r._requestBody !== undefined) {
+        out.push(`request body: ${trimmedJson(r._requestBody)}`);
     }
+    if (r._message) out.push(`! ${r._message}`);
+    out.push(`response shape: ${shapeOf(r._data)}`);
+    out.push(trimmedJson(r._data));
     out.push('');
-    return { winner, result: winningResult };
 }
 
 function extractCreatedId(data: unknown): number | null {
@@ -199,8 +165,9 @@ async function runProbe() {
     const out: string[] = [];
     const probeName = `_admcrud_probe_${Date.now()}`;
     const probeNewName = `${probeName}_renamed`;
+    const verdicts: string[] = [];
 
-    out.push(`=== ADMCRUD full probe @ ${new Date().toISOString()} ===`);
+    out.push(`=== ADMCRUD probe @ ${new Date().toISOString()} ===`);
     out.push(`build: ${buildShaShort}  buildTime: ${buildTime}`);
     out.push(
         `page origin: ${
@@ -212,299 +179,26 @@ async function runProbe() {
     out.push(`probe row name: ${probeName}`);
     out.push('');
 
-    // ---- 1. Read-only baseline ------------------------------------
-    try {
-        const t = await listCrudTables();
-        out.push('========== 1. listTables ==========');
-        out.push(`> ${t._method} ${t._url}`);
-        out.push(`< HTTP ${t._status} in ${t._durationMs}ms`);
-        out.push(trimmedJson(t._data));
-        out.push('');
-
-        const s = await getCrudSchema(PROBE_TABLE);
-        out.push(`========== 2. schema(${PROBE_TABLE}) ==========`);
-        out.push(`> ${s._method} ${s._url}`);
-        out.push(`< HTTP ${s._status} in ${s._durationMs}ms`);
-        out.push(trimmedJson(s._data));
-        out.push('');
-
-        const l = await listCrudRows(PROBE_TABLE);
-        out.push(`========== 3. listRows(${PROBE_TABLE}) ==========`);
-        out.push(`> ${l._method} ${l._url}`);
-        out.push(`< HTTP ${l._status} in ${l._durationMs}ms`);
-        out.push(trimmedJson(l._data));
-        out.push('');
-    } catch (e) {
-        out.push(
-            `!!! read-only suite threw: ${
-                e instanceof Error ? e.message : String(e)
-            }`
+    function record(verb: string, r: CrudResult) {
+        verdicts.push(
+            `${verb.padEnd(12)} ${r._ok ? 'OK ' : 'FAIL'}  ${r._url ?? ''}`
         );
     }
 
-    // ---- 2. Lookup body-shape discovery (against existing id=11) ---
-    let lookupWinner: ProbeAttempt | null = null;
-    try {
-        const r = await tryAttempts(out, '4. lookup body shapes', [
-            {
-                label: 'wrapped values: {values: {id: 11}}',
-                body: { values: { id: 11 } },
-                fn: (b) => lookupCrudRow(PROBE_TABLE, b),
-            },
-            {
-                label: 'wrapped data: {data: {id: 11}}',
-                body: { data: { id: 11 } },
-                fn: (b) => lookupCrudRow(PROBE_TABLE, b),
-            },
-            {
-                label: 'wrapped row: {row: {id: 11}}',
-                body: { row: { id: 11 } },
-                fn: (b) => lookupCrudRow(PROBE_TABLE, b),
-            },
-            {
-                label: 'wrapped pk: {pk: {id: 11}}',
-                body: { pk: { id: 11 } },
-                fn: (b) => lookupCrudRow(PROBE_TABLE, b),
-            },
-        ]);
-        lookupWinner = r.winner;
-    } catch (e) {
-        out.push(
-            `!!! lookup discovery threw: ${
-                e instanceof Error ? e.message : String(e)
-            }`
-        );
-    }
-
-    // ---- 3. Create body-shape discovery ----------------------------
-    let createdId: number | null = null;
-    let createWinner: ProbeAttempt | null = null;
-    let createWinnerResult: CrudResult | null = null;
-    try {
-        const r = await tryAttempts(out, '5. create body shapes', [
-            {
-                label: 'flat columns',
-                body: {
-                    display_name: probeName,
-                    release_to_all: 0,
-                    release_to_some: 0,
-                },
-                fn: (b) => createCrudRow(PROBE_TABLE, b),
-            },
-            {
-                label: 'wrapped row',
-                body: {
-                    row: {
-                        display_name: probeName,
-                        release_to_all: 0,
-                        release_to_some: 0,
-                    },
-                },
-                fn: (b) => createCrudRow(PROBE_TABLE, b),
-            },
-            {
-                label: 'wrapped values',
-                body: {
-                    values: {
-                        display_name: probeName,
-                        release_to_all: 0,
-                        release_to_some: 0,
-                    },
-                },
-                fn: (b) => createCrudRow(PROBE_TABLE, b),
-            },
-        ]);
-        createWinner = r.winner;
-        createWinnerResult = r.result;
-        createdId = extractCreatedId(createWinnerResult?._data);
-        out.push(`extracted createdId: ${createdId ?? '(none — see data)'}`);
-        out.push('');
-    } catch (e) {
-        out.push(
-            `!!! create discovery threw: ${
-                e instanceof Error ? e.message : String(e)
-            }`
-        );
-    }
-
-    // ---- 4. If create worked, do lookup/update/delete on test row -
-    if (createWinner && createdId !== null) {
-        try {
-            const r = await tryAttempts(
-                out,
-                `6. lookup test row id=${createdId}`,
-                [
-                    {
-                        label: 'wrapped values: {values: {id}}',
-                        body: { values: { id: createdId } },
-                        fn: (b) => lookupCrudRow(PROBE_TABLE, b),
-                    },
-                    {
-                        label: 'wrapped data: {data: {id}}',
-                        body: { data: { id: createdId } },
-                        fn: (b) => lookupCrudRow(PROBE_TABLE, b),
-                    },
-                ]
-            );
-            void r;
-        } catch (e) {
-            out.push(
-                `!!! lookup of test row threw: ${
-                    e instanceof Error ? e.message : String(e)
-                }`
-            );
-        }
-
-        try {
-            const r = await tryAttempts(out, '7. update body shapes', [
-                {
-                    label: 'all-in-values: {values: {id, display_name}}',
-                    body: {
-                        values: {
-                            id: createdId,
-                            display_name: probeNewName,
-                        },
-                    },
-                    fn: (b) => updateCrudRow(PROBE_TABLE, b),
-                },
-                {
-                    label: 'pk-out + values: {id, values: {display_name}}',
-                    body: {
-                        id: createdId,
-                        values: { display_name: probeNewName },
-                    },
-                    fn: (b) => updateCrudRow(PROBE_TABLE, b),
-                },
-                {
-                    label: 'where + values: {where: {id}, values: {display_name}}',
-                    body: {
-                        where: { id: createdId },
-                        values: { display_name: probeNewName },
-                    },
-                    fn: (b) => updateCrudRow(PROBE_TABLE, b),
-                },
-                {
-                    label: 'data-only: {data: {id, display_name}}',
-                    body: {
-                        data: {
-                            id: createdId,
-                            display_name: probeNewName,
-                        },
-                    },
-                    fn: (b) => updateCrudRow(PROBE_TABLE, b),
-                },
-            ]);
-            void r;
-        } catch (e) {
-            out.push(
-                `!!! update discovery threw: ${
-                    e instanceof Error ? e.message : String(e)
-                }`
-            );
-        }
-
-        try {
-            const r = await tryAttempts(out, '8. delete body shapes', [
-                {
-                    label: 'wrapped values: {values: {id}}',
-                    body: { values: { id: createdId } },
-                    fn: (b) => deleteCrudRow(PROBE_TABLE, b),
-                },
-                {
-                    label: 'wrapped data: {data: {id}}',
-                    body: { data: { id: createdId } },
-                    fn: (b) => deleteCrudRow(PROBE_TABLE, b),
-                },
-                {
-                    label: 'wrapped pk: {pk: {id}}',
-                    body: { pk: { id: createdId } },
-                    fn: (b) => deleteCrudRow(PROBE_TABLE, b),
-                },
-            ]);
-            void r;
-        } catch (e) {
-            out.push(
-                `!!! delete discovery threw: ${
-                    e instanceof Error ? e.message : String(e)
-                }`
-            );
-        }
-
-        // ---- 5. Verify deletion -----------------------------------
-        try {
-            out.push('========== 9. verify post-delete listRows ==========');
-            const list = await listCrudRows(PROBE_TABLE);
-            const data = list?._data as
-                | {
-                      rows?: Array<Record<string, unknown>>;
-                      total?: number;
-                  }
-                | undefined;
-            const stillThere = (data?.rows ?? []).filter(
-                (r) =>
-                    typeof r.display_name === 'string' &&
-                    ((r.display_name as string) === probeName ||
-                        (r.display_name as string) === probeNewName)
-            );
-            out.push(
-                `total rows: ${data?.total ?? '?'}, leftover probe rows: ${
-                    stillThere.length
-                }`
-            );
-            if (stillThere.length) {
-                out.push(trimmedJson(stillThere));
-            }
-            out.push('');
-        } catch (e) {
-            out.push(
-                `!!! verify threw: ${
-                    e instanceof Error ? e.message : String(e)
-                }`
-            );
-        }
-    } else {
-        out.push(
-            `(skipping lookup/update/delete on test row: create did not return a usable id — winner=${
-                createWinner?.label ?? 'none'
-            }, createdId=${createdId})`
-        );
-        out.push('');
-    }
-
-    // ---- 6. Sweep stale probe rows --------------------------------
+    // ---- 1. Sweep leaked probe rows from prior runs --------------
     try {
         const stale = await findProbeRows();
-        out.push(`========== 10. sweep stale probe rows ==========`);
+        out.push('========== 1. pre-run sweep of stale probe rows ==========');
         out.push(
             `found ${stale.length} stale row(s): ${JSON.stringify(stale)}`
         );
-        const deleteShapes: {
-            label: string;
-            build: (id: number) => unknown;
-        }[] = [
-            { label: 'values', build: (id) => ({ values: { id } }) },
-            { label: 'data', build: (id) => ({ data: { id } }) },
-            { label: 'pk', build: (id) => ({ pk: { id } }) },
-            { label: 'flat', build: (id) => ({ id }) },
-            { label: 'where', build: (id) => ({ where: { id } }) },
-        ];
         for (const id of stale) {
-            let cleaned = false;
-            for (const shape of deleteShapes) {
-                const r = await deleteCrudRow(PROBE_TABLE, shape.build(id));
-                out.push(
-                    `  delete id=${id} via ${shape.label} → HTTP ${r._status} ${
-                        r._error ? '(error)' : '(ok)'
-                    }`
-                );
-                if (r._ok) {
-                    cleaned = true;
-                    break;
-                }
-            }
-            if (!cleaned) {
-                out.push(`  ! id=${id} could not be deleted with any shape`);
-            }
+            const r = await deleteCrudRow(PROBE_TABLE, { id });
+            out.push(
+                `  delete id=${id} → HTTP ${r._status} ${
+                    r._error ? '(error)' : '(ok)'
+                }`
+            );
         }
         out.push('');
     } catch (e) {
@@ -513,13 +207,125 @@ async function runProbe() {
         );
     }
 
-    out.push('=== probe complete ===');
-    out.push(`lookup winner: ${lookupWinner?.label ?? '(none)'}`);
-    out.push(`create winner: ${createWinner?.label ?? '(none)'}`);
+    // ---- 2. Read-only baseline -----------------------------------
+    try {
+        const t = await listCrudTables();
+        record('listTables', t);
+        dump(out, '2. listTables', t);
+
+        const s = await getCrudSchema(PROBE_TABLE);
+        record('schema', s);
+        dump(out, `3. schema(${PROBE_TABLE})`, s);
+
+        const l = await listCrudRows(PROBE_TABLE);
+        record('listRows', l);
+        dump(out, `4. listRows(${PROBE_TABLE})`, l);
+    } catch (e) {
+        out.push(
+            `!!! read-only suite threw: ${
+                e instanceof Error ? e.message : String(e)
+            }`
+        );
+    }
+
+    // ---- 3. Create -> Lookup -> Update -> Lookup -> Delete -> Verify
+    let createdId: number | null = null;
+    try {
+        const created = await createCrudRow(PROBE_TABLE, {
+            display_name: probeName,
+            release_to_all: 0,
+            release_to_some: 0,
+        });
+        record('create', created);
+        dump(out, '5. create test row', created);
+        createdId = extractCreatedId(created._data);
+        out.push(`extracted createdId: ${createdId ?? '(missing)'}`);
+        out.push('');
+    } catch (e) {
+        out.push(
+            `!!! create threw: ${e instanceof Error ? e.message : String(e)}`
+        );
+    }
+
+    if (createdId !== null) {
+        try {
+            const looked = await lookupCrudRow(PROBE_TABLE, { id: createdId });
+            record('lookup', looked);
+            dump(out, `6. lookup id=${createdId}`, looked);
+        } catch (e) {
+            out.push(
+                `!!! lookup threw: ${
+                    e instanceof Error ? e.message : String(e)
+                }`
+            );
+        }
+
+        try {
+            const updated = await updateCrudRow(
+                PROBE_TABLE,
+                { id: createdId },
+                { display_name: probeNewName, release_to_some: 1 }
+            );
+            record('update', updated);
+            dump(out, `7. update id=${createdId}`, updated);
+        } catch (e) {
+            out.push(
+                `!!! update threw: ${
+                    e instanceof Error ? e.message : String(e)
+                }`
+            );
+        }
+
+        try {
+            const reLooked = await lookupCrudRow(PROBE_TABLE, {
+                id: createdId,
+            });
+            record('lookup-2', reLooked);
+            dump(out, `8. lookup post-update id=${createdId}`, reLooked);
+        } catch (e) {
+            out.push(
+                `!!! re-lookup threw: ${
+                    e instanceof Error ? e.message : String(e)
+                }`
+            );
+        }
+
+        try {
+            const deleted = await deleteCrudRow(PROBE_TABLE, {
+                id: createdId,
+            });
+            record('delete', deleted);
+            dump(out, `9. delete id=${createdId}`, deleted);
+        } catch (e) {
+            out.push(
+                `!!! delete threw: ${
+                    e instanceof Error ? e.message : String(e)
+                }`
+            );
+        }
+
+        try {
+            const verifyDeleted = await lookupCrudRow(PROBE_TABLE, {
+                id: createdId,
+            });
+            record('verify', verifyDeleted);
+            dump(out, `10. lookup post-delete id=${createdId}`, verifyDeleted);
+        } catch (e) {
+            out.push(
+                `!!! verify threw: ${
+                    e instanceof Error ? e.message : String(e)
+                }`
+            );
+        }
+    } else {
+        out.push('(create did not return an id — skipping lifecycle steps)');
+        out.push('');
+    }
+
+    out.push('========== verdict ==========');
+    for (const v of verdicts) out.push(v);
     out.push('');
-    out.push(
-        'Tip: search for ">>>" markers above to see which body shape won each verb.'
-    );
+    out.push('=== probe complete ===');
 
     probeOutput.value = out.join('\n');
     probeRunning.value = false;
