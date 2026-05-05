@@ -37,6 +37,14 @@ export interface CrudResult<T = unknown> {
 export type CrudKey = Record<string, string | number>;
 export type CrudValues = Record<string, string | number | boolean | null>;
 
+export interface ListCrudRowsOptions {
+    pageSize?: number;
+    offset?: number;
+    orderBy?: string;
+    orderDir?: 'ASC' | 'DESC';
+    where?: Record<string, string | number>;
+}
+
 function encodeBody(body: unknown): string {
     if (body === undefined) return '';
     return encodeURIComponent(JSON.stringify(body));
@@ -57,11 +65,15 @@ export async function getCrudSchema(table: string): Promise<CrudResult> {
     });
 }
 
-export async function listCrudRows(table: string): Promise<CrudResult> {
+export async function listCrudRows(
+    table: string,
+    options?: ListCrudRowsOptions
+): Promise<CrudResult> {
     return await fetchUncached<CrudResult>({
         namespace: NAMESPACE,
         type: 'crudList',
         table,
+        _query: options ? encodeBody(options) : '',
     });
 }
 

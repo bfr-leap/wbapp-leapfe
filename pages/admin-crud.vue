@@ -357,6 +357,10 @@ const buttonLabel = computed(() => {
             <span v-if="buildTime" class="admcrud-build-time">{{
                 buildTime
             }}</span>
+            <span style="flex: 1"></span>
+            <RouterLink class="admcrud-build-link" to="/admin"
+                >back to admin ↗</RouterLink
+            >
         </header>
 
         <h1>Admin CRUD probe</h1>
@@ -458,6 +462,16 @@ const buttonLabel = computed(() => {
 .admcrud-build-time {
     color: var(--gh-fg-muted, #8b949e);
     font-size: 0.75rem;
+}
+
+.admcrud-build-link {
+    color: var(--gh-fg-muted, #8b949e);
+    text-decoration: none;
+    font-size: 0.75rem;
+}
+
+.admcrud-build-link:hover {
+    color: #7ee787;
 }
 
 h1 {

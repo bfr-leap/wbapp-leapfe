@@ -165,6 +165,39 @@ function decodeBody(raw: unknown): unknown {
     }
 }
 
+function buildQueryString(params: unknown): string {
+    if (!params || typeof params !== 'object') return '';
+    const parts: string[] = [];
+    for (const [key, value] of Object.entries(
+        params as Record<string, unknown>
+    )) {
+        if (value === undefined || value === null || value === '') continue;
+        if (
+            typeof value === 'object' &&
+            !Array.isArray(value) &&
+            value !== null
+        ) {
+            for (const [k, v] of Object.entries(
+                value as Record<string, unknown>
+            )) {
+                if (v === undefined || v === null || v === '') continue;
+                parts.push(
+                    `${encodeURIComponent(key)}[${encodeURIComponent(
+                        k
+                    )}]=${encodeURIComponent(String(v))}`
+                );
+            }
+        } else {
+            parts.push(
+                `${encodeURIComponent(key)}=${encodeURIComponent(
+                    String(value)
+                )}`
+            );
+        }
+    }
+    return parts.length ? `?${parts.join('&')}` : '';
+}
+
 export async function adminCrudHandler(
     namespace: string,
     query: { [name: string]: string | number }
@@ -173,6 +206,8 @@ export async function adminCrudHandler(
     const table = String(query?.table || '');
     const authHeader = String(query?._authHeader || '');
     const body = decodeBody(query?._body);
+    const brokerQuery = decodeBody(query?._query);
+    const qs = buildQueryString(brokerQuery);
 
     console.log('[ADMCRUD] adminCrudHandler()', {
         namespace,
@@ -181,6 +216,7 @@ export async function adminCrudHandler(
         BASE_URL,
         hasAuth: !!authHeader,
         hasBody: body !== undefined,
+        hasQuery: !!qs,
     });
 
     const tablePath = encodeURIComponent(table);
@@ -205,7 +241,7 @@ export async function adminCrudHandler(
         case 'crudList':
             return callBroker(
                 'GET',
-                `/admin/crud/tables/${tablePath}`,
+                `/admin/crud/tables/${tablePath}${qs}`,
                 undefined,
                 authHeader,
                 'crudList'
