@@ -1,15 +1,13 @@
 <script setup lang="ts">
 /**
- * Admin CRUD placeholder page.
+ * Admin CRUD probe — single-button placeholder.
  *
- * Surfaces the LEAP Data Broker's seven global admin CRUD endpoints so
- * we can probe them and learn their request/response shapes. Gated
- * client-side by the `global_admin` feature flag (the broker enforces
- * the same gate server-side).
+ * Hits every endpoint and tries multiple body shapes for the mutating
+ * verbs so we can discover which one the broker accepts in one round
+ * trip. Output is dumped to a copyable textarea and auto-copied to the
+ * clipboard. Self-cleans the test rows it creates.
  *
- * Every action logs a `[ADMCRUD-UI]` group with inputs, the resolved
- * envelope, and the embedded data. Share the console output from a
- * preview deployment so we can iterate on a real admin UI from there.
+ * Gated client-side by the `global_admin` feature flag.
  */
 import { ref, computed } from 'vue';
 import type { Ref } from 'vue';
@@ -39,24 +37,43 @@ if (import.meta.server) {
     setToken(serverInitialState.value?.token);
 }
 
+const runtimeConfig = useRuntimeConfig();
+const buildSha = String(runtimeConfig.public.BUILD_COMMIT_SHA || 'dev');
+const buildShaShort = buildSha === 'dev' ? 'dev' : buildSha.slice(0, 7);
+const buildTime = String(runtimeConfig.public.BUILD_TIME || '');
+
 const featureChecked = ref(false);
 const featureEnabled = ref(false);
 const featureList: Ref<string[]> = ref([]);
 
-const tableName = ref('');
-const bodyJson = ref(
-    '{\n    "// fill in PK columns for lookup/update/delete,": "",\n    "// or full row for create": ""\n}'
-);
-const lastAction = ref<string>('');
-const lastResult: Ref<CrudResult | null> = ref(null);
-const isLoading = ref(false);
-const errorBanner = ref<string>('');
-
 const probeOutput = ref<string>('');
 const probeRunning = ref(false);
-const probeCopied = ref(false);
+const probeAutoCopied = ref(false);
+const probeCopyManual = ref(false);
 
-function trimmedJson(v: unknown, max = 8000): string {
+async function ensureFeatures() {
+    if (featureChecked.value) return;
+    try {
+        const features = await getUserFeatures();
+        featureList.value = Array.isArray(features) ? features : [];
+        featureEnabled.value = featureList.value.includes(FEATURE_FLAG);
+    } catch (e) {
+        console.error('[ADMCRUD-UI] feature check failed', e);
+        featureEnabled.value = false;
+    } finally {
+        featureChecked.value = true;
+    }
+}
+
+if (import.meta.client) {
+    ensureFeatures();
+}
+
+// ---------------------------------------------------------------------
+// Output helpers
+// ---------------------------------------------------------------------
+
+function trimmedJson(v: unknown, max = 6000): string {
     if (v === undefined) return '(undefined)';
     if (v === null) return 'null';
     let s: string;
@@ -71,488 +88,487 @@ function trimmedJson(v: unknown, max = 8000): string {
     return s;
 }
 
-function extractTableNames(data: unknown): string[] {
-    if (!data) return [];
-    if (Array.isArray(data)) {
-        const names: string[] = [];
-        for (const item of data) {
-            if (typeof item === 'string') {
-                names.push(item);
-            } else if (item && typeof item === 'object') {
-                const o = item as Record<string, unknown>;
-                const n = o.name ?? o.table ?? o.table_name ?? o.id;
-                if (n !== undefined && n !== null) names.push(String(n));
-            }
-        }
-        return names;
-    }
+function shapeOf(data: unknown): string {
+    if (data === null || data === undefined) return 'null';
+    if (Array.isArray(data)) return `array[${data.length}]`;
     if (typeof data === 'object') {
-        const o = data as Record<string, unknown>;
-        if (Array.isArray(o.tables)) return extractTableNames(o.tables);
-        if (Array.isArray(o.data)) return extractTableNames(o.data);
-        if (Array.isArray(o.rows)) return extractTableNames(o.rows);
-        return Object.keys(o);
+        return `object{${Object.keys(data as object)
+            .slice(0, 8)
+            .join(',')}}`;
     }
-    return [];
+    return typeof data;
+}
+
+// ---------------------------------------------------------------------
+// Probe
+// ---------------------------------------------------------------------
+
+const PROBE_TABLE = 'app_features';
+
+interface ProbeAttempt {
+    label: string;
+    body: unknown;
+    fn: (body: unknown) => Promise<CrudResult>;
+}
+
+async function tryAttempts(
+    out: string[],
+    section: string,
+    attempts: ProbeAttempt[]
+): Promise<{ winner: ProbeAttempt | null; result: CrudResult | null }> {
+    out.push(`========== ${section} ==========`);
+    let winner: ProbeAttempt | null = null;
+    let winningResult: CrudResult | null = null;
+    for (const a of attempts) {
+        out.push(`--- attempt: ${a.label}`);
+        out.push(`request body: ${trimmedJson(a.body)}`);
+        let r: CrudResult | null = null;
+        try {
+            r = await a.fn(a.body);
+        } catch (e) {
+            out.push(`! threw: ${e instanceof Error ? e.message : String(e)}`);
+            out.push('');
+            continue;
+        }
+        out.push(`> ${r._method ?? '?'} ${r._url ?? '?'}`);
+        if (r._status !== undefined) {
+            out.push(
+                `< HTTP ${r._status} in ${r._durationMs ?? '?'}ms${
+                    r._error ? '  (ERROR)' : '  (OK)'
+                }`
+            );
+        }
+        if (r._requestBody !== undefined) {
+            out.push(`echoed _requestBody: ${trimmedJson(r._requestBody)}`);
+        } else {
+            out.push(`echoed _requestBody: (missing — old build?)`);
+        }
+        if (r._message) out.push(`! ${r._message}`);
+        out.push(`response shape: ${shapeOf(r._data)}`);
+        out.push(trimmedJson(r._data));
+        out.push('');
+        if (r._ok && !winner) {
+            winner = a;
+            winningResult = r;
+        }
+    }
+    if (winner) {
+        out.push(`>>> ${section} winner: "${winner.label}"`);
+    } else {
+        out.push(`>>> ${section}: no shape succeeded`);
+    }
+    out.push('');
+    return { winner, result: winningResult };
+}
+
+function extractCreatedId(data: unknown): number | null {
+    if (!data || typeof data !== 'object') return null;
+    const o = data as Record<string, unknown>;
+    if (typeof o.id === 'number') return o.id;
+    if (typeof o.lastInsertRowid === 'number') return o.lastInsertRowid;
+    if (typeof o.lastID === 'number') return o.lastID;
+    if (o.row && typeof o.row === 'object') {
+        return extractCreatedId(o.row);
+    }
+    if (o.data && typeof o.data === 'object') {
+        return extractCreatedId(o.data);
+    }
+    return null;
+}
+
+async function findProbeRows(): Promise<number[]> {
+    const list = await listCrudRows(PROBE_TABLE);
+    const data = list?._data as
+        | { rows?: Array<Record<string, unknown>> }
+        | undefined;
+    const rows = data?.rows ?? [];
+    return rows
+        .filter(
+            (r) =>
+                typeof r.display_name === 'string' &&
+                (r.display_name as string).startsWith('_admcrud_probe_')
+        )
+        .map((r) => Number(r.id))
+        .filter((id) => Number.isFinite(id));
 }
 
 async function runProbe() {
     probeRunning.value = true;
-    probeCopied.value = false;
-    const lines: string[] = [];
-    const push = (s = '') => lines.push(s);
+    probeAutoCopied.value = false;
+    probeCopyManual.value = false;
+    const out: string[] = [];
+    const probeName = `_admcrud_probe_${Date.now()}`;
+    const probeNewName = `${probeName}_renamed`;
 
-    function dump(label: string, result: CrudResult) {
-        push(`--- ${label} ---`);
-        push(`> ${result._method ?? '?'} ${result._url ?? '(no url)'}`);
-        if (result._status !== undefined) {
-            push(
-                `< HTTP ${result._status} in ${result._durationMs ?? '?'}ms${
-                    result._error ? '  (ERROR)' : ''
+    out.push(`=== ADMCRUD full probe @ ${new Date().toISOString()} ===`);
+    out.push(`build: ${buildShaShort}  buildTime: ${buildTime}`);
+    out.push(
+        `page origin: ${
+            typeof window !== 'undefined' ? window.location.origin : '(ssr)'
+        }`
+    );
+    out.push(`features: ${JSON.stringify(featureList.value)}`);
+    out.push(`probe table: ${PROBE_TABLE}`);
+    out.push(`probe row name: ${probeName}`);
+    out.push('');
+
+    // ---- 1. Read-only baseline ------------------------------------
+    try {
+        const t = await listCrudTables();
+        out.push('========== 1. listTables ==========');
+        out.push(`> ${t._method} ${t._url}`);
+        out.push(`< HTTP ${t._status} in ${t._durationMs}ms`);
+        out.push(trimmedJson(t._data));
+        out.push('');
+
+        const s = await getCrudSchema(PROBE_TABLE);
+        out.push(`========== 2. schema(${PROBE_TABLE}) ==========`);
+        out.push(`> ${s._method} ${s._url}`);
+        out.push(`< HTTP ${s._status} in ${s._durationMs}ms`);
+        out.push(trimmedJson(s._data));
+        out.push('');
+
+        const l = await listCrudRows(PROBE_TABLE);
+        out.push(`========== 3. listRows(${PROBE_TABLE}) ==========`);
+        out.push(`> ${l._method} ${l._url}`);
+        out.push(`< HTTP ${l._status} in ${l._durationMs}ms`);
+        out.push(trimmedJson(l._data));
+        out.push('');
+    } catch (e) {
+        out.push(
+            `!!! read-only suite threw: ${
+                e instanceof Error ? e.message : String(e)
+            }`
+        );
+    }
+
+    // ---- 2. Lookup body-shape discovery (against existing id=11) ---
+    let lookupWinner: ProbeAttempt | null = null;
+    try {
+        const r = await tryAttempts(out, '4. lookup body shapes', [
+            {
+                label: 'flat: {id: 11}',
+                body: { id: 11 },
+                fn: (b) => lookupCrudRow(PROBE_TABLE, b),
+            },
+            {
+                label: 'wrapped keys: {keys: {id: 11}}',
+                body: { keys: { id: 11 } },
+                fn: (b) => lookupCrudRow(PROBE_TABLE, b),
+            },
+            {
+                label: 'wrapped where: {where: {id: 11}}',
+                body: { where: { id: 11 } },
+                fn: (b) => lookupCrudRow(PROBE_TABLE, b),
+            },
+        ]);
+        lookupWinner = r.winner;
+    } catch (e) {
+        out.push(
+            `!!! lookup discovery threw: ${
+                e instanceof Error ? e.message : String(e)
+            }`
+        );
+    }
+
+    // ---- 3. Create body-shape discovery ----------------------------
+    let createdId: number | null = null;
+    let createWinner: ProbeAttempt | null = null;
+    let createWinnerResult: CrudResult | null = null;
+    try {
+        const r = await tryAttempts(out, '5. create body shapes', [
+            {
+                label: 'flat columns',
+                body: {
+                    display_name: probeName,
+                    release_to_all: 0,
+                    release_to_some: 0,
+                },
+                fn: (b) => createCrudRow(PROBE_TABLE, b),
+            },
+            {
+                label: 'wrapped row',
+                body: {
+                    row: {
+                        display_name: probeName,
+                        release_to_all: 0,
+                        release_to_some: 0,
+                    },
+                },
+                fn: (b) => createCrudRow(PROBE_TABLE, b),
+            },
+            {
+                label: 'wrapped values',
+                body: {
+                    values: {
+                        display_name: probeName,
+                        release_to_all: 0,
+                        release_to_some: 0,
+                    },
+                },
+                fn: (b) => createCrudRow(PROBE_TABLE, b),
+            },
+        ]);
+        createWinner = r.winner;
+        createWinnerResult = r.result;
+        createdId = extractCreatedId(createWinnerResult?._data);
+        out.push(`extracted createdId: ${createdId ?? '(none — see data)'}`);
+        out.push('');
+    } catch (e) {
+        out.push(
+            `!!! create discovery threw: ${
+                e instanceof Error ? e.message : String(e)
+            }`
+        );
+    }
+
+    // ---- 4. If create worked, do lookup/update/delete on test row -
+    if (createWinner && createdId !== null) {
+        try {
+            const r = await tryAttempts(
+                out,
+                `6. lookup test row id=${createdId}`,
+                [
+                    {
+                        label: 'flat: {id}',
+                        body: { id: createdId },
+                        fn: (b) => lookupCrudRow(PROBE_TABLE, b),
+                    },
+                    {
+                        label: 'keys: {keys: {id}}',
+                        body: { keys: { id: createdId } },
+                        fn: (b) => lookupCrudRow(PROBE_TABLE, b),
+                    },
+                ]
+            );
+            void r;
+        } catch (e) {
+            out.push(
+                `!!! lookup of test row threw: ${
+                    e instanceof Error ? e.message : String(e)
                 }`
             );
-        } else if (result._error) {
-            push(`< (no HTTP response) ERROR`);
-        }
-        if (result._message) push(`! ${result._message}`);
-        push(trimmedJson(result._data));
-        push();
-    }
-
-    push(`=== ADMCRUD discovery probe @ ${new Date().toISOString()} ===`);
-    push(`user features: ${JSON.stringify(featureList.value)}`);
-    push(`page origin: ${window.location.origin}`);
-    push();
-
-    try {
-        const tablesResult = await listCrudTables();
-        dump('1. crudTables (GET /admin/crud/tables)', tablesResult);
-
-        const tableNames = extractTableNames(tablesResult._data);
-        push(
-            `extracted ${tableNames.length} table name(s): ${JSON.stringify(
-                tableNames
-            )}`
-        );
-        push();
-
-        const probeTables = tableNames.slice(0, 5);
-        for (const name of probeTables) {
-            const schema = await getCrudSchema(name);
-            dump(`2. crudSchema (table=${name})`, schema);
-
-            const list = await listCrudRows(name);
-            dump(`3. crudList (table=${name})`, list);
         }
 
-        if (probeTables.length > 0) {
-            const lookup = await lookupCrudRow(probeTables[0], {});
-            dump(
-                `4. crudGet w/ empty body (table=${probeTables[0]}) — probing for required-field error shape`,
-                lookup
+        try {
+            const r = await tryAttempts(out, '7. update body shapes', [
+                {
+                    label: 'flat: {id, ...fields}',
+                    body: { id: createdId, display_name: probeNewName },
+                    fn: (b) => updateCrudRow(PROBE_TABLE, b),
+                },
+                {
+                    label: 'keys+values',
+                    body: {
+                        keys: { id: createdId },
+                        values: { display_name: probeNewName },
+                    },
+                    fn: (b) => updateCrudRow(PROBE_TABLE, b),
+                },
+                {
+                    label: 'where+set',
+                    body: {
+                        where: { id: createdId },
+                        set: { display_name: probeNewName },
+                    },
+                    fn: (b) => updateCrudRow(PROBE_TABLE, b),
+                },
+            ]);
+            void r;
+        } catch (e) {
+            out.push(
+                `!!! update discovery threw: ${
+                    e instanceof Error ? e.message : String(e)
+                }`
             );
         }
 
-        push('=== probe complete ===');
-        push(
-            'NOTE: create / update / delete were NOT exercised — share the above and we can pick a safe table for mutation tests.'
+        try {
+            const r = await tryAttempts(out, '8. delete body shapes', [
+                {
+                    label: 'flat: {id}',
+                    body: { id: createdId },
+                    fn: (b) => deleteCrudRow(PROBE_TABLE, b),
+                },
+                {
+                    label: 'keys: {keys: {id}}',
+                    body: { keys: { id: createdId } },
+                    fn: (b) => deleteCrudRow(PROBE_TABLE, b),
+                },
+                {
+                    label: 'where: {where: {id}}',
+                    body: { where: { id: createdId } },
+                    fn: (b) => deleteCrudRow(PROBE_TABLE, b),
+                },
+            ]);
+            void r;
+        } catch (e) {
+            out.push(
+                `!!! delete discovery threw: ${
+                    e instanceof Error ? e.message : String(e)
+                }`
+            );
+        }
+
+        // ---- 5. Verify deletion -----------------------------------
+        try {
+            out.push('========== 9. verify post-delete listRows ==========');
+            const list = await listCrudRows(PROBE_TABLE);
+            const data = list?._data as
+                | {
+                      rows?: Array<Record<string, unknown>>;
+                      total?: number;
+                  }
+                | undefined;
+            const stillThere = (data?.rows ?? []).filter(
+                (r) =>
+                    typeof r.display_name === 'string' &&
+                    ((r.display_name as string) === probeName ||
+                        (r.display_name as string) === probeNewName)
+            );
+            out.push(
+                `total rows: ${data?.total ?? '?'}, leftover probe rows: ${
+                    stillThere.length
+                }`
+            );
+            if (stillThere.length) {
+                out.push(trimmedJson(stillThere));
+            }
+            out.push('');
+        } catch (e) {
+            out.push(
+                `!!! verify threw: ${
+                    e instanceof Error ? e.message : String(e)
+                }`
+            );
+        }
+    } else {
+        out.push(
+            `(skipping lookup/update/delete on test row: create did not return a usable id — winner=${
+                createWinner?.label ?? 'none'
+            }, createdId=${createdId})`
         );
+        out.push('');
+    }
+
+    // ---- 6. Sweep stale probe rows --------------------------------
+    try {
+        const stale = await findProbeRows();
+        out.push(`========== 10. sweep stale probe rows ==========`);
+        out.push(
+            `found ${stale.length} stale row(s): ${JSON.stringify(stale)}`
+        );
+        for (const id of stale) {
+            const r = await deleteCrudRow(PROBE_TABLE, { id });
+            out.push(
+                `  delete id=${id} → HTTP ${r._status} ${
+                    r._error ? '(error)' : '(ok)'
+                }`
+            );
+        }
+        out.push('');
     } catch (e) {
-        push(`!!! probe threw: ${e instanceof Error ? e.message : String(e)}`);
-    } finally {
-        probeOutput.value = lines.join('\n');
-        probeRunning.value = false;
-        console.log('[ADMCRUD-UI] probe output ready', {
-            length: probeOutput.value.length,
-        });
+        out.push(
+            `!!! sweep threw: ${e instanceof Error ? e.message : String(e)}`
+        );
+    }
+
+    out.push('=== probe complete ===');
+    out.push(`lookup winner: ${lookupWinner?.label ?? '(none)'}`);
+    out.push(`create winner: ${createWinner?.label ?? '(none)'}`);
+    out.push('');
+    out.push(
+        'Tip: search for ">>>" markers above to see which body shape won each verb.'
+    );
+
+    probeOutput.value = out.join('\n');
+    probeRunning.value = false;
+
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+        try {
+            await navigator.clipboard.writeText(probeOutput.value);
+            probeAutoCopied.value = true;
+        } catch {
+            probeCopyManual.value = true;
+        }
+    } else {
+        probeCopyManual.value = true;
     }
 }
 
-async function copyProbe() {
-    if (!probeOutput.value) return;
-    try {
-        await navigator.clipboard.writeText(probeOutput.value);
-        probeCopied.value = true;
-        setTimeout(() => (probeCopied.value = false), 2000);
-    } catch (e) {
-        console.warn('[ADMCRUD-UI] clipboard write failed', e);
-        errorBanner.value =
-            'Could not write to clipboard — select the text manually.';
-    }
-}
-
-async function ensureFeatures() {
-    if (featureChecked.value) return;
-    try {
-        const features = await getUserFeatures();
-        featureList.value = Array.isArray(features) ? features : [];
-        featureEnabled.value = featureList.value.includes(FEATURE_FLAG);
-        console.log('[ADMCRUD-UI] feature check', {
-            flag: FEATURE_FLAG,
-            enabled: featureEnabled.value,
-            features: featureList.value,
-        });
-    } catch (e) {
-        console.error('[ADMCRUD-UI] feature check failed', e);
-        featureEnabled.value = false;
-    } finally {
-        featureChecked.value = true;
-    }
-}
-
-if (import.meta.client) {
-    ensureFeatures();
-}
-
-function parseBody(): unknown {
-    const raw = bodyJson.value.trim();
-    if (!raw) return undefined;
-    try {
-        return JSON.parse(raw);
-    } catch (e) {
-        const msg = e instanceof Error ? e.message : String(e);
-        errorBanner.value = `Body is not valid JSON: ${msg}`;
-        throw e;
-    }
-}
-
-async function run(
-    name: string,
-    fn: () => Promise<CrudResult>,
-    inputs: Record<string, unknown>
-) {
-    errorBanner.value = '';
-    isLoading.value = true;
-    lastAction.value = name;
-    const t0 = Date.now();
-    console.groupCollapsed(`[ADMCRUD-UI] ${name}`);
-    console.log('inputs', inputs);
-    try {
-        const result = await fn();
-        lastResult.value = result;
-        console.log('envelope', result);
-        console.log('data', result?._data);
-        console.log(`elapsed ${Date.now() - t0}ms`);
-    } catch (e) {
-        console.error('threw', e);
-        lastResult.value = {
-            _error: true,
-            _source: name,
-            _message: e instanceof Error ? e.message : String(e),
-        };
-    } finally {
-        console.groupEnd();
-        isLoading.value = false;
-    }
-}
-
-function callListTables() {
-    run('listTables', () => listCrudTables(), {});
-}
-
-function callGetSchema() {
-    if (!tableName.value) {
-        errorBanner.value = 'table name is required';
-        return;
-    }
-    run('getSchema', () => getCrudSchema(tableName.value), {
-        table: tableName.value,
-    });
-}
-
-function callListRows() {
-    if (!tableName.value) {
-        errorBanner.value = 'table name is required';
-        return;
-    }
-    run('listRows', () => listCrudRows(tableName.value), {
-        table: tableName.value,
-    });
-}
-
-function callLookup() {
-    if (!tableName.value) {
-        errorBanner.value = 'table name is required';
-        return;
-    }
-    let body: unknown;
-    try {
-        body = parseBody();
-    } catch {
-        return;
-    }
-    run('lookup', () => lookupCrudRow(tableName.value, body), {
-        table: tableName.value,
-        body,
-    });
-}
-
-function callCreate() {
-    if (!tableName.value) {
-        errorBanner.value = 'table name is required';
-        return;
-    }
-    let body: unknown;
-    try {
-        body = parseBody();
-    } catch {
-        return;
-    }
-    run('create', () => createCrudRow(tableName.value, body), {
-        table: tableName.value,
-        body,
-    });
-}
-
-function callUpdate() {
-    if (!tableName.value) {
-        errorBanner.value = 'table name is required';
-        return;
-    }
-    let body: unknown;
-    try {
-        body = parseBody();
-    } catch {
-        return;
-    }
-    run('update', () => updateCrudRow(tableName.value, body), {
-        table: tableName.value,
-        body,
-    });
-}
-
-function callDelete() {
-    if (!tableName.value) {
-        errorBanner.value = 'table name is required';
-        return;
-    }
-    let body: unknown;
-    try {
-        body = parseBody();
-    } catch {
-        return;
-    }
-    run('delete', () => deleteCrudRow(tableName.value, body), {
-        table: tableName.value,
-        body,
-    });
-}
-
-const prettyResult = computed(() => {
-    if (!lastResult.value) return '';
-    try {
-        return JSON.stringify(lastResult.value, null, 2);
-    } catch {
-        return String(lastResult.value);
-    }
+const buttonLabel = computed(() => {
+    if (probeRunning.value) return 'Running probe…';
+    if (probeOutput.value) return 'Run again';
+    return 'Run full probe';
 });
 </script>
 
 <template>
     <div class="admcrud-page">
-        <header class="admcrud-header">
-            <h1>Admin · Data Broker CRUD</h1>
-            <p class="admcrud-subtitle">
-                Placeholder probe for
-                <code>/api/admin/crud/*</code> — open the browser console to see
-                <code>[ADMCRUD-UI]</code> and server <code>[ADMCRUD]</code> logs
-                (the latter appear in the dev / Vercel server log).
-            </p>
+        <header class="admcrud-build-banner">
+            <span class="admcrud-build-label">build:</span>
+            <code class="admcrud-build-sha">{{ buildShaShort }}</code>
+            <span v-if="buildTime" class="admcrud-build-time">{{
+                buildTime
+            }}</span>
         </header>
 
+        <h1>Admin CRUD probe</h1>
+
         <SignedOut>
-            <div class="admcrud-callout">
-                You must be signed in to use admin CRUD.
+            <p class="admcrud-callout">
+                You must be signed in.
                 <SignInButton />
-            </div>
+            </p>
         </SignedOut>
 
         <SignedIn>
-            <div v-if="!featureChecked" class="admcrud-callout">
+            <p v-if="!featureChecked" class="admcrud-callout">
                 Checking feature flag…
-            </div>
+            </p>
 
-            <div
+            <p
                 v-else-if="!featureEnabled"
                 class="admcrud-callout admcrud-callout--warn"
             >
-                <strong
-                    >Feature flag <code>{{ FEATURE_FLAG }}</code> is not enabled
-                    for your account.</strong
-                >
-                <div>
-                    Features seen for this user:
-                    <code>{{ JSON.stringify(featureList) }}</code>
-                </div>
-                <div>
-                    The page is otherwise wired up — once the broker enables the
-                    flag, the buttons below will fire real requests.
-                </div>
-            </div>
+                Feature flag <code>{{ FEATURE_FLAG }}</code> is not enabled for
+                your account. Features:
+                <code>{{ JSON.stringify(featureList) }}</code>
+            </p>
 
             <div v-else>
-                <div v-if="errorBanner" class="admcrud-error">
-                    {{ errorBanner }}
-                </div>
+                <p class="admcrud-meta">
+                    One click: lists tables, lists schemas/rows for
+                    <code>app_features</code>, then tries multiple body shapes
+                    for lookup / create / update / delete using a self-cleaning
+                    <code>_admcrud_probe_*</code> test row. Output is
+                    auto-copied to your clipboard.
+                </p>
 
-                <section class="admcrud-section admcrud-section--probe">
-                    <h2>One-click discovery probe</h2>
-                    <p class="admcrud-meta">
-                        Hits every read-only endpoint (tables, schema for the
-                        first 5 tables, list rows for each, and an empty-body
-                        lookup) and dumps the full envelopes into the textarea.
-                        Nothing is created, updated, or deleted.
-                    </p>
-                    <div class="admcrud-button-row">
-                        <button
-                            type="button"
-                            class="admcrud-btn admcrud-btn--primary"
-                            v-bind:disabled="probeRunning"
-                            v-on:click="runProbe"
-                        >
-                            {{
-                                probeRunning
-                                    ? 'Running probe…'
-                                    : 'Run discovery probe'
-                            }}
-                        </button>
-                        <button
-                            type="button"
-                            class="admcrud-btn"
-                            v-bind:disabled="!probeOutput"
-                            v-on:click="copyProbe"
-                        >
-                            {{ probeCopied ? 'Copied ✓' : 'Copy to clipboard' }}
-                        </button>
-                    </div>
-                    <textarea
-                        class="admcrud-textarea admcrud-probe-output"
-                        readonly
-                        spellcheck="false"
-                        placeholder="Click 'Run discovery probe' above — output appears here, then 'Copy to clipboard' and paste back."
-                        v-bind:value="probeOutput"
-                    ></textarea>
-                </section>
+                <button
+                    type="button"
+                    class="admcrud-big-button"
+                    v-bind:disabled="probeRunning"
+                    v-on:click="runProbe"
+                >
+                    {{ buttonLabel }}
+                </button>
 
-                <section class="admcrud-section">
-                    <h2>1. List tables</h2>
-                    <button
-                        type="button"
-                        class="admcrud-btn"
-                        v-bind:disabled="isLoading"
-                        v-on:click="callListTables"
-                    >
-                        GET /admin/crud/tables
-                    </button>
-                </section>
+                <p v-if="probeAutoCopied" class="admcrud-status">
+                    ✓ Output copied to clipboard — paste it back to me.
+                </p>
+                <p v-else-if="probeCopyManual" class="admcrud-status">
+                    Auto-copy failed — select all in the textarea below and copy
+                    manually.
+                </p>
 
-                <section class="admcrud-section">
-                    <h2>2. Pick a table</h2>
-                    <label class="admcrud-label">
-                        Table name
-                        <input
-                            v-model="tableName"
-                            type="text"
-                            class="admcrud-input"
-                            placeholder="e.g. users"
-                        />
-                    </label>
-                    <div class="admcrud-button-row">
-                        <button
-                            type="button"
-                            class="admcrud-btn"
-                            v-bind:disabled="isLoading"
-                            v-on:click="callGetSchema"
-                        >
-                            GET …/:table/schema
-                        </button>
-                        <button
-                            type="button"
-                            class="admcrud-btn"
-                            v-bind:disabled="isLoading"
-                            v-on:click="callListRows"
-                        >
-                            GET …/:table
-                        </button>
-                    </div>
-                </section>
-
-                <section class="admcrud-section">
-                    <h2>
-                        3. JSON body (for lookup / create / update / delete)
-                    </h2>
-                    <textarea
-                        v-model="bodyJson"
-                        class="admcrud-textarea"
-                        rows="8"
-                        spellcheck="false"
-                    ></textarea>
-                    <div class="admcrud-button-row">
-                        <button
-                            type="button"
-                            class="admcrud-btn"
-                            v-bind:disabled="isLoading"
-                            v-on:click="callLookup"
-                        >
-                            POST …/lookup
-                        </button>
-                        <button
-                            type="button"
-                            class="admcrud-btn admcrud-btn--primary"
-                            v-bind:disabled="isLoading"
-                            v-on:click="callCreate"
-                        >
-                            POST …/:table (create)
-                        </button>
-                        <button
-                            type="button"
-                            class="admcrud-btn"
-                            v-bind:disabled="isLoading"
-                            v-on:click="callUpdate"
-                        >
-                            PATCH …/:table (update)
-                        </button>
-                        <button
-                            type="button"
-                            class="admcrud-btn admcrud-btn--danger"
-                            v-bind:disabled="isLoading"
-                            v-on:click="callDelete"
-                        >
-                            DELETE …/:table
-                        </button>
-                    </div>
-                </section>
-
-                <section class="admcrud-section">
-                    <h2>Last response</h2>
-                    <div v-if="lastAction" class="admcrud-meta">
-                        action: <code>{{ lastAction }}</code>
-                        <span v-if="lastResult?._method">
-                            · {{ lastResult._method }}
-                        </span>
-                        <span v-if="lastResult?._url">
-                            · <code>{{ lastResult._url }}</code>
-                        </span>
-                        <span v-if="lastResult?._status">
-                            · status {{ lastResult._status }}
-                        </span>
-                        <span
-                            v-if="
-                                lastResult?._durationMs !== undefined &&
-                                lastResult?._durationMs !== null
-                            "
-                        >
-                            · {{ lastResult._durationMs }}ms
-                        </span>
-                    </div>
-                    <pre
-                        v-if="prettyResult"
-                        class="admcrud-result"
-                    ><code>{{ prettyResult }}</code></pre>
-                    <p v-else class="admcrud-meta">
-                        No response yet — click a button above.
-                    </p>
-                </section>
+                <textarea
+                    class="admcrud-output"
+                    readonly
+                    spellcheck="false"
+                    placeholder="Click the button above. Output appears here."
+                    v-bind:value="probeOutput"
+                ></textarea>
             </div>
         </SignedIn>
     </div>
@@ -567,15 +583,40 @@ const prettyResult = computed(() => {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-.admcrud-header h1 {
-    margin: 0 0 4px;
-    font-size: 1.5rem;
+.admcrud-build-banner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    margin-bottom: 16px;
+    border: 1px solid #2ea043;
+    background: #0f2a16;
+    border-radius: 6px;
+    font-size: 0.8125rem;
 }
 
-.admcrud-subtitle {
+.admcrud-build-label {
     color: var(--gh-fg-muted, #8b949e);
-    font-size: 0.875rem;
-    margin: 0 0 24px;
+}
+
+.admcrud-build-sha {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        monospace;
+    font-weight: 600;
+    color: #7ee787;
+    padding: 2px 6px;
+    background: rgba(46, 160, 67, 0.15);
+    border-radius: 3px;
+}
+
+.admcrud-build-time {
+    color: var(--gh-fg-muted, #8b949e);
+    font-size: 0.75rem;
+}
+
+h1 {
+    font-size: 1.5rem;
+    margin: 0 0 12px;
 }
 
 .admcrud-callout {
@@ -583,7 +624,6 @@ const prettyResult = computed(() => {
     border: 1px solid var(--gh-border-default, #30363d);
     border-radius: 6px;
     background: var(--gh-canvas-subtle, #161b22);
-    margin-bottom: 16px;
 }
 
 .admcrud-callout--warn {
@@ -591,133 +631,57 @@ const prettyResult = computed(() => {
     background: #1f1500;
 }
 
-.admcrud-error {
-    padding: 8px 12px;
-    border: 1px solid #f85149;
-    background: #2a0f10;
-    color: #ffa198;
-    border-radius: 6px;
-    margin-bottom: 16px;
-    font-size: 0.875rem;
-}
-
-.admcrud-section {
-    border: 1px solid var(--gh-border-default, #30363d);
-    border-radius: 6px;
-    padding: 16px;
-    margin-bottom: 16px;
-    background: var(--gh-canvas-subtle, #161b22);
-}
-
-.admcrud-section h2 {
-    margin: 0 0 12px;
-    font-size: 1rem;
-    font-weight: 600;
-}
-
-.admcrud-label {
-    display: block;
-    font-size: 0.875rem;
+.admcrud-meta {
     color: var(--gh-fg-muted, #8b949e);
+    font-size: 0.875rem;
+    margin: 0 0 16px;
+}
+
+.admcrud-big-button {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    font-size: 1.125rem;
+    font-weight: 600;
+    border: 1px solid #2ea043;
+    background: #238636;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
     margin-bottom: 12px;
 }
 
-.admcrud-input,
-.admcrud-textarea {
+.admcrud-big-button:hover:not(:disabled) {
+    background: #2ea043;
+}
+
+.admcrud-big-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.admcrud-status {
+    margin: 8px 0;
+    color: #7ee787;
+    font-size: 0.875rem;
+}
+
+.admcrud-output {
     display: block;
     width: 100%;
-    margin-top: 4px;
-    padding: 6px 10px;
+    min-height: 480px;
+    margin-top: 8px;
+    padding: 12px;
     border: 1px solid var(--gh-border-default, #30363d);
     background: var(--gh-canvas-default, #0d1117);
     color: inherit;
     border-radius: 6px;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
         monospace;
-    font-size: 0.875rem;
-}
-
-.admcrud-textarea {
-    min-height: 140px;
-    resize: vertical;
-}
-
-.admcrud-section--probe {
-    border-color: #2ea043;
-}
-
-.admcrud-probe-output {
-    margin-top: 12px;
-    min-height: 280px;
     font-size: 0.75rem;
     line-height: 1.4;
-}
-
-.admcrud-button-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 8px;
-}
-
-.admcrud-btn {
-    padding: 6px 12px;
-    border: 1px solid var(--gh-border-default, #30363d);
-    background: var(--gh-btn-bg, #21262d);
-    color: inherit;
-    border-radius: 6px;
-    font-size: 0.875rem;
-    cursor: pointer;
-    font-family: inherit;
-}
-
-.admcrud-btn:hover:not(:disabled) {
-    background: #30363d;
-}
-
-.admcrud-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.admcrud-btn--primary {
-    background: #238636;
-    border-color: #2ea043;
-}
-
-.admcrud-btn--primary:hover:not(:disabled) {
-    background: #2ea043;
-}
-
-.admcrud-btn--danger {
-    background: #6e2222;
-    border-color: #8e3a3a;
-}
-
-.admcrud-btn--danger:hover:not(:disabled) {
-    background: #8e3a3a;
-}
-
-.admcrud-meta {
-    font-size: 0.8125rem;
-    color: var(--gh-fg-muted, #8b949e);
-    margin-bottom: 8px;
-}
-
-.admcrud-meta code {
-    word-break: break-all;
-}
-
-.admcrud-result {
-    background: var(--gh-canvas-default, #0d1117);
-    border: 1px solid var(--gh-border-default, #30363d);
-    border-radius: 6px;
-    padding: 12px;
-    overflow-x: auto;
-    max-height: 480px;
-    font-size: 0.8125rem;
+    resize: vertical;
     white-space: pre;
-    margin: 0;
 }
 
 code {

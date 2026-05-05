@@ -14,6 +14,11 @@ export default defineNuxtConfig({
         public: {
             CLERK_PUBLISHABLE_KEY: process.env.CLERK_PUBLISHABLE_KEY,
             API_BASE_URL: process.env.API_BASE_URL || 'http://localhost:3000',
+            BUILD_COMMIT_SHA:
+                process.env.VERCEL_GIT_COMMIT_SHA ||
+                process.env.GIT_COMMIT_SHA ||
+                'dev',
+            BUILD_TIME: new Date().toISOString(),
         },
         CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
         CLERK_JWT_KEY: process.env.CLERK_JWT_KEY,
