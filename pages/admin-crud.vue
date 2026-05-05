@@ -44,7 +44,9 @@ const featureEnabled = ref(false);
 const featureList: Ref<string[]> = ref([]);
 
 const tableName = ref('');
-const bodyJson = ref('{\n    \n}');
+const bodyJson = ref(
+    '{\n    "// fill in PK columns for lookup/update/delete,": "",\n    "// or full row for create": ""\n}'
+);
 const lastAction = ref<string>('');
 const lastResult: Ref<CrudResult | null> = ref(null);
 const isLoading = ref(false);

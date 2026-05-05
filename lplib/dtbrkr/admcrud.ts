@@ -30,6 +30,7 @@ interface CrudHandlerResult {
     _durationMs?: number;
     _baseUrl?: string;
     _message?: string;
+    _requestBody?: unknown;
     _data?: unknown;
 }
 
@@ -111,6 +112,7 @@ async function callBroker(
                 _status: res.status,
                 _durationMs: durationMs,
                 _message: `HTTP ${res.status}`,
+                _requestBody: hasBody ? body : undefined,
                 _data: data,
             };
         }
@@ -126,6 +128,7 @@ async function callBroker(
             _url: url,
             _status: res.status,
             _durationMs: durationMs,
+            _requestBody: hasBody ? body : undefined,
             _data: data,
         };
     } catch (e) {
@@ -143,6 +146,7 @@ async function callBroker(
             _baseUrl: BASE_URL,
             _durationMs: durationMs,
             _message: `NETWORK ERROR: ${msg}`,
+            _requestBody: hasBody ? body : undefined,
         };
     }
 }

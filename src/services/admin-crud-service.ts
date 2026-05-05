@@ -26,6 +26,7 @@ export interface CrudResult<T = unknown> {
     _durationMs?: number;
     _baseUrl?: string;
     _message?: string;
+    _requestBody?: unknown;
     _data?: T;
 }
 
