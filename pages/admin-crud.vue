@@ -247,18 +247,23 @@ async function runProbe() {
     try {
         const r = await tryAttempts(out, '4. lookup body shapes', [
             {
-                label: 'flat: {id: 11}',
-                body: { id: 11 },
+                label: 'wrapped values: {values: {id: 11}}',
+                body: { values: { id: 11 } },
                 fn: (b) => lookupCrudRow(PROBE_TABLE, b),
             },
             {
-                label: 'wrapped keys: {keys: {id: 11}}',
-                body: { keys: { id: 11 } },
+                label: 'wrapped data: {data: {id: 11}}',
+                body: { data: { id: 11 } },
                 fn: (b) => lookupCrudRow(PROBE_TABLE, b),
             },
             {
-                label: 'wrapped where: {where: {id: 11}}',
-                body: { where: { id: 11 } },
+                label: 'wrapped row: {row: {id: 11}}',
+                body: { row: { id: 11 } },
+                fn: (b) => lookupCrudRow(PROBE_TABLE, b),
+            },
+            {
+                label: 'wrapped pk: {pk: {id: 11}}',
+                body: { pk: { id: 11 } },
                 fn: (b) => lookupCrudRow(PROBE_TABLE, b),
             },
         ]);
@@ -330,13 +335,13 @@ async function runProbe() {
                 `6. lookup test row id=${createdId}`,
                 [
                     {
-                        label: 'flat: {id}',
-                        body: { id: createdId },
+                        label: 'wrapped values: {values: {id}}',
+                        body: { values: { id: createdId } },
                         fn: (b) => lookupCrudRow(PROBE_TABLE, b),
                     },
                     {
-                        label: 'keys: {keys: {id}}',
-                        body: { keys: { id: createdId } },
+                        label: 'wrapped data: {data: {id}}',
+                        body: { data: { id: createdId } },
                         fn: (b) => lookupCrudRow(PROBE_TABLE, b),
                     },
                 ]
@@ -353,23 +358,38 @@ async function runProbe() {
         try {
             const r = await tryAttempts(out, '7. update body shapes', [
                 {
-                    label: 'flat: {id, ...fields}',
-                    body: { id: createdId, display_name: probeNewName },
+                    label: 'all-in-values: {values: {id, display_name}}',
+                    body: {
+                        values: {
+                            id: createdId,
+                            display_name: probeNewName,
+                        },
+                    },
                     fn: (b) => updateCrudRow(PROBE_TABLE, b),
                 },
                 {
-                    label: 'keys+values',
+                    label: 'pk-out + values: {id, values: {display_name}}',
                     body: {
-                        keys: { id: createdId },
+                        id: createdId,
                         values: { display_name: probeNewName },
                     },
                     fn: (b) => updateCrudRow(PROBE_TABLE, b),
                 },
                 {
-                    label: 'where+set',
+                    label: 'where + values: {where: {id}, values: {display_name}}',
                     body: {
                         where: { id: createdId },
-                        set: { display_name: probeNewName },
+                        values: { display_name: probeNewName },
+                    },
+                    fn: (b) => updateCrudRow(PROBE_TABLE, b),
+                },
+                {
+                    label: 'data-only: {data: {id, display_name}}',
+                    body: {
+                        data: {
+                            id: createdId,
+                            display_name: probeNewName,
+                        },
                     },
                     fn: (b) => updateCrudRow(PROBE_TABLE, b),
                 },
@@ -386,18 +406,18 @@ async function runProbe() {
         try {
             const r = await tryAttempts(out, '8. delete body shapes', [
                 {
-                    label: 'flat: {id}',
-                    body: { id: createdId },
+                    label: 'wrapped values: {values: {id}}',
+                    body: { values: { id: createdId } },
                     fn: (b) => deleteCrudRow(PROBE_TABLE, b),
                 },
                 {
-                    label: 'keys: {keys: {id}}',
-                    body: { keys: { id: createdId } },
+                    label: 'wrapped data: {data: {id}}',
+                    body: { data: { id: createdId } },
                     fn: (b) => deleteCrudRow(PROBE_TABLE, b),
                 },
                 {
-                    label: 'where: {where: {id}}',
-                    body: { where: { id: createdId } },
+                    label: 'wrapped pk: {pk: {id}}',
+                    body: { pk: { id: createdId } },
                     fn: (b) => deleteCrudRow(PROBE_TABLE, b),
                 },
             ]);
@@ -458,13 +478,33 @@ async function runProbe() {
         out.push(
             `found ${stale.length} stale row(s): ${JSON.stringify(stale)}`
         );
+        const deleteShapes: {
+            label: string;
+            build: (id: number) => unknown;
+        }[] = [
+            { label: 'values', build: (id) => ({ values: { id } }) },
+            { label: 'data', build: (id) => ({ data: { id } }) },
+            { label: 'pk', build: (id) => ({ pk: { id } }) },
+            { label: 'flat', build: (id) => ({ id }) },
+            { label: 'where', build: (id) => ({ where: { id } }) },
+        ];
         for (const id of stale) {
-            const r = await deleteCrudRow(PROBE_TABLE, { id });
-            out.push(
-                `  delete id=${id} → HTTP ${r._status} ${
-                    r._error ? '(error)' : '(ok)'
-                }`
-            );
+            let cleaned = false;
+            for (const shape of deleteShapes) {
+                const r = await deleteCrudRow(PROBE_TABLE, shape.build(id));
+                out.push(
+                    `  delete id=${id} via ${shape.label} → HTTP ${r._status} ${
+                        r._error ? '(error)' : '(ok)'
+                    }`
+                );
+                if (r._ok) {
+                    cleaned = true;
+                    break;
+                }
+            }
+            if (!cleaned) {
+                out.push(`  ! id=${id} could not be deleted with any shape`);
+            }
         }
         out.push('');
     } catch (e) {
