@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref, watch, watchEffect } from 'vue';
+import { ref, computed, watch, watchEffect } from 'vue';
 import { RouterLink, RouterView } from 'vue-router';
 import { useRoute } from 'vue-router';
 import { SignedIn, SignedOut, SignInButton } from 'vue-clerk';
 import IRIdentityCardLink from '@@/src/components/user/ir-identity-card-link.vue';
 import { useAuth } from 'vue-clerk';
 import { getUserLeaguesState } from '@@/src/utils/fetch-util';
+import { getUserFeatures } from '@@/src/services/user-service';
 import type { Ref } from 'vue';
 import {
     preFetch,
@@ -27,6 +28,25 @@ const serverInitialState = useState<AuthObject | undefined>(
 if (import.meta.server) {
     const token = serverInitialState.value?.token;
     setToken(token);
+}
+
+const userFeatures: Ref<string[]> = ref([]);
+const isGlobalAdmin = computed(() =>
+    userFeatures.value.includes('global_admin')
+);
+
+if (import.meta.client) {
+    watchEffect(async () => {
+        if (auth.isSignedIn.value) {
+            try {
+                userFeatures.value = await getUserFeatures();
+            } catch (e) {
+                console.warn('[index] failed to load user features', e);
+            }
+        } else {
+            userFeatures.value = [];
+        }
+    });
 }
 
 async function fetchModel() {
@@ -218,6 +238,23 @@ const lgSeasSubCtx: Ref<LgSeasSubCtx> =
                                 />
                             </svg>
                             <span>Profile</span>
+                        </RouterLinkProxy>
+                    </div>
+
+                    <div v-if="isGlobalAdmin" class="gh-underline-nav-item">
+                        <RouterLinkProxy class="gh-nav-link" to="/admin">
+                            <svg
+                                class="gh-nav-icon"
+                                viewBox="0 0 16 16"
+                                width="16"
+                                height="16"
+                                fill="currentColor"
+                            >
+                                <path
+                                    d="M7.467.133a1.75 1.75 0 0 1 1.066 0l5.25 1.68A1.75 1.75 0 0 1 15 3.48V7c0 1.566-.32 3.182-1.303 4.682-.983 1.498-2.585 2.813-5.032 3.855a1.7 1.7 0 0 1-1.33 0c-2.447-1.042-4.049-2.357-5.032-3.855C1.32 10.182 1 8.566 1 7V3.48a1.75 1.75 0 0 1 1.217-1.667Zm.61 1.429a.25.25 0 0 0-.153 0l-5.25 1.68a.25.25 0 0 0-.174.238V7c0 1.358.275 2.666 1.057 3.86.784 1.194 2.121 2.34 4.366 3.297a.2.2 0 0 0 .154 0c2.245-.957 3.582-2.103 4.366-3.297C13.225 9.666 13.5 8.358 13.5 7V3.48a.25.25 0 0 0-.174-.237l-5.25-1.68ZM8 4.25a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-1.5 0V5A.75.75 0 0 1 8 4.25Zm0 6.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"
+                                />
+                            </svg>
+                            <span>Admin</span>
                         </RouterLinkProxy>
                     </div>
                 </SignedIn>

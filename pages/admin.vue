@@ -127,6 +127,10 @@ const offset = ref(0);
 const listLoading = ref(false);
 const listError = ref('');
 
+const orderBy = ref<string>('');
+const orderDir = ref<'ASC' | 'DESC' | ''>('');
+const filters = ref<Record<string, string>>({});
+
 const form = ref<{
     mode: FormMode;
     values: Record<string, string | null>;
@@ -189,9 +193,17 @@ async function loadRows() {
     listLoading.value = true;
     listError.value = '';
     try {
+        const where: Record<string, string> = {};
+        for (const [k, v] of Object.entries(filters.value)) {
+            const trimmed = (v ?? '').trim();
+            if (trimmed !== '') where[k] = trimmed;
+        }
         const r = await listCrudRows(selectedTable.value, {
             pageSize: pageSize.value,
             offset: offset.value,
+            orderBy: orderBy.value || undefined,
+            orderDir: orderDir.value || undefined,
+            where: Object.keys(where).length ? where : undefined,
         });
         if (r._error) {
             listError.value = explain(r);
@@ -224,6 +236,9 @@ function explain(r: CrudResult): string {
 async function onSelectTable(name: string) {
     selectedTable.value = name;
     offset.value = 0;
+    orderBy.value = '';
+    orderDir.value = '';
+    filters.value = {};
     closeForm();
     router.replace({
         path: '/admin',
@@ -238,6 +253,39 @@ async function onSelectTable(name: string) {
     await loadSchema(name);
     await loadRows();
 }
+
+// ---------------------------------------------------------------------
+// Sort and filter
+// ---------------------------------------------------------------------
+
+function cycleSort(colName: string) {
+    if (orderBy.value !== colName) {
+        orderBy.value = colName;
+        orderDir.value = 'ASC';
+    } else if (orderDir.value === 'ASC') {
+        orderDir.value = 'DESC';
+    } else {
+        orderBy.value = '';
+        orderDir.value = '';
+    }
+    offset.value = 0;
+    loadRows();
+}
+
+function applyFilters() {
+    offset.value = 0;
+    loadRows();
+}
+
+function clearFilters() {
+    filters.value = {};
+    offset.value = 0;
+    loadRows();
+}
+
+const hasActiveFilters = computed(() =>
+    Object.values(filters.value).some((v) => (v ?? '').trim() !== '')
+);
 
 // ---------------------------------------------------------------------
 // Pagination
@@ -668,18 +716,30 @@ const pageInfo = computed(() => {
                     {{ listError }}
                 </p>
 
-                <div v-if="schema && rows.length" class="admin-grid-wrap">
+                <div v-if="schema" class="admin-grid-wrap">
                     <table class="admin-grid">
                         <thead>
                             <tr>
                                 <th
                                     v-for="col in schema.columns"
                                     v-bind:key="col.name"
+                                    class="admin-grid-header"
                                     v-bind:class="{
                                         'admin-grid-pk': col.pk > 0,
+                                        'admin-grid-header--sorted':
+                                            orderBy === col.name,
                                     }"
+                                    v-bind:title="`Click to sort by ${col.name}`"
+                                    v-on:click="cycleSort(col.name)"
                                 >
                                     {{ col.name }}
+                                    <span
+                                        v-if="orderBy === col.name"
+                                        class="admin-sort-arrow"
+                                        >{{
+                                            orderDir === 'ASC' ? '↑' : '↓'
+                                        }}</span
+                                    >
                                     <span
                                         v-if="col.pk > 0"
                                         class="admin-pk-marker"
@@ -690,6 +750,36 @@ const pageInfo = computed(() => {
                                     }}</small>
                                 </th>
                                 <th class="admin-grid-actions">edit</th>
+                            </tr>
+                            <tr class="admin-filter-row">
+                                <th
+                                    v-for="col in schema.columns"
+                                    v-bind:key="col.name"
+                                >
+                                    <input
+                                        v-model="filters[col.name]"
+                                        v-bind:type="
+                                            col.type.toUpperCase() === 'INTEGER'
+                                                ? 'number'
+                                                : 'text'
+                                        "
+                                        class="admin-filter-input"
+                                        v-bind:placeholder="`filter…`"
+                                        v-bind:disabled="listLoading"
+                                        v-on:change="applyFilters"
+                                        v-on:keyup.enter="applyFilters"
+                                    />
+                                </th>
+                                <th class="admin-grid-actions">
+                                    <button
+                                        v-if="hasActiveFilters"
+                                        type="button"
+                                        class="admin-btn admin-btn--small"
+                                        v-on:click="clearFilters"
+                                    >
+                                        clear
+                                    </button>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -729,18 +819,21 @@ const pageInfo = computed(() => {
                                     </button>
                                 </td>
                             </tr>
+                            <tr v-if="!rows.length && !listLoading">
+                                <td
+                                    v-bind:colspan="schema.columns.length + 1"
+                                    class="admin-grid-empty"
+                                >
+                                    {{
+                                        hasActiveFilters
+                                            ? 'No rows match the active filters.'
+                                            : 'No rows.'
+                                    }}
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
-
-                <p
-                    v-else-if="
-                        selectedTable && schema && !rows.length && !listLoading
-                    "
-                    class="admin-callout"
-                >
-                    No rows.
-                </p>
 
                 <section v-if="form.mode" class="admin-form">
                     <header class="admin-form-header">
@@ -1055,6 +1148,54 @@ h1 {
     font-weight: 600;
     position: sticky;
     top: 0;
+}
+
+.admin-grid-header {
+    cursor: pointer;
+    user-select: none;
+}
+
+.admin-grid-header:hover {
+    background: rgba(56, 139, 253, 0.12);
+}
+
+.admin-grid-header--sorted {
+    background: rgba(46, 160, 67, 0.12);
+}
+
+.admin-sort-arrow {
+    color: #7ee787;
+    margin-left: 4px;
+    font-weight: 700;
+}
+
+.admin-filter-row th {
+    background: var(--gh-canvas-subtle, #161b22);
+    padding: 4px 6px;
+    font-weight: 400;
+    border-bottom: 1px solid var(--gh-border-default, #30363d);
+    position: sticky;
+    top: 32px;
+}
+
+.admin-filter-input {
+    width: 100%;
+    padding: 3px 6px;
+    border: 1px solid var(--gh-border-default, #30363d);
+    background: var(--gh-canvas-default, #0d1117);
+    color: inherit;
+    border-radius: 4px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        monospace;
+    font-size: 0.75rem;
+    box-sizing: border-box;
+}
+
+.admin-grid-empty {
+    text-align: center;
+    color: var(--gh-fg-muted, #8b949e);
+    padding: 24px;
+    font-style: italic;
 }
 
 .admin-grid-pk {
