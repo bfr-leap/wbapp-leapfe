@@ -543,10 +543,6 @@ const pageInfo = computed(() => {
             <span v-if="buildTime" class="admin-build-time">{{
                 buildTime
             }}</span>
-            <span class="admin-build-spacer"></span>
-            <RouterLink class="admin-build-link" to="/admin-crud"
-                >self-test ↗</RouterLink
-            >
         </header>
 
         <h1>Admin · Tables</h1>
@@ -905,20 +901,6 @@ const pageInfo = computed(() => {
 .admin-build-time {
     color: var(--gh-fg-muted, #8b949e);
     font-size: 0.75rem;
-}
-
-.admin-build-spacer {
-    flex: 1;
-}
-
-.admin-build-link {
-    color: var(--gh-fg-muted, #8b949e);
-    text-decoration: none;
-    font-size: 0.75rem;
-}
-
-.admin-build-link:hover {
-    color: #7ee787;
 }
 
 h1 {
