@@ -49,13 +49,19 @@ export function getMemberViewFromM_Member(
         };
     }
 
+    const m: any = member;
     console.log('[club-debug] getMemberViewFromM_Member raw member', {
-        cust_id: (member as any).cust_id,
-        display_name: (member as any).display_name,
-        club_id: (member as any).club_id,
-        club_name: (member as any).club_name,
-        keys: Object.keys(member as any),
-        member,
+        cust_id: m.cust_id,
+        display_name: m.display_name,
+        club_id: m.club_id,
+        club_name: m.club_name,
+        keys: Object.keys(m).join(','),
+        // Spot-check sub-objects iRacing might have moved club info into
+        club_obj: m.club,
+        region: m.region,
+        country: m.country,
+        country_code: m.country_code,
+        json: JSON.stringify(m).slice(0, 1500),
     });
 
     let names = getFirstLastNames(member.display_name);

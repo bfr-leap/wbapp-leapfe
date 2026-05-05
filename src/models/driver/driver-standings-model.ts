@@ -226,14 +226,19 @@ export async function getDriverStandingsModel(
     let allDrivers: DriverModel[] = [];
     let position = 1;
 
+    const sample0: any = sortedM[0];
     console.log(
         '[club-debug] driver-standings-model: building standings',
         {
             league,
             season,
             memberCount: sortedM.length,
-            firstMemberKeys: sortedM[0] ? Object.keys(sortedM[0] as any) : [],
-            sampleMember: sortedM[0],
+            firstMemberKeys: sample0
+                ? Object.keys(sample0).join(',')
+                : '',
+            sampleMemberJSON: sample0
+                ? JSON.stringify(sample0).slice(0, 2000)
+                : null,
         }
     );
 
