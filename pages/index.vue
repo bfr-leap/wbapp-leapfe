@@ -37,7 +37,7 @@ const isGlobalAdmin = computed(() =>
 
 if (import.meta.client) {
     watchEffect(async () => {
-        if (auth.isSignedIn.value) {
+        if (auth?.isSignedIn?.value === true) {
             try {
                 userFeatures.value = await getUserFeatures();
             } catch (e) {
