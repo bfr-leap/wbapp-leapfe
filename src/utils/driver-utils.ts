@@ -36,6 +36,7 @@ export function getMemberViewFromM_Member(
     _teamInfoMap: { [name: number]: CLTI_Team }
 ) {
     if (member === null) {
+        console.log('[club-debug] getMemberViewFromM_Member: member is null');
         return {
             clubId: -1,
             lastName: '',
@@ -47,6 +48,15 @@ export function getMemberViewFromM_Member(
             teamId: 0,
         };
     }
+
+    console.log('[club-debug] getMemberViewFromM_Member raw member', {
+        cust_id: (member as any).cust_id,
+        display_name: (member as any).display_name,
+        club_id: (member as any).club_id,
+        club_name: (member as any).club_name,
+        keys: Object.keys(member as any),
+        member,
+    });
 
     let names = getFirstLastNames(member.display_name);
     let rL = getFormulaLicense(member.licenses);
@@ -69,7 +79,7 @@ export function getMemberViewFromM_Member(
         teamName = team.team_name;
     }
 
-    return {
+    const view = {
         clubId: member.club_id,
         lastName: names.lastName,
         firstName: names.firstName,
@@ -79,4 +89,13 @@ export function getMemberViewFromM_Member(
         teamName: teamName,
         teamId: teamId,
     };
+
+    console.log('[club-debug] getMemberViewFromM_Member returning', {
+        cust_id: member.cust_id,
+        display_name: member.display_name,
+        clubId: view.clubId,
+        clubIdType: typeof view.clubId,
+    });
+
+    return view;
 }

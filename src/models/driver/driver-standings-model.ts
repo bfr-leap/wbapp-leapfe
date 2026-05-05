@@ -226,12 +226,32 @@ export async function getDriverStandingsModel(
     let allDrivers: DriverModel[] = [];
     let position = 1;
 
+    console.log(
+        '[club-debug] driver-standings-model: building standings',
+        {
+            league,
+            season,
+            memberCount: sortedM.length,
+            firstMemberKeys: sortedM[0] ? Object.keys(sortedM[0] as any) : [],
+            sampleMember: sortedM[0],
+        }
+    );
+
     for (let member of sortedM) {
         const memberView = getMemberViewFromM_Member(
             member,
             userTeamIdMap,
             teamInfoMap
         );
+
+        console.log('[club-debug] driver-standings-model member -> dv', {
+            cust_id: member.cust_id,
+            display_name: member.display_name,
+            raw_club_id: (member as any).club_id,
+            raw_club_id_type: typeof (member as any).club_id,
+            raw_club_name: (member as any).club_name,
+            memberView_clubId: memberView.clubId,
+        });
 
         let dv: DriverModel = {
             position: position,

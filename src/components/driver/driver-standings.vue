@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Ref } from 'vue';
+import { watchEffect } from 'vue';
 import DriverTag from './driver-tag.vue';
 import TeamTag from '../team/team-tag.vue';
 import LeagueSeasonMenu from '@@/src/components/nav/league-season-menu.vue';
@@ -33,6 +34,22 @@ const view: Ref<DriverStandingsModel> =
         getDefaultStandingsModel,
         [() => props.league, () => props.season, () => props.summary_mode]
     );
+
+watchEffect(() => {
+    console.log('[club-debug] driver-standings.vue render', {
+        league: props.league,
+        season: props.season,
+        summary_mode: props.summary_mode,
+        driverCount: view.value?.drivers?.length ?? 0,
+        renderedClubs: (view.value?.drivers ?? []).map((d) => ({
+            cust_id: d.custId,
+            lastName: d.lastName,
+            clubId: d.clubId,
+            clubIdType: typeof d.clubId,
+            cssClass: `driver-img club-${d.clubId}`,
+        })),
+    });
+});
 </script>
 
 <template>
