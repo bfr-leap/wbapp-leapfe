@@ -81,6 +81,16 @@ const lgSeasSubCtx: Ref<LgSeasSubCtx> =
         getDefaultModel,
         [route]
     );
+
+const runtimeConfig = useRuntimeConfig();
+const buildSha = computed(() =>
+    (runtimeConfig.public.BUILD_COMMIT_SHA as string) || 'dev'
+);
+const buildShortSha = computed(() => buildSha.value.slice(0, 7));
+const buildDate = computed(() => {
+    const t = runtimeConfig.public.BUILD_TIME as string | undefined;
+    return t ? t.slice(0, 10) : '';
+});
 </script>
 
 <template>
@@ -396,6 +406,16 @@ const lgSeasSubCtx: Ref<LgSeasSubCtx> =
             rel="noopener noreferrer"
             >Live Event Analysis and Performance by Blue Frog Racing.</a
         >
+        <a
+            v-if="buildSha !== 'dev'"
+            class="gh-footer-build"
+            v-bind:href="`https://github.com/bfr-leap/wbapp-leapfe/commit/${buildSha}`"
+            target="_blank"
+            rel="noopener noreferrer"
+            >build {{ buildShortSha
+            }}<span v-if="buildDate"> · {{ buildDate }}</span></a
+        >
+        <span v-else class="gh-footer-build">build dev</span>
     </footer>
 </template>
 
@@ -596,5 +616,18 @@ const lgSeasSubCtx: Ref<LgSeasSubCtx> =
 }
 .gh-footer-link:hover {
     color: var(--text-secondary);
+}
+
+.gh-footer-build {
+    display: block;
+    margin-top: var(--space-1);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    color: var(--text-disabled);
+    letter-spacing: 0.02em;
+    text-decoration: none;
+}
+.gh-footer-build:hover {
+    color: var(--text-muted);
 }
 </style>
