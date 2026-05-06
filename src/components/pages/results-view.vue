@@ -46,6 +46,8 @@ const resultsModel: Ref<ResultsModel> =
             () => props.simsession,
         ]
     );
+
+const summaryExpanded = ref(false);
 </script>
 
 <template>
@@ -59,22 +61,6 @@ const resultsModel: Ref<ResultsModel> =
         >
             <section class="section">
                 <TrackBanner v-bind:track-id="resultsModel.trackId" />
-            </section>
-
-            <section v-if="resultsModel.summary.length > 0" class="section">
-                <div v-html="resultsModel.summary[0]"></div>
-            </section>
-
-            <section class="section">
-                <header class="section__head">
-                    <span class="section__title">Session Report</span>
-                </header>
-                <GenericTable
-                    title=""
-                    :leagueId="resultsModel.leagueId"
-                    :rows="resultsModel.results"
-                    :season-id="resultsModel.seasonId"
-                />
             </section>
 
             <section
@@ -143,6 +129,38 @@ const resultsModel: Ref<ResultsModel> =
                     v-bind:league="resultsModel.leagueId"
                 />
             </section>
+
+            <section v-if="resultsModel.summary.length > 0" class="section">
+                <header class="section__head">
+                    <span class="section__title">Race Summary</span>
+                </header>
+                <div
+                    class="summary-content"
+                    v-bind:class="{
+                        'summary-content--collapsed': !summaryExpanded,
+                    }"
+                    v-html="resultsModel.summary[0]"
+                ></div>
+                <button
+                    type="button"
+                    class="summary-toggle"
+                    @click="summaryExpanded = !summaryExpanded"
+                >
+                    {{ summaryExpanded ? 'Show less' : 'Read more →' }}
+                </button>
+            </section>
+
+            <section class="section">
+                <header class="section__head">
+                    <span class="section__title">Session Report</span>
+                </header>
+                <GenericTable
+                    title=""
+                    :leagueId="resultsModel.leagueId"
+                    :rows="resultsModel.results"
+                    :season-id="resultsModel.seasonId"
+                />
+            </section>
         </template>
         <section v-else class="section">
             <div class="results-empty">Results not available</div>
@@ -155,5 +173,37 @@ const resultsModel: Ref<ResultsModel> =
     text-align: center;
     padding: var(--space-6) 0;
     font-size: var(--text-sm);
+}
+
+.summary-content--collapsed {
+    max-height: 8rem;
+    overflow: hidden;
+    position: relative;
+}
+.summary-content--collapsed::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4rem;
+    background: linear-gradient(transparent, var(--surface-0));
+    pointer-events: none;
+}
+
+.summary-toggle {
+    margin-top: var(--space-3);
+    background: transparent;
+    border: 0;
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0;
+    font-family: inherit;
+    transition: color var(--duration-fast) var(--easing-out);
+}
+.summary-toggle:hover {
+    color: var(--text-primary);
 }
 </style>
