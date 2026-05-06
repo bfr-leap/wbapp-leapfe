@@ -39,11 +39,15 @@ const props = defineProps<{
 
 const isNarrow = computed(() => containerWidth.value < 576);
 
+// Y-axis labels live on the right (Bloomberg / Apple Stocks
+// pattern). The right margin reserves space for them; the left
+// is just a small gutter so the leftmost data point isn't
+// clipped against the section edge.
 const chartMargin = computed(() => ({
     top: 8,
-    right: 4,
+    right: isNarrow.value ? 32 : 44,
     bottom: isNarrow.value ? 20 : 28,
-    left: isNarrow.value ? 24 : 36,
+    left: isNarrow.value ? 4 : 8,
 }));
 
 // Unovis expects a flat data array with one entry per x-value, where
@@ -219,7 +223,12 @@ const parsedSeries = computed(() =>
                 />
 
                 <VisAxis type="x" :gridLine="false" :numTicks="5" />
-                <VisAxis type="y" :gridLine="false" :numTicks="5" />
+                <VisAxis
+                    type="y"
+                    position="right"
+                    :gridLine="false"
+                    :numTicks="5"
+                />
             </VisXYContainer>
         </div>
         <div class="legend-toolbar d-print-none">
