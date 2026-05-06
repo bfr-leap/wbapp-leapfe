@@ -40,10 +40,10 @@ const props = defineProps<{
 const isNarrow = computed(() => containerWidth.value < 576);
 
 const chartMargin = computed(() => ({
-    top: 10,
-    right: 10,
-    bottom: isNarrow.value ? 20 : 30,
-    left: isNarrow.value ? 35 : 50,
+    top: 8,
+    right: 4,
+    bottom: isNarrow.value ? 20 : 28,
+    left: isNarrow.value ? 24 : 36,
 }));
 
 // Unovis expects a flat data array with one entry per x-value, where
@@ -176,6 +176,20 @@ function onToggle(seriesIndex: number) {
 function onToggleAll() {
     toggleState.value = toggleState.value.map((v) => !v);
 }
+
+// Series names typically arrive pre-formatted as "P1 - Elliot Rolls".
+// Split into position prefix + driver name so the chip can show
+// just the position on phones and the full label on wider screens.
+const parsedSeries = computed(() =>
+    props.data.map((s) => {
+        const idx = s.name.indexOf(' - ');
+        if (idx < 0) return { pos: s.name, name: '' };
+        return {
+            pos: s.name.slice(0, idx),
+            name: s.name.slice(idx + 3),
+        };
+    })
+);
 </script>
 
 <template>
@@ -204,8 +218,8 @@ function onToggleAll() {
                     :curveType="CurveType.Linear"
                 />
 
-                <VisAxis type="x" :gridLine="true" :numTicks="5" />
-                <VisAxis type="y" :gridLine="true" :numTicks="5" />
+                <VisAxis type="x" :gridLine="false" :numTicks="5" />
+                <VisAxis type="y" :gridLine="false" :numTicks="5" />
             </VisXYContainer>
         </div>
         <div class="legend-toolbar d-print-none">
@@ -224,6 +238,7 @@ function onToggleAll() {
                 type="button"
                 class="legend-chip"
                 :class="{ 'legend-chip--off': !toggleState[i] }"
+                v-bind:title="series.name"
                 @click="onToggle(i)"
             >
                 <span
@@ -232,7 +247,14 @@ function onToggleAll() {
                         backgroundColor: baseColors[i % baseColors.length],
                     }"
                 ></span>
-                <span class="legend-chip__name">{{ series.name }}</span>
+                <span class="legend-chip__pos">{{
+                    parsedSeries[i].pos
+                }}</span>
+                <span
+                    v-if="parsedSeries[i].name"
+                    class="legend-chip__name d-none d-sm-inline"
+                    >{{ parsedSeries[i].name }}</span
+                >
             </button>
         </div>
     </div>
@@ -268,15 +290,6 @@ function onToggleAll() {
     font-size: 10px !important;
 }
 
-/* Grid + axis lines as hairlines so the data dominates rather
-   than the chrome around it. */
-.chart-container :deep(.unovis-axis .grid line),
-.chart-container :deep(.unovis-axis .domain),
-.chart-container :deep(.unovis-axis line) {
-    stroke: var(--border-subtle);
-    stroke-width: 1;
-}
-
 .legend-toolbar {
     display: flex;
     justify-content: center;
@@ -294,15 +307,15 @@ function onToggleAll() {
 .legend-chip {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-1) var(--space-2);
+    gap: var(--space-1);
+    padding: 2px var(--space-2);
     background: transparent;
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-sm);
     color: var(--text-primary);
     font-family: inherit;
     font-size: var(--text-xs);
-    line-height: 1;
+    line-height: 1.4;
     cursor: pointer;
     transition: background-color var(--duration-fast) var(--easing-out),
         border-color var(--duration-fast) var(--easing-out),
@@ -319,8 +332,8 @@ function onToggleAll() {
 }
 
 .legend-chip__dot {
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
     flex-shrink: 0;
     transition: opacity var(--duration-fast) var(--easing-out);
@@ -329,18 +342,23 @@ function onToggleAll() {
     opacity: 0.35;
 }
 
+.legend-chip__pos {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    color: var(--text-secondary);
+}
 .legend-chip__name {
     font-variant-numeric: tabular-nums;
 }
 
 @media (max-width: 576px) {
+    .legend-area {
+        gap: 4px;
+    }
     .legend-chip {
         font-size: 0.6875rem;
-        padding: 2px var(--space-2);
-    }
-    .legend-chip__dot {
-        width: 7px;
-        height: 7px;
+        padding: 2px 6px;
+        min-width: 2.5rem;
     }
 }
 </style>
