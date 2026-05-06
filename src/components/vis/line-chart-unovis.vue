@@ -271,11 +271,24 @@ const parsedSeries = computed(() =>
 .chart-container {
     width: 100%;
     aspect-ratio: 1 / 0.5;
+    display: block;
+    margin: 0;
+    padding: 0;
 }
 
+/* Force unovis's container, SVG, and inner groups to fill the
+   wrapper. unovis sometimes lays out a centered SVG narrower
+   than its parent — explicit width: 100% closes the gap on the
+   left side that was eating ~25% of the chart on mobile. */
 .chart-container :deep(.unovis-xy-container) {
     width: 100% !important;
     height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+.chart-container :deep(svg) {
+    width: 100% !important;
+    display: block;
 }
 
 /* Mono, tabular, recessed axis labels — they are reference, not
