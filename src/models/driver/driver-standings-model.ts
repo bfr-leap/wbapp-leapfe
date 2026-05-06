@@ -226,37 +226,12 @@ export async function getDriverStandingsModel(
     let allDrivers: DriverModel[] = [];
     let position = 1;
 
-    const sample0: any = sortedM[0];
-    console.log(
-        '[club-debug] driver-standings-model: building standings',
-        {
-            league,
-            season,
-            memberCount: sortedM.length,
-            firstMemberKeys: sample0
-                ? Object.keys(sample0).join(',')
-                : '',
-            sampleMemberJSON: sample0
-                ? JSON.stringify(sample0).slice(0, 2000)
-                : null,
-        }
-    );
-
     for (let member of sortedM) {
         const memberView = getMemberViewFromM_Member(
             member,
             userTeamIdMap,
             teamInfoMap
         );
-
-        console.log('[club-debug] driver-standings-model member -> dv', {
-            cust_id: member.cust_id,
-            display_name: member.display_name,
-            raw_club_id: (member as any).club_id,
-            raw_club_id_type: typeof (member as any).club_id,
-            raw_club_name: (member as any).club_name,
-            memberView_clubId: memberView.clubId,
-        });
 
         let dv: DriverModel = {
             position: position,
@@ -265,7 +240,6 @@ export async function getDriverStandingsModel(
             ...memberView,
             showStats: false,
             custId: member.cust_id.toString(),
-            clubId: member.club_id,
             stats: {
                 started: -1,
                 poles: -1,

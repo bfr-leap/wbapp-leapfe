@@ -2,7 +2,7 @@
 import Stats from './driver-stats.vue';
 import DriverTag from './driver-tag.vue';
 import DriverPenaltySummary from './driver-penalty-summary.vue';
-import { computed, watchEffect } from 'vue';
+import { computed } from 'vue';
 import type { Ref } from 'vue';
 import { useRoute } from 'vue-router';
 import type { DriverProfileModel } from '@@/src/models/driver/driver-profile-model';
@@ -31,22 +31,6 @@ const driverProfileModel: Ref<DriverProfileModel> =
         getDefaultDriverProfileModel,
         [() => props.league, () => props.driver]
     );
-
-watchEffect(() => {
-    const m = driverProfileModel.value;
-    const single: any = m?.singleMemberData;
-    console.log('[club-debug] driver-profile.vue render', {
-        league: props.league,
-        driver: props.driver,
-        singleMemberData_keys: single ? Object.keys(single) : null,
-        singleMemberData_club_id: single?.club_id,
-        singleMemberData_club_name: single?.club_name,
-        memberView_clubId: m?.memberView?.clubId,
-        memberView_clubIdType: typeof m?.memberView?.clubId,
-        cssClass: `driver-img club-${m?.memberView?.clubId}`,
-        singleMemberData: single,
-    });
-});
 
 /**
  * Season for the penalty summary. Prefers an explicit season from the

@@ -258,8 +258,14 @@ export interface M_Member {
     helmet: M_Helmet;
     last_login: string;
     member_since: string;
-    club_id: number;
-    club_name: number;
+    // Legacy iRacing "club" (regional grouping). Still present on the
+    // singleMemberData endpoint; absent on the league membersData endpoint
+    // since iRacing replaced it with the country-level "flair" fields.
+    club_id?: number;
+    club_name?: string;
+    flair_id?: number;
+    flair_name?: string;
+    flair_shortname?: string;
     ai: boolean;
     licenses: M_License[];
 }

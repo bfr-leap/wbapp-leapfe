@@ -30,13 +30,116 @@ export function getFormulaLicense(licenses: M_License[]): M_License {
     return rL;
 }
 
+// iRacing replaced the regional `club_id` with a country-level `flair`
+// on the league membersData endpoint. The UI still keys flag CSS off
+// the legacy regional clubs, so map the country flair shortname back
+// to the closest iRacing region. Unknown countries fall through to
+// club 1 (International).
+const FLAIR_TO_CLUB: { [shortname: string]: number } = {
+    USA: 30,
+    CAN: 15,
+    GBR: 36,
+    SCT: 36,
+    WLS: 36,
+    ENG: 36,
+    NIR: 36,
+    IRL: 36,
+    FRA: 39,
+    DEU: 42,
+    GER: 42,
+    ITA: 41,
+    ESP: 38,
+    PRT: 38,
+    POR: 38,
+    FIN: 44,
+    SWE: 43,
+    NOR: 43,
+    DNK: 43,
+    DEN: 43,
+    ISL: 43,
+    NLD: 40,
+    NED: 40,
+    BEL: 40,
+    LUX: 40,
+    AUS: 34,
+    NZL: 34,
+    JPN: 48,
+    BRA: 45,
+    ZAF: 50,
+    MEX: 24,
+    COL: 24,
+    ARG: 24,
+    CHL: 24,
+    PER: 24,
+    VEN: 24,
+    URY: 24,
+    BOL: 24,
+    PRY: 24,
+    ECU: 24,
+    CRI: 24,
+    PAN: 24,
+    GTM: 24,
+    DOM: 24,
+    PRI: 24,
+    CHN: 47,
+    KOR: 47,
+    IND: 47,
+    LKA: 47,
+    THA: 47,
+    SGP: 47,
+    MYS: 47,
+    IDN: 47,
+    PHL: 47,
+    HKG: 47,
+    TWN: 47,
+    VNM: 47,
+    ARE: 47,
+    SAU: 47,
+    ISR: 47,
+    AUT: 46,
+    CHE: 46,
+    POL: 46,
+    CZE: 46,
+    HUN: 46,
+    ROU: 46,
+    GRC: 46,
+    TUR: 46,
+    RUS: 46,
+    UKR: 46,
+    BGR: 46,
+    HRV: 46,
+    SRB: 46,
+    SVK: 46,
+    SVN: 46,
+    LTU: 46,
+    LVA: 46,
+    EST: 46,
+    BIH: 46,
+    MKD: 46,
+    ALB: 46,
+    MNE: 46,
+    BLR: 46,
+    MLT: 46,
+    CYP: 46,
+};
+
+export function resolveClubId(member: M_Member): number {
+    if (typeof member.club_id === 'number') {
+        return member.club_id;
+    }
+    const code = member.flair_shortname?.toUpperCase();
+    if (code && code in FLAIR_TO_CLUB) {
+        return FLAIR_TO_CLUB[code];
+    }
+    return 1;
+}
+
 export function getMemberViewFromM_Member(
     member: M_Member | null,
     _userTeamIdMap: { [name: number]: number },
     _teamInfoMap: { [name: number]: CLTI_Team }
 ) {
     if (member === null) {
-        console.log('[club-debug] getMemberViewFromM_Member: member is null');
         return {
             clubId: -1,
             lastName: '',
@@ -48,21 +151,6 @@ export function getMemberViewFromM_Member(
             teamId: 0,
         };
     }
-
-    const m: any = member;
-    console.log('[club-debug] getMemberViewFromM_Member raw member', {
-        cust_id: m.cust_id,
-        display_name: m.display_name,
-        club_id: m.club_id,
-        club_name: m.club_name,
-        keys: Object.keys(m).join(','),
-        // Spot-check sub-objects iRacing might have moved club info into
-        club_obj: m.club,
-        region: m.region,
-        country: m.country,
-        country_code: m.country_code,
-        json: JSON.stringify(m).slice(0, 1500),
-    });
 
     let names = getFirstLastNames(member.display_name);
     let rL = getFormulaLicense(member.licenses);
@@ -85,8 +173,8 @@ export function getMemberViewFromM_Member(
         teamName = team.team_name;
     }
 
-    const view = {
-        clubId: member.club_id,
+    return {
+        clubId: resolveClubId(member),
         lastName: names.lastName,
         firstName: names.firstName,
         iRating: iratingStr,
@@ -95,13 +183,4 @@ export function getMemberViewFromM_Member(
         teamName: teamName,
         teamId: teamId,
     };
-
-    console.log('[club-debug] getMemberViewFromM_Member returning', {
-        cust_id: member.cust_id,
-        display_name: member.display_name,
-        clubId: view.clubId,
-        clubIdType: typeof view.clubId,
-    });
-
-    return view;
 }

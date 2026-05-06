@@ -126,6 +126,66 @@ describe('getMemberViewFromM_Member', () => {
         expect(result.iRating).toBe('4.8k');
     });
 
+    it('falls back to flair_shortname when club_id is missing (membersData shape)', () => {
+        const member = {
+            cust_id: 807711,
+            display_name: 'Jaden Calloway',
+            flair_id: 223,
+            flair_name: 'United States',
+            flair_shortname: 'USA',
+            licenses: [
+                {
+                    category: 'formula_car',
+                    irating: 5717,
+                    group_name: 'Class A',
+                    safety_rating: 3.28,
+                },
+            ],
+        } as unknown as M_Member;
+
+        const result = getMemberViewFromM_Member(member, {}, {});
+        expect(result.clubId).toBe(30);
+    });
+
+    it('prefers club_id over flair when both are present', () => {
+        const member = {
+            cust_id: 1,
+            display_name: 'Test Driver',
+            club_id: 39,
+            flair_shortname: 'USA',
+            licenses: [
+                {
+                    category: 'formula_car',
+                    irating: 2000,
+                    group_name: 'Class A',
+                    safety_rating: 3.0,
+                },
+            ],
+        } as unknown as M_Member;
+
+        const result = getMemberViewFromM_Member(member, {}, {});
+        expect(result.clubId).toBe(39);
+    });
+
+    it('falls back to club 1 (International) for unknown flair codes', () => {
+        const member = {
+            cust_id: 931126,
+            display_name: 'Rafe Autie',
+            flair_shortname: 'ATA',
+            licenses: [
+                {
+                    category: 'formula_car',
+                    irating: 3014,
+                    group_name: 'Class B',
+                    safety_rating: 3.3,
+                },
+            ],
+        } as unknown as M_Member;
+
+        const result = getMemberViewFromM_Member(member, {}, {});
+        expect(result.clubId).toBe(1);
+    });
+
     it('handles zero irating', () => {
         const member = {
             cust_id: 789,
