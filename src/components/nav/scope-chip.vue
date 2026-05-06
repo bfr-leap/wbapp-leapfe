@@ -60,6 +60,8 @@ function onClick() {
     font-family: inherit;
     font-size: var(--text-sm);
     line-height: 1;
+    white-space: nowrap;
+    flex-shrink: 0;
     transition: background-color var(--duration-fast) var(--easing-out),
         border-color var(--duration-fast) var(--easing-out);
 }
