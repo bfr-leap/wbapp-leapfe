@@ -462,10 +462,12 @@ body {
 }
 
 /* Featured section — accent stripe sits in the page gutter via
-   a negative outer box-shadow, so content alignment is identical
-   to non-featured sections. */
+   a negative outer box-shadow, plus a small left padding so the
+   stripe doesn't touch the section's content text. Other sections
+   stay flush with the page padding edge. */
 .section--featured {
     box-shadow: -3px 0 0 var(--accent);
+    padding-left: var(--space-2);
 }
 
 /* ============================================================
