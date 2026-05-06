@@ -66,6 +66,7 @@ function getDefaultModel() {
         league_id: 0,
         season_id: 0,
         subsession_id: 0,
+        simsession_id: 0,
     };
 }
 
@@ -73,6 +74,7 @@ interface LgSeasSubCtx {
     league_id: number;
     season_id: number;
     subsession_id: number;
+    simsession_id: number;
 }
 
 const lgSeasSubCtx: Ref<LgSeasSubCtx> =
@@ -117,16 +119,16 @@ const buildDate = computed(() => {
                 <ResultsScopeChip
                     v-if="
                         route.query.m === 'results' &&
-                        route.query.league &&
-                        route.query.season &&
-                        route.query.subsession &&
-                        route.query.simsession
+                        lgSeasSubCtx.league_id &&
+                        lgSeasSubCtx.season_id &&
+                        lgSeasSubCtx.subsession_id &&
+                        lgSeasSubCtx.simsession_id
                     "
-                    :key="`results-chip-${route.query.league}-${route.query.season}-${route.query.subsession}-${route.query.simsession}`"
-                    v-bind:league="route.query.league.toString()"
-                    v-bind:season="route.query.season.toString()"
-                    v-bind:subsession="route.query.subsession.toString()"
-                    v-bind:simsession="route.query.simsession.toString()"
+                    :key="`results-chip-${lgSeasSubCtx.league_id}-${lgSeasSubCtx.season_id}-${lgSeasSubCtx.subsession_id}-${lgSeasSubCtx.simsession_id}`"
+                    v-bind:league="lgSeasSubCtx.league_id.toString()"
+                    v-bind:season="lgSeasSubCtx.season_id.toString()"
+                    v-bind:subsession="lgSeasSubCtx.subsession_id.toString()"
+                    v-bind:simsession="lgSeasSubCtx.simsession_id.toString()"
                 />
                 <TrackStatsChip
                     v-else-if="
