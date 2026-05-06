@@ -282,7 +282,7 @@ watchEffect(fetchModel);
                     </tbody>
                 </table>
             </div>
-        </div>
+        </section>
     </div>
 
     <!-- Edit / Add Modal -->
@@ -440,7 +440,7 @@ watchEffect(fetchModel);
                     </button>
                 </div>
             </div>
-        </section>
+        </div>
     </div>
 
     <!-- Toast Notification -->
