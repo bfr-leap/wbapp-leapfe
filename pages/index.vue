@@ -272,7 +272,11 @@ const buildDate = computed(() => {
 
                 <div class="app-header__user">
                     <SignedOut>
-                        <SignInButton />
+                        <SignInButton>
+                            <button class="button button--ghost button--sm">
+                                Sign In
+                            </button>
+                        </SignInButton>
                     </SignedOut>
                     <SignedIn>
                         <IRIdentityCardLink />

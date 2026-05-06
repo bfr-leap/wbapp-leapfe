@@ -426,6 +426,12 @@ body {
     letter-spacing: var(--tracking-wide);
 }
 
+.button--sm {
+    min-height: 2rem;
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-sm);
+}
+
 /* ============================================================
    Section — primary structural element. No chrome, no nested
    padding. Eyebrow + content. Adjacent sections separate via

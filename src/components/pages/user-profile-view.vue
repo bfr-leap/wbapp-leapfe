@@ -45,7 +45,9 @@ watch(route, fetchModel);
         <div class="card bg-dark text-light m-2">
             <div class="card-body p-2">
                 You must be signed in to access profile functionality
-                <SignInButton />
+                <SignInButton>
+                    <button class="button button--ghost">Sign In</button>
+                </SignInButton>
             </div>
         </div>
     </SignedOut>

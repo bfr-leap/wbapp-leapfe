@@ -75,7 +75,11 @@ watch(route, fetchModel);
                 </div>
             </div>
             <SignedOut>
-                <SignInButton />
+                <SignInButton>
+                    <button class="button button--ghost button--sm">
+                        Sign In
+                    </button>
+                </SignInButton>
             </SignedOut>
             <SignedIn>
                 <div style="display: inline-flex">

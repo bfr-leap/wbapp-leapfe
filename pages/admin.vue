@@ -598,7 +598,9 @@ const pageInfo = computed(() => {
         <SignedOut>
             <p class="admin-callout">
                 You must be signed in.
-                <SignInButton />
+                <SignInButton>
+                    <button class="button button--ghost">Sign In</button>
+                </SignInButton>
             </p>
         </SignedOut>
 
