@@ -27,6 +27,7 @@ function onClick() {
             'scope-chip--open': isOpen,
             'scope-chip--secondary': dimension.priority === 'secondary',
             'scope-chip--mono': dimension.mono,
+            'scope-chip--truncate': dimension.truncate,
         }"
         v-bind:aria-expanded="isOpen"
         @click="onClick"
@@ -61,12 +62,18 @@ function onClick() {
     font-size: var(--text-sm);
     line-height: 1;
     white-space: nowrap;
-    /* min-width:0 lets the chip shrink below its content size when
-       the bar is constrained, so the value can truncate with
-       ellipsis instead of overflowing the header. */
-    min-width: 0;
+    /* Default chips render at natural width and do not shrink.
+       Pages opt into shrink + ellipsis per dimension via the
+       --truncate modifier below — used on dimensions with
+       known-long values (e.g. Round titles on Results). */
+    flex-shrink: 0;
     transition: background-color var(--duration-fast) var(--easing-out),
         border-color var(--duration-fast) var(--easing-out);
+}
+.scope-chip--truncate {
+    flex-shrink: 1;
+    min-width: 0;
+    max-width: 14rem;
 }
 .scope-chip:hover {
     background: var(--surface-3);
@@ -80,6 +87,8 @@ function onClick() {
 .scope-chip__value {
     font-weight: 500;
     font-variant-numeric: tabular-nums;
+}
+.scope-chip--truncate .scope-chip__value {
     overflow: hidden;
     text-overflow: ellipsis;
     min-width: 0;
