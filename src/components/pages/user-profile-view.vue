@@ -41,40 +41,31 @@ watchEffect(fetchModel);
 watch(route, fetchModel);
 </script>
 <template>
-    <SignedOut>
-        <div class="card bg-dark text-light m-2">
-            <div class="card-body p-2">
+    <div class="page">
+        <SignedOut>
+            <section class="section">
                 You must be signed in to access profile functionality
                 <SignInButton>
                     <button class="button button--ghost">Sign In</button>
                 </SignInButton>
-            </div>
-        </div>
-    </SignedOut>
+            </section>
+        </SignedOut>
 
-    <SignedIn>
-        <div class="card bg-dark text-light m-2">
-            <div class="card-body p-2">
-                <table>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <UserButton />
-                            </td>
-                            <td></td>
-                            <td>Manage user account</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div
-            v-if="userProfileModel.isVerified === false"
-            class="card bg-dark text-light m-2"
-        >
-            <div class="card-body p-2">
-                Link to iRacing
-                <p></p>
+        <SignedIn>
+            <section class="section">
+                <div class="user-row">
+                    <UserButton />
+                    <span>Manage user account</span>
+                </div>
+            </section>
+
+            <section
+                v-if="userProfileModel.isVerified === false"
+                class="section"
+            >
+                <header class="section__head">
+                    <span class="section__title">Link to iRacing</span>
+                </header>
                 <div class="row g-3">
                     <div class="col-4">
                         <label for="iRacingCustId" class="form-label"
@@ -98,14 +89,14 @@ watch(route, fetchModel);
                                 userProfileModel.irCustId !== forms.custId
                             "
                             type="submit"
-                            class="btn btn-primary"
+                            class="button button--ghost"
                         >
                             Submit
                         </button>
                         <button
                             v-else
                             type="submit"
-                            class="btn btn-primary"
+                            class="button button--ghost"
                             disabled
                         >
                             Submit
@@ -118,8 +109,7 @@ watch(route, fetchModel);
                     </div>
                 </div>
 
-                <span v-if="userProfileModel.msgSent"><br /></span>
-                <div v-if="userProfileModel.msgSent" class="row g-3">
+                <div v-if="userProfileModel.msgSent" class="row g-3 mt-2">
                     <div class="col-4">
                         <label for="exampleInputEmail1" class="form-label"
                             >Verification Code:</label
@@ -143,44 +133,40 @@ watch(route, fetchModel);
                                 forms.verificationNum
                             "
                             type="submit"
-                            class="btn btn-primary"
+                            class="button button--ghost"
                         >
                             Submit
                         </button>
                         <button
                             v-else
                             type="submit"
-                            class="btn btn-primary"
+                            class="button button--ghost"
                             disabled
                         >
                             Submit
                         </button>
                     </div>
                 </div>
-            </div>
-        </div>
-        <div
-            v-if="userProfileModel.isVerified"
-            class="card bg-dark text-light m-2"
-        >
-            <div class="card-body p-2">Verified Profile...</div>
-        </div>
+            </section>
 
-        <div class="card bg-dark text-light m-2">
-            <div class="card-body p-2">
-                My Leagues
-                <div class="container">
-                    <div style="height: 1em"></div>
-                    <div class="row g-1">
-                        <div class="col-12">
-                            <div class="row g-1 h-100">
-                                <LeagueCardSelector></LeagueCardSelector>
-                            </div>
-                        </div>
-                    </div>
-                    <div style="height: 1em"></div>
-                </div>
-            </div>
-        </div>
-    </SignedIn>
+            <section v-if="userProfileModel.isVerified" class="section">
+                Verified Profile...
+            </section>
+
+            <section class="section">
+                <header class="section__head">
+                    <span class="section__title">My Leagues</span>
+                </header>
+                <LeagueCardSelector></LeagueCardSelector>
+            </section>
+        </SignedIn>
+    </div>
 </template>
+
+<style scoped>
+.user-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+</style>

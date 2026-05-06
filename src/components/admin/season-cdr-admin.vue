@@ -222,8 +222,8 @@ watchEffect(fetchModel);
 </script>
 
 <template>
-    <div class="card bg-dark text-light m-2">
-        <div class="card-body p-2">
+    <div class="page">
+        <section class="section">
             <div class="container">
                 <table class="table table-dark table-hover">
                     <thead style="position: sticky; top: 0">
@@ -440,7 +440,7 @@ watchEffect(fetchModel);
                     </button>
                 </div>
             </div>
-        </div>
+        </section>
     </div>
 
     <!-- Toast Notification -->

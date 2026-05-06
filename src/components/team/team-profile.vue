@@ -28,65 +28,103 @@ const statClasses = 'px-2 py-1 m-1 fs-5';
 </script>
 
 <template>
-    <div class="card bg-dark text-light m-2 sticky-top">
-        <div class="card-body p-2">
-            <div class="row p-3">
-                <div v-bind:class="`driver-img team-${props.team}`"></div>
-                <div class="col">
-                    <TeamTag
-                        v-bind:league-id="props.league"
-                        v-bind:team-id="Number.parseInt(props.team, 10)"
-                    ></TeamTag>
+    <div class="page">
+        <section class="section team-header">
+            <div v-bind:class="`driver-img team-${props.team}`"></div>
+            <TeamTag
+                v-bind:league-id="props.league"
+                v-bind:team-id="Number.parseInt(props.team, 10)"
+            ></TeamTag>
+        </section>
+
+        <section class="section">
+            <header class="section__head">
+                <span class="section__title">Stats</span>
+            </header>
+            <div class="stats-row">
+                <div class="stat-cell">
+                    <span class="stat-cell__label">Starts</span>
+                    <span class="stat-cell__value num">{{
+                        teamProfileModel.stats.started
+                    }}</span>
+                </div>
+                <div class="stat-cell">
+                    <span class="stat-cell__label">Poles</span>
+                    <span class="stat-cell__value num">{{
+                        teamProfileModel.stats.poles
+                    }}</span>
+                </div>
+                <div class="stat-cell">
+                    <span class="stat-cell__label">Wins</span>
+                    <span class="stat-cell__value num">{{
+                        teamProfileModel.stats.wins
+                    }}</span>
+                </div>
+                <div class="stat-cell">
+                    <span class="stat-cell__label">Podiums</span>
+                    <span class="stat-cell__value num">{{
+                        teamProfileModel.stats.podiums
+                    }}</span>
+                </div>
+                <div class="stat-cell">
+                    <span class="stat-cell__label">Top 10</span>
+                    <span class="stat-cell__value num">{{
+                        teamProfileModel.stats.top_10
+                    }}</span>
+                </div>
+                <div class="stat-cell">
+                    <span class="stat-cell__label">Top 20</span>
+                    <span class="stat-cell__value num">{{
+                        teamProfileModel.stats.top_20
+                    }}</span>
+                </div>
+                <div class="stat-cell">
+                    <span class="stat-cell__label">LEAP Points</span>
+                    <span class="stat-cell__value num">{{
+                        teamProfileModel.stats.power_points
+                    }}</span>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <div class="card bg-dark text-light m-2">
-        <div class="d-flex flex-wrap">
-            <div :class="statClasses">
-                <span class="name">Starts: </span
-                ><span class="value">
-                    {{ teamProfileModel.stats.started }}</span
-                >
-            </div>
-            <div :class="statClasses">
-                <span class="name">Poles: </span
-                ><span class="value"> {{ teamProfileModel.stats.poles }}</span>
-            </div>
-            <div :class="statClasses">
-                <span class="name">Wins: </span
-                ><span class="value"> {{ teamProfileModel.stats.wins }}</span>
-            </div>
-            <div :class="statClasses">
-                <span class="name">Podiums: </span
-                ><span class="value">
-                    {{ teamProfileModel.stats.podiums }}</span
-                >
-            </div>
-            <div :class="statClasses">
-                <span class="name">Top 10: </span
-                ><span class="value"> {{ teamProfileModel.stats.top_10 }}</span>
-            </div>
-            <div :class="statClasses">
-                <span class="name">Top 20: </span
-                ><span class="value"> {{ teamProfileModel.stats.top_20 }}</span>
-            </div>
-            <div :class="statClasses">
-                <span class="name">LEAP Points: </span
-                ><span class="value">
-                    {{ teamProfileModel.stats.power_points }}</span
-                >
-            </div>
-        </div>
+        </section>
     </div>
 </template>
 
 <style scoped>
+.team-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.stats-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+}
+.stat-cell {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+.stat-cell__label {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--text-muted);
+    font-weight: 600;
+}
+.stat-cell__value {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
 .driver-img {
     height: 3em;
     width: 3em;
-    background-color: var(--gh-neutral-emphasis);
+    background-color: var(--surface-2);
+    border: 1px solid var(--border-subtle);
     border-radius: var(--gh-radius-full);
     background-size: cover;
     background-position: center;

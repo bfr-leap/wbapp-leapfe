@@ -80,9 +80,11 @@ async function onSave() {
 </script>
 
 <template>
-    <div class="card bg-dark text-light m-2">
-        <div class="card-body p-3">
-            <h5 class="mb-3">Steward Configuration</h5>
+    <div class="page">
+        <section class="section">
+            <header class="section__head">
+                <span class="section__title">Steward Configuration</span>
+            </header>
             <p class="text-muted small">
                 The Discord channel where stewards post penalty announcements
                 for this league.
@@ -124,7 +126,7 @@ async function onSave() {
                 ></span>
                 Save
             </button>
-        </div>
+        </section>
     </div>
 
     <!-- Toast -->
