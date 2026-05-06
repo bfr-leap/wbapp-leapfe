@@ -214,11 +214,21 @@ const view: Ref<DriverStandingsModel> =
 .standings-row:last-child {
     border-bottom: 0;
 }
+.standings-row .fs-2 {
+    color: var(--text-primary);
+    font-weight: 600;
+    line-height: 1;
+}
+.standings-row .fs-4 {
+    color: var(--text-primary);
+    font-weight: 600;
+}
 
 .pts-line {
     font-size: 0.8125rem;
-    color: var(--text-muted);
-    line-height: 1.1;
+    color: var(--text-secondary);
+    line-height: 1.2;
+    margin-top: var(--space-1);
 }
 
 .driver-img {
