@@ -18,6 +18,7 @@ import RouterLinkProxy from '@@/src/components/nav/router-link-proxy.vue';
 import LeagueSeasonChip from '@@/src/components/nav/league-season-chip.vue';
 import TrackStatsChip from '@@/src/components/nav/track-stats-chip.vue';
 import ResultsScopeChip from '@@/src/components/nav/results-scope-chip.vue';
+import { selectChip } from '@@/src/utils/scope-chip-selector';
 import HomeView from '@@/src/views/HomeView.vue';
 
 const route = useRoute();
@@ -94,6 +95,20 @@ const buildDate = computed(() => {
     const t = runtimeConfig.public.BUILD_TIME as string | undefined;
     return t ? t.slice(0, 10) : '';
 });
+
+const headerChip = computed(() =>
+    selectChip(
+        {
+            m: route.query.m as string | undefined,
+            car: route.query.car as string | undefined,
+            track: route.query.track as string | undefined,
+        },
+        {
+            league_id: lgSeasSubCtx.value.league_id,
+            season_id: lgSeasSubCtx.value.season_id,
+        }
+    )
+);
 </script>
 
 <template>
@@ -117,10 +132,7 @@ const buildDate = computed(() => {
                 </RouterLinkProxy>
 
                 <ResultsScopeChip
-                    v-if="
-                        route.query.m === 'results' &&
-                        lgSeasSubCtx.league_id
-                    "
+                    v-if="headerChip === 'results'"
                     :key="`results-chip-${lgSeasSubCtx.league_id}-${lgSeasSubCtx.season_id || 0}-${lgSeasSubCtx.subsession_id || 0}-${lgSeasSubCtx.simsession_id || 0}`"
                     v-bind:league="lgSeasSubCtx.league_id.toString()"
                     v-bind:season="(lgSeasSubCtx.season_id || 0).toString()"
@@ -133,7 +145,7 @@ const buildDate = computed(() => {
                 />
                 <TrackStatsChip
                     v-else-if="
-                        route.query.m === 'track' &&
+                        headerChip === 'track' &&
                         route.query.league &&
                         route.query.car &&
                         route.query.track
@@ -144,9 +156,7 @@ const buildDate = computed(() => {
                     v-bind:track="route.query.track.toString()"
                 />
                 <LeagueSeasonChip
-                    v-else-if="
-                        lgSeasSubCtx.league_id && lgSeasSubCtx.season_id
-                    "
+                    v-else-if="headerChip === 'league-season'"
                     :key="`chip-${lgSeasSubCtx.league_id}-${lgSeasSubCtx.season_id}-${route.query.m || ''}`"
                     v-bind:league="lgSeasSubCtx.league_id.toString()"
                     v-bind:season="lgSeasSubCtx.season_id.toString()"
