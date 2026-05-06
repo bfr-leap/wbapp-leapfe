@@ -1,0 +1,357 @@
+/* ============================================================
+   LEAP design tokens
+
+   Visual concept: "Bloomberg terminal for sim racing" — modern.
+       · Near-black canvas, hairline rules, no shadows.
+       · Tabular-monospaced numerics dominate; prose stays sans.
+       · Color encodes role (you / leader / field) and direction
+         (gain / loss / penalty), never decoration.
+       · One signature accent (terminal yellow) used sparingly to
+         flag the viewer's own data.
+   Mobile-first: sizes in rem, fluid type via clamp(),
+   interactive surfaces ≥ 44px tall.
+   Layered on top of Bootstrap — view code can adopt
+   incrementally without ripping out utility classes.
+   ============================================================ */
+
+:root {
+    color-scheme: dark;
+
+    /* ---- Surfaces (page → raised → hover) ---- */
+    --surface-0: #0b0d10;
+    --surface-1: #14181d;
+    --surface-2: #1c2229;
+    --surface-3: #262d36;
+    --surface-inverse: #f5f7fa;
+
+    /* ---- Borders & rules ---- */
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.18);
+    --rule: 1px solid var(--border-subtle);
+
+    /* ---- Text ---- */
+    --text-primary: #f1f4f8;
+    --text-secondary: #a8b1bd;
+    --text-muted: #6c7785;
+    --text-disabled: #4a525c;
+
+    /* ---- Brand accent (override per league via .league-* class) ---- */
+    --accent: #e10600;
+    --accent-fg: #ffffff;
+    --accent-soft: rgba(225, 6, 0, 0.12);
+
+    /* ---- Data-viz roles (encode meaning, not identity) ---- */
+    --you: #ffd400;
+    --field: #6c7785;
+    --leader: #e6c66a;
+    --podium-1: #ffd54a;
+    --podium-2: #c0c5cb;
+    --podium-3: #c08a5e;
+
+    /* ---- Delta / change ---- */
+    --gain: #3fc77b;
+    --loss: #ff5c6c;
+    --neutral: var(--text-secondary);
+
+    /* ---- Penalty severity ---- */
+    --warn: #f3c969;
+    --penalty: #ef8a4a;
+    --dq: #d6243a;
+
+    /* ---- Spacing (4pt grid) ---- */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.5rem;
+    --space-6: 2rem;
+    --space-7: 3rem;
+    --space-8: 4rem;
+
+    --gutter-page: var(--space-3);
+    --gutter-page-md: var(--space-5);
+    --touch-target: 2.75rem;
+
+    /* ---- Radius (sharp, not pillowy) ---- */
+    --radius-sm: 0.25rem;
+    --radius-md: 0.375rem;
+    --radius-lg: 0.5rem;
+
+    /* ---- Type scale: fluid mobile → desktop ---- */
+    --text-xs: clamp(0.6875rem, 0.66rem + 0.15vw, 0.75rem);
+    --text-sm: clamp(0.8125rem, 0.78rem + 0.2vw, 0.875rem);
+    --text-base: clamp(0.9375rem, 0.9rem + 0.25vw, 1rem);
+    --text-lg: clamp(1.0625rem, 1rem + 0.4vw, 1.125rem);
+    --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.375rem);
+    --display-sm: clamp(1.5rem, 1.3rem + 1vw, 1.875rem);
+    --display-md: clamp(2rem, 1.6rem + 2vw, 2.75rem);
+    --display-lg: clamp(2.75rem, 2rem + 3.5vw, 4rem);
+    --display-xl: clamp(3.5rem, 2.5rem + 5vw, 6rem);
+
+    --leading-tight: 1.1;
+    --leading-normal: 1.45;
+    --leading-loose: 1.6;
+    --tracking-wide: 0.08em;
+
+    --font-display: 'Inter', system-ui, sans-serif;
+    --font-body: 'Inter', system-ui, sans-serif;
+    --font-mono: ui-monospace, 'JetBrains Mono', SFMono-Regular, Menlo,
+        monospace;
+
+    /* ---- Motion ---- */
+    --duration-fast: 120ms;
+    --duration-base: 200ms;
+    --easing-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* ---- Elevation (used sparingly — racing reads flat) ---- */
+    --shadow-1: 0 1px 0 rgba(0, 0, 0, 0.4);
+    --shadow-2: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+/* Page background applied once so views don't repeat it. */
+body {
+    background: var(--surface-0);
+    color: var(--text-primary);
+    font-size: var(--text-base);
+    font-feature-settings: 'tnum', 'cv11';
+}
+
+/* ============================================================
+   Numerics — apply .num anywhere a lap time, gap, position, or
+   count is shown so digits align column-to-column.
+   ============================================================ */
+.num {
+    font-variant-numeric: tabular-nums lining-nums;
+    font-feature-settings: 'tnum', 'cv11';
+    letter-spacing: -0.01em;
+}
+.num-mono {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+   Stat block — the headline pattern for driver-facing data.
+       <div class="stat">
+           <div class="stat__value num">1:42.318</div>
+           <div class="stat__label">Best lap</div>
+           <div class="stat__delta delta--gain num">−0.214</div>
+       </div>
+   ============================================================ */
+.stat {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: var(--space-3) var(--space-4);
+}
+.stat__value {
+    font-size: var(--display-md);
+    font-weight: 600;
+    line-height: var(--leading-tight);
+    color: var(--text-primary);
+}
+.stat__label {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--text-muted);
+}
+.stat__delta {
+    font-size: var(--text-sm);
+    color: var(--neutral);
+}
+.delta--gain {
+    color: var(--gain);
+}
+.delta--loss {
+    color: var(--loss);
+}
+
+/* ============================================================
+   Surface / card — flat replacement for `card bg-dark text-light`.
+   The `--lead` modifier exposes a 3px accent stripe at the leading
+   edge to carry league/team identity without a heavy background.
+   ============================================================ */
+.surface {
+    background: var(--surface-1);
+    border: var(--rule);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+}
+.surface--bare {
+    background: transparent;
+    border-color: transparent;
+    padding: 0;
+}
+.surface--lead {
+    border-left: 3px solid var(--accent);
+    padding-left: calc(var(--space-4) - 3px);
+}
+
+/* ============================================================
+   Vertical rhythm — replaces ad-hoc `m-2` and 1em spacer divs.
+   ============================================================ */
+.stack > * + * {
+    margin-top: var(--space-4);
+}
+.stack-sm > * + * {
+    margin-top: var(--space-2);
+}
+.stack-lg > * + * {
+    margin-top: var(--space-6);
+}
+
+.page {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: var(--gutter-page);
+}
+@media (min-width: 768px) {
+    .page {
+        padding: var(--gutter-page-md);
+    }
+}
+
+/* ============================================================
+   Section labels
+   ============================================================ */
+.eyebrow {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--text-muted);
+    font-weight: 600;
+}
+.section-title {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    line-height: var(--leading-tight);
+    color: var(--text-primary);
+}
+
+/* ============================================================
+   Touch targets — interactive primitives clear 44px on mobile.
+   ============================================================ */
+.tap {
+    min-height: var(--touch-target);
+    display: inline-flex;
+    align-items: center;
+}
+@media (hover: hover) {
+    .tap:hover {
+        background: var(--surface-3);
+    }
+}
+
+/* ============================================================
+   KPI — denser, terminal-feel variant of .stat.
+   Values stay mono so columns of KPIs align across cards.
+       <div class="kpi">
+           <span class="kpi__label">P</span>
+           <span class="kpi__value num-mono">04</span>
+           <span class="kpi__delta delta--gain num-mono">+2</span>
+       </div>
+   ============================================================ */
+.kpi {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: baseline;
+    column-gap: var(--space-3);
+    padding: var(--space-2) 0;
+    border-bottom: var(--rule);
+}
+.kpi__label {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--text-muted);
+}
+.kpi__value {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+.kpi__delta {
+    font-size: var(--text-xs);
+}
+
+/* ============================================================
+   Tape — horizontal strip of mono data. The Bloomberg ticker,
+   minus the marquee. Use for "last 5 races" style summaries.
+   Scrolls horizontally on mobile rather than wrapping.
+   ============================================================ */
+.tape {
+    display: flex;
+    gap: var(--space-5);
+    padding: var(--space-2) var(--space-3);
+    background: var(--surface-1);
+    border-top: var(--rule);
+    border-bottom: var(--rule);
+    overflow-x: auto;
+    white-space: nowrap;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    scrollbar-width: thin;
+}
+.tape__item {
+    display: inline-flex;
+    gap: var(--space-2);
+    align-items: baseline;
+}
+.tape__item > .label {
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    font-size: var(--text-xs);
+}
+
+/* ============================================================
+   Status pip — small colored dot for inline state markers
+   (driver online, penalty active, lap personal best, etc.).
+   ============================================================ */
+.pip {
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--text-muted);
+    vertical-align: middle;
+    margin-right: var(--space-2);
+}
+.pip--you {
+    background: var(--you);
+    box-shadow: 0 0 0 2px var(--accent-soft);
+}
+.pip--gain {
+    background: var(--gain);
+}
+.pip--loss {
+    background: var(--loss);
+}
+.pip--warn {
+    background: var(--warn);
+}
+.pip--dq {
+    background: var(--dq);
+}
+
+/* ============================================================
+   Hairline rule — terminal-style separator. Prefer over <hr>.
+   ============================================================ */
+.hr {
+    height: 1px;
+    background: var(--border-subtle);
+    border: 0;
+    margin: var(--space-4) 0;
+}
+
+/* ============================================================
+   Bootstrap interop — soften the default dark card so existing
+   views inherit the new surface treatment during migration.
+   Padding stays under view control via Bootstrap utilities.
+   ============================================================ */
+.card.bg-dark {
+    background: var(--surface-1) !important;
+    border: var(--rule) !important;
+    border-radius: var(--radius-md);
+}

@@ -2,7 +2,10 @@
 export default defineNuxtConfig({
     ssr: false,
     compatibilityDate: '2024-04-03',
-    css: ['~/src/assets/github-dark-theme.css'],
+    css: [
+        '~/src/assets/github-dark-theme.css',
+        '~/src/assets/design-tokens.css',
+    ],
     devtools: {
         enabled: true,
 
