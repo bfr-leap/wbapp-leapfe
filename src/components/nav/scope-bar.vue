@@ -141,6 +141,12 @@ onBeforeUnmount(() => {
     display: inline-flex;
     align-items: center;
     gap: var(--space-1);
+    /* min-width:0 propagates flex-shrink down to the chips so a
+       long value (e.g. a long subsession title) can ellipsis
+       instead of pushing the bar past the right edge of the
+       header. */
+    min-width: 0;
+    max-width: 100%;
 }
 
 /* Sheet is teleported to <body> — positioned via JS on desktop

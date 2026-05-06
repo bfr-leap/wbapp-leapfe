@@ -61,7 +61,10 @@ function onClick() {
     font-size: var(--text-sm);
     line-height: 1;
     white-space: nowrap;
-    flex-shrink: 0;
+    /* min-width:0 lets the chip shrink below its content size when
+       the bar is constrained, so the value can truncate with
+       ellipsis instead of overflowing the header. */
+    min-width: 0;
     transition: background-color var(--duration-fast) var(--easing-out),
         border-color var(--duration-fast) var(--easing-out);
 }
@@ -77,6 +80,9 @@ function onClick() {
 .scope-chip__value {
     font-weight: 500;
     font-variant-numeric: tabular-nums;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
 }
 .scope-chip--mono .scope-chip__value {
     font-family: var(--font-mono);
