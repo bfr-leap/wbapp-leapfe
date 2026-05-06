@@ -273,8 +273,25 @@ const buildDate = computed(() => {
                 <div class="app-header__user">
                     <SignedOut>
                         <SignInButton>
-                            <button class="button button--ghost button--sm">
-                                Sign In
+                            <button
+                                class="button button--ghost button--sm"
+                                aria-label="Sign in"
+                            >
+                                <svg
+                                    viewBox="0 0 16 16"
+                                    width="16"
+                                    height="16"
+                                    fill="currentColor"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        d="M2 2.75A2.75 2.75 0 0 1 4.75 0h7.5A2.75 2.75 0 0 1 15 2.75v10.5A2.75 2.75 0 0 1 12.25 16h-7.5a.75.75 0 0 1 0-1.5h7.5c.69 0 1.25-.56 1.25-1.25V2.75c0-.69-.56-1.25-1.25-1.25h-7.5c-.69 0-1.25.56-1.25 1.25v10.5a.75.75 0 0 1-1.5 0V2.75Z"
+                                    />
+                                    <path
+                                        d="M9.78 8.53a.75.75 0 0 0 0-1.06L7.06 4.75a.751.751 0 0 0-1.042.018.751.751 0 0 0-.018 1.042l1.47 1.47H1.75a.75.75 0 0 0 0 1.5h5.72L6 10.25a.751.751 0 0 0 .018 1.042.751.751 0 0 0 1.042.018L9.78 8.53Z"
+                                    />
+                                </svg>
+                                <span class="d-none d-sm-inline">Sign In</span>
                             </button>
                         </SignInButton>
                     </SignedOut>
