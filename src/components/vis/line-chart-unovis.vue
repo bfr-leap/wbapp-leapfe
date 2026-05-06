@@ -45,7 +45,7 @@ const isNarrow = computed(() => containerWidth.value < 576);
 // clipped against the section edge.
 const chartMargin = computed(() => ({
     top: 8,
-    right: isNarrow.value ? 32 : 44,
+    right: isNarrow.value ? 24 : 36,
     bottom: isNarrow.value ? 20 : 28,
     left: isNarrow.value ? 4 : 8,
 }));

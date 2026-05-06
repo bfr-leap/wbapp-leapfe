@@ -98,9 +98,9 @@ const tickTextWidth = computed(() => (isNarrow.value ? 70 : 120));
 
 const chartMargin = computed(() => ({
     top: 10,
-    right: 10,
+    right: isNarrow.value ? 32 : 44,
     bottom: isNarrow.value ? 60 : 80,
-    left: isNarrow.value ? 35 : 50,
+    left: isNarrow.value ? 4 : 8,
 }));
 
 const xTickValues = computed(() => chartData.value.map((_, i) => i));
@@ -165,7 +165,12 @@ function tooltipTemplate(d: ChartDatum): string {
                     tickTextFitMode="trim"
                     :gridLine="false"
                 />
-                <VisAxis type="y" :gridLine="false" :tickFormat="yTickFormat" />
+                <VisAxis
+                    type="y"
+                    position="right"
+                    :gridLine="false"
+                    :tickFormat="yTickFormat"
+                />
 
                 <VisCrosshair :template="tooltipTemplate" />
                 <VisTooltip />
