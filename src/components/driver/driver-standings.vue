@@ -2,7 +2,6 @@
 import type { Ref } from 'vue';
 import DriverTag from './driver-tag.vue';
 import TeamTag from '../team/team-tag.vue';
-import LeagueSeasonMenu from '@@/src/components/nav/league-season-menu.vue';
 import type { DriverStandingsModel } from '@@/src/models/driver/driver-standings-model';
 import {
     getDriverStandingsModel,
@@ -36,13 +35,6 @@ const view: Ref<DriverStandingsModel> =
 </script>
 
 <template>
-    <LeagueSeasonMenu
-        v-if="!summary_mode && view.leagueId && view.seasonId"
-        targetPage="standings"
-        v-bind:league="view.leagueId"
-        v-bind:season="view.seasonId"
-    ></LeagueSeasonMenu>
-
     <section class="section">
         <header class="section__head">
             <span class="section__title">Driver Standings</span>

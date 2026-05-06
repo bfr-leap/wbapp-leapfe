@@ -8,7 +8,6 @@ import BarChartUnovis from '@@/src/components/vis/bar-chart-unovis.vue';
 import EventCardLg from '@@/src/components/event/event-card-lg.vue';
 import EventCardSm from '@@/src/components/event/event-card-sm.vue';
 import DriverStandings from '@@/src/components/driver/driver-standings.vue';
-import LeagueSeasonMenu from '@@/src/components/nav/league-season-menu.vue';
 import PastEventCards from '@@/src/components/event/past-event-cards.vue';
 import LeagueRoster from '@@/src/components/driver/league-roster.vue';
 import {
@@ -71,12 +70,6 @@ function onClick(eventInfo: { trackId: string; date: string }) {
 </script>
 
 <template>
-    <LeagueSeasonMenu
-        target-page="season"
-        v-bind:league="seasonProfileModel.leagueId"
-        v-bind:season="seasonProfileModel.seasonId"
-    />
-
     <div class="card bg-dark text-light m-2">
         <div class="card-body p-2">
             <div>Past Events</div>
