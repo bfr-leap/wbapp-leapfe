@@ -119,16 +119,17 @@ const buildDate = computed(() => {
                 <ResultsScopeChip
                     v-if="
                         route.query.m === 'results' &&
-                        lgSeasSubCtx.league_id &&
-                        lgSeasSubCtx.season_id &&
-                        lgSeasSubCtx.subsession_id &&
-                        lgSeasSubCtx.simsession_id
+                        lgSeasSubCtx.league_id
                     "
-                    :key="`results-chip-${lgSeasSubCtx.league_id}-${lgSeasSubCtx.season_id}-${lgSeasSubCtx.subsession_id}-${lgSeasSubCtx.simsession_id}`"
+                    :key="`results-chip-${lgSeasSubCtx.league_id}-${lgSeasSubCtx.season_id || 0}-${lgSeasSubCtx.subsession_id || 0}-${lgSeasSubCtx.simsession_id || 0}`"
                     v-bind:league="lgSeasSubCtx.league_id.toString()"
-                    v-bind:season="lgSeasSubCtx.season_id.toString()"
-                    v-bind:subsession="lgSeasSubCtx.subsession_id.toString()"
-                    v-bind:simsession="lgSeasSubCtx.simsession_id.toString()"
+                    v-bind:season="(lgSeasSubCtx.season_id || 0).toString()"
+                    v-bind:subsession="
+                        (lgSeasSubCtx.subsession_id || 0).toString()
+                    "
+                    v-bind:simsession="
+                        (lgSeasSubCtx.simsession_id || 0).toString()
+                    "
                 />
                 <TrackStatsChip
                     v-else-if="
