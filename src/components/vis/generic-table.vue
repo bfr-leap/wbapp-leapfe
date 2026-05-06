@@ -45,7 +45,7 @@ const table: Ref<GenericTableModel> =
 
 <template>
     <div v-if="table" class="gh-table-wrap">
-        <div class="gh-table-title">{{ table.title }}</div>
+        <div v-if="table.title" class="gh-table-title">{{ table.title }}</div>
         <div class="table-responsive">
             <table class="table table-dark table-hover">
                 <thead style="position: sticky; top: 0">

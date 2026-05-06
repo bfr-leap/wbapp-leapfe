@@ -17,6 +17,7 @@ import {
 import RouterLinkProxy from '@@/src/components/nav/router-link-proxy.vue';
 import LeagueSeasonChip from '@@/src/components/nav/league-season-chip.vue';
 import TrackStatsChip from '@@/src/components/nav/track-stats-chip.vue';
+import ResultsScopeChip from '@@/src/components/nav/results-scope-chip.vue';
 import HomeView from '@@/src/views/HomeView.vue';
 
 const route = useRoute();
@@ -113,8 +114,22 @@ const buildDate = computed(() => {
                     <span class="app-header__brand-text">LEAP</span>
                 </RouterLinkProxy>
 
-                <TrackStatsChip
+                <ResultsScopeChip
                     v-if="
+                        route.query.m === 'results' &&
+                        route.query.league &&
+                        route.query.season &&
+                        route.query.subsession &&
+                        route.query.simsession
+                    "
+                    :key="`results-chip-${route.query.league}-${route.query.season}-${route.query.subsession}-${route.query.simsession}`"
+                    v-bind:league="route.query.league.toString()"
+                    v-bind:season="route.query.season.toString()"
+                    v-bind:subsession="route.query.subsession.toString()"
+                    v-bind:simsession="route.query.simsession.toString()"
+                />
+                <TrackStatsChip
+                    v-else-if="
                         route.query.m === 'track' &&
                         route.query.league &&
                         route.query.car &&
