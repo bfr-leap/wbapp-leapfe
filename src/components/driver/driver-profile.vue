@@ -48,125 +48,108 @@ const penaltySeason = computed<string>(() => {
 </script>
 
 <template>
-    <!-- ── Driver profile header (GitHub org-style) ──────────── -->
-    <div class="gh-profile-header">
-        <div
-            v-bind:class="`driver-img club-${driverProfileModel.memberView.clubId}`"
-        ></div>
-        <div class="gh-profile-info">
-            <DriverTag
-                class="fs-4"
-                v-bind:lastName="driverProfileModel.memberView.lastName"
-                v-bind:firstName="driverProfileModel.memberView.firstName"
-                v-bind:licenseLevel="driverProfileModel.memberView.licenseLevel"
-                v-bind:iRating="driverProfileModel.memberView.iRating"
-                v-bind:safetyRating="driverProfileModel.memberView.safetyRating"
-                v-bind:teamName="driverProfileModel.memberView.teamName"
-                v-bind:clubId="driverProfileModel.memberView.clubId"
-            />
-        </div>
-    </div>
+    <div class="page">
+        <section class="section profile-header">
+            <div
+                v-bind:class="`driver-img club-${driverProfileModel.memberView.clubId}`"
+            ></div>
+            <div class="profile-info">
+                <DriverTag
+                    class="fs-4"
+                    v-bind:lastName="driverProfileModel.memberView.lastName"
+                    v-bind:firstName="driverProfileModel.memberView.firstName"
+                    v-bind:licenseLevel="
+                        driverProfileModel.memberView.licenseLevel
+                    "
+                    v-bind:iRating="driverProfileModel.memberView.iRating"
+                    v-bind:safetyRating="
+                        driverProfileModel.memberView.safetyRating
+                    "
+                    v-bind:teamName="driverProfileModel.memberView.teamName"
+                    v-bind:clubId="driverProfileModel.memberView.clubId"
+                />
+            </div>
+        </section>
 
-    <!-- ── DOTD profile blurb ─────────────────────────────────── -->
-    <div v-if="driverProfileModel.dotdProfile?.blurb" class="dotd-profile">
-        <h6 class="dotd-profile-header">Driver of the Day Profile</h6>
-        <p class="dotd-profile-text">
-            {{ driverProfileModel.dotdProfile.blurb }}
-        </p>
-        <small
-            v-if="driverProfileModel.dotdProfile.generated_at"
-            class="dotd-profile-footer"
+        <section
+            v-if="driverProfileModel.dotdProfile?.blurb"
+            class="section"
         >
-            Generated on:
-            {{
-                new Date(
-                    driverProfileModel.dotdProfile.generated_at
-                ).toLocaleDateString(undefined, {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                })
-            }}
-        </small>
-    </div>
+            <header class="section__head">
+                <span class="section__title">Driver of the Day Profile</span>
+            </header>
+            <p class="dotd-profile-text">
+                {{ driverProfileModel.dotdProfile.blurb }}
+            </p>
+            <small
+                v-if="driverProfileModel.dotdProfile.generated_at"
+                class="dotd-profile-footer"
+            >
+                Generated on:
+                {{
+                    new Date(
+                        driverProfileModel.dotdProfile.generated_at
+                    ).toLocaleDateString(undefined, {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                    })
+                }}
+            </small>
+        </section>
 
-    <!-- ── Stats & charts panel ──────────────────────────────── -->
-    <div class="gh-content-card">
-        <Stats
-            v-if="driverProfileModel.driverStatsMap?.[0]?.[driverId]"
-            :stats="driverProfileModel.driverStatsMap[0][driverId]"
-            :results="driverProfileModel.allTimeResults"
-            seasonName="All Time"
-            v-bind:seasonId="0"
-            v-bind:league-id="props.league"
+        <section class="section">
+            <Stats
+                v-if="driverProfileModel.driverStatsMap?.[0]?.[driverId]"
+                :stats="driverProfileModel.driverStatsMap[0][driverId]"
+                :results="driverProfileModel.allTimeResults"
+                seasonName="All Time"
+                v-bind:seasonId="0"
+                v-bind:league-id="props.league"
+            />
+        </section>
+
+        <DriverPenaltySummary
+            v-if="penaltySeason"
+            v-bind:league="props.league"
+            v-bind:season="penaltySeason"
+            v-bind:driver="props.driver"
         />
     </div>
-
-    <!-- ── Steward rulings panel (hidden when no rulings) ────── -->
-    <DriverPenaltySummary
-        v-if="penaltySeason"
-        v-bind:league="props.league"
-        v-bind:season="penaltySeason"
-        v-bind:driver="props.driver"
-    />
 </template>
 
 <style scoped>
-/* ── GitHub org-style profile header ────────────────────────── */
-.gh-profile-header {
+.profile-header {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 24px 0 16px;
+    gap: var(--space-4);
 }
-
-.gh-profile-info {
+.profile-info {
     flex: 1;
     min-width: 0;
-}
-
-/* ── DOTD profile blurb ─────────────────────────────────────── */
-.dotd-profile {
-    padding: 8px 0;
-    margin-top: 8px;
-}
-
-.dotd-profile-header {
-    margin: 0 0 6px;
-    font-weight: 600;
-    color: var(--gh-text-muted, #8b949e);
 }
 
 .dotd-profile-text {
     margin: 0;
     line-height: 1.5;
-    color: var(--gh-text-primary, #e6edf3);
+    color: var(--text-primary);
 }
-
 .dotd-profile-footer {
     display: block;
-    margin-top: 6px;
+    margin-top: var(--space-2);
     text-align: right;
-    color: var(--gh-text-muted, #8b949e);
-}
-
-/* ── Content card (bordered panel like GitHub README card) ──── */
-.gh-content-card {
-    border: 1px solid var(--gh-border-default);
-    border-radius: var(--gh-radius-md);
-    padding: 16px;
-    margin-top: 8px;
+    color: var(--text-muted);
 }
 
 .driver-img {
     height: 64px;
     width: 64px;
     flex-shrink: 0;
-    background-color: var(--gh-neutral-emphasis);
-    border-radius: var(--gh-radius-full);
+    background-color: var(--surface-2);
+    border: 1px solid var(--border-subtle);
+    border-radius: 50%;
     background-size: cover;
     background-position: center;
-    box-shadow: 0 0 0 1px var(--gh-border-default);
 }
 
 .club-30,
