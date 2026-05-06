@@ -273,14 +273,11 @@ const buildDate = computed(() => {
                 <div class="app-header__user">
                     <SignedOut>
                         <SignInButton>
-                            <button
-                                class="button button--ghost button--sm"
-                                aria-label="Sign in"
-                            >
+                            <button class="icon-btn" aria-label="Sign in">
                                 <svg
                                     viewBox="0 0 16 16"
-                                    width="16"
-                                    height="16"
+                                    width="18"
+                                    height="18"
                                     fill="currentColor"
                                     aria-hidden="true"
                                 >
@@ -291,7 +288,6 @@ const buildDate = computed(() => {
                                         d="M9.78 8.53a.75.75 0 0 0 0-1.06L7.06 4.75a.751.751 0 0 0-1.042.018.751.751 0 0 0-.018 1.042l1.47 1.47H1.75a.75.75 0 0 0 0 1.5h5.72L6 10.25a.751.751 0 0 0 .018 1.042.751.751 0 0 0 1.042.018L9.78 8.53Z"
                                     />
                                 </svg>
-                                <span class="d-none d-sm-inline">Sign In</span>
                             </button>
                         </SignInButton>
                     </SignedOut>

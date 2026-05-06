@@ -432,6 +432,31 @@ body {
     font-size: var(--text-sm);
 }
 
+/* Chromeless icon-only button — matches the visual weight of
+   the helmet/profile avatar so signed-in and signed-out chrome
+   states sit on the same baseline at the right edge of the
+   header. No background, no border, slight opacity to recess. */
+.icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 1.75rem;
+    width: 1.75rem;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    border-radius: 50%;
+    color: var(--text-secondary);
+    cursor: pointer;
+    opacity: 0.85;
+    transition: opacity var(--duration-fast) var(--easing-out),
+        color var(--duration-fast) var(--easing-out);
+}
+.icon-btn:hover {
+    opacity: 1;
+    color: var(--text-primary);
+}
+
 /* ============================================================
    Section — primary structural element. No chrome, no nested
    padding. Eyebrow + content. Adjacent sections separate via
