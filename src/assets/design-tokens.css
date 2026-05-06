@@ -58,6 +58,15 @@
     --penalty: #ef8a4a;
     --dq: #d6243a;
 
+    /* ---- iRacing license-class colors. Applied to the class
+            letter inside a license chip — the chip surface stays
+            nearly neutral so color doesn't dominate the row. ---- */
+    --license-a: #5a9bff;
+    --license-b: #4ec877;
+    --license-c: #f5cb5c;
+    --license-d: #f5803e;
+    --license-r: #ff5c6c;
+
     /* ---- Spacing (4pt grid) ---- */
     --space-1: 0.25rem;
     --space-2: 0.5rem;

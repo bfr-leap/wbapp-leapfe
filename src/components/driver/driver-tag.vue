@@ -37,10 +37,20 @@ const props = defineProps<{
                     <span class="firt-name">{{ props.firstName + ' ' }} </span>
                 </template>
                 <span
-                    v-bind:class="`badge rounded-pill license-pill-${props.licenseLevel.toLowerCase()}`"
-                    >{{ props.iRating }} | {{ props.licenseLevel }}
-                    {{ props.safetyRating }}</span
+                    class="license-chip"
+                    v-bind:class="`license-chip--${props.licenseLevel.toLowerCase()}`"
                 >
+                    <span class="license-chip__rating">{{
+                        props.iRating
+                    }}</span>
+                    <span class="license-chip__sep">·</span>
+                    <span class="license-chip__class">{{
+                        props.licenseLevel
+                    }}</span>
+                    <span class="license-chip__sr">{{
+                        props.safetyRating
+                    }}</span>
+                </span>
             </div>
             <div>
                 <RouterLinkProxy
@@ -61,39 +71,50 @@ const props = defineProps<{
     font-weight: 600;
 }
 
-.license-pill-a {
-    color: var(--gh-label-blue-text) !important;
-    background-color: var(--gh-label-blue-bg) !important;
-    border: 1px solid rgba(56, 139, 253, 0.3);
+.license-chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--space-1);
+    padding: 1px var(--space-2);
+    margin-left: var(--space-1);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-subtle);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    white-space: nowrap;
+}
+.license-chip__rating {
+    color: var(--text-primary);
+}
+.license-chip__sep {
+    color: var(--text-muted);
+}
+.license-chip__class {
+    color: var(--chip-class-color, var(--text-primary));
+    font-weight: 700;
+}
+.license-chip__sr {
+    color: var(--text-secondary);
 }
 
-.license-pill-b {
-    color: var(--gh-label-green-text) !important;
-    background-color: var(--gh-label-green-bg) !important;
-    border: 1px solid rgba(46, 160, 67, 0.3);
+.license-chip--a {
+    --chip-class-color: var(--license-a);
 }
-
-.license-pill-c {
-    color: var(--gh-label-yellow-text) !important;
-    background-color: var(--gh-label-yellow-bg) !important;
-    border: 1px solid rgba(187, 128, 9, 0.3);
+.license-chip--b {
+    --chip-class-color: var(--license-b);
 }
-
-.license-pill-d {
-    color: var(--gh-label-orange-text) !important;
-    background-color: var(--gh-label-orange-bg) !important;
-    border: 1px solid rgba(219, 109, 40, 0.3);
+.license-chip--c {
+    --chip-class-color: var(--license-c);
 }
-
-.license-pill-r {
-    color: var(--gh-label-red-text) !important;
-    background-color: var(--gh-label-red-bg) !important;
-    border: 1px solid rgba(248, 81, 73, 0.3);
+.license-chip--d {
+    --chip-class-color: var(--license-d);
 }
-
-.license-pill-e {
-    color: var(--gh-label-red-text) !important;
-    background-color: var(--gh-label-red-bg) !important;
-    border: 1px solid rgba(248, 81, 73, 0.3);
+.license-chip--r,
+.license-chip--e {
+    --chip-class-color: var(--license-r);
 }
 </style>
