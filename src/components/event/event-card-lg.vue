@@ -117,32 +117,50 @@ updateTimer();
     width: 100%;
     height: 100%;
     object-fit: cover;
-    opacity: 0.55;
+    opacity: 0.6;
 }
 
 .track-logo {
     object-fit: contain;
-    background: rgba(240, 246, 252, 0.06);
+    background: rgba(240, 246, 252, 0.05);
     width: 100%;
     height: 6em;
 }
 .wrap {
     overflow: hidden;
     position: relative;
+    isolation: isolate;
     background: var(--surface-2);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-sm);
+}
+.wrap::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.35) 0%,
+        rgba(0, 0, 0, 0.55) 50%,
+        rgba(0, 0, 0, 0.85) 100%
+    );
+    z-index: 1;
+    pointer-events: none;
 }
 
 .bg {
     position: absolute;
     left: 0;
     top: 0;
+    z-index: 0;
 }
 
 .content {
     position: relative;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.65);
+    z-index: 2;
+    color: var(--text-primary);
+    font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
 }
 
 .padded-title {

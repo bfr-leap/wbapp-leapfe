@@ -43,7 +43,7 @@ const view: Ref<DriverStandingsModel> =
         v-bind:season="view.seasonId"
     ></LeagueSeasonMenu>
 
-    <div class="card bg-dark text-light m-2">
+    <div class="card bg-dark text-light">
         <div class="card-body p-2">
             <div class="container">
                 <div v-if="view.drivers.length !== 0" class="row">
@@ -140,7 +140,7 @@ const view: Ref<DriverStandingsModel> =
         </div>
     </div>
 
-    <div v-if="view.teams.length > 1" class="card bg-dark text-light m-2">
+    <div v-if="view.teams.length > 1" class="card bg-dark text-light">
         <div class="card-body p-2">
             <div class="container">
                 <div v-if="view.teams.length !== 0" class="row">
