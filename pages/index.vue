@@ -16,6 +16,7 @@ import {
 } from '@@/src/utils/fetch-util';
 import RouterLinkProxy from '@@/src/components/nav/router-link-proxy.vue';
 import LeagueSeasonChip from '@@/src/components/nav/league-season-chip.vue';
+import TrackStatsChip from '@@/src/components/nav/track-stats-chip.vue';
 import HomeView from '@@/src/views/HomeView.vue';
 
 const route = useRoute();
@@ -102,8 +103,22 @@ const lgSeasSubCtx: Ref<LgSeasSubCtx> =
                     <span class="app-header__brand-text">LEAP</span>
                 </RouterLinkProxy>
 
+                <TrackStatsChip
+                    v-if="
+                        route.query.m === 'track' &&
+                        route.query.league &&
+                        route.query.car &&
+                        route.query.track
+                    "
+                    :key="`track-chip-${route.query.league}-${route.query.car}-${route.query.track}`"
+                    v-bind:league="route.query.league.toString()"
+                    v-bind:car="route.query.car.toString()"
+                    v-bind:track="route.query.track.toString()"
+                />
                 <LeagueSeasonChip
-                    v-if="lgSeasSubCtx.league_id && lgSeasSubCtx.season_id"
+                    v-else-if="
+                        lgSeasSubCtx.league_id && lgSeasSubCtx.season_id
+                    "
                     :key="`chip-${lgSeasSubCtx.league_id}-${lgSeasSubCtx.season_id}-${route.query.m || ''}`"
                     v-bind:league="lgSeasSubCtx.league_id.toString()"
                     v-bind:season="lgSeasSubCtx.season_id.toString()"

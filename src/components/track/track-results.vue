@@ -4,7 +4,6 @@ import type { Ref } from 'vue';
 import type { TrackStats } from 'lplib/endpoint-types/iracing-endpoints';
 import { getTrackStats } from '@@/src/utils/fetch-util';
 import GenericTable from '@@/src/components/vis/generic-table.vue';
-import TrackResultsMenu from '@@/src/components/nav/track-results-menu.vue';
 import TrackBanner from '@@/src/components/track/track-banner.vue';
 
 const props = defineProps<{
@@ -71,12 +70,6 @@ watchEffect(fetchJsonData);
 </script>
 
 <template>
-    <TrackResultsMenu
-        v-bind:league="props.league"
-        v-bind:car="props.car"
-        v-bind:track="props.track"
-    />
-
     <div class="card bg-dark text-light m-2">
         <div class="card-body p-2">
             <TrackBanner v-bind:track-id="props.track" />
