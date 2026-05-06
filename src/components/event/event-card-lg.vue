@@ -78,7 +78,7 @@ updateTimer();
                     <div class="col">
                         <a
                             v-if="props.embed_mode"
-                            class="btn btn--ghost btn--mono"
+                            class="button button--ghost button--mono"
                             target="_blank"
                             rel="noopener noreferrer"
                             v-bind:href="`?m=track&league=${props.league_id}&car=${props.car_id}&track=${props.track_id}`"
@@ -86,7 +86,7 @@ updateTimer();
                         >
                         <RouterLinkProxy
                             v-else
-                            class="btn btn--ghost btn--mono"
+                            class="button button--ghost button--mono"
                             v-bind:to="`?m=track&league=${props.league_id}&car=${props.car_id}&track=${props.track_id}`"
                             >Track Stats →</RouterLinkProxy
                         >
