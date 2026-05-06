@@ -70,20 +70,24 @@ function onClick(eventInfo: { trackId: string; date: string }) {
 </script>
 
 <template>
-    <div class="page stack">
-        <LeagueSeasonMenu
-            v-if="homeModel.leagueId && homeModel.seasonId"
-            :key="`lsm-${homeModel.leagueId}-${homeModel.seasonId}`"
-            target-page=""
-            v-bind:league="homeModel.leagueId"
-            v-bind:season="homeModel.seasonId"
-        />
+    <div class="page">
+        <section class="section">
+            <LeagueSeasonMenu
+                v-if="homeModel.leagueId && homeModel.seasonId"
+                :key="`lsm-${homeModel.leagueId}-${homeModel.seasonId}`"
+                target-page=""
+                v-bind:league="homeModel.leagueId"
+                v-bind:season="homeModel.seasonId"
+            />
+        </section>
 
         <section
             v-if="homeModel.leagueId && homeModel.seasonId"
-            class="surface stack-sm"
+            class="section"
         >
-            <div class="eyebrow">Past Events</div>
+            <header class="section__head">
+                <span class="section__title">Past Events</span>
+            </header>
             <PastEventCards
                 v-bind:league="homeModel.leagueId"
                 v-bind:season="homeModel.seasonId"
@@ -93,9 +97,21 @@ function onClick(eventInfo: { trackId: string; date: string }) {
 
         <section
             v-if="homeModel.nextRace.date"
-            class="surface surface--lead stack-sm"
+            class="section section--featured"
         >
-            <div class="eyebrow">Up Next</div>
+            <header class="section__head">
+                <span class="section__title">Up Next</span>
+                <SignedIn>
+                    <RouterLinkProxy
+                        v-if="homeModel.allowEditCalendar"
+                        class="section__more"
+                        type="button"
+                        v-bind:to="`/?m=season-cdr-admin&league=${$props.league}&season=${$props.season}`"
+                    >
+                        Edit Calendar
+                    </RouterLinkProxy>
+                </SignedIn>
+            </header>
             <div v-if="homeModel.nextRace.date !== ''" class="row g-1">
                 <div class="col-12 col-sm-3 col-lg-2">
                     <div class="row g-1 flex-sm-column h-100">
@@ -139,16 +155,6 @@ function onClick(eventInfo: { trackId: string; date: string }) {
                 </div>
             </div>
             <div v-else>No Future Events</div>
-            <SignedIn>
-                <RouterLinkProxy
-                    v-if="homeModel.allowEditCalendar"
-                    class="dropdown-item"
-                    type="button"
-                    v-bind:to="`/?m=season-cdr-admin&league=${$props.league}&season=${$props.season}`"
-                >
-                    Edit Calendar
-                </RouterLinkProxy>
-            </SignedIn>
         </section>
 
         <DriverStandings
@@ -159,12 +165,12 @@ function onClick(eventInfo: { trackId: string; date: string }) {
             v-bind:league="homeModel.leagueId"
         />
 
-        <section class="surface surface--bare">
+        <section class="section">
             <RouterLinkProxy
                 v-if="homeModel.seasonId && homeModel.leagueId"
-                class="link-light"
+                class="section__more"
                 v-bind:to="`?m=season&league=${homeModel.leagueId}&season=${homeModel.seasonId}`"
-                >See More Season Details</RouterLinkProxy
+                >See More Season Details →</RouterLinkProxy
             >
         </section>
     </div>

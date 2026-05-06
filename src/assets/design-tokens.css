@@ -346,9 +346,61 @@ body {
 }
 
 /* ============================================================
-   Bootstrap interop — soften the default dark card so existing
-   views inherit the new surface treatment during migration.
-   Padding stays under view control via Bootstrap utilities.
+   Section — primary structural element. No chrome, no nested
+   padding. Eyebrow + content. Adjacent sections separate via
+   a hairline rule, the way data-dense terminals (Bloomberg,
+   Linear, Stripe) compose pages — typography and rules carry
+   structure instead of stacked card backgrounds.
+
+       <section class="section">
+         <header class="section__head">
+           <span class="section__title">Standings</span>
+           <a class="section__more">See all</a>
+         </header>
+         <!-- content sits at .page padding edge -->
+       </section>
+   ============================================================ */
+.section__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+}
+.section__title {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--text-muted);
+    font-weight: 600;
+}
+.section__more {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    text-decoration: none;
+}
+.section__more:hover {
+    color: var(--text-primary);
+}
+
+.section + .section {
+    margin-top: var(--space-5);
+    padding-top: var(--space-5);
+    border-top: var(--rule);
+}
+
+/* Featured section — accent stripe sits in the page gutter via
+   a negative outer box-shadow, so content alignment is identical
+   to non-featured sections. */
+.section--featured {
+    box-shadow: -3px 0 0 var(--accent);
+}
+
+/* ============================================================
+   Bootstrap interop — soften the default dark card so legacy
+   views inherit the new surface treatment until they migrate
+   to .section. Once all views are converted, this block can
+   be removed.
    ============================================================ */
 .card.bg-dark {
     background: var(--surface-1) !important;

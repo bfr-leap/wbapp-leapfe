@@ -43,194 +43,178 @@ const view: Ref<DriverStandingsModel> =
         v-bind:season="view.seasonId"
     ></LeagueSeasonMenu>
 
-    <div class="card bg-dark text-light">
-        <div class="card-body p-2">
-            <div class="container">
-                <div v-if="view.drivers.length !== 0" class="row">
-                    <div
-                        class="col-3 d-flex d-sm-none align-items-center justify-content-center"
-                    >
-                        <span class="eyebrow">POS · PTS</span>
-                    </div>
-                    <div
-                        class="col-2 d-none d-sm-flex text-center justify-content-center align-items-center"
-                    >
-                        <span class="eyebrow">LEAP Ranking</span>
-                    </div>
-                    <div
-                        class="col-2 d-none d-sm-flex text-center justify-content-center align-items-center"
-                    >
-                        <span class="eyebrow">LEAP Points</span>
-                    </div>
-                    <div class="col-2 col-lg-1 text-center"></div>
-                    <div
-                        class="col-7 col-sm-6 col-lg-7 d-flex align-items-center"
-                    >
-                        <span class="eyebrow">Driver</span>
-                    </div>
-                </div>
-
-                <template
-                    v-if="view.drivers.length !== 0"
-                    v-for="(member, i) in view.drivers"
-                >
-                    <div class="row">
-                        <div
-                            class="col-3 justify-content-center d-flex d-sm-none text-center flex-column"
-                        >
-                            <div class="fs-2 num">
-                                {{ member.position }}
-                            </div>
-                            <div
-                                class="num d-flex justify-content-center pts-line"
-                            >
-                                <span>{{ member.points }} pts</span>
-                            </div>
-                        </div>
-                        <div
-                            class="col-2 d-none d-sm-flex justify-content-center fs-2 num"
-                        >
-                            <div>{{ member.position }}</div>
-                        </div>
-                        <div
-                            class="col-2 d-none d-sm-flex justify-content-center fs-4 num"
-                        >
-                            <div>{{ member.points }}</div>
-                        </div>
-                        <div class="col-2 col-lg-1 text-center">
-                            <div
-                                v-bind:class="`driver-img club-${member.clubId}`"
-                            ></div>
-                        </div>
-                        <div class="col-7 col-sm-6 col-lg-7">
-                            <DriverTag
-                                v-bind:lastName="member.lastName"
-                                v-bind:firstName="member.firstName"
-                                v-bind:licenseLevel="member.licenseLevel"
-                                v-bind:iRating="member.iRating"
-                                v-bind:safetyRating="member.safetyRating"
-                                v-bind:teamName="member.teamName"
-                                v-bind:clubId="member.clubId"
-                                v-bind:driverId="member.custId"
-                                v-bind:teamId="member.teamId?.toString()"
-                                v-bind:leagueId="view.leagueId"
-                            />
-                        </div>
-                    </div>
-                    <div class="row">
-                        <!-- <div class="col text-center">&#x25BC;</div> -->
-                        <div class="col text-center" style="height: 1em"></div>
-                    </div>
-                </template>
+    <section class="section">
+        <header class="section__head">
+            <span class="section__title">Driver Standings</span>
+            <RouterLinkProxy
+                v-if="view.drivers.length !== 0 && summary_mode"
+                class="section__more"
+                type="button"
+                v-bind:to="`?m=standings&league=${view.leagueId}&season=${view.seasonId}`"
+                >See all →
+            </RouterLinkProxy>
+        </header>
+        <div class="container">
+            <div v-if="view.drivers.length !== 0" class="row">
                 <div
-                    class="row"
-                    v-if="view.drivers.length !== 0 && summary_mode"
+                    class="col-3 d-flex d-sm-none align-items-center justify-content-center"
                 >
-                    <RouterLinkProxy
-                        class="dropdown-item"
-                        type="button"
-                        v-bind:to="`?m=standings&league=${view.leagueId}&season=${view.seasonId}`"
-                        >See all Standings
-                    </RouterLinkProxy>
+                    <span class="eyebrow">POS · PTS</span>
                 </div>
-                <div class="row" v-if="view.drivers.length === 0">
-                    Standings not Available
+                <div
+                    class="col-2 d-none d-sm-flex text-center justify-content-center align-items-center"
+                >
+                    <span class="eyebrow">LEAP Ranking</span>
+                </div>
+                <div
+                    class="col-2 d-none d-sm-flex text-center justify-content-center align-items-center"
+                >
+                    <span class="eyebrow">LEAP Points</span>
+                </div>
+                <div class="col-2 col-lg-1 text-center"></div>
+                <div class="col-7 col-sm-6 col-lg-7 d-flex align-items-center">
+                    <span class="eyebrow">Driver</span>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div v-if="view.teams.length > 1" class="card bg-dark text-light">
-        <div class="card-body p-2">
-            <div class="container">
-                <div v-if="view.teams.length !== 0" class="row">
+            <template
+                v-if="view.drivers.length !== 0"
+                v-for="(member, i) in view.drivers"
+            >
+                <div class="row standings-row">
                     <div
-                        class="col-3 d-flex d-sm-none align-items-center justify-content-center"
+                        class="col-3 justify-content-center d-flex d-sm-none text-center flex-column"
                     >
-                        <span class="eyebrow">POS · PTS</span>
+                        <div class="fs-2 num">
+                            {{ member.position }}
+                        </div>
+                        <div class="num d-flex justify-content-center pts-line">
+                            <span>{{ member.points }} pts</span>
+                        </div>
                     </div>
                     <div
-                        class="col-2 d-none d-sm-flex text-center justify-content-center align-items-center"
+                        class="col-2 d-none d-sm-flex justify-content-center fs-2 num"
                     >
-                        <span class="eyebrow">LEAP Ranking</span>
+                        <div>{{ member.position }}</div>
                     </div>
                     <div
-                        class="col-2 d-none d-sm-flex text-center justify-content-center align-items-center"
+                        class="col-2 d-none d-sm-flex justify-content-center fs-4 num"
                     >
-                        <span class="eyebrow">LEAP Points</span>
+                        <div>{{ member.points }}</div>
                     </div>
-                    <div class="col-2 col-lg-1 text-center"></div>
-                    <div
-                        class="col-7 col-sm-6 col-lg-7 d-flex align-items-center"
-                    >
-                        <span class="eyebrow">Team</span>
+                    <div class="col-2 col-lg-1 text-center">
+                        <div
+                            v-bind:class="`driver-img club-${member.clubId}`"
+                        ></div>
+                    </div>
+                    <div class="col-7 col-sm-6 col-lg-7">
+                        <DriverTag
+                            v-bind:lastName="member.lastName"
+                            v-bind:firstName="member.firstName"
+                            v-bind:licenseLevel="member.licenseLevel"
+                            v-bind:iRating="member.iRating"
+                            v-bind:safetyRating="member.safetyRating"
+                            v-bind:teamName="member.teamName"
+                            v-bind:clubId="member.clubId"
+                            v-bind:driverId="member.custId"
+                            v-bind:teamId="member.teamId?.toString()"
+                            v-bind:leagueId="view.leagueId"
+                        />
                     </div>
                 </div>
-
-                <template
-                    v-if="view.teams.length !== 0"
-                    v-for="(team, i) in view.teams"
-                >
-                    <div v-if="team.teamId" class="row">
-                        <div
-                            class="col-3 justify-content-center d-flex d-sm-none text-center flex-column"
-                        >
-                            <div class="fs-2 num">
-                                {{ team.position }}
-                            </div>
-                            <div
-                                class="num d-flex justify-content-center pts-line"
-                            >
-                                <span>{{ team.points }} pts</span>
-                            </div>
-                        </div>
-                        <div
-                            class="col-2 d-none d-sm-flex justify-content-center fs-2 num"
-                        >
-                            <div>{{ team.position }}</div>
-                        </div>
-                        <div
-                            class="col-2 d-none d-sm-flex justify-content-center fs-4 num"
-                        >
-                            <div>{{ team.points }}</div>
-                        </div>
-                        <div class="col-2 col-lg-1 text-center">
-                            <div
-                                v-bind:class="`driver-img team-${team.teamId}`"
-                            ></div>
-                        </div>
-                        <div class="col-7 col-sm-6 col-lg-7">
-                            <!-- <RouterLinkProxy
-                                class="dropdown-item"
-                                type="button"
-                                v-bind:to="`?m=team&league=${props.league}&team=${team.teamId}`"
-                            >
-                                {{ team.teamName }}</RouterLinkProxy
-                            > -->
-                            <TeamTag
-                                v-bind:league-id="view.leagueId"
-                                v-bind:team-id="team.teamId"
-                            ></TeamTag>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col text-center" style="height: 1em"></div>
-                    </div>
-                </template>
-                <div class="row" v-if="view.teams.length !== 0 && summary_mode">
-                    <RouterLinkProxy
-                        class="dropdown-item"
-                        type="button"
-                        v-bind:to="`?m=standings&league=${view.leagueId}&season=${view.seasonId}`"
-                        >See all Standings
-                    </RouterLinkProxy>
-                </div>
+            </template>
+            <div class="row" v-if="view.drivers.length === 0">
+                Standings not Available
             </div>
         </div>
-    </div>
+    </section>
+
+    <section v-if="view.teams.length > 1" class="section">
+        <header class="section__head">
+            <span class="section__title">Team Standings</span>
+            <RouterLinkProxy
+                v-if="view.teams.length !== 0 && summary_mode"
+                class="section__more"
+                type="button"
+                v-bind:to="`?m=standings&league=${view.leagueId}&season=${view.seasonId}`"
+                >See all →
+            </RouterLinkProxy>
+        </header>
+        <div class="container">
+            <div v-if="view.teams.length !== 0" class="row">
+                <div
+                    class="col-3 d-flex d-sm-none align-items-center justify-content-center"
+                >
+                    <span class="eyebrow">POS · PTS</span>
+                </div>
+                <div
+                    class="col-2 d-none d-sm-flex text-center justify-content-center align-items-center"
+                >
+                    <span class="eyebrow">LEAP Ranking</span>
+                </div>
+                <div
+                    class="col-2 d-none d-sm-flex text-center justify-content-center align-items-center"
+                >
+                    <span class="eyebrow">LEAP Points</span>
+                </div>
+                <div class="col-2 col-lg-1 text-center"></div>
+                <div class="col-7 col-sm-6 col-lg-7 d-flex align-items-center">
+                    <span class="eyebrow">Team</span>
+                </div>
+            </div>
+
+            <template
+                v-if="view.teams.length !== 0"
+                v-for="(team, i) in view.teams"
+            >
+                <div v-if="team.teamId" class="row standings-row">
+                    <div
+                        class="col-3 justify-content-center d-flex d-sm-none text-center flex-column"
+                    >
+                        <div class="fs-2 num">
+                            {{ team.position }}
+                        </div>
+                        <div class="num d-flex justify-content-center pts-line">
+                            <span>{{ team.points }} pts</span>
+                        </div>
+                    </div>
+                    <div
+                        class="col-2 d-none d-sm-flex justify-content-center fs-2 num"
+                    >
+                        <div>{{ team.position }}</div>
+                    </div>
+                    <div
+                        class="col-2 d-none d-sm-flex justify-content-center fs-4 num"
+                    >
+                        <div>{{ team.points }}</div>
+                    </div>
+                    <div class="col-2 col-lg-1 text-center">
+                        <div
+                            v-bind:class="`driver-img team-${team.teamId}`"
+                        ></div>
+                    </div>
+                    <div class="col-7 col-sm-6 col-lg-7">
+                        <TeamTag
+                            v-bind:league-id="view.leagueId"
+                            v-bind:team-id="team.teamId"
+                        ></TeamTag>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </section>
 </template>
 
 <style scoped>
+.standings-row {
+    align-items: center;
+    padding: var(--space-3) 0;
+    border-bottom: var(--rule);
+}
+.standings-row:last-child {
+    border-bottom: 0;
+}
+
 .pts-line {
     font-size: 0.8125rem;
     color: var(--text-muted);
