@@ -204,35 +204,46 @@ function onToggleAll() {
                     :curveType="CurveType.Linear"
                 />
 
-                <VisAxis type="x" :gridLine="false" :numTicks="5" />
-                <VisAxis type="y" :gridLine="false" :numTicks="5" />
+                <VisAxis type="x" :gridLine="true" :numTicks="5" />
+                <VisAxis type="y" :gridLine="true" :numTicks="5" />
             </VisXYContainer>
         </div>
-        <div class="legend-area d-print-none">
-            <button class="toggle-btn" @click="onToggleAll">Toggle All</button>
+        <div class="legend-toolbar d-print-none">
+            <button
+                type="button"
+                class="button button--ghost button--sm"
+                @click="onToggleAll"
+            >
+                Toggle All
+            </button>
         </div>
         <div class="legend-area d-print-none">
-            <div v-for="(series, i) in props.data" :key="i" class="legend-item">
-                <button class="toggle-btn" @click="onToggle(i)">
-                    <span
-                        class="color-swatch"
-                        :style="{
-                            backgroundColor: toggleState[i]
-                                ? baseColors[i % baseColors.length]
-                                : baseColors[i % baseColors.length] + '08',
-                        }"
-                    ></span>
-                    {{ series.name }}
-                </button>
-            </div>
+            <button
+                v-for="(series, i) in props.data"
+                :key="i"
+                type="button"
+                class="legend-chip"
+                :class="{ 'legend-chip--off': !toggleState[i] }"
+                @click="onToggle(i)"
+            >
+                <span
+                    class="legend-chip__dot"
+                    :style="{
+                        backgroundColor: baseColors[i % baseColors.length],
+                    }"
+                ></span>
+                <span class="legend-chip__name">{{ series.name }}</span>
+            </button>
         </div>
     </div>
 </template>
 
 <style scoped>
 .chart-title {
-    color: var(--gh-fg-default, #e6edf3);
-    margin-bottom: 4px;
+    color: var(--text-primary);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    margin-bottom: var(--space-2);
 }
 
 .chart-container {
@@ -245,52 +256,91 @@ function onToggleAll() {
     height: 100% !important;
 }
 
+/* Mono, tabular, recessed axis labels — they are reference, not
+   data. Default unovis labels are sans and slightly too bright. */
+.chart-container :deep(.unovis-axis text),
+.chart-container :deep(text.tick-label) {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    fill: var(--text-muted);
+}
 .chart-container.narrow :deep(text) {
     font-size: 10px !important;
+}
+
+/* Grid + axis lines as hairlines so the data dominates rather
+   than the chrome around it. */
+.chart-container :deep(.unovis-axis .grid line),
+.chart-container :deep(.unovis-axis .domain),
+.chart-container :deep(.unovis-axis line) {
+    stroke: var(--border-subtle);
+    stroke-width: 1;
+}
+
+.legend-toolbar {
+    display: flex;
+    justify-content: center;
+    margin-top: var(--space-3);
 }
 
 .legend-area {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    gap: var(--space-1);
+    margin-top: var(--space-2);
 }
 
-.legend-item {
-    padding: 0.25rem;
-}
-
-.toggle-btn {
-    background-color: var(--gh-canvas-subtle, #161b22);
-    color: var(--gh-fg-default, #e6edf3);
-    border: none;
-    padding: 4px 8px;
-    border-radius: 4px;
+.legend-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-2);
+    background: transparent;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: var(--text-xs);
+    line-height: 1;
     cursor: pointer;
+    transition: background-color var(--duration-fast) var(--easing-out),
+        border-color var(--duration-fast) var(--easing-out),
+        color var(--duration-fast) var(--easing-out),
+        opacity var(--duration-fast) var(--easing-out);
+}
+.legend-chip:hover {
+    background: var(--surface-2);
+    border-color: var(--border-strong);
+}
+.legend-chip--off {
+    color: var(--text-muted);
+    opacity: 0.6;
 }
 
-.toggle-btn:hover {
-    opacity: 0.8;
+.legend-chip__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: opacity var(--duration-fast) var(--easing-out);
+}
+.legend-chip--off .legend-chip__dot {
+    opacity: 0.35;
 }
 
-.color-swatch {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
+.legend-chip__name {
+    font-variant-numeric: tabular-nums;
 }
 
 @media (max-width: 576px) {
-    .toggle-btn {
-        font-size: 0.75rem;
-        padding: 2px 5px;
+    .legend-chip {
+        font-size: 0.6875rem;
+        padding: 2px var(--space-2);
     }
-
-    .legend-item {
-        padding: 0.125rem;
-    }
-
-    .color-swatch {
-        width: 8px;
-        height: 8px;
+    .legend-chip__dot {
+        width: 7px;
+        height: 7px;
     }
 }
 </style>
