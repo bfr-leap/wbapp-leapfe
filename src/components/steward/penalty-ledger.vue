@@ -152,240 +152,280 @@ function isValidUrl(u: string): boolean {
     }
 }
 
+/**
+ * Compress evidence URLs to host + a short tail so a Discord link
+ * doesn't dominate the row with a long opaque ID. Falls back to
+ * the raw string if the URL doesn't parse.
+ */
+function shortenUrl(u: string): string {
+    try {
+        const parsed = new URL(u);
+        if (parsed.host.endsWith('discord.com')) return 'Discord message';
+        return parsed.host;
+    } catch {
+        return u;
+    }
+}
+
+/**
+ * Map a classification string to the .tag color modifier so a
+ * "Disqualification" reads red, "Major Penalty" orange, "Minor
+ * Penalty" yellow, and "Reprimand" stays neutral. Unknown
+ * classifications fall through to no modifier.
+ */
+function classificationTagClass(classification: string): string {
+    const k = classification.toLowerCase();
+    if (k.includes('disqualif')) return 'tag--dq';
+    if (k.includes('major')) return 'tag--penalty';
+    if (k.includes('minor') || k.includes('warn')) return 'tag--warn';
+    return '';
+}
+
 const standings = computed<DriverLicenseStanding[]>(
     () => model.value.standings
 );
 </script>
 
 <template>
-    <div class="card bg-dark text-light m-2">
-        <div class="card-body p-2">
-            <!-- ── Tabs ────────────────────────────────────────────── -->
-            <ul class="nav nav-tabs mb-3">
-                <li class="nav-item">
-                    <button
-                        type="button"
-                        class="nav-link"
-                        :class="{ active: activeTab === 'ledger' }"
-                        @click="activeTab = 'ledger'"
-                    >
-                        Penalty Ledger
-                    </button>
-                </li>
-                <li class="nav-item">
-                    <button
-                        type="button"
-                        class="nav-link"
-                        :class="{ active: activeTab === 'standings' }"
-                        @click="activeTab = 'standings'"
-                    >
-                        License Standings
-                    </button>
-                </li>
-            </ul>
+    <div class="page">
+        <!-- ── Tabs ────────────────────────────────────────────── -->
+        <div class="tabs" role="tablist">
+            <button
+                type="button"
+                class="tabs__item"
+                v-bind:class="{ 'tabs__item--active': activeTab === 'ledger' }"
+                role="tab"
+                v-bind:aria-selected="activeTab === 'ledger'"
+                @click="activeTab = 'ledger'"
+            >
+                Penalty Ledger
+            </button>
+            <button
+                type="button"
+                class="tabs__item"
+                v-bind:class="{
+                    'tabs__item--active': activeTab === 'standings',
+                }"
+                role="tab"
+                v-bind:aria-selected="activeTab === 'standings'"
+                @click="activeTab = 'standings'"
+            >
+                License Standings
+            </button>
+        </div>
 
-            <div v-if="errorMsg" class="alert alert-danger">
-                {{ errorMsg }}
+        <div v-if="errorMsg" class="alert alert-danger">
+            {{ errorMsg }}
+        </div>
+
+        <!-- ── Penalty Ledger Tab ──────────────────────────────── -->
+        <div v-if="activeTab === 'ledger'">
+            <div class="ledger-filters">
+                <div class="ledger-filter">
+                    <label
+                        for="ledgerDriverFilter"
+                        class="ledger-filter-label"
+                    >
+                        Driver
+                    </label>
+                    <input
+                        id="ledgerDriverFilter"
+                        type="text"
+                        class="form-control form-control-sm"
+                        placeholder="Filter by name or Discord id..."
+                        v-model="driverFilter"
+                    />
+                </div>
+                <div class="ledger-filter">
+                    <label
+                        for="ledgerClassFilter"
+                        class="ledger-filter-label"
+                    >
+                        Classification
+                    </label>
+                    <select
+                        id="ledgerClassFilter"
+                        class="form-select form-select-sm"
+                        v-model="classificationFilter"
+                    >
+                        <option value="">All classifications</option>
+                        <option v-for="c in classifications" :key="c" :value="c">
+                            {{ c }}
+                        </option>
+                    </select>
+                </div>
+                <button
+                    v-if="driverFilter || classificationFilter"
+                    type="button"
+                    class="button button--ghost button--sm ledger-filter-clear"
+                    @click="
+                        driverFilter = '';
+                        classificationFilter = '';
+                    "
+                >
+                    Clear
+                </button>
             </div>
 
-            <!-- ── Penalty Ledger Tab ──────────────────────────────── -->
-            <div v-if="activeTab === 'ledger'">
-                <div class="ledger-filters">
-                    <div class="ledger-filter">
-                        <label
-                            for="ledgerDriverFilter"
-                            class="ledger-filter-label"
-                        >
-                            Driver
-                        </label>
-                        <input
-                            id="ledgerDriverFilter"
-                            type="text"
-                            class="form-control form-control-sm"
-                            placeholder="Filter by name or Discord id..."
-                            v-model="driverFilter"
-                        />
-                    </div>
-                    <div class="ledger-filter">
-                        <label
-                            for="ledgerClassFilter"
-                            class="ledger-filter-label"
-                        >
-                            Classification
-                        </label>
-                        <select
-                            id="ledgerClassFilter"
-                            class="form-select form-select-sm"
-                            v-model="classificationFilter"
-                        >
-                            <option value="">All classifications</option>
-                            <option
-                                v-for="c in classifications"
-                                :key="c"
-                                :value="c"
-                            >
-                                {{ c }}
-                            </option>
-                        </select>
-                    </div>
-                    <button
-                        v-if="driverFilter || classificationFilter"
-                        type="button"
-                        class="btn btn-sm btn-outline-secondary ledger-filter-clear"
-                        @click="
-                            driverFilter = '';
-                            classificationFilter = '';
-                        "
-                    >
-                        Clear
-                    </button>
-                </div>
+            <div
+                v-if="
+                    !loading &&
+                    filteredRulings.length === 0 &&
+                    model.rulings.length === 0
+                "
+                class="ledger-empty"
+            >
+                No steward rulings have been issued for this season.
+            </div>
+            <div
+                v-else-if="
+                    !loading &&
+                    filteredRulings.length === 0 &&
+                    model.rulings.length > 0
+                "
+                class="ledger-empty"
+            >
+                No rulings match the current filters.
+            </div>
 
-                <div
-                    v-if="
-                        !loading &&
-                        filteredRulings.length === 0 &&
-                        model.rulings.length === 0
-                    "
-                    class="text-muted py-4 text-center"
-                >
-                    No steward rulings have been issued for this season.
-                </div>
-                <div
-                    v-else-if="
-                        !loading &&
-                        filteredRulings.length === 0 &&
-                        model.rulings.length > 0
-                    "
-                    class="text-muted py-4 text-center"
-                >
-                    No rulings match the current filters.
-                </div>
-
-                <div
-                    v-for="r in filteredRulings"
-                    :key="r.ruling_id"
-                    class="ruling-card"
-                >
-                    <div class="ruling-card-header">
-                        <div>
-                            <div class="ruling-driver">
-                                {{ rulingDriverName(r) }}
-                            </div>
-                            <div class="ruling-meta">
-                                {{ formatDate(r.ruling_date) }}
-                                <span v-if="sessionLabel(r)" class="ms-2">
-                                    · {{ sessionLabel(r) }}
-                                </span>
-                            </div>
+            <div
+                v-for="r in filteredRulings"
+                :key="r.ruling_id"
+                class="ruling-card"
+            >
+                <div class="ruling-card-header">
+                    <div>
+                        <div class="ruling-driver">
+                            {{ rulingDriverName(r) }}
                         </div>
-                        <div class="ruling-tags">
-                            <span
-                                v-if="r.classification"
-                                class="badge bg-warning text-dark"
-                            >
-                                {{ r.classification }}
-                            </span>
-                            <span
-                                class="badge bg-danger ms-1"
-                                title="License points assigned"
-                            >
-                                {{ r.license_points || 0 }} pts
+                        <div class="ruling-meta">
+                            {{ formatDate(r.ruling_date) }}
+                            <span v-if="sessionLabel(r)">
+                                · {{ sessionLabel(r) }}
                             </span>
                         </div>
                     </div>
-
-                    <div v-if="r.infraction" class="ruling-row">
-                        <span class="ruling-label">Infraction:</span>
-                        <span>{{ r.infraction }}</span>
-                    </div>
-
-                    <div
-                        v-if="r.sanctions && r.sanctions.length > 0"
-                        class="ruling-row"
-                    >
-                        <span class="ruling-label">Sanctions:</span>
-                        <ul class="ruling-sanctions">
-                            <li v-for="(s, i) in r.sanctions" :key="i">
-                                {{ sanctionLabel(s) }}
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div
-                        v-if="r.evidence_urls && r.evidence_urls.length > 0"
-                        class="ruling-row"
-                    >
-                        <span class="ruling-label">Evidence:</span>
-                        <ul class="ruling-evidence">
-                            <li v-for="(u, i) in r.evidence_urls" :key="i">
-                                <a
-                                    v-if="isValidUrl(u)"
-                                    :href="u"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    {{ u }}
-                                </a>
-                                <span v-else>{{ u }}</span>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div v-if="r.steward_notes" class="ruling-row">
-                        <span class="ruling-label">Steward notes:</span>
-                        <div class="ruling-notes">{{ r.steward_notes }}</div>
+                    <div class="ruling-tags">
+                        <span
+                            v-if="r.classification"
+                            class="tag"
+                            v-bind:class="classificationTagClass(r.classification)"
+                        >
+                            {{ r.classification }}
+                        </span>
+                        <span
+                            class="tag tag--dq"
+                            title="License points assigned"
+                        >
+                            {{ r.license_points || 0 }} pts
+                        </span>
                     </div>
                 </div>
-            </div>
 
-            <!-- ── License Standings Tab ───────────────────────────── -->
-            <div v-if="activeTab === 'standings'">
+                <div v-if="r.infraction" class="ruling-row">
+                    <span class="ruling-label">Infraction</span>
+                    <span>{{ r.infraction }}</span>
+                </div>
+
                 <div
-                    v-if="!loading && standings.length === 0"
-                    class="text-muted py-4 text-center"
+                    v-if="r.sanctions && r.sanctions.length > 0"
+                    class="ruling-row"
                 >
-                    No license points have been issued this season.
+                    <span class="ruling-label">Sanctions</span>
+                    <ul class="ruling-sanctions">
+                        <li v-for="(s, i) in r.sanctions" :key="i">
+                            {{ sanctionLabel(s) }}
+                        </li>
+                    </ul>
                 </div>
-                <table v-else class="table table-dark table-hover">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Driver</th>
-                            <th class="text-end">License points</th>
-                            <th class="text-end">Rulings</th>
-                            <th class="text-end">Champ. pts deducted</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(s, i) in standings" :key="s.key">
-                            <td>{{ i + 1 }}</td>
-                            <td>{{ s.driverName }}</td>
-                            <td class="text-end">{{ s.totalLicensePoints }}</td>
-                            <td class="text-end">{{ s.totalRulings }}</td>
-                            <td class="text-end">
-                                {{ s.totalChampionshipPointDeduction }}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+
+                <div
+                    v-if="r.evidence_urls && r.evidence_urls.length > 0"
+                    class="ruling-row"
+                >
+                    <span class="ruling-label">Evidence</span>
+                    <ul class="ruling-evidence">
+                        <li v-for="(u, i) in r.evidence_urls" :key="i">
+                            <a
+                                v-if="isValidUrl(u)"
+                                :href="u"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                >{{ shortenUrl(u) }} →</a
+                            >
+                            <span v-else>{{ u }}</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div v-if="r.steward_notes" class="ruling-row">
+                    <span class="ruling-label">Steward notes</span>
+                    <div class="ruling-notes">{{ r.steward_notes }}</div>
+                </div>
             </div>
+        </div>
+
+        <!-- ── License Standings Tab ───────────────────────────── -->
+        <div v-if="activeTab === 'standings'">
+            <div
+                v-if="!loading && standings.length === 0"
+                class="ledger-empty"
+            >
+                No license points have been issued this season.
+            </div>
+            <table v-else class="standings-table">
+                <thead>
+                    <tr>
+                        <th class="num">#</th>
+                        <th>Driver</th>
+                        <th class="text-end num">License pts</th>
+                        <th class="text-end num">Rulings</th>
+                        <th class="text-end num">Champ. pts</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(s, i) in standings" :key="s.key">
+                        <td class="num">{{ i + 1 }}</td>
+                        <td>{{ s.driverName }}</td>
+                        <td class="text-end num">
+                            {{ s.totalLicensePoints }}
+                        </td>
+                        <td class="text-end num">{{ s.totalRulings }}</td>
+                        <td class="text-end num">
+                            {{ s.totalChampionshipPointDeduction }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </template>
 
 <style scoped>
+.alert {
+    background: rgba(214, 36, 58, 0.08);
+    border: 1px solid var(--dq);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    padding: var(--space-3) var(--space-4);
+    margin-bottom: var(--space-4);
+    font-size: var(--text-sm);
+}
+
+.ledger-empty {
+    color: var(--text-muted);
+    text-align: center;
+    padding: var(--space-6) 0;
+    font-size: var(--text-sm);
+}
+
 /* ── Filter bar ─────────────────────────────────────────────── */
 .ledger-filters {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
-    gap: 12px;
-    padding: 12px;
-    margin-bottom: 16px;
-    background-color: var(--gh-canvas-subtle);
-    border: 1px solid var(--gh-border-default);
-    border-radius: var(--gh-radius-md);
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
 }
 
 .ledger-filter {
@@ -395,125 +435,159 @@ const standings = computed<DriverLicenseStanding[]>(
 
 .ledger-filter-label {
     display: block;
-    font-size: 0.75rem;
+    font-size: var(--text-xs);
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.03em;
-    color: var(--gh-fg-muted);
-    margin-bottom: 4px;
+    letter-spacing: var(--tracking-wide);
+    color: var(--text-muted);
+    margin-bottom: var(--space-1);
 }
 
 .ledger-filter-clear {
     flex: 0 0 auto;
-    align-self: flex-end;
-    height: calc(1.5em + 0.5rem + 2px); /* match form-control-sm height */
 }
 
-/* The global theme already styles .form-control; fill in the gap
-   for .form-select, which Bootstrap ships with a hardcoded dark
-   chevron SVG that vanishes against a dark background. */
 .ledger-filters :deep(.form-control),
 .ledger-filters :deep(.form-select) {
-    background-color: var(--gh-input-bg);
-    border: 1px solid var(--gh-input-border);
-    color: var(--gh-input-text);
-    border-radius: var(--gh-radius-md);
+    background: var(--surface-2);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-primary);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+    padding: var(--space-2) var(--space-3);
+    width: 100%;
 }
-
 .ledger-filters :deep(.form-control::placeholder) {
-    color: var(--gh-input-placeholder);
+    color: var(--text-muted);
 }
-
 .ledger-filters :deep(.form-control:focus),
 .ledger-filters :deep(.form-select:focus) {
-    background-color: var(--gh-input-bg);
-    border-color: var(--gh-input-focus-border);
-    box-shadow: var(--gh-input-focus-shadow);
-    color: var(--gh-input-text);
+    background: var(--surface-3);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent);
+    color: var(--text-primary);
     outline: none;
 }
 
-/* Light-coloured chevron for the select dropdown. URL-encoded so we
-   don't need an external asset. Stroke is --gh-fg-muted (#8b949e). */
 .ledger-filters :deep(.form-select) {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%238b949e' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23a8b1bd' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
     background-repeat: no-repeat;
-    background-position: right 0.75rem center;
-    background-size: 14px 10px;
+    background-position: right var(--space-3) center;
+    background-size: 12px 8px;
     padding-right: 2rem;
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
 }
-
-/* Native option list uses browser chrome, but most engines honour
-   this background so the dropdown at least doesn't flash white. */
 .ledger-filters :deep(.form-select option) {
-    background-color: var(--gh-canvas-default);
-    color: var(--gh-fg-default);
+    background: var(--surface-1);
+    color: var(--text-primary);
 }
 
+/* ── Ruling card ────────────────────────────────────────────── */
 .ruling-card {
-    border: 1px solid var(--gh-border-default);
-    border-radius: var(--gh-radius-md);
-    padding: 12px;
-    margin-bottom: 12px;
-    background-color: var(--gh-canvas-subtle);
+    padding: var(--space-3) 0;
+    border-bottom: var(--rule);
+}
+.ruling-card:last-child {
+    border-bottom: 0;
 }
 
 .ruling-card-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 12px;
-    margin-bottom: 8px;
+    gap: var(--space-3);
+    margin-bottom: var(--space-2);
 }
 
 .ruling-driver {
     font-weight: 600;
-    font-size: 1rem;
+    font-size: var(--text-base);
+    color: var(--text-primary);
 }
 
 .ruling-meta {
-    font-size: 0.85rem;
-    color: var(--gh-fg-muted);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    margin-top: 2px;
 }
 
 .ruling-tags {
     flex-shrink: 0;
+    display: inline-flex;
+    gap: var(--space-1);
+    align-items: center;
 }
 
 .ruling-row {
-    margin-top: 6px;
-    font-size: 0.9rem;
+    margin-top: var(--space-2);
+    font-size: var(--text-sm);
+    line-height: 1.5;
 }
 
 .ruling-label {
+    display: inline-block;
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
     font-weight: 600;
-    color: var(--gh-fg-muted);
-    margin-right: 6px;
+    color: var(--text-muted);
+    margin-right: var(--space-2);
 }
 
 .ruling-sanctions,
 .ruling-evidence {
-    margin: 4px 0 0;
-    padding-left: 20px;
+    margin: var(--space-1) 0 0;
+    padding-left: var(--space-5);
+    color: var(--text-primary);
+}
+.ruling-sanctions li,
+.ruling-evidence li {
+    line-height: 1.6;
+}
+
+.ruling-evidence a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+}
+.ruling-evidence a:hover {
+    color: var(--text-primary);
 }
 
 .ruling-notes {
-    margin-top: 4px;
+    margin-top: var(--space-1);
     white-space: pre-wrap;
+    color: var(--text-secondary);
 }
 
-.nav-tabs .nav-link {
-    color: var(--gh-fg-muted);
-    background: transparent;
-    border-color: transparent;
+/* ── License Standings table ───────────────────────────────── */
+.standings-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
 }
-
-.nav-tabs .nav-link.active {
-    color: var(--gh-fg-default);
-    background-color: var(--gh-canvas-subtle);
-    border-color: var(--gh-border-default) var(--gh-border-default) transparent;
+.standings-table th {
+    text-align: left;
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--text-muted);
+    font-weight: 600;
+    padding: var(--space-2) var(--space-3);
+    border-bottom: var(--rule);
+}
+.standings-table td {
+    padding: var(--space-3);
+    border-bottom: var(--rule);
+    color: var(--text-primary);
+}
+.standings-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+.standings-table .text-end {
+    text-align: right;
 }
 </style>

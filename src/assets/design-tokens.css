@@ -511,6 +511,88 @@ body {
 }
 
 /* ============================================================
+   Tag — small generic data marker. Same chip vocabulary as
+   .license-chip but for arbitrary single-word labels (severity,
+   classification, status). Color modifiers map to semantic
+   tokens. The tag itself stays nearly neutral — color only on
+   the foreground text — so a row of tags reads as data, not
+   as competing fills.
+   ============================================================ */
+.tag {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--space-1);
+    padding: 1px var(--space-2);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-subtle);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.5;
+    white-space: nowrap;
+    color: var(--text-secondary);
+}
+.tag--warn {
+    color: var(--warn);
+}
+.tag--penalty {
+    color: var(--penalty);
+}
+.tag--dq {
+    color: var(--dq);
+}
+.tag--gain {
+    color: var(--gain);
+}
+.tag--loss {
+    color: var(--loss);
+}
+.tag--info {
+    color: var(--license-a);
+}
+
+/* ============================================================
+   Tabs — horizontal switcher with a 2px accent underline on the
+   active item. Mirrors the top-tab vocabulary in the header
+   (white text + accent positional indicator) so navigation reads
+   the same way at every level of the page.
+   ============================================================ */
+.tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: var(--rule);
+    margin-bottom: var(--space-4);
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar {
+    display: none;
+}
+.tabs__item {
+    padding: var(--space-2) var(--space-3);
+    margin-bottom: -1px;
+    color: var(--text-secondary);
+    background: transparent;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    white-space: nowrap;
+    transition: color var(--duration-fast) var(--easing-out),
+        border-color var(--duration-fast) var(--easing-out);
+}
+.tabs__item:hover {
+    color: var(--text-primary);
+}
+.tabs__item--active {
+    color: var(--text-primary);
+    border-bottom-color: var(--accent);
+}
+
+/* ============================================================
    Bootstrap interop — soften the default dark card so legacy
    views inherit the new surface treatment until they migrate
    to .section. Once all views are converted, this block can
