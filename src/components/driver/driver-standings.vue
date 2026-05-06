@@ -47,22 +47,27 @@ const view: Ref<DriverStandingsModel> =
         <div class="card-body p-2">
             <div class="container">
                 <div v-if="view.drivers.length !== 0" class="row">
-                    <div class="col-2 d-flex d-sm-none text-center flex-column">
-                        <div class="mx-1 inline-block"><span>LEAP</span></div>
-                        <div class="inline-block"><span>R-P</span></div>
+                    <div
+                        class="col-3 d-flex d-sm-none align-items-center justify-content-center"
+                    >
+                        <span class="eyebrow">POS · PTS</span>
                     </div>
                     <div
-                        class="col-2 d-none d-sm-flex text-center justify-content-center"
+                        class="col-2 d-none d-sm-flex text-center justify-content-center align-items-center"
                     >
-                        <div>LEAP Ranking</div>
+                        <span class="eyebrow">LEAP Ranking</span>
                     </div>
                     <div
-                        class="col-2 d-none d-sm-flex text-center justify-content-center"
+                        class="col-2 d-none d-sm-flex text-center justify-content-center align-items-center"
                     >
-                        <div>LEAP Points</div>
+                        <span class="eyebrow">LEAP Points</span>
                     </div>
                     <div class="col-2 col-lg-1 text-center"></div>
-                    <div class="col-6 col-lg-7 text-left">Driver</div>
+                    <div
+                        class="col-7 col-sm-6 col-lg-7 d-flex align-items-center"
+                    >
+                        <span class="eyebrow">Driver</span>
+                    </div>
                 </div>
 
                 <template
@@ -71,22 +76,24 @@ const view: Ref<DriverStandingsModel> =
                 >
                     <div class="row">
                         <div
-                            class="col-2 justify-content-center d-flex d-sm-none text-center flex-column"
+                            class="col-3 justify-content-center d-flex d-sm-none text-center flex-column"
                         >
-                            <div class="fs-2 mx-1">
+                            <div class="fs-2 num">
                                 {{ member.position }}
                             </div>
-                            <div class="d-flex fs-7 justify-content-center">
-                                <span>{{ member.points }}</span>
+                            <div
+                                class="num d-flex justify-content-center pts-line"
+                            >
+                                <span>{{ member.points }} pts</span>
                             </div>
                         </div>
                         <div
-                            class="col-2 d-none d-sm-flex justify-content-center fs-2"
+                            class="col-2 d-none d-sm-flex justify-content-center fs-2 num"
                         >
                             <div>{{ member.position }}</div>
                         </div>
                         <div
-                            class="col-2 d-none d-sm-flex justify-content-center fs-4"
+                            class="col-2 d-none d-sm-flex justify-content-center fs-4 num"
                         >
                             <div>{{ member.points }}</div>
                         </div>
@@ -95,7 +102,7 @@ const view: Ref<DriverStandingsModel> =
                                 v-bind:class="`driver-img club-${member.clubId}`"
                             ></div>
                         </div>
-                        <div class="col-6 col-lg-7">
+                        <div class="col-7 col-sm-6 col-lg-7">
                             <DriverTag
                                 v-bind:lastName="member.lastName"
                                 v-bind:firstName="member.firstName"
@@ -137,22 +144,27 @@ const view: Ref<DriverStandingsModel> =
         <div class="card-body p-2">
             <div class="container">
                 <div v-if="view.teams.length !== 0" class="row">
-                    <div class="col-2 d-flex d-sm-none text-center flex-column">
-                        <div class="mx-1 inline-block"><span>LEAP</span></div>
-                        <div class="inline-block"><span>R-P</span></div>
+                    <div
+                        class="col-3 d-flex d-sm-none align-items-center justify-content-center"
+                    >
+                        <span class="eyebrow">POS · PTS</span>
                     </div>
                     <div
-                        class="col-2 d-none d-sm-flex text-center justify-content-center"
+                        class="col-2 d-none d-sm-flex text-center justify-content-center align-items-center"
                     >
-                        <div>LEAP Ranking</div>
+                        <span class="eyebrow">LEAP Ranking</span>
                     </div>
                     <div
-                        class="col-2 d-none d-sm-flex text-center justify-content-center"
+                        class="col-2 d-none d-sm-flex text-center justify-content-center align-items-center"
                     >
-                        <div>LEAP Points</div>
+                        <span class="eyebrow">LEAP Points</span>
                     </div>
                     <div class="col-2 col-lg-1 text-center"></div>
-                    <div class="col-6 col-lg-7 text-left">Team</div>
+                    <div
+                        class="col-7 col-sm-6 col-lg-7 d-flex align-items-center"
+                    >
+                        <span class="eyebrow">Team</span>
+                    </div>
                 </div>
 
                 <template
@@ -161,22 +173,24 @@ const view: Ref<DriverStandingsModel> =
                 >
                     <div v-if="team.teamId" class="row">
                         <div
-                            class="col-2 justify-content-center d-flex d-sm-none text-center flex-column"
+                            class="col-3 justify-content-center d-flex d-sm-none text-center flex-column"
                         >
-                            <div class="fs-2 mx-1">
+                            <div class="fs-2 num">
                                 {{ team.position }}
                             </div>
-                            <div class="d-flex fs-7 justify-content-center">
-                                <span>{{ team.points }}</span>
+                            <div
+                                class="num d-flex justify-content-center pts-line"
+                            >
+                                <span>{{ team.points }} pts</span>
                             </div>
                         </div>
                         <div
-                            class="col-2 d-none d-sm-flex justify-content-center fs-2"
+                            class="col-2 d-none d-sm-flex justify-content-center fs-2 num"
                         >
                             <div>{{ team.position }}</div>
                         </div>
                         <div
-                            class="col-2 d-none d-sm-flex justify-content-center fs-4"
+                            class="col-2 d-none d-sm-flex justify-content-center fs-4 num"
                         >
                             <div>{{ team.points }}</div>
                         </div>
@@ -185,7 +199,7 @@ const view: Ref<DriverStandingsModel> =
                                 v-bind:class="`driver-img team-${team.teamId}`"
                             ></div>
                         </div>
-                        <div class="col-6 col-lg-7">
+                        <div class="col-7 col-sm-6 col-lg-7">
                             <!-- <RouterLinkProxy
                                 class="dropdown-item"
                                 type="button"
@@ -217,10 +231,17 @@ const view: Ref<DriverStandingsModel> =
 </template>
 
 <style scoped>
+.pts-line {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    line-height: 1.1;
+}
+
 .driver-img {
     height: 3em;
     width: 3em;
-    background-color: var(--gh-neutral-emphasis);
+    background-color: var(--surface-2);
+    border: 1px solid var(--border-subtle);
     border-radius: var(--gh-radius-full);
     background-size: cover;
     background-position: center;

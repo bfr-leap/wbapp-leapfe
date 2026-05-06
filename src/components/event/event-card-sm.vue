@@ -112,10 +112,13 @@ const shortName: Ref<string> = await asyncDataWithReactiveModel<string>(
 .wrap {
     overflow: hidden;
     position: relative;
+    background: var(--surface-2);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
 }
 
 .bg {
-    opacity: 0.3;
+    opacity: 0.55;
     position: absolute;
     left: 0;
     top: 0;
@@ -126,9 +129,13 @@ const shortName: Ref<string> = await asyncDataWithReactiveModel<string>(
 
 .content {
     position: relative;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.65);
 }
-.hv:hover,
+.hv:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+}
 .selected {
-    background-color: var(--gh-canvas-inset);
+    background-color: rgba(255, 255, 255, 0.04);
+    box-shadow: inset 0 0 0 1px var(--accent);
 }
 </style>

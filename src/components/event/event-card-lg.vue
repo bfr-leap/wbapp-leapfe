@@ -100,10 +100,9 @@ updateTimer();
                     </div>
                 </div>
                 <div class="row text-center" style="margin: 0">
-                    <div class="col fs-2 padded-title bg-secondary">
-                        <span style="color: transparent">:: </span
-                        ><ClientOnly>{{ countdown }}</ClientOnly
-                        ><span style="color: transparent"> ::</span>
+                    <div class="col countdown-tape num-mono">
+                        <span class="countdown-label">T −</span
+                        ><ClientOnly>{{ countdown }}</ClientOnly>
                     </div>
                 </div>
             </div>
@@ -118,18 +117,21 @@ updateTimer();
     width: 100%;
     height: 100%;
     object-fit: cover;
-    opacity: 0.3;
+    opacity: 0.55;
 }
 
 .track-logo {
     object-fit: contain;
-    background: rgba(240, 246, 252, 0.1);
+    background: rgba(240, 246, 252, 0.06);
     width: 100%;
     height: 6em;
 }
 .wrap {
     overflow: hidden;
     position: relative;
+    background: var(--surface-2);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
 }
 
 .bg {
@@ -140,9 +142,28 @@ updateTimer();
 
 .content {
     position: relative;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.65);
 }
 
 .padded-title {
     margin-top: 3em;
+}
+
+.countdown-tape {
+    background: #000;
+    color: var(--you);
+    font-size: var(--text-lg);
+    letter-spacing: 0.06em;
+    padding: var(--space-2) var(--space-3);
+    border-top: 1px solid var(--border-subtle);
+    text-shadow: none;
+}
+
+.countdown-label {
+    color: var(--text-muted);
+    margin-right: var(--space-2);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
 }
 </style>
