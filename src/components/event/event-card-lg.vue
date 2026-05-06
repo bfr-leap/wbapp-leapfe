@@ -75,22 +75,20 @@ updateTimer();
                     </div>
                 </div>
                 <div class="row text-center">
-                    <div>
-                        <span class="fs-5 badge text-bg-primary rounded-pill">
-                            <a
-                                v-if="props.embed_mode"
-                                class="link-light"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                v-bind:href="`?m=track&league=${props.league_id}&car=${props.car_id}&track=${props.track_id}`"
-                                >track stats</a
-                            >
-                            <RouterLinkProxy
-                                v-else
-                                class="link-light"
-                                v-bind:to="`?m=track&league=${props.league_id}&car=${props.car_id}&track=${props.track_id}`"
-                                >track stats</RouterLinkProxy
-                            ></span
+                    <div class="col">
+                        <a
+                            v-if="props.embed_mode"
+                            class="btn btn--ghost btn--mono"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            v-bind:href="`?m=track&league=${props.league_id}&car=${props.car_id}&track=${props.track_id}`"
+                            >Track Stats →</a
+                        >
+                        <RouterLinkProxy
+                            v-else
+                            class="btn btn--ghost btn--mono"
+                            v-bind:to="`?m=track&league=${props.league_id}&car=${props.car_id}&track=${props.track_id}`"
+                            >Track Stats →</RouterLinkProxy
                         >
                     </div>
                 </div>

@@ -501,11 +501,15 @@ const lgSeasSubCtx: Ref<LgSeasSubCtx> =
     color: var(--text-primary);
 }
 .bottom-nav :deep(.bottom-nav__item--active) {
-    color: var(--accent);
+    color: var(--text-primary);
+    box-shadow: inset 0 2px 0 var(--accent);
 }
 .bottom-nav__icon {
     flex-shrink: 0;
-    opacity: 0.9;
+    opacity: 0.85;
+}
+.bottom-nav :deep(.bottom-nav__item--active) .bottom-nav__icon {
+    opacity: 1;
 }
 .bottom-nav__label {
     font-size: 0.6875rem;
