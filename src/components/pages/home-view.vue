@@ -4,7 +4,6 @@ import type { Ref } from 'vue';
 import EventCardLg from '@@/src/components/event/event-card-lg.vue';
 import EventCardSm from '@@/src/components/event/event-card-sm.vue';
 import DriverStandings from '@@/src/components/driver/driver-standings.vue';
-import LeagueSeasonMenu from '@@/src/components/nav/league-season-menu.vue';
 import PastEventCards from '../event/past-event-cards.vue';
 import type { HomeModel } from '@@/src/models/pages/home-model';
 import {
@@ -71,16 +70,6 @@ function onClick(eventInfo: { trackId: string; date: string }) {
 
 <template>
     <div class="page">
-        <section class="section">
-            <LeagueSeasonMenu
-                v-if="homeModel.leagueId && homeModel.seasonId"
-                :key="`lsm-${homeModel.leagueId}-${homeModel.seasonId}`"
-                target-page=""
-                v-bind:league="homeModel.leagueId"
-                v-bind:season="homeModel.seasonId"
-            />
-        </section>
-
         <section
             v-if="homeModel.leagueId && homeModel.seasonId"
             class="section"

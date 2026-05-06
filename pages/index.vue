@@ -15,6 +15,7 @@ import {
     setToken,
 } from '@@/src/utils/fetch-util';
 import RouterLinkProxy from '@@/src/components/nav/router-link-proxy.vue';
+import LeagueSeasonChip from '@@/src/components/nav/league-season-chip.vue';
 import HomeView from '@@/src/views/HomeView.vue';
 
 const route = useRoute();
@@ -100,6 +101,14 @@ const lgSeasSubCtx: Ref<LgSeasSubCtx> =
                     <span class="app-header__brand-sep">/</span>
                     <span class="app-header__brand-text">LEAP</span>
                 </RouterLinkProxy>
+
+                <LeagueSeasonChip
+                    v-if="lgSeasSubCtx.league_id && lgSeasSubCtx.season_id"
+                    :key="`chip-${lgSeasSubCtx.league_id}-${lgSeasSubCtx.season_id}-${route.query.m || ''}`"
+                    v-bind:league="lgSeasSubCtx.league_id.toString()"
+                    v-bind:season="lgSeasSubCtx.season_id.toString()"
+                    v-bind:target-page="(route.query.m as string) || ''"
+                />
 
                 <!-- Desktop tabs — hidden on mobile, where the bottom
                      bar takes over primary navigation. -->
