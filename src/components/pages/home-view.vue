@@ -5,6 +5,7 @@ import EventCardLg from '@@/src/components/event/event-card-lg.vue';
 import EventCardSm from '@@/src/components/event/event-card-sm.vue';
 import DriverStandings from '@@/src/components/driver/driver-standings.vue';
 import PastEventCards from '../event/past-event-cards.vue';
+import LatestRaceSummary from '../event/latest-race-summary.vue';
 import type { HomeModel } from '@@/src/models/pages/home-model';
 import {
     getDefaultHomeModel,
@@ -83,6 +84,12 @@ function onClick(eventInfo: { trackId: string; date: string }) {
                 v-bind:car="homeModel.carId"
             />
         </section>
+
+        <LatestRaceSummary
+            v-if="homeModel.leagueId && homeModel.seasonId"
+            v-bind:league="homeModel.leagueId"
+            v-bind:season="homeModel.seasonId"
+        />
 
         <section
             v-if="homeModel.nextRace.date"
