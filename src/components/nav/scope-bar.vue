@@ -5,7 +5,9 @@ import {
     nextTick,
     onMounted,
     onBeforeUnmount,
+    watch,
 } from 'vue';
+import { useRoute } from 'vue-router';
 import RouterLinkProxy from './router-link-proxy.vue';
 import ScopeChip from './scope-chip.vue';
 import type { ScopeDimension } from './scope-types';
@@ -63,6 +65,16 @@ function close() {
     openKey.value = null;
     anchorEl.value = null;
 }
+
+// Close the sheet whenever the route changes — the @click on
+// RouterLinkProxy doesn't always fire because the component is
+// a Fragment (multiple root branches), and clicking an option
+// is the most common reason the route changes anyway.
+const route = useRoute();
+watch(
+    () => route.fullPath,
+    () => close()
+);
 
 function onDocClick(e: MouseEvent) {
     if (!open.value) return;
