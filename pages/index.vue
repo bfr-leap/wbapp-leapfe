@@ -100,10 +100,6 @@ const buildSha = computed(() =>
     (runtimeConfig.public.BUILD_COMMIT_SHA as string) || 'dev'
 );
 const buildShortSha = computed(() => buildSha.value.slice(0, 7));
-const buildDate = computed(() => {
-    const t = runtimeConfig.public.BUILD_TIME as string | undefined;
-    return t ? t.slice(0, 10) : '';
-});
 
 const headerChip = computed(() =>
     selectChip(
@@ -472,8 +468,7 @@ const isEmbedMode = computed(() =>
             v-bind:href="`https://github.com/bfr-leap/wbapp-leapfe/commit/${buildSha}`"
             target="_blank"
             rel="noopener noreferrer"
-            >build {{ buildShortSha
-            }}<span v-if="buildDate"> · {{ buildDate }}</span></a
+            >build {{ buildShortSha }}</a
         >
         <span v-else class="gh-footer-build">build dev</span>
     </footer>
