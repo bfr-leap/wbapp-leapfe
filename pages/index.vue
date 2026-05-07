@@ -109,6 +109,12 @@ const headerChip = computed(() =>
         }
     )
 );
+
+const isEmbedMode = computed(() =>
+    ['nextEventTimerEmbed', 'subsessionSummaryEmbed'].includes(
+        (route.query.m as string) || ''
+    )
+);
 </script>
 
 <template>
@@ -439,11 +445,11 @@ const headerChip = computed(() =>
         </nav>
     </div>
 
-    <main class="app-main">
+    <main class="app-main" v-bind:class="{ 'app-main--embed': isEmbedMode }">
         <HomeView />
     </main>
 
-    <footer class="gh-footer">
+    <footer v-if="!isEmbedMode" class="gh-footer">
         <a
             href="https://www.bluefrogracing.com/"
             class="gh-footer-link"
@@ -644,6 +650,13 @@ const headerChip = computed(() =>
     .app-main {
         padding-bottom: 0;
     }
+}
+
+/* Embed mode: no chrome, no footer, no reserved bottom space.
+   The embed renders flush to the iframe edges. */
+.app-main--embed {
+    padding-bottom: 0;
+    max-width: none;
 }
 
 /* ── Footer ──────────────────────────────────────────────────── */
