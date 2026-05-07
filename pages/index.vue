@@ -311,8 +311,14 @@ const isEmbedMode = computed(() =>
 
                 <div class="app-header__user">
                     <SignedOut>
-                        <SignInButton>
-                            <button class="icon-btn" aria-label="Sign in">
+                        <SignInButton :as-child="true" v-slot="{ onClick }">
+                            <a
+                                class="icon-btn"
+                                href="#"
+                                role="button"
+                                aria-label="Sign in"
+                                @click.prevent="onClick"
+                            >
                                 <svg
                                     viewBox="0 0 16 16"
                                     width="18"
@@ -327,7 +333,7 @@ const isEmbedMode = computed(() =>
                                         d="M9.78 8.53a.75.75 0 0 0 0-1.06L7.06 4.75a.751.751 0 0 0-1.042.018.751.751 0 0 0-.018 1.042l1.47 1.47H1.75a.75.75 0 0 0 0 1.5h5.72L6 10.25a.751.751 0 0 0 .018 1.042.751.751 0 0 0 1.042.018L9.78 8.53Z"
                                     />
                                 </svg>
-                            </button>
+                            </a>
                         </SignInButton>
                     </SignedOut>
                     <SignedIn>

@@ -75,8 +75,8 @@ watch(route, fetchModel);
                 </div>
             </div>
             <SignedOut>
-                <SignInButton>
-                    <button class="button button--ghost button--sm">
+                <SignInButton :as-child="true" v-slot="{ onClick }">
+                    <button class="button button--ghost button--sm" @click="onClick">
                         Sign In
                     </button>
                 </SignInButton>

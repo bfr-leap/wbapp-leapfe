@@ -45,8 +45,10 @@ watch(route, fetchModel);
         <SignedOut>
             <section class="section">
                 You must be signed in to access profile functionality
-                <SignInButton>
-                    <button class="button button--ghost">Sign In</button>
+                <SignInButton :as-child="true" v-slot="{ onClick }">
+                    <button class="button button--ghost" @click="onClick">
+                        Sign In
+                    </button>
                 </SignInButton>
             </section>
         </SignedOut>
