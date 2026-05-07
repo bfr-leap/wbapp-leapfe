@@ -616,7 +616,7 @@ const isEmbedMode = computed(() =>
     border-top: var(--rule);
     padding-bottom: env(safe-area-inset-bottom);
 }
-@media (min-width: 768px) {
+@media (min-width: 992px) {
     .bottom-nav {
         display: none;
     }
@@ -665,7 +665,7 @@ const isEmbedMode = computed(() =>
     margin: 0 auto;
     padding-bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom));
 }
-@media (min-width: 768px) {
+@media (min-width: 992px) {
     .app-main {
         padding-bottom: 0;
     }
