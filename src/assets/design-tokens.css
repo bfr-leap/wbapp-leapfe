@@ -445,26 +445,34 @@ body {
     justify-content: center;
     height: 1.75rem;
     width: 1.75rem;
-    background: transparent;
-    border: 0;
-    padding: 0;
+    background: transparent !important;
+    border: 0 !important;
+    padding: 0 !important;
     border-radius: 50%;
     color: var(--text-secondary);
     cursor: pointer;
     opacity: 0.85;
-    /* Strip native browser button chrome — Edge / Chromium and
-       Safari otherwise paint a subtle bevel + rounded fill that
-       breaks the chromeless "icon in chrome band" silhouette
-       the helmet uses. */
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
+    /* Strip every form of native or vendor-injected button
+       chrome. Edge/Chromium and Safari paint -webkit-appearance:
+       button (subtle bevel + rounded fill); Bootstrap's reboot
+       reapplies it via [type=...] selectors. !important on the
+       reset side ensures the chromeless silhouette regardless
+       of cascade order or vendor stylesheet. */
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    box-shadow: none !important;
+    outline: none;
     transition: opacity var(--duration-fast) var(--easing-out),
         color var(--duration-fast) var(--easing-out);
 }
 .icon-btn:hover {
     opacity: 1;
     color: var(--text-primary);
+}
+.icon-btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
 }
 
 /* ============================================================

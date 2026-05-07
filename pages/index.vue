@@ -543,17 +543,26 @@ const isEmbedMode = computed(() =>
     letter-spacing: -0.01em;
 }
 
-/* Desktop tabs — hidden on mobile, the bottom bar takes over there. */
+/* Desktop tabs — hidden below 992px so the bottom-nav handles
+   primary navigation on phones and tablets. The 768-991 range
+   was causing tabs and the chip bar to fight for horizontal
+   space and visually overlap the rightmost chip. */
 .app-header__tabs {
     display: none;
 }
-@media (min-width: 768px) {
+@media (min-width: 992px) {
     .app-header__tabs {
         display: flex;
         align-items: center;
         gap: var(--space-1);
         margin-left: var(--space-4);
-        flex: 1;
+        /* flex:1 1 auto + min-width:0 + overflow:hidden means
+           tabs occupy their natural content width, can shrink,
+           and clip silently if a viewport is unusually narrow
+           — they never push past their slot into the chip bar. */
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow: hidden;
     }
 }
 
