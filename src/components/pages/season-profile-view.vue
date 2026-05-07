@@ -8,7 +8,6 @@ import BarChartUnovis from '@@/src/components/vis/bar-chart-unovis.vue';
 import EventCardLg from '@@/src/components/event/event-card-lg.vue';
 import EventCardSm from '@@/src/components/event/event-card-sm.vue';
 import DriverStandings from '@@/src/components/driver/driver-standings.vue';
-import LeagueSeasonMenu from '@@/src/components/nav/league-season-menu.vue';
 import PastEventCards from '@@/src/components/event/past-event-cards.vue';
 import LeagueRoster from '@@/src/components/driver/league-roster.vue';
 import {
@@ -71,34 +70,23 @@ function onClick(eventInfo: { trackId: string; date: string }) {
 </script>
 
 <template>
-    <LeagueSeasonMenu
-        target-page="season"
-        v-bind:league="seasonProfileModel.leagueId"
-        v-bind:season="seasonProfileModel.seasonId"
-    />
+    <div class="page">
+        <section class="section">
+            <header class="section__head">
+                <span class="section__title">Past Events</span>
+            </header>
+            <PastEventCards
+                v-bind:league="seasonProfileModel.leagueId"
+                v-bind:season="seasonProfileModel.seasonId"
+            >
+            </PastEventCards>
+        </section>
 
-    <div class="card bg-dark text-light m-2">
-        <div class="card-body p-2">
-            <div>Past Events</div>
-            <div style="height: 1em"></div>
-            <div class="container">
-                <PastEventCards
-                    v-bind:league="seasonProfileModel.leagueId"
-                    v-bind:season="seasonProfileModel.seasonId"
-                >
-                </PastEventCards>
-            </div>
-            <div style="height: 1em"></div>
-        </div>
-    </div>
-
-    <template v-for="split in statSplit">
-        <div class="card bg-dark text-light m-2">
-            <div class="card-body p-2">
-                <div class="row">
-                    <div class="col-12 m-auto">{{ split }} Stats</div>
-                </div>
-                <div style="height: 1em"></div>
+        <template v-for="split in statSplit">
+            <section class="section">
+                <header class="section__head">
+                    <span class="section__title">{{ split }} Stats</span>
+                </header>
                 <ul class="nav nav-pills">
                     <li class="nav-item dropdown">
                         <a
@@ -156,175 +144,157 @@ function onClick(eventInfo: { trackId: string; date: string }) {
                     </li>
                 </ul>
 
-                <div style="height: 2em"></div>
-                <div class="tab-content" id="nav-tabContent">
+                <div class="tab-content section-tabs" id="nav-tabContent">
                     <div
                         class="tab-pane fade show active"
                         v-bind:id="`nav-inc-chart-${split}`"
                         role="tabpanel"
-                        aria-labelledby="nav-home-tab"
                         tabindex="0"
                     >
-                        <div class="row">
-                            <div class="col-12 m-auto">incidents per lap</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12 m-auto">
-                                <BarChartUnovis
-                                    v-if="
-                                        getChartDataFromStats(
-                                            seasonProfileModel.stats,
-                                            'incidents_per_lap',
-                                            split
-                                        ).length
-                                    "
-                                    :data="
-                                        getChartDataFromStats(
-                                            seasonProfileModel.stats,
-                                            'incidents_per_lap',
-                                            split
-                                        )
-                                    "
-                                />
-                            </div>
-                        </div>
+                        <div class="eyebrow">Incidents per Lap</div>
+                        <BarChartUnovis
+                            v-if="
+                                getChartDataFromStats(
+                                    seasonProfileModel.stats,
+                                    'incidents_per_lap',
+                                    split
+                                ).length
+                            "
+                            :data="
+                                getChartDataFromStats(
+                                    seasonProfileModel.stats,
+                                    'incidents_per_lap',
+                                    split
+                                )
+                            "
+                        />
                     </div>
 
                     <div
                         class="tab-pane fade"
                         v-bind:id="`nav-par-chart-${split}`"
                         role="tabpanel"
-                        aria-labelledby="nav-home-tab"
                         tabindex="0"
                     >
-                        <div class="row">
-                            <div class="col-12 m-auto">
-                                number of participants
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12 m-auto">
-                                <BarChartUnovis
-                                    v-if="
-                                        getChartDataFromStats(
-                                            seasonProfileModel.stats,
-                                            'number_of_participants',
-                                            split
-                                        ).length
-                                    "
-                                    :data="
-                                        getChartDataFromStats(
-                                            seasonProfileModel.stats,
-                                            'number_of_participants',
-                                            split
-                                        )
-                                    "
-                                />
-                            </div>
-                        </div>
+                        <div class="eyebrow">Number of Participants</div>
+                        <BarChartUnovis
+                            v-if="
+                                getChartDataFromStats(
+                                    seasonProfileModel.stats,
+                                    'number_of_participants',
+                                    split
+                                ).length
+                            "
+                            :data="
+                                getChartDataFromStats(
+                                    seasonProfileModel.stats,
+                                    'number_of_participants',
+                                    split
+                                )
+                            "
+                        />
                     </div>
 
                     <div
                         class="tab-pane fade"
                         v-bind:id="`nav-sts-table-${split}`"
                         role="tabpanel"
-                        aria-labelledby="nav-home-tab"
                         tabindex="0"
                     >
-                        <div class="row">
-                            <GenericTable
-                                :title="`Season Stats - ${split}`"
-                                :league-id="seasonProfileModel.leagueId"
-                                :rows="seasonProfileModel.stats[split]"
-                                :season-id="seasonProfileModel.seasonId"
-                            />
+                        <GenericTable
+                            :title="`Season Stats - ${split}`"
+                            :league-id="seasonProfileModel.leagueId"
+                            :rows="seasonProfileModel.stats[split]"
+                            :season-id="seasonProfileModel.seasonId"
+                        />
+                    </div>
+                </div>
+            </section>
+        </template>
+
+        <section
+            v-if="seasonProfileModel.nextRace.date !== ''"
+            class="section"
+        >
+            <header class="section__head">
+                <span class="section__title">Future Events</span>
+            </header>
+            <div
+                v-if="seasonProfileModel.nextRace.date !== ''"
+                class="row g-1"
+            >
+                <div class="col-12 col-sm-3 col-lg-2">
+                    <div class="row g-1 flex-sm-column h-100">
+                        <div
+                            class="col"
+                            @click="onClick(seasonProfileModel.nextRace)"
+                        >
+                            <EventCardSm
+                                class="h-100"
+                                v-bind:track_id="
+                                    seasonProfileModel.nextRace.trackId
+                                "
+                                v-bind:is_next="true"
+                                v-bind:date="
+                                    new Date(
+                                        seasonProfileModel.nextRace.date
+                                    )
+                                "
+                                v-bind:is_selected="
+                                    seasonProfileModel.nextRace.isSelected
+                                "
+                            ></EventCardSm>
+                        </div>
+                        <div
+                            v-for="race in seasonProfileModel.futureRaces"
+                            class="col"
+                            @click="onClick(race)"
+                        >
+                            <EventCardSm
+                                class="h-100"
+                                v-bind:track_id="race.trackId"
+                                v-bind:is_next="false"
+                                v-bind:date="new Date(race.date)"
+                                v-bind:is_selected="race.isSelected"
+                            >
+                            </EventCardSm>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </template>
-
-    <div
-        v-if="seasonProfileModel.nextRace.date !== ''"
-        class="card bg-dark text-light m-2"
-    >
-        <div class="card-body p-2">
-            <div class="container">
-                <div>Future Events</div>
-                <div
-                    v-if="seasonProfileModel.nextRace.date !== ''"
-                    class="row g-1"
-                >
-                    <div class="col-12 col-sm-3 col-lg-2">
-                        <div class="row g-1 flex-sm-column h-100">
-                            <div
-                                class="col"
-                                @click="onClick(seasonProfileModel.nextRace)"
-                            >
-                                <EventCardSm
-                                    class="h-100"
-                                    v-bind:track_id="
-                                        seasonProfileModel.nextRace.trackId
-                                    "
-                                    v-bind:is_next="true"
-                                    v-bind:date="
-                                        new Date(
-                                            seasonProfileModel.nextRace.date
-                                        )
-                                    "
-                                    v-bind:is_selected="
-                                        seasonProfileModel.nextRace.isSelected
-                                    "
-                                ></EventCardSm>
-                            </div>
-                            <div
-                                v-for="race in seasonProfileModel.futureRaces"
-                                class="col"
-                                @click="onClick(race)"
-                            >
-                                <EventCardSm
-                                    class="h-100"
-                                    v-bind:track_id="race.trackId"
-                                    v-bind:is_next="false"
-                                    v-bind:date="new Date(race.date)"
-                                    v-bind:is_selected="race.isSelected"
-                                >
-                                </EventCardSm>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-sm-9 col-lg-10">
-                        <EventCardLg
-                            v-bind:track_id="
-                                seasonProfileModel.selectedRace.trackId.toString()
-                            "
-                            v-bind:car_id="seasonProfileModel.carId"
-                            v-bind:league_id="seasonProfileModel.leagueId"
-                            v-bind:is_next="false"
-                            v-bind:date="
-                                new Date(seasonProfileModel.selectedRace.date)
-                            "
-                        ></EventCardLg>
-                    </div>
-                </div>
-                <div v-else>No Future Events</div>
-            </div>
-        </div>
-    </div>
-    <DriverStandings
-        summary_mode
-        v-bind:season="seasonProfileModel.seasonId"
-        v-bind:league="seasonProfileModel.leagueId"
-    />
-
-    <div class="card bg-dark text-light m-2">
-        <div class="card-body p-2">
-            <div class="container">
-                <div>
-                    <LeagueRoster v-bind:league="seasonProfileModel.leagueId" />
+                <div class="col-12 col-sm-9 col-lg-10">
+                    <EventCardLg
+                        v-bind:track_id="
+                            seasonProfileModel.selectedRace.trackId.toString()
+                        "
+                        v-bind:car_id="seasonProfileModel.carId"
+                        v-bind:league_id="seasonProfileModel.leagueId"
+                        v-bind:is_next="false"
+                        v-bind:date="
+                            new Date(seasonProfileModel.selectedRace.date)
+                        "
+                    ></EventCardLg>
                 </div>
             </div>
-        </div>
+            <div v-else>No Future Events</div>
+        </section>
+
+        <DriverStandings
+            summary_mode
+            v-bind:season="seasonProfileModel.seasonId"
+            v-bind:league="seasonProfileModel.leagueId"
+        />
+
+        <section class="section">
+            <header class="section__head">
+                <span class="section__title">League Roster</span>
+            </header>
+            <LeagueRoster v-bind:league="seasonProfileModel.leagueId" />
+        </section>
     </div>
 </template>
+
+<style scoped>
+.section-tabs {
+    margin-top: var(--space-3);
+}
+</style>

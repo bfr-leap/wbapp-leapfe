@@ -5,7 +5,6 @@ import { useRouter } from 'vue-router';
 import { SignedIn } from 'vue-clerk';
 import { useAuth } from 'vue-clerk';
 
-import LeagueSeasonMenu from '@@/src/components/nav/league-season-menu.vue';
 import SeasonCdrAdmin from '@@/src/components/admin/season-cdr-admin.vue';
 
 const { isSignedIn } = useAuth();
@@ -28,12 +27,6 @@ watchEffect(fetchModel);
 
 <template>
     <SignedIn>
-        <LeagueSeasonMenu
-            v-if="props.league && props.season"
-            target-page="season-cdr-admin"
-            v-bind:league="props.league"
-            v-bind:season="props.season"
-        />
         <SeasonCdrAdmin
             v-bind:league="props.league"
             v-bind:season="props.season"

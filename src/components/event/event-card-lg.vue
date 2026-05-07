@@ -75,22 +75,20 @@ updateTimer();
                     </div>
                 </div>
                 <div class="row text-center">
-                    <div>
-                        <span class="fs-5 badge text-bg-primary rounded-pill">
-                            <a
-                                v-if="props.embed_mode"
-                                class="link-light"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                v-bind:href="`?m=track&league=${props.league_id}&car=${props.car_id}&track=${props.track_id}`"
-                                >track stats</a
-                            >
-                            <RouterLinkProxy
-                                v-else
-                                class="link-light"
-                                v-bind:to="`?m=track&league=${props.league_id}&car=${props.car_id}&track=${props.track_id}`"
-                                >track stats</RouterLinkProxy
-                            ></span
+                    <div class="col">
+                        <a
+                            v-if="props.embed_mode"
+                            class="button button--ghost button--mono"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            v-bind:href="`?m=track&league=${props.league_id}&car=${props.car_id}&track=${props.track_id}`"
+                            >Track Stats →</a
+                        >
+                        <RouterLinkProxy
+                            v-else
+                            class="button button--ghost button--mono"
+                            v-bind:to="`?m=track&league=${props.league_id}&car=${props.car_id}&track=${props.track_id}`"
+                            >Track Stats →</RouterLinkProxy
                         >
                     </div>
                 </div>
@@ -100,10 +98,9 @@ updateTimer();
                     </div>
                 </div>
                 <div class="row text-center" style="margin: 0">
-                    <div class="col fs-2 padded-title bg-secondary">
-                        <span style="color: transparent">:: </span
-                        ><ClientOnly>{{ countdown }}</ClientOnly
-                        ><span style="color: transparent"> ::</span>
+                    <div class="col countdown-tape num-mono">
+                        <span class="countdown-label">T −</span
+                        ><ClientOnly>{{ countdown }}</ClientOnly>
                     </div>
                 </div>
             </div>
@@ -118,31 +115,71 @@ updateTimer();
     width: 100%;
     height: 100%;
     object-fit: cover;
-    opacity: 0.3;
+    opacity: 0.6;
 }
 
 .track-logo {
     object-fit: contain;
-    background: rgba(240, 246, 252, 0.1);
+    background: rgba(240, 246, 252, 0.05);
     width: 100%;
     height: 6em;
 }
 .wrap {
     overflow: hidden;
     position: relative;
+    isolation: isolate;
+    background: var(--surface-2);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+}
+.wrap::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.35) 0%,
+        rgba(0, 0, 0, 0.55) 50%,
+        rgba(0, 0, 0, 0.85) 100%
+    );
+    z-index: 1;
+    pointer-events: none;
 }
 
 .bg {
     position: absolute;
     left: 0;
     top: 0;
+    z-index: 0;
 }
 
 .content {
     position: relative;
+    z-index: 2;
+    color: var(--text-primary);
+    font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
 }
 
 .padded-title {
     margin-top: 3em;
+}
+
+.countdown-tape {
+    background: #000;
+    color: var(--you);
+    font-size: var(--text-lg);
+    letter-spacing: 0.06em;
+    padding: var(--space-2) var(--space-3);
+    border-top: 1px solid var(--border-subtle);
+    text-shadow: none;
+}
+
+.countdown-label {
+    color: var(--text-muted);
+    margin-right: var(--space-2);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
 }
 </style>

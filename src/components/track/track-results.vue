@@ -4,7 +4,6 @@ import type { Ref } from 'vue';
 import type { TrackStats } from 'lplib/endpoint-types/iracing-endpoints';
 import { getTrackStats } from '@@/src/utils/fetch-util';
 import GenericTable from '@@/src/components/vis/generic-table.vue';
-import TrackResultsMenu from '@@/src/components/nav/track-results-menu.vue';
 import TrackBanner from '@@/src/components/track/track-banner.vue';
 
 const props = defineProps<{
@@ -71,16 +70,12 @@ watchEffect(fetchJsonData);
 </script>
 
 <template>
-    <TrackResultsMenu
-        v-bind:league="props.league"
-        v-bind:car="props.car"
-        v-bind:track="props.track"
-    />
-
-    <div class="card bg-dark text-light m-2">
-        <div class="card-body p-2">
+    <div class="page">
+        <section class="section">
             <TrackBanner v-bind:track-id="props.track" />
-            <div class="container d-flex flex-wrap">
+        </section>
+        <section class="section">
+            <div class="track-tables">
                 <GenericTable
                     v-bind:title="trackResult.best_quali.title"
                     v-bind:league-id="props.league"
@@ -93,7 +88,6 @@ watchEffect(fetchJsonData);
                     v-bind:rows="trackResult.race_lap.rows"
                     season-id="-1"
                 />
-                <div class="col-12"></div>
                 <GenericTable
                     v-bind:title="trackResult.poles.title"
                     v-bind:league-id="props.league"
@@ -106,11 +100,6 @@ watchEffect(fetchJsonData);
                     v-bind:rows="trackResult.fastest_race_lap.rows"
                     season-id="-1"
                 />
-                <!-- <GenericTable
-                    v-bind:title="trackResult.numb_entries.title"
-                    v-bind:league-id="props.league"
-                    v-bind:rows="trackResult.numb_entries.rows"
-                /> -->
                 <GenericTable
                     v-bind:title="trackResult.wins.title"
                     v-bind:league-id="props.league"
@@ -124,29 +113,14 @@ watchEffect(fetchJsonData);
                     season-id="-1"
                 />
             </div>
-        </div>
+        </section>
     </div>
 </template>
 
 <style scoped>
-.track-bg {
-    background-size: cover;
-    background-position: center;
-    width: 100%;
-}
-
-.wrap {
-    overflow: hidden;
-    position: relative;
-}
-
-.bg {
-    opacity: 0.8;
-    _position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 8em;
-    object-fit: cover;
+.track-tables {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
 }
 </style>

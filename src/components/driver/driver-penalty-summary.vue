@@ -81,29 +81,33 @@ function joinedSanctions(r: StewardRuling): string {
 </script>
 
 <template>
-    <div v-if="hasRulings" class="gh-content-card">
-        <h6 class="penalty-header">Steward Rulings</h6>
+    <section v-if="hasRulings" class="section">
+        <header class="section__head">
+            <span class="section__title">Steward Rulings</span>
+        </header>
 
         <div class="penalty-totals">
             <div class="penalty-total">
-                <div class="penalty-total-value">
-                    {{ model.totalLicensePoints }}
-                </div>
-                <div class="penalty-total-label">License points</div>
+                <span class="penalty-total-label">License points</span>
+                <span class="penalty-total-value num">{{
+                    model.totalLicensePoints
+                }}</span>
             </div>
             <div class="penalty-total">
-                <div class="penalty-total-value">{{ model.totalRulings }}</div>
-                <div class="penalty-total-label">Rulings</div>
+                <span class="penalty-total-label">Rulings</span>
+                <span class="penalty-total-value num">{{
+                    model.totalRulings
+                }}</span>
             </div>
             <div class="penalty-total">
-                <div class="penalty-total-value">
-                    {{ model.totalChampionshipPointDeduction }}
-                </div>
-                <div class="penalty-total-label">Champ. pts deducted</div>
+                <span class="penalty-total-label">Champ. pts</span>
+                <span class="penalty-total-value num">{{
+                    model.totalChampionshipPointDeduction
+                }}</span>
             </div>
         </div>
 
-        <table class="table table-dark table-sm mt-3">
+        <table class="penalty-table">
             <thead>
                 <tr>
                     <th>Date</th>
@@ -115,52 +119,69 @@ function joinedSanctions(r: StewardRuling): string {
             </thead>
             <tbody>
                 <tr v-for="r in model.rulings" :key="r.ruling_id">
-                    <td>{{ formatDate(r.ruling_date) }}</td>
+                    <td class="num">{{ formatDate(r.ruling_date) }}</td>
                     <td>{{ r.classification || '—' }}</td>
                     <td>{{ r.infraction || '—' }}</td>
                     <td>{{ joinedSanctions(r) || '—' }}</td>
-                    <td class="text-end">{{ r.license_points || 0 }}</td>
+                    <td class="text-end num">{{ r.license_points || 0 }}</td>
                 </tr>
             </tbody>
         </table>
-    </div>
+    </section>
 </template>
 
 <style scoped>
-.gh-content-card {
-    border: 1px solid var(--gh-border-default);
-    border-radius: var(--gh-radius-md);
-    padding: 16px;
-    margin-top: 8px;
-}
-
-.penalty-header {
-    margin: 0 0 12px;
-    font-weight: 600;
-    color: var(--gh-text-muted, #8b949e);
-}
-
 .penalty-totals {
     display: flex;
-    gap: 16px;
+    gap: var(--space-4);
     flex-wrap: wrap;
+    margin-bottom: var(--space-4);
 }
 
 .penalty-total {
-    background-color: var(--gh-canvas-subtle);
-    border: 1px solid var(--gh-border-default);
-    border-radius: var(--gh-radius-md);
-    padding: 8px 16px;
-    min-width: 120px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    min-width: 7rem;
 }
-
-.penalty-total-value {
-    font-size: 1.5rem;
+.penalty-total-label {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--text-muted);
     font-weight: 600;
 }
+.penalty-total-value {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+}
 
-.penalty-total-label {
-    font-size: 0.8rem;
-    color: var(--gh-fg-muted);
+.penalty-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+}
+.penalty-table th {
+    text-align: left;
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--text-muted);
+    font-weight: 600;
+    padding: var(--space-2) var(--space-3);
+    border-bottom: var(--rule);
+}
+.penalty-table td {
+    padding: var(--space-2) var(--space-3);
+    border-bottom: var(--rule);
+    color: var(--text-primary);
+}
+.penalty-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+.penalty-table .text-end {
+    text-align: right;
 }
 </style>

@@ -598,7 +598,11 @@ const pageInfo = computed(() => {
         <SignedOut>
             <p class="admin-callout">
                 You must be signed in.
-                <SignInButton />
+                <SignInButton :as-child="true" v-slot="{ onClick }">
+                    <button class="button button--ghost" @click="onClick">
+                        Sign In
+                    </button>
+                </SignInButton>
             </p>
         </SignedOut>
 

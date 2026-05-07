@@ -112,23 +112,46 @@ const shortName: Ref<string> = await asyncDataWithReactiveModel<string>(
 .wrap {
     overflow: hidden;
     position: relative;
+    isolation: isolate;
+    background: var(--surface-2);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+}
+.wrap::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.5) 0%,
+        rgba(0, 0, 0, 0.7) 100%
+    );
+    z-index: 1;
+    pointer-events: none;
 }
 
 .bg {
-    opacity: 0.3;
+    opacity: 0.5;
     position: absolute;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    z-index: 0;
 }
 
 .content {
     position: relative;
+    z-index: 2;
+    color: var(--text-primary);
+    font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
 }
-.hv:hover,
+.hv:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+}
 .selected {
-    background-color: var(--gh-canvas-inset);
+    box-shadow: inset 0 0 0 1px var(--accent);
 }
 </style>

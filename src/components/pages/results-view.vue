@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, watchEffect } from 'vue';
 import type { Ref } from 'vue';
-import LeagueIndex from '@@/src/components/nav/league-index.vue';
 import CumulativeDeltaChart from '@@/src/components/vis/cumulative-delta-chart.vue';
 import StartFinishChart from '../vis/start-finish-chart.vue';
 import PaceChart from '../vis/pace-chart.vue';
@@ -47,155 +46,164 @@ const resultsModel: Ref<ResultsModel> =
             () => props.simsession,
         ]
     );
+
+const summaryExpanded = ref(false);
 </script>
 
 <template>
-    <template
-        v-if="
-            resultsModel.leagueId &&
-            resultsModel.seasonId &&
-            resultsModel.subsessionId
-        "
-    >
-        <LeagueIndex
-            v-bind:simsession-id="resultsModel.simsessionId"
-            v-bind:subsession-id="resultsModel.subsessionId"
-            v-bind:season-id="resultsModel.seasonId"
-            v-bind:league-id="resultsModel.leagueId"
-        />
-
-        <div class="card bg-dark text-light m-2">
-            <div class="card-body p-2">
+    <div class="page">
+        <template
+            v-if="
+                resultsModel.leagueId &&
+                resultsModel.seasonId &&
+                resultsModel.subsessionId
+            "
+        >
+            <section class="section">
                 <TrackBanner v-bind:track-id="resultsModel.trackId" />
-            </div>
-        </div>
+            </section>
 
-        <div
-            v-if="resultsModel.summary.length > 0"
-            class="card bg-dark text-light m-2"
-        >
-            <div class="card-body p-2">
-                <div class="container">
-                    <div v-html="resultsModel.summary[0]"></div>
-                </div>
-            </div>
-        </div>
-        <div class="card bg-dark text-light m-2">
-            <div class="card-body p-2">
-                <div style="height: 2em"></div>
-                <div class="container">
-                    <div class="row">
-                        <GenericTable
-                            title="Session Report"
-                            :leagueId="resultsModel.leagueId"
-                            :rows="resultsModel.results"
-                            :season-id="resultsModel.seasonId"
-                        />
-                    </div>
-                    <div style="height: 2em"></div>
-                </div>
-            </div>
-        </div>
-        <div class="page-break"></div>
+            <section
+                v-if="
+                    resultsModel.simsessionType === 'race' ||
+                    resultsModel.simsessionType === 'sprint'
+                "
+                class="section"
+            >
+                <header class="section__head">
+                    <span class="section__title">Cumulative Delta</span>
+                </header>
+                <CumulativeDeltaChart
+                    v-bind:league="resultsModel.leagueId"
+                    v-bind:subsession="resultsModel.subsessionId"
+                    v-bind:simsession="resultsModel.simsessionId"
+                />
+            </section>
 
-        <div
-            v-if="
-                resultsModel.simsessionType === 'race' ||
-                resultsModel.simsessionType === 'sprint'
-            "
-            class="card bg-dark text-light m-2"
-        >
-            <div class="card-body p-2">
-                <!-- <div class="container"> -->
-                <div class="row">
-                    <div>Cumulative Delta</div>
-                </div>
-                <div class="row">
-                    <CumulativeDeltaChart
-                        v-bind:league="resultsModel.leagueId"
-                        v-bind:subsession="resultsModel.subsessionId"
-                        v-bind:simsession="resultsModel.simsessionId"
-                    />
-                </div>
-                <!-- </div> -->
-            </div>
-        </div>
+            <section
+                v-if="
+                    resultsModel.simsessionType === 'race' ||
+                    resultsModel.simsessionType === 'sprint'
+                "
+                class="section"
+            >
+                <header class="section__head">
+                    <span class="section__title">Start vs Finish</span>
+                </header>
+                <StartFinishChart
+                    v-bind:league="resultsModel.leagueId"
+                    v-bind:subsession="resultsModel.subsessionId"
+                    v-bind:simsession="resultsModel.simsessionId"
+                />
+            </section>
 
-        <div
-            v-if="
-                resultsModel.simsessionType === 'race' ||
-                resultsModel.simsessionType === 'sprint'
-            "
-            class="card bg-dark text-light m-2"
-        >
-            <div class="card-body p-2">
-                <!-- <div class="container"> -->
-                <div class="row">
-                    <StartFinishChart
-                        v-bind:league="resultsModel.leagueId"
-                        v-bind:subsession="resultsModel.subsessionId"
-                        v-bind:simsession="resultsModel.simsessionId"
-                    />
-                </div>
-                <!-- </div> -->
-            </div>
-        </div>
+            <section
+                v-if="resultsModel.simsessionType === 'qualify'"
+                class="section"
+            >
+                <header class="section__head">
+                    <span class="section__title">Pace</span>
+                </header>
+                <PaceChart
+                    v-bind:subsession="resultsModel.subsessionId"
+                    v-bind:simsession="resultsModel.simsessionId"
+                    v-bind:league="resultsModel.leagueId"
+                />
+            </section>
 
-        <div
-            v-if="resultsModel.simsessionType === 'qualify'"
-            class="card bg-dark text-light m-2"
-        >
-            <div class="card-body p-2">
-                <div class="container">
-                    <div class="row">
-                        <PaceChart
-                            v-bind:subsession="resultsModel.subsessionId"
-                            v-bind:simsession="resultsModel.simsessionId"
-                            v-bind:league="resultsModel.leagueId"
-                        />
-                    </div>
-                </div>
-            </div>
-        </div>
+            <section
+                v-if="
+                    resultsModel.simsessionType === 'qualify' &&
+                    resultsModel.hasTelemetry
+                "
+                class="section"
+            >
+                <header class="section__head">
+                    <span class="section__title">
+                        Fastest Lap Cumulative Delta
+                    </span>
+                </header>
+                <BestQualifyLapChart
+                    v-bind:subsession="resultsModel.subsessionId"
+                    v-bind:simsession="resultsModel.simsessionId"
+                    v-bind:league="resultsModel.leagueId"
+                />
+            </section>
 
-        <div
-            v-if="
-                resultsModel.simsessionType === 'qualify' &&
-                resultsModel.hasTelemetry
-            "
-            class="card bg-dark text-light m-2"
-        >
-            <div class="card-body p-2">
-                <div class="container">
-                    <div class="row">
-                        <div>Fastest Lap Cumulative Delta</div>
-                    </div>
-                    <div class="row">
-                        <BestQualifyLapChart
-                            v-bind:subsession="resultsModel.subsessionId"
-                            v-bind:simsession="resultsModel.simsessionId"
-                            v-bind:league="resultsModel.leagueId"
-                        />
-                    </div>
-                </div>
-            </div>
-        </div>
-    </template>
-    <div v-else class="card bg-dark text-light m-2">
-        <div class="card-body p-2">
-            <div class="container">
-                <div class="row">Results not Available</div>
-            </div>
-        </div>
+            <section v-if="resultsModel.summary.length > 0" class="section">
+                <header class="section__head">
+                    <span class="section__title">Race Summary</span>
+                </header>
+                <div
+                    class="summary-content"
+                    v-bind:class="{
+                        'summary-content--collapsed': !summaryExpanded,
+                    }"
+                    v-html="resultsModel.summary[0]"
+                ></div>
+                <button
+                    type="button"
+                    class="summary-toggle"
+                    @click="summaryExpanded = !summaryExpanded"
+                >
+                    {{ summaryExpanded ? 'Show less' : 'Read more →' }}
+                </button>
+            </section>
+
+            <section class="section">
+                <header class="section__head">
+                    <span class="section__title">Session Report</span>
+                </header>
+                <GenericTable
+                    title=""
+                    :leagueId="resultsModel.leagueId"
+                    :rows="resultsModel.results"
+                    :season-id="resultsModel.seasonId"
+                />
+            </section>
+        </template>
+        <section v-else class="section">
+            <div class="results-empty">Results not available</div>
+        </section>
     </div>
 </template>
 <style scoped>
-@media print {
-    /* .row{
-        display: block;
-    } */
-    .page-break {
-        page-break-before: always;
-    }
+.results-empty {
+    color: var(--text-muted);
+    text-align: center;
+    padding: var(--space-6) 0;
+    font-size: var(--text-sm);
+}
+
+.summary-content--collapsed {
+    max-height: 8rem;
+    overflow: hidden;
+    position: relative;
+}
+.summary-content--collapsed::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4rem;
+    background: linear-gradient(transparent, var(--surface-0));
+    pointer-events: none;
+}
+
+.summary-toggle {
+    margin-top: var(--space-3);
+    background: transparent;
+    border: 0;
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0;
+    font-family: inherit;
+    transition: color var(--duration-fast) var(--easing-out);
+}
+.summary-toggle:hover {
+    color: var(--text-primary);
 }
 </style>
