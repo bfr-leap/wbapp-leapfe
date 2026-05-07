@@ -72,7 +72,11 @@ function onClick() {
 }
 .scope-chip--truncate {
     flex-shrink: 1;
-    min-width: 0;
+    /* Floor so the chip never collapses to a bare caret when the
+       header is squeezed — keep at least a few characters of the
+       value visible. min-width:0 was the previous setting and
+       allowed the chip to disappear on narrow desktop widths. */
+    min-width: 4rem;
     max-width: 14rem;
 }
 .scope-chip:hover {
@@ -109,10 +113,12 @@ function onClick() {
     transform: rotate(180deg);
 }
 
-/* Secondary-priority chips hide on phones; their dimension is
-   still reachable through the sheet that opens from any visible
-   chip. */
-@media (max-width: 575px) {
+/* Secondary-priority chips only show on wide desktops. On
+   phones AND tablets they hide (their dimension is still
+   reachable via the sheet from any visible chip), so the
+   header doesn't compete with the desktop tab strip for
+   horizontal space and elements don't overlap on resize. */
+@media (max-width: 991px) {
     .scope-chip--secondary {
         display: none;
     }

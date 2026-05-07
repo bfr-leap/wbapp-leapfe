@@ -103,7 +103,7 @@ function onClick(eventInfo: { trackId: string; date: string }) {
             </header>
             <div v-if="homeModel.nextRace.date !== ''" class="row g-1">
                 <div class="col-12 col-sm-3 col-lg-2">
-                    <div class="row g-1 flex-sm-column h-100">
+                    <div class="row g-1 flex-sm-column h-100 event-strip">
                         <div class="col" @click="onClick(homeModel.nextRace)">
                             <EventCardSm
                                 class="h-100"
@@ -164,3 +164,23 @@ function onClick(eventInfo: { trackId: string; date: string }) {
         </section>
     </div>
 </template>
+
+<style scoped>
+/* Make the small-event-card column stretch its children to fill
+   the height of the EventCardLg next to it. Bootstrap's .col with
+   flex:1 0 0% in a column-direction flex container distributes
+   space, but height:100% on a grandchild (the EventCardSm wrapper)
+   doesn't always resolve in nested flex layouts — making each
+   .col itself a flex column whose child grows to fill makes the
+   stretch reliable across browsers. */
+@media (min-width: 576px) {
+    .event-strip > .col {
+        display: flex;
+        flex-direction: column;
+    }
+    .event-strip > .col > * {
+        flex: 1 1 auto;
+        min-height: 0;
+    }
+}
+</style>

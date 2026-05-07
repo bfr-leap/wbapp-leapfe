@@ -32,6 +32,20 @@ watch(props, fetchModel, { immediate: true });
 
 const dimensions = computed<ScopeDimension[]>(() => [
     {
+        key: 'league',
+        label: 'League',
+        selected: model.value.leagueOptions.selected,
+        options: model.value.leagueOptions.options,
+        priority: 'secondary',
+    },
+    {
+        key: 'season',
+        label: 'Season',
+        selected: model.value.seasonOptions.selected,
+        options: model.value.seasonOptions.options,
+        priority: 'secondary',
+    },
+    {
         key: 'subsession',
         label: 'Round',
         selected: model.value.subsessionOptions.selected,
@@ -46,20 +60,6 @@ const dimensions = computed<ScopeDimension[]>(() => [
         options: model.value.simsessionOptions.options,
         priority: 'primary',
         mono: true,
-    },
-    {
-        key: 'league',
-        label: 'League',
-        selected: model.value.leagueOptions.selected,
-        options: model.value.leagueOptions.options,
-        priority: 'secondary',
-    },
-    {
-        key: 'season',
-        label: 'Season',
-        selected: model.value.seasonOptions.selected,
-        options: model.value.seasonOptions.options,
-        priority: 'secondary',
     },
 ]);
 </script>

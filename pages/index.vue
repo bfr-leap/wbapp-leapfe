@@ -54,12 +54,21 @@ if (import.meta.client) {
 }
 
 async function fetchModel() {
-    //await preFetch(route.query);
-    return await defLgSeasSubCtx(
+    const def = await defLgSeasSubCtx(
         route.query.league as string,
         route.query.season as string,
         route.query.subsession as string
     );
+    // defLgSeasSubCtx doesn't carry simsession; mirror HomeView's
+    // pattern of grafting it on from route.query so the header chip
+    // can read it without going to route directly.
+    if (def) {
+        const sim = route.query.simsession as string | undefined;
+        (def as { simsession_id?: number | string }).simsession_id = sim
+            ? Number(sim)
+            : 0;
+    }
+    return def;
 }
 
 function getDefaultModel() {
@@ -80,7 +89,7 @@ interface LgSeasSubCtx {
 
 const lgSeasSubCtx: Ref<LgSeasSubCtx> =
     await asyncDataWithReactiveModel<LgSeasSubCtx>(
-        `indexModel-${route.query.league}-${route.query.season}-${route.query.subsession}`,
+        `indexModel-${route.query.league}-${route.query.season}-${route.query.subsession}-${route.query.simsession || ''}`,
         fetchModel,
         getDefaultModel,
         [route]
@@ -499,6 +508,12 @@ const isEmbedMode = computed(() =>
     max-width: 1280px;
     margin: 0 auto;
     padding: 0 var(--gutter-page);
+    /* Safety net: at narrow desktop widths the chip bar + tab
+       strip could compete for space and overlap. min-width:0
+       lets flex children actually shrink instead of pushing
+       past the container edge. */
+    min-width: 0;
+    overflow: hidden;
 }
 @media (min-width: 768px) {
     .app-header__inner {

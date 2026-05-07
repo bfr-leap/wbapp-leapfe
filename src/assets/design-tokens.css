@@ -394,6 +394,9 @@ body {
     border-radius: var(--radius-sm);
     text-decoration: none !important;
     cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
     transition: background-color var(--duration-fast) var(--easing-out),
         border-color var(--duration-fast) var(--easing-out),
         color var(--duration-fast) var(--easing-out);
@@ -449,6 +452,13 @@ body {
     color: var(--text-secondary);
     cursor: pointer;
     opacity: 0.85;
+    /* Strip native browser button chrome — Edge / Chromium and
+       Safari otherwise paint a subtle bevel + rounded fill that
+       breaks the chromeless "icon in chrome band" silhouette
+       the helmet uses. */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
     transition: opacity var(--duration-fast) var(--easing-out),
         color var(--duration-fast) var(--easing-out);
 }
