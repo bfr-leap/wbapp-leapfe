@@ -15,6 +15,9 @@ import {
 import type { PastEventCardEntry } from '@@/src/models/event/past-events-cards-model';
 import { getPastEventCardsModel } from '@@/src/models/event/past-events-cards-model';
 import { resolveProtagonistCustId } from '@@/src/models/driver/protagonist';
+import { venueKey } from '@@/src/utils/track-utils';
+import { getCuratedTrackDisplayInfo } from '@@/src/utils/fetch-util';
+import type { CuratedTrackDisplayhInfo } from 'lplib/endpoint-types/iracing-endpoints';
 import { SignedIn, SignedOut, SignInButton } from 'vue-clerk';
 import { useAuth } from 'vue-clerk';
 import RouterLinkProxy from '@@/src/components/nav/router-link-proxy.vue';
@@ -45,6 +48,7 @@ const homeModel: Ref<HomeModel> = await asyncDataWithReactiveModel<HomeModel>(
 );
 
 const protagonistRaces: Ref<PastEventCardEntry[]> = ref([]);
+const trackDisplayInfo: Ref<CuratedTrackDisplayhInfo | null> = ref(null);
 
 watch(
     () => [
@@ -63,12 +67,14 @@ watch(
             seasonId,
             isSignedIn.value === true
         );
-        if (!irCustId) {
-            protagonistRaces.value = [];
-            return;
-        }
-        const m = await getPastEventCardsModel(leagueId, seasonId, irCustId);
-        protagonistRaces.value = m.pastRaces;
+        const [past, display] = await Promise.all([
+            irCustId
+                ? getPastEventCardsModel(leagueId, seasonId, irCustId)
+                : Promise.resolve(null),
+            getCuratedTrackDisplayInfo(),
+        ]);
+        protagonistRaces.value = past?.pastRaces ?? [];
+        trackDisplayInfo.value = display ?? null;
     },
     { immediate: true }
 );
@@ -76,10 +82,11 @@ watch(
 const lastTimeHere = computed(() => {
     const trackId = homeModel.value.selectedRace?.trackId?.toString();
     if (!trackId) return null;
+    const targetVenue = venueKey(trackId, trackDisplayInfo.value);
     const matches = protagonistRaces.value
         .filter(
             (r) =>
-                r.trackId === trackId &&
+                venueKey(r.trackId, trackDisplayInfo.value) === targetVenue &&
                 r.protagonistFinish !== undefined &&
                 r.date
         )

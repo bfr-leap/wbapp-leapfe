@@ -1,4 +1,18 @@
 import { getCuratedTrackDisplayInfo } from './fetch-util';
+import type { CuratedTrackDisplayhInfo } from 'lplib/endpoint-types/iracing-endpoints';
+
+/**
+ * Returns a venue-stable key for a trackId so different layouts of the same
+ * circuit (e.g. Hungaroring GP vs short) compare equal. Falls back to the
+ * raw trackId when no display info is available.
+ */
+export function venueKey(
+    trackId: string,
+    displayInfo: CuratedTrackDisplayhInfo | null
+): string {
+    const short = displayInfo?.[trackId]?.short_display;
+    return short ? short.toUpperCase() : trackId;
+}
 
 export async function getshortTrackName(trackId: string): Promise<string> {
     let displayInfo = await getCuratedTrackDisplayInfo();
