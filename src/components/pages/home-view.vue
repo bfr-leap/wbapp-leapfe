@@ -121,26 +121,6 @@ function onClick(eventInfo: { trackId: string; date: string }) {
 <template>
     <div class="page">
         <section
-            v-if="homeModel.leagueId && homeModel.seasonId"
-            class="section"
-        >
-            <header class="section__head">
-                <span class="section__title">Past Events</span>
-            </header>
-            <PastEventCards
-                v-bind:league="homeModel.leagueId"
-                v-bind:season="homeModel.seasonId"
-                v-bind:car="homeModel.carId"
-            />
-        </section>
-
-        <LatestRaceSummary
-            v-if="homeModel.leagueId && homeModel.seasonId"
-            v-bind:league="homeModel.leagueId"
-            v-bind:season="homeModel.seasonId"
-        />
-
-        <section
             v-if="homeModel.nextRace.date"
             class="section section--featured"
         >
@@ -211,6 +191,26 @@ function onClick(eventInfo: { trackId: string; date: string }) {
             v-bind:league="homeModel.leagueId"
             v-bind:season="homeModel.seasonId"
         />
+
+        <LatestRaceSummary
+            v-if="homeModel.leagueId && homeModel.seasonId"
+            v-bind:league="homeModel.leagueId"
+            v-bind:season="homeModel.seasonId"
+        />
+
+        <section
+            v-if="homeModel.leagueId && homeModel.seasonId"
+            class="section"
+        >
+            <header class="section__head">
+                <span class="section__title">Past Events</span>
+            </header>
+            <PastEventCards
+                v-bind:league="homeModel.leagueId"
+                v-bind:season="homeModel.seasonId"
+                v-bind:car="homeModel.carId"
+            />
+        </section>
 
         <DriverStandings
             v-if="homeModel.seasonId && homeModel.leagueId"

@@ -49,4 +49,16 @@ describe('pickProtagonist', () => {
     it('falls back to the standings leader when the user is not in the field', () => {
         expect(pickProtagonist(drivers, '999')?.custId).toBe('100');
     });
+
+    it('uses the fallback custId when the user is not in the field', () => {
+        expect(pickProtagonist(drivers, '999', '300')?.custId).toBe('300');
+    });
+
+    it('prefers the user over the fallback when both are in the field', () => {
+        expect(pickProtagonist(drivers, '200', '300')?.custId).toBe('200');
+    });
+
+    it('skips an out-of-field fallback and uses the standings leader', () => {
+        expect(pickProtagonist(drivers, '', '999')?.custId).toBe('100');
+    });
 });

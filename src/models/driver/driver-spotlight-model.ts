@@ -7,7 +7,7 @@ import {
     getSimsessionResults,
     getTrackInfoDirectory,
 } from '@@/src/utils/fetch-util';
-import { pickProtagonist, safeIrCustId } from './protagonist';
+import { resolveProtagonistCustId } from './protagonist';
 
 export interface SpotlightLastRace {
     trackId: string;
@@ -54,8 +54,13 @@ export async function getDriverSpotlightModel(
     const standings = await getDriverStandingsModel(league, season, false);
     if (!standings.drivers.length) return ret;
 
-    const irCustId = isSignedIn ? await safeIrCustId() : '';
-    const pick = pickProtagonist(standings.drivers, irCustId);
+    const protagonistCustId = await resolveProtagonistCustId(
+        league,
+        season,
+        isSignedIn
+    );
+    const pick =
+        standings.drivers.find((d) => d.custId === protagonistCustId) ?? null;
     if (!pick) return ret;
 
     ret.driver = pick;
