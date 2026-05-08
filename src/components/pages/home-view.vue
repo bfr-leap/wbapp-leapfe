@@ -4,6 +4,7 @@ import type { Ref } from 'vue';
 import EventCardLg from '@@/src/components/event/event-card-lg.vue';
 import EventCardSm from '@@/src/components/event/event-card-sm.vue';
 import DriverStandings from '@@/src/components/driver/driver-standings.vue';
+import DriverSpotlight from '@@/src/components/driver/driver-spotlight.vue';
 import PastEventCards from '../event/past-event-cards.vue';
 import LatestRaceSummary from '../event/latest-race-summary.vue';
 import type { HomeModel } from '@@/src/models/pages/home-model';
@@ -152,6 +153,13 @@ function onClick(eventInfo: { trackId: string; date: string }) {
             </div>
             <div v-else>No Future Events</div>
         </section>
+
+        <DriverSpotlight
+            v-if="homeModel.seasonId && homeModel.leagueId"
+            :key="`sp-${homeModel.leagueId}-${homeModel.seasonId}`"
+            v-bind:league="homeModel.leagueId"
+            v-bind:season="homeModel.seasonId"
+        />
 
         <DriverStandings
             v-if="homeModel.seasonId && homeModel.leagueId"
