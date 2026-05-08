@@ -47,14 +47,16 @@ watch(route, fetchModel);
                 </div>
             </section>
 
-            <section
-                v-if="userProfileModel.isVerified === false"
-                class="section"
-            >
+            <section class="section">
                 <header class="section__head">
                     <span class="section__title">Link to iRacing</span>
                 </header>
-                <p class="form-text">
+                <p v-if="userProfileModel.irCustId" class="form-text">
+                    Currently linked as cust id
+                    <strong>{{ userProfileModel.irCustId }}</strong
+                    >. Picked the wrong frog? Hop back in and switch.
+                </p>
+                <p v-else class="form-text">
                     We don't know which driver you are yet. Hop in and pick
                     yourself from the league roster.
                 </p>
@@ -64,12 +66,12 @@ watch(route, fetchModel);
                     data-bs-toggle="modal"
                     data-bs-target="#irDriverFinderModal"
                 >
-                    Find yourself in the lineup
+                    {{
+                        userProfileModel.irCustId
+                            ? 'Pick a different driver'
+                            : 'Find yourself in the lineup'
+                    }}
                 </button>
-            </section>
-
-            <section v-if="userProfileModel.isVerified" class="section">
-                Verified Profile...
             </section>
 
             <section class="section">
