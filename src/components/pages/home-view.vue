@@ -16,8 +16,14 @@ import type { PastEventCardEntry } from '@@/src/models/event/past-events-cards-m
 import { getPastEventCardsModel } from '@@/src/models/event/past-events-cards-model';
 import { resolveProtagonistCustId } from '@@/src/models/driver/protagonist';
 import { venueKey } from '@@/src/utils/track-utils';
-import { getCuratedTrackDisplayInfo } from '@@/src/utils/fetch-util';
-import type { CuratedTrackDisplayhInfo } from 'lplib/endpoint-types/iracing-endpoints';
+import {
+    getCuratedTrackDisplayInfo,
+    getTrackInfoDirectory,
+} from '@@/src/utils/fetch-util';
+import type {
+    CuratedTrackDisplayhInfo,
+    TrackInfoDirectory,
+} from 'lplib/endpoint-types/iracing-endpoints';
 import { SignedIn, SignedOut, SignInButton } from 'vue-clerk';
 import { useAuth } from 'vue-clerk';
 import RouterLinkProxy from '@@/src/components/nav/router-link-proxy.vue';
@@ -49,6 +55,7 @@ const homeModel: Ref<HomeModel> = await asyncDataWithReactiveModel<HomeModel>(
 
 const protagonistRaces: Ref<PastEventCardEntry[]> = ref([]);
 const trackDisplayInfo: Ref<CuratedTrackDisplayhInfo | null> = ref(null);
+const leagueTrackDirectory: Ref<TrackInfoDirectory | null> = ref(null);
 
 watch(
     () => [
@@ -67,14 +74,16 @@ watch(
             seasonId,
             isSignedIn.value === true
         );
-        const [past, display] = await Promise.all([
+        const [past, display, directory] = await Promise.all([
             irCustId
                 ? getPastEventCardsModel(leagueId, seasonId, irCustId)
                 : Promise.resolve(null),
             getCuratedTrackDisplayInfo(),
+            getTrackInfoDirectory(leagueId),
         ]);
         protagonistRaces.value = past?.pastRaces ?? [];
         trackDisplayInfo.value = display ?? null;
+        leagueTrackDirectory.value = directory ?? null;
     },
     { immediate: true }
 );
@@ -82,11 +91,19 @@ watch(
 const lastTimeHere = computed(() => {
     const trackId = homeModel.value.selectedRace?.trackId?.toString();
     if (!trackId) return null;
-    const targetVenue = venueKey(trackId, trackDisplayInfo.value);
+    const targetVenue = venueKey(
+        trackId,
+        trackDisplayInfo.value,
+        leagueTrackDirectory.value
+    );
     const matches = protagonistRaces.value
         .filter(
             (r) =>
-                venueKey(r.trackId, trackDisplayInfo.value) === targetVenue &&
+                venueKey(
+                    r.trackId,
+                    trackDisplayInfo.value,
+                    leagueTrackDirectory.value
+                ) === targetVenue &&
                 r.protagonistFinish !== undefined &&
                 r.date
         )

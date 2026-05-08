@@ -1,17 +1,37 @@
 import { getCuratedTrackDisplayInfo } from './fetch-util';
-import type { CuratedTrackDisplayhInfo } from 'lplib/endpoint-types/iracing-endpoints';
+import type {
+    CuratedTrackDisplayhInfo,
+    TrackInfoDirectory,
+} from 'lplib/endpoint-types/iracing-endpoints';
 
 /**
  * Returns a venue-stable key for a trackId so different layouts of the same
- * circuit (e.g. Hungaroring GP vs short) compare equal. Falls back to the
- * raw trackId when no display info is available.
+ * circuit (e.g. Hungaroring GP vs short) compare equal.
+ *
+ * Resolution order, most specific first:
+ *   1. Curated short_display (e.g. "HRNG") — same across configs by design.
+ *   2. League track_display name with parens stripped + lowercased — works
+ *      when the curated map is missing the trackId but the league directory
+ *      knows it.
+ *   3. Raw trackId.
  */
 export function venueKey(
     trackId: string,
-    displayInfo: CuratedTrackDisplayhInfo | null
+    curated: CuratedTrackDisplayhInfo | null,
+    leagueDirectory: TrackInfoDirectory | null = null
 ): string {
-    const short = displayInfo?.[trackId]?.short_display;
-    return short ? short.toUpperCase() : trackId;
+    const short = curated?.[trackId]?.short_display;
+    if (short) return short.toUpperCase();
+
+    const display = leagueDirectory?.track_display?.[trackId];
+    if (display) {
+        return display
+            .replace(/\(.*?\)/g, '')
+            .trim()
+            .toLowerCase();
+    }
+
+    return trackId;
 }
 
 export async function getshortTrackName(trackId: string): Promise<string> {
