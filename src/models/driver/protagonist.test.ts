@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { pickProtagonist } from './driver-spotlight-model';
+import { pickProtagonist } from './protagonist';
 import type { DriverModel } from './driver-standings-model';
 
 function makeDriver(custId: string, position: number): DriverModel {

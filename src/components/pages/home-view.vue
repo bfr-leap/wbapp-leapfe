@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watchEffect } from 'vue';
+import { ref, computed, watch } from 'vue';
 import type { Ref } from 'vue';
 import EventCardLg from '@@/src/components/event/event-card-lg.vue';
 import EventCardSm from '@@/src/components/event/event-card-sm.vue';
@@ -12,6 +12,9 @@ import {
     getDefaultHomeModel,
     getHomeModel,
 } from '@@/src/models/pages/home-model';
+import type { PastEventCardEntry } from '@@/src/models/event/past-events-cards-model';
+import { getPastEventCardsModel } from '@@/src/models/event/past-events-cards-model';
+import { resolveProtagonistCustId } from '@@/src/models/driver/protagonist';
 import { SignedIn, SignedOut, SignInButton } from 'vue-clerk';
 import { useAuth } from 'vue-clerk';
 import RouterLinkProxy from '@@/src/components/nav/router-link-proxy.vue';
@@ -40,6 +43,51 @@ const homeModel: Ref<HomeModel> = await asyncDataWithReactiveModel<HomeModel>(
     getDefaultHomeModel,
     [() => props.league, () => props.season, () => props.subsession]
 );
+
+const protagonistRaces: Ref<PastEventCardEntry[]> = ref([]);
+
+watch(
+    () => [
+        homeModel.value.leagueId,
+        homeModel.value.seasonId,
+        isSignedIn.value,
+    ],
+    async () => {
+        const { leagueId, seasonId } = homeModel.value;
+        if (!leagueId || !seasonId) {
+            protagonistRaces.value = [];
+            return;
+        }
+        const irCustId = await resolveProtagonistCustId(
+            leagueId,
+            seasonId,
+            isSignedIn.value === true
+        );
+        if (!irCustId) {
+            protagonistRaces.value = [];
+            return;
+        }
+        const m = await getPastEventCardsModel(leagueId, seasonId, irCustId);
+        protagonistRaces.value = m.pastRaces;
+    },
+    { immediate: true }
+);
+
+const lastTimeHere = computed(() => {
+    const trackId = homeModel.value.selectedRace?.trackId?.toString();
+    if (!trackId) return null;
+    const matches = protagonistRaces.value
+        .filter(
+            (r) =>
+                r.trackId === trackId &&
+                r.protagonistFinish !== undefined &&
+                r.date
+        )
+        .sort(
+            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+    return matches[0] ?? null;
+});
 
 function onClick(eventInfo: { trackId: string; date: string }) {
     homeModel.value.selectedRace = {
@@ -98,6 +146,9 @@ function onClick(eventInfo: { trackId: string; date: string }) {
         >
             <header class="section__head">
                 <span class="section__title">Up Next</span>
+                <span v-if="lastTimeHere" class="section__hint">
+                    Last time here: P{{ lastTimeHere.protagonistFinish }}
+                </span>
                 <SignedIn>
                     <RouterLinkProxy
                         v-if="homeModel.allowEditCalendar"
@@ -181,6 +232,13 @@ function onClick(eventInfo: { trackId: string; date: string }) {
 </template>
 
 <style scoped>
+.section__hint {
+    margin-left: var(--space-3);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
 /* Make the small-event-card column stretch its children to fill
    the height of the EventCardLg next to it. Bootstrap's .col with
    flex:1 0 0% in a column-direction flex container distributes

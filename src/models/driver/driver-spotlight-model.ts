@@ -7,7 +7,7 @@ import {
     getSimsessionResults,
     getTrackInfoDirectory,
 } from '@@/src/utils/fetch-util';
-import { getIrLinkState } from '@@/src/services/user-service';
+import { pickProtagonist, safeIrCustId } from './protagonist';
 
 export interface SpotlightLastRace {
     trackId: string;
@@ -38,27 +38,6 @@ export function getDefaultDriverSpotlightModel(): DriverSpotlightModel {
         fieldSize: 0,
         lastRace: null,
     };
-}
-
-async function safeIrCustId(): Promise<string> {
-    try {
-        const s = await getIrLinkState();
-        return s?.irCustId || '';
-    } catch {
-        return '';
-    }
-}
-
-export function pickProtagonist(
-    drivers: DriverModel[],
-    irCustId: string
-): DriverModel | null {
-    if (drivers.length === 0) return null;
-    if (irCustId) {
-        const mine = drivers.find((d) => d.custId === irCustId);
-        if (mine) return mine;
-    }
-    return drivers[0] ?? null;
 }
 
 export async function getDriverSpotlightModel(

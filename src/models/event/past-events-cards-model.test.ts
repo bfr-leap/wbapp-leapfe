@@ -11,15 +11,18 @@ import {
 vi.mock('@@/src/utils/fetch-util', () => ({
     getLeagueSeasonSessions: vi.fn(),
     getLeagueSimsessionIndex: vi.fn(),
+    getDriverResults: vi.fn(),
 }));
 
 import {
     getLeagueSeasonSessions,
     getLeagueSimsessionIndex,
+    getDriverResults,
 } from '@@/src/utils/fetch-util';
 
 const mockGetLeagueSeasonSessions = vi.mocked(getLeagueSeasonSessions);
 const mockGetLeagueSimsessionIndex = vi.mocked(getLeagueSimsessionIndex);
+const mockGetDriverResults = vi.mocked(getDriverResults);
 
 // ---------------------------------------------------------------------------
 // Test data
@@ -167,5 +170,38 @@ describe('getPastEventCardsModel', () => {
 
         expect(model.pastRaces[0].simsessionId).toBe('');
         expect(model.pastRaces[1].simsessionId).toBe('');
+    });
+
+    it('augments pastRaces with protagonist finish/start when irCustId provided', async () => {
+        mockGetLeagueSeasonSessions.mockResolvedValue(makeSessions() as any);
+        mockGetLeagueSimsessionIndex.mockResolvedValue(
+            makeSimsessionIndex() as any
+        );
+        // DriverResults shape: { [season]: { [subsession]: SSR_ResultsEntry } }
+        mockGetDriverResults.mockResolvedValue({
+            5678: {
+                100: { position: 5, start_position: 8 } as any,
+                // subsession 200 intentionally missing — simulates a DNS/skip
+            },
+        } as any);
+
+        const model = await getPastEventCardsModel(LEAGUE, SEASON, '42');
+
+        expect(model.pastRaces[0].protagonistFinish).toBe(5);
+        expect(model.pastRaces[0].protagonistStart).toBe(8);
+        expect(model.pastRaces[1].protagonistFinish).toBeUndefined();
+        expect(model.pastRaces[1].protagonistStart).toBeUndefined();
+        expect(mockGetDriverResults).toHaveBeenCalledWith(LEAGUE, '42', 'race');
+    });
+
+    it('does not call getDriverResults when no irCustId is provided', async () => {
+        mockGetLeagueSeasonSessions.mockResolvedValue(makeSessions() as any);
+        mockGetLeagueSimsessionIndex.mockResolvedValue(
+            makeSimsessionIndex() as any
+        );
+
+        await getPastEventCardsModel(LEAGUE, SEASON);
+
+        expect(mockGetDriverResults).not.toHaveBeenCalled();
     });
 });
