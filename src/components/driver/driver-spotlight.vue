@@ -31,9 +31,22 @@ watch(() => [props.league, props.season, isSignedIn.value], fetchModel);
 </script>
 
 <template>
-    <section v-if="model.hasDriver && model.driver" class="section spotlight">
-        <header class="section__head">
+    <section
+        v-if="model.hasDriver && model.driver"
+        class="section spotlight"
+        :class="{ 'spotlight--has-photo': model.heroPhotoUrl }"
+    >
+        <div
+            v-if="model.heroPhotoUrl"
+            class="spotlight__bg"
+            :style="{ backgroundImage: `url(${model.heroPhotoUrl})` }"
+        ></div>
+
+        <header class="section__head spotlight__head">
             <span class="section__title">Driver Spotlight</span>
+            <span v-if="model.heroPhotoCaption" class="spotlight__caption">{{
+                model.heroPhotoCaption
+            }}</span>
         </header>
 
         <div class="spotlight__body">
@@ -96,6 +109,53 @@ watch(() => [props.league, props.season, isSignedIn.value], fetchModel);
 </template>
 
 <style scoped>
+.spotlight {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+}
+
+.spotlight--has-photo {
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-subtle);
+    padding: var(--space-3);
+}
+
+.spotlight__bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.55;
+    z-index: 0;
+}
+
+.spotlight--has-photo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.45) 0%,
+        rgba(0, 0, 0, 0.75) 100%
+    );
+    z-index: 1;
+    pointer-events: none;
+}
+
+.spotlight__head,
+.spotlight__body {
+    position: relative;
+    z-index: 2;
+}
+
+.spotlight__caption {
+    margin-left: var(--space-3);
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
 .spotlight__body {
     display: flex;
     flex-wrap: wrap;
@@ -133,5 +193,12 @@ watch(() => [props.league, props.season, isSignedIn.value], fetchModel);
     font-size: 0.8rem;
     color: var(--text-secondary);
     margin-top: 2px;
+}
+
+.spotlight--has-photo .stat__value,
+.spotlight--has-photo .stat__label,
+.spotlight--has-photo .spotlight__caption,
+.spotlight--has-photo .section__title {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
 }
 </style>

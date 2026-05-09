@@ -7,6 +7,7 @@ import {
     getSimsessionResults,
     getTrackInfoDirectory,
 } from '@@/src/utils/fetch-util';
+import { getPhotoIndex, pickHeroPhoto } from '@@/src/services/photo-service';
 import { resolveProtagonistCustId } from './protagonist';
 
 export interface SpotlightLastRace {
@@ -26,6 +27,8 @@ export interface DriverSpotlightModel {
     deltaToAhead: number | null;
     fieldSize: number;
     lastRace: SpotlightLastRace | null;
+    heroPhotoUrl: string | null;
+    heroPhotoCaption: string | null;
 }
 
 export function getDefaultDriverSpotlightModel(): DriverSpotlightModel {
@@ -37,6 +40,8 @@ export function getDefaultDriverSpotlightModel(): DriverSpotlightModel {
         deltaToAhead: null,
         fieldSize: 0,
         lastRace: null,
+        heroPhotoUrl: null,
+        heroPhotoCaption: null,
     };
 }
 
@@ -90,9 +95,10 @@ export async function getDriverSpotlightModel(
     const latest = completed[0];
     if (!latest) return ret;
 
-    const [sim, trackInfo] = await Promise.all([
+    const [sim, trackInfo, photoIndex] = await Promise.all([
         getSimsessionResults(latest.sessionId, latest.simsessionId),
         getTrackInfoDirectory(league),
+        getPhotoIndex(latest.sessionId, latest.simsessionId),
     ]);
     const entry = sim?.results.find(
         (r) => r.cust_id.toString() === pick.custId
@@ -107,6 +113,12 @@ export async function getDriverSpotlightModel(
         startPosition: entry.start_position,
         positionsGained: entry.start_position - entry.position,
     };
+
+    const hero = pickHeroPhoto(photoIndex?.photos ?? [], pick.custId);
+    if (hero) {
+        ret.heroPhotoUrl = hero.url;
+        ret.heroPhotoCaption = hero.caption ?? null;
+    }
 
     return ret;
 }
