@@ -62,7 +62,6 @@ export {
 export {
     getIrLinkState,
     setIrLinkDriver,
-    setIrLinkCode,
     getUserLeaguesState,
     setUserLeaguesState,
     getUserFeatures,
