@@ -19,6 +19,9 @@ TRACKS = os.path.join(os.path.dirname(__file__), '..', 'public', 'tracks')
 WHITE_KEY = [
     '123', '166', '212', '219', '233', '371', '390', '445', '451',
     '475', '478', '498', '473', '474',
+    # Real PNGs that were authored with alpha=255 across a white
+    # background, so the white renders as a solid block.
+    'n1', '20', '236', '266', '362', '419',
 ]
 # These have non-trivial backgrounds; just re-encode as proper PNGs
 # so the file extension matches the contents.
