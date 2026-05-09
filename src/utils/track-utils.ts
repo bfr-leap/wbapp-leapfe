@@ -8,11 +8,12 @@ import type {
  * Returns a venue-stable key for a trackId so different layouts of the same
  * circuit (e.g. Hungaroring GP vs short) compare equal.
  *
- * Resolution order, most specific first:
- *   1. Curated short_display (e.g. "HRNG") — same across configs by design.
- *   2. League track_display name with parens stripped + lowercased — works
- *      when the curated map is missing the trackId but the league directory
- *      knows it.
+ * Resolution order, most venue-stable first:
+ *   1. League TrackInfoDirectory.track_display name (parens stripped,
+ *      lowercased) — typically the bare venue name.
+ *   2. Curated short_display (e.g. "HRNG") — usually consistent across
+ *      configs, but not always (some venues get distinct shorts per layout),
+ *      so we only fall back to it.
  *   3. Raw trackId.
  */
 export function venueKey(
@@ -20,9 +21,6 @@ export function venueKey(
     curated: CuratedTrackDisplayhInfo | null,
     leagueDirectory: TrackInfoDirectory | null = null
 ): string {
-    const short = curated?.[trackId]?.short_display;
-    if (short) return short.toUpperCase();
-
     const display = leagueDirectory?.track_display?.[trackId];
     if (display) {
         return display
@@ -30,6 +28,9 @@ export function venueKey(
             .trim()
             .toLowerCase();
     }
+
+    const short = curated?.[trackId]?.short_display;
+    if (short) return short.toUpperCase();
 
     return trackId;
 }

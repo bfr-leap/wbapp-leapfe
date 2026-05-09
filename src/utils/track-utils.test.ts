@@ -48,13 +48,27 @@ describe('venueKey', () => {
         );
     });
 
-    it('prefers curated short_display over the league directory name', () => {
+    it('prefers the league directory name over curated short_display', () => {
+        // Real-world case: Hungaroring configs have different curated shorts
+        // (HUNG vs HRNG) but share the league directory name "Hungaroring".
+        const curatedSplit: CuratedTrackDisplayhInfo = {
+            '413': { short_display: 'HUNG', display: 'Hungaroring' },
+            '390': {
+                short_display: 'HRNG',
+                display: 'Hungaroring National',
+            },
+        };
         const directory: TrackInfoDirectory = {
             league_name: 'Test',
-            track_display: { '300': 'Anything Else' },
+            track_display: {
+                '413': 'Hungaroring',
+                '390': 'Hungaroring',
+            },
             car_display: {},
             car_2_track_map: {},
         };
-        expect(venueKey('300', curated, directory)).toBe('HRNG');
+        expect(venueKey('413', curatedSplit, directory)).toBe(
+            venueKey('390', curatedSplit, directory)
+        );
     });
 });
