@@ -35,6 +35,8 @@ const props = defineProps<{
     height: 100%;
     padding-top: 10px;
     padding-bottom: 10px;
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.55))
+        drop-shadow(0 0 6px rgba(255, 255, 255, 0.25));
 }
 .wrap {
     width: 100%;

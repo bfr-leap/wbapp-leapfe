@@ -123,6 +123,9 @@ updateTimer();
     background: rgba(240, 246, 252, 0.05);
     width: 100%;
     height: 6em;
+    /* Halo so dark monochrome logos read on the dark track photo. */
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.55))
+        drop-shadow(0 0 6px rgba(255, 255, 255, 0.25));
 }
 .wrap {
     overflow: hidden;
