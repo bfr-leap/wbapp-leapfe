@@ -32,14 +32,6 @@ export async function setIrLinkDriver(
     return await fetchUncached({ namespace, type, driver });
 }
 
-export async function setIrLinkCode(
-    code: number
-): Promise<Record<string, unknown>> {
-    const namespace = 'ldata-usrdata';
-    const type = 'irLinkCodeUpd';
-    return await fetchUncached({ namespace, type, code });
-}
-
 // ---------------------------------------------------------------------------
 // User leagues state (with short-lived cache)
 // ---------------------------------------------------------------------------

@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref, watchEffect } from 'vue';
+import { ref, computed, watch } from 'vue';
 import type { Ref } from 'vue';
 import EventCardLg from '@@/src/components/event/event-card-lg.vue';
 import EventCardSm from '@@/src/components/event/event-card-sm.vue';
 import DriverStandings from '@@/src/components/driver/driver-standings.vue';
+import DriverSpotlight from '@@/src/components/driver/driver-spotlight.vue';
 import PastEventCards from '../event/past-event-cards.vue';
 import LatestRaceSummary from '../event/latest-race-summary.vue';
 import type { HomeModel } from '@@/src/models/pages/home-model';
@@ -11,6 +12,9 @@ import {
     getDefaultHomeModel,
     getHomeModel,
 } from '@@/src/models/pages/home-model';
+import type { PastEventCardEntry } from '@@/src/models/event/past-events-cards-model';
+import { getPastEventCardsModel } from '@@/src/models/event/past-events-cards-model';
+import { resolveProtagonistCustId } from '@@/src/models/driver/protagonist';
 import { SignedIn, SignedOut, SignInButton } from 'vue-clerk';
 import { useAuth } from 'vue-clerk';
 import RouterLinkProxy from '@@/src/components/nav/router-link-proxy.vue';
@@ -39,6 +43,54 @@ const homeModel: Ref<HomeModel> = await asyncDataWithReactiveModel<HomeModel>(
     getDefaultHomeModel,
     [() => props.league, () => props.season, () => props.subsession]
 );
+
+const protagonistRaces: Ref<PastEventCardEntry[]> = ref([]);
+
+watch(
+    () => [
+        homeModel.value.leagueId,
+        homeModel.value.seasonId,
+        isSignedIn.value,
+    ],
+    async () => {
+        const { leagueId, seasonId } = homeModel.value;
+        if (!leagueId || !seasonId) {
+            protagonistRaces.value = [];
+            return;
+        }
+        const irCustId = await resolveProtagonistCustId(
+            leagueId,
+            seasonId,
+            isSignedIn.value === true
+        );
+        if (!irCustId) {
+            protagonistRaces.value = [];
+            return;
+        }
+        const past = await getPastEventCardsModel(leagueId, seasonId, irCustId);
+        protagonistRaces.value = past?.pastRaces ?? [];
+    },
+    { immediate: true }
+);
+
+// Strict track_id equality on purpose: in iRacing, distinct track_ids mean
+// distinct scans/layouts, so we should only surface "last time here" when the
+// protagonist has raced this exact track configuration before.
+const lastTimeHere = computed(() => {
+    const trackId = homeModel.value.selectedRace?.trackId?.toString();
+    if (!trackId) return null;
+    const matches = protagonistRaces.value
+        .filter(
+            (r) =>
+                r.trackId === trackId &&
+                r.protagonistFinish !== undefined &&
+                r.date
+        )
+        .sort(
+            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+    return matches[0] ?? null;
+});
 
 function onClick(eventInfo: { trackId: string; date: string }) {
     homeModel.value.selectedRace = {
@@ -72,31 +124,14 @@ function onClick(eventInfo: { trackId: string; date: string }) {
 <template>
     <div class="page">
         <section
-            v-if="homeModel.leagueId && homeModel.seasonId"
-            class="section"
-        >
-            <header class="section__head">
-                <span class="section__title">Past Events</span>
-            </header>
-            <PastEventCards
-                v-bind:league="homeModel.leagueId"
-                v-bind:season="homeModel.seasonId"
-                v-bind:car="homeModel.carId"
-            />
-        </section>
-
-        <LatestRaceSummary
-            v-if="homeModel.leagueId && homeModel.seasonId"
-            v-bind:league="homeModel.leagueId"
-            v-bind:season="homeModel.seasonId"
-        />
-
-        <section
             v-if="homeModel.nextRace.date"
             class="section section--featured"
         >
             <header class="section__head">
                 <span class="section__title">Up Next</span>
+                <span v-if="lastTimeHere" class="section__hint">
+                    Last time here: P{{ lastTimeHere.protagonistFinish }}
+                </span>
                 <SignedIn>
                     <RouterLinkProxy
                         v-if="homeModel.allowEditCalendar"
@@ -153,6 +188,34 @@ function onClick(eventInfo: { trackId: string; date: string }) {
             <div v-else>No Future Events</div>
         </section>
 
+        <DriverSpotlight
+            v-if="homeModel.seasonId && homeModel.leagueId"
+            :key="`sp-${homeModel.leagueId}-${homeModel.seasonId}`"
+            v-bind:league="homeModel.leagueId"
+            v-bind:season="homeModel.seasonId"
+        />
+
+        <LatestRaceSummary
+            v-if="homeModel.leagueId && homeModel.seasonId"
+            v-bind:league="homeModel.leagueId"
+            v-bind:season="homeModel.seasonId"
+        />
+
+        <section
+            v-if="homeModel.leagueId && homeModel.seasonId"
+            class="section"
+        >
+            <header class="section__head">
+                <span class="section__title">Past Events</span>
+            </header>
+            <PastEventCards
+                :key="`pe-${homeModel.leagueId}-${homeModel.seasonId}`"
+                v-bind:league="homeModel.leagueId"
+                v-bind:season="homeModel.seasonId"
+                v-bind:car="homeModel.carId"
+            />
+        </section>
+
         <DriverStandings
             v-if="homeModel.seasonId && homeModel.leagueId"
             :key="`ds-${homeModel.leagueId}-${homeModel.seasonId}`"
@@ -173,6 +236,13 @@ function onClick(eventInfo: { trackId: string; date: string }) {
 </template>
 
 <style scoped>
+.section__hint {
+    margin-left: var(--space-3);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
 /* Make the small-event-card column stretch its children to fill
    the height of the EventCardLg next to it. Bootstrap's .col with
    flex:1 0 0% in a column-direction flex container distributes
