@@ -1,17 +1,92 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import EventCardLg from '@@/src/components/event/event-card-lg.vue';
 import TrackBanner from '@@/src/components/track/track-banner.vue';
 
-const trackIds = ref<string[]>([]);
-try {
-    const res = await $fetch<{ trackIds: string[] }>('/api/list-track-images');
-    trackIds.value = res.trackIds;
-} catch (e) {
-    console.warn('[track-audit] failed to list track images', e);
-}
+// Derived from `ls public/tracks/*.jpg`. Refresh by running:
+//   ls public/tracks/*.jpg | xargs -n1 basename | grep -v _logo | sed 's/.jpg$//'
+const trackIds: string[] = [
+    'n1',
+    '18',
+    '20',
+    '31',
+    '47',
+    '53',
+    '94',
+    '95',
+    '103',
+    '108',
+    '109',
+    '121',
+    '123',
+    '124',
+    '127',
+    '131',
+    '136',
+    '144',
+    '145',
+    '149',
+    '152',
+    '163',
+    '164',
+    '166',
+    '168',
+    '169',
+    '178',
+    '179',
+    '180',
+    '191',
+    '192',
+    '195',
+    '198',
+    '200',
+    '212',
+    '214',
+    '218',
+    '219',
+    '225',
+    '229',
+    '233',
+    '234',
+    '236',
+    '237',
+    '239',
+    '250',
+    '255',
+    '266',
+    '276',
+    '277',
+    '319',
+    '341',
+    '345',
+    '349',
+    '362',
+    '371',
+    '390',
+    '397',
+    '403',
+    '413',
+    '419',
+    '434',
+    '435',
+    '444',
+    '445',
+    '448',
+    '451',
+    '453',
+    '463',
+    '465',
+    '473',
+    '474',
+    '475',
+    '478',
+    '485',
+    '498',
+    '501',
+    '509',
+    '523',
+    '584',
+];
 
-// Fixed future date so the "up next" countdown renders consistently.
 const sampleDate = new Date('2099-01-01T00:00:00Z');
 </script>
 
