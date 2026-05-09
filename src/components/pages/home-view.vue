@@ -26,12 +26,9 @@ import type {
 } from 'lplib/endpoint-types/iracing-endpoints';
 import { SignedIn, SignedOut, SignInButton } from 'vue-clerk';
 import { useAuth } from 'vue-clerk';
-import { useRoute } from 'vue-router';
 import RouterLinkProxy from '@@/src/components/nav/router-link-proxy.vue';
 
 const { isSignedIn } = useAuth();
-const route = useRoute();
-const showDebug = computed(() => !!route.query.debug);
 const debugStatus = ref('');
 
 const props = defineProps<{
@@ -221,12 +218,7 @@ async function copyDebug() {
                 <span v-if="lastTimeHere" class="section__hint">
                     Last time here: P{{ lastTimeHere.protagonistFinish }}
                 </span>
-                <button
-                    v-if="showDebug"
-                    type="button"
-                    class="debug-btn"
-                    @click="copyDebug"
-                >
+                <button type="button" class="debug-btn" @click="copyDebug">
                     {{ debugStatus || 'Copy debug' }}
                 </button>
                 <SignedIn>
