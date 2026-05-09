@@ -15,21 +15,11 @@ import {
 import type { PastEventCardEntry } from '@@/src/models/event/past-events-cards-model';
 import { getPastEventCardsModel } from '@@/src/models/event/past-events-cards-model';
 import { resolveProtagonistCustId } from '@@/src/models/driver/protagonist';
-import { venueKey } from '@@/src/utils/track-utils';
-import {
-    getCuratedTrackDisplayInfo,
-    getTrackInfoDirectory,
-} from '@@/src/utils/fetch-util';
-import type {
-    CuratedTrackDisplayhInfo,
-    TrackInfoDirectory,
-} from 'lplib/endpoint-types/iracing-endpoints';
 import { SignedIn, SignedOut, SignInButton } from 'vue-clerk';
 import { useAuth } from 'vue-clerk';
 import RouterLinkProxy from '@@/src/components/nav/router-link-proxy.vue';
 
 const { isSignedIn } = useAuth();
-const debugStatus = ref('');
 
 const props = defineProps<{
     league: string;
@@ -55,9 +45,6 @@ const homeModel: Ref<HomeModel> = await asyncDataWithReactiveModel<HomeModel>(
 );
 
 const protagonistRaces: Ref<PastEventCardEntry[]> = ref([]);
-const trackDisplayInfo: Ref<CuratedTrackDisplayhInfo | null> = ref(null);
-const leagueTrackDirectory: Ref<TrackInfoDirectory | null> = ref(null);
-const protagonistCustIdRef: Ref<string> = ref('');
 
 watch(
     () => [
@@ -76,37 +63,26 @@ watch(
             seasonId,
             isSignedIn.value === true
         );
-        protagonistCustIdRef.value = irCustId;
-        const [past, display, directory] = await Promise.all([
-            irCustId
-                ? getPastEventCardsModel(leagueId, seasonId, irCustId)
-                : Promise.resolve(null),
-            getCuratedTrackDisplayInfo(),
-            getTrackInfoDirectory(leagueId),
-        ]);
+        if (!irCustId) {
+            protagonistRaces.value = [];
+            return;
+        }
+        const past = await getPastEventCardsModel(leagueId, seasonId, irCustId);
         protagonistRaces.value = past?.pastRaces ?? [];
-        trackDisplayInfo.value = display ?? null;
-        leagueTrackDirectory.value = directory ?? null;
     },
     { immediate: true }
 );
 
+// Strict track_id equality on purpose: in iRacing, distinct track_ids mean
+// distinct scans/layouts, so we should only surface "last time here" when the
+// protagonist has raced this exact track configuration before.
 const lastTimeHere = computed(() => {
     const trackId = homeModel.value.selectedRace?.trackId?.toString();
     if (!trackId) return null;
-    const targetVenue = venueKey(
-        trackId,
-        trackDisplayInfo.value,
-        leagueTrackDirectory.value
-    );
     const matches = protagonistRaces.value
         .filter(
             (r) =>
-                venueKey(
-                    r.trackId,
-                    trackDisplayInfo.value,
-                    leagueTrackDirectory.value
-                ) === targetVenue &&
+                r.trackId === trackId &&
                 r.protagonistFinish !== undefined &&
                 r.date
         )
@@ -143,68 +119,6 @@ function onClick(eventInfo: { trackId: string; date: string }) {
         }
     }
 }
-
-function buildDebugPayload() {
-    const selectedTrackId =
-        homeModel.value.selectedRace?.trackId?.toString() || '';
-    return {
-        isSignedIn: isSignedIn.value === true,
-        leagueId: homeModel.value.leagueId,
-        seasonId: homeModel.value.seasonId,
-        protagonistCustId: protagonistCustIdRef.value,
-        selectedRace: {
-            trackId: selectedTrackId,
-            venueKey: venueKey(
-                selectedTrackId,
-                trackDisplayInfo.value,
-                leagueTrackDirectory.value
-            ),
-            inCurated: !!trackDisplayInfo.value?.[selectedTrackId],
-            inLeagueDirectory:
-                !!leagueTrackDirectory.value?.track_display?.[selectedTrackId],
-            curatedShort:
-                trackDisplayInfo.value?.[selectedTrackId]?.short_display ??
-                null,
-            directoryName:
-                leagueTrackDirectory.value?.track_display?.[selectedTrackId] ??
-                null,
-        },
-        protagonistRaces: protagonistRaces.value.map((r) => ({
-            trackId: r.trackId,
-            venueKey: venueKey(
-                r.trackId,
-                trackDisplayInfo.value,
-                leagueTrackDirectory.value
-            ),
-            finish: r.protagonistFinish ?? null,
-            date: r.date,
-            inCurated: !!trackDisplayInfo.value?.[r.trackId],
-            inLeagueDirectory:
-                !!leagueTrackDirectory.value?.track_display?.[r.trackId],
-        })),
-        lastTimeHere: lastTimeHere.value,
-    };
-}
-
-async function copyDebug() {
-    const json = JSON.stringify(buildDebugPayload(), null, 2);
-    try {
-        await navigator.clipboard.writeText(json);
-        debugStatus.value = 'Copied!';
-    } catch {
-        // Clipboard API can fail on insecure origins or restricted browsers.
-        // Fall back to a prompt the user can manually copy from.
-        try {
-            window.prompt('Copy this debug payload:', json);
-            debugStatus.value = 'Prompt shown';
-        } catch {
-            debugStatus.value = 'Failed';
-        }
-    }
-    setTimeout(() => {
-        debugStatus.value = '';
-    }, 2000);
-}
 </script>
 
 <template>
@@ -218,9 +132,6 @@ async function copyDebug() {
                 <span v-if="lastTimeHere" class="section__hint">
                     Last time here: P{{ lastTimeHere.protagonistFinish }}
                 </span>
-                <button type="button" class="debug-btn" @click="copyDebug">
-                    {{ debugStatus || 'Copy debug' }}
-                </button>
                 <SignedIn>
                     <RouterLinkProxy
                         v-if="homeModel.allowEditCalendar"
@@ -329,21 +240,6 @@ async function copyDebug() {
     font-size: 0.85rem;
     color: var(--text-secondary);
     font-variant-numeric: tabular-nums;
-}
-
-.debug-btn {
-    margin-left: var(--space-3);
-    font-size: 0.75rem;
-    padding: 2px 8px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border-subtle);
-    background: rgba(255, 255, 255, 0.04);
-    color: var(--text-secondary);
-    font-family: var(--font-mono);
-    cursor: pointer;
-}
-.debug-btn:hover {
-    background: rgba(255, 255, 255, 0.08);
 }
 
 /* Make the small-event-card column stretch its children to fill
