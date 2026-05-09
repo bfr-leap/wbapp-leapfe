@@ -209,6 +209,7 @@ function onClick(eventInfo: { trackId: string; date: string }) {
                 <span class="section__title">Past Events</span>
             </header>
             <PastEventCards
+                :key="`pe-${homeModel.leagueId}-${homeModel.seasonId}`"
                 v-bind:league="homeModel.leagueId"
                 v-bind:season="homeModel.seasonId"
                 v-bind:car="homeModel.carId"
