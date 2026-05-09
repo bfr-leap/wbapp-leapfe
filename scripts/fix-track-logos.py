@@ -9,8 +9,10 @@ Run from the repo root: python3 scripts/fix-track-logos.py
 """
 
 from PIL import Image
+import base64
 import glob
 import os
+import re
 import sys
 
 TRACKS = os.path.join(os.path.dirname(__file__), '..', 'public', 'tracks')
@@ -37,10 +39,25 @@ REENCODE_RGBA = ['131', '136']
 # track photo. Invert their RGB (alpha preserved) so they render as
 # white-on-transparent. Auto-detect candidates with:
 #   python3 scripts/diagnose-track-logos.py | grep INVERT_CANDIDATE
+# 124, 236, 419 dropped because their content moves to _map.svg below.
 INVERT_RGB = [
-    'n1', '18', '47', '124', '145', '163', '164', '179', '236',
-    '276', '419', '523',
+    'n1', '18', '47', '145', '163', '164', '179', '276', '523',
 ]
+
+# These tracks shipped with logo and map content swapped: the
+# _logo.png is actually a track outline and the _map.svg holds
+# the wordmark. Swap them: render the SVG to PNG (logo) and
+# embed the PNG into a new SVG (map).
+SWAP_LOGO_AND_MAP = ['124', '169', '236', '419']
+
+# Tracks missing a map svg, paired with the donor track id whose
+# map should be reused.
+COPY_MAP = {'164': '163'}
+
+# Tracks whose _map.svg embeds a raster PNG with an opaque white
+# background. Re-embed the raster with white keyed out so the map
+# matches the dark/transparent style of the vector maps.
+SVG_KEY_WHITE = ['341']
 
 WHITE_THRESHOLD = 235      # below this brightness => fully opaque
 WHITE_FEATHER_END = 252    # above this => fully transparent
@@ -123,9 +140,98 @@ def tighten(im, padding_frac=0.03):
     )
 
 
+def png_to_svg_image(png_path, svg_path):
+    """Wrap a PNG into a minimal SVG via a base64 <image> tag."""
+    with open(png_path, 'rb') as f:
+        data = base64.b64encode(f.read()).decode('ascii')
+    im = Image.open(png_path)
+    w, h = im.size
+    svg = (
+        f'<svg xmlns="http://www.w3.org/2000/svg" '
+        f'viewBox="0 0 {w} {h}">\n'
+        f'  <image href="data:image/png;base64,{data}" '
+        f'width="{w}" height="{h}"/>\n'
+        f'</svg>\n'
+    )
+    with open(svg_path, 'w') as f:
+        f.write(svg)
+
+
+def svg_to_png(svg_path, png_path, output_height=300):
+    """Rasterize an SVG to PNG, sized for use as a logo overlay."""
+    import cairosvg
+
+    cairosvg.svg2png(
+        url=svg_path,
+        write_to=png_path,
+        output_height=output_height,
+    )
+
+
+def key_white_svg_image(svg_path):
+    """White-key the embedded raster of a PNG-in-SVG map.
+
+    These maps are rasters wrapped in <svg><image href="data:..."/></svg>
+    with an opaque white background, so they paint a white block over
+    the dark backdrop. Decode the raster, key out white, re-embed.
+    """
+    with open(svg_path) as f:
+        body = f.read()
+    m = re.search(r'href="data:image/(png|jpeg);base64,([^"]+)"', body)
+    if not m:
+        return False
+    fmt, b64 = m.group(1), m.group(2)
+    raw = base64.b64decode(b64)
+    tmp_in = svg_path + f'.in.{fmt}'
+    with open(tmp_in, 'wb') as f:
+        f.write(raw)
+    im = key_white(Image.open(tmp_in))
+    tmp_out = svg_path + '.out.png'
+    im.save(tmp_out, 'PNG', optimize=True)
+    with open(tmp_out, 'rb') as f:
+        new_b64 = base64.b64encode(f.read()).decode('ascii')
+    os.remove(tmp_in)
+    os.remove(tmp_out)
+    body = re.sub(
+        r'href="data:image/(png|jpeg);base64,[^"]+"',
+        f'href="data:image/png;base64,{new_b64}"',
+        body,
+        count=1,
+    )
+    with open(svg_path, 'w') as f:
+        f.write(body)
+    return True
+
+
 def main():
-    # Run order matters: key out background -> re-encode -> invert.
+    # Run order matters: structural swaps & copies first so the rest
+    # of the pipeline operates on the corrected file roles.
     changed = []
+    for tid in SWAP_LOGO_AND_MAP:
+        png_path = os.path.join(TRACKS, f'{tid}_logo.png')
+        svg_path = os.path.join(TRACKS, f'{tid}_map.svg')
+        # Render current SVG (the wordmark) to a PNG that will become
+        # the logo. Stash to a temp first so we don't clobber inputs.
+        tmp_logo = png_path + '.new'
+        svg_to_png(svg_path, tmp_logo)
+        # Wrap the original PNG (the track outline) into a fresh SVG
+        # that becomes the map.
+        png_to_svg_image(png_path, svg_path)
+        os.replace(tmp_logo, png_path)
+        changed.append(('swap', tid))
+    for tid, donor in COPY_MAP.items():
+        src = os.path.join(TRACKS, f'{donor}_map.svg')
+        dst = os.path.join(TRACKS, f'{tid}_map.svg')
+        with open(src) as f:
+            body = f.read()
+        with open(dst, 'w') as f:
+            f.write(body)
+        changed.append((f'copy-from-{donor}', f'{tid}_map.svg'))
+    for tid in SVG_KEY_WHITE:
+        svg_path = os.path.join(TRACKS, f'{tid}_map.svg')
+        if key_white_svg_image(svg_path):
+            changed.append(('svg-key-white', tid))
+
     for tid in WHITE_KEY:
         p = os.path.join(TRACKS, f'{tid}_logo.png')
         out = key_white(Image.open(p))
