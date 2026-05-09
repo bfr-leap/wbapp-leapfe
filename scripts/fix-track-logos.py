@@ -1,11 +1,56 @@
 #!/usr/bin/env python3
-"""Re-encode misnamed track logo files as real PNGs.
+"""One-shot pipeline that fixes track-image assets in public/tracks/.
 
-For files whose four corners are all near-white, also key out the
-background to transparent with a fuzzy alpha gradient so the logo
-composites cleanly over the dark track photo.
+Background
+----------
+The original asset set under public/tracks/ shipped with a mix of
+problems that made the logos and maps render poorly in the home
+banner (event-card-lg.vue) and the results banner (track-banner.vue):
 
-Run from the repo root: python3 scripts/fix-track-logos.py
+  - PNG files that were really JPEGs/WebPs renamed with .png, so the
+    logo painted a solid background block over the track photo.
+  - Real PNGs with opaque white or black backgrounds that needed
+    background keying.
+  - Monochrome-black logos that disappeared on the dark backdrop and
+    needed RGB inversion to white-on-transparent.
+  - Indexed-color PNGs that needed re-encoding to RGBA for smooth
+    alpha edges.
+  - Logos with lots of transparent padding that wasted the slot when
+    rendered with object-fit: contain.
+  - A handful of tracks that shipped with their _logo.png and
+    _map.svg content swapped, and one track missing its map entirely.
+  - .jpg backdrops framed too high (mostly sky) so the home banner
+    showed only clouds.
+
+This script encodes the per-track recipe for each of those issues in
+the lists at the top of the file. Each list is documentation as much
+as configuration: the track id is in the list because it had that
+specific problem.
+
+Usage
+-----
+    # 1. Reset public/tracks/ to the source-of-truth originals on main
+    git restore --source=origin/main -- public/tracks/
+
+    # 2. Run the pipeline
+    python3 scripts/fix-track-logos.py
+
+    # 3. Review and commit the resulting files
+
+The script is NOT idempotent against its own output -- running it
+twice in a row will double-process (e.g. invert an already-inverted
+logo). Always start from the originals.
+
+Adding a new track
+------------------
+If a newly uploaded track has any of the issues described above, add
+its id to the appropriate list and re-run. Use scripts/diagnose-
+track-logos.py to find INVERT_CANDIDATEs automatically. New JPG_CROP
+or SWAP_LOGO_AND_MAP entries need a manual eyeball pass.
+
+Dependencies
+------------
+    pip install Pillow cairosvg
 """
 
 from PIL import Image

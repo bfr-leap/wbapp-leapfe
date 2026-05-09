@@ -1,17 +1,41 @@
 #!/usr/bin/env python3
-"""Per-logo luminance + transparency stats.
+"""Companion diagnostic for scripts/fix-track-logos.py.
 
-Flags logos that are likely to render poorly on the darkened track
-photo behind them. Reports:
+Scans every public/tracks/*_logo.png and reports per-logo stats that
+help triage how a new or existing logo will render against the dark
+track backdrop:
 
-  * mean luminance of opaque pixels (low => dark logo, may need
-    inversion to read on dark backdrop)
-  * fraction of fully transparent pixels (0 means nothing was
-    keyed out -- a likely sign the logo still has a solid bg)
-  * dimensions
+  * size               width x height
+  * trans%             fraction of fully transparent pixels
+                       (~0% means the logo still has a solid bg
+                       and probably needs WHITE_KEY / BLACK_KEY)
+  * meanL              mean luminance of opaque pixels
+  * blk%               fraction of opaque pixels that are near-black
+  * chr                mean chroma (color saturation) of opaque pixels
 
-Run from the repo root:
+Flags surfaced:
+
+  INVERT_CANDIDATE   Predominantly-black, low-chroma logo that won't
+                     read on the dark backdrop. Add the id to
+                     INVERT_RGB in scripts/fix-track-logos.py.
+  DARK               Mean luminance below 80; may benefit from the
+                     CSS halo we already apply, otherwise consider
+                     a manual treatment.
+  NO_TRANSPARENCY    No keyed-out pixels at all -- logo probably
+                     needs WHITE_KEY / BLACK_KEY first.
+  TINY               Almost no opaque content; likely a broken file.
+
+Usage
+-----
+    # After running fix-track-logos.py, list remaining issues
     python3 scripts/diagnose-track-logos.py
+
+    # Get only the inversion candidates
+    python3 scripts/diagnose-track-logos.py | grep INVERT_CANDIDATE
+
+Dependencies
+------------
+    pip install Pillow
 """
 
 from PIL import Image
