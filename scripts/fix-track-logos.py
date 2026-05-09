@@ -39,16 +39,17 @@ REENCODE_RGBA = ['131', '136']
 # track photo. Invert their RGB (alpha preserved) so they render as
 # white-on-transparent. Auto-detect candidates with:
 #   python3 scripts/diagnose-track-logos.py | grep INVERT_CANDIDATE
-# 124, 236, 419 dropped because their content moves to _map.svg below.
+# Tracks in SWAP_LOGO_AND_MAP get a fresh wordmark logo from their
+# SVG, so they don't need inversion.
 INVERT_RGB = [
-    'n1', '18', '47', '145', '163', '164', '179', '276', '523',
+    'n1', '18', '47', '145', '163', '164', '179', '523',
 ]
 
 # These tracks shipped with logo and map content swapped: the
 # _logo.png is actually a track outline and the _map.svg holds
 # the wordmark. Swap them: render the SVG to PNG (logo) and
 # embed the PNG into a new SVG (map).
-SWAP_LOGO_AND_MAP = ['124', '169', '236', '419']
+SWAP_LOGO_AND_MAP = ['124', '169', '236', '276', '419']
 
 # Tracks missing a map svg, paired with the donor track id whose
 # map should be reused.
@@ -58,6 +59,13 @@ COPY_MAP = {'164': '163'}
 # background. Re-embed the raster with white keyed out so the map
 # matches the dark/transparent style of the vector maps.
 SVG_KEY_WHITE = ['341']
+
+# Tracks whose .jpg backgrounds are framed too high (mostly sky),
+# so the home/results banners only show clouds. (top, left, right,
+# bottom) as fractions of the source. None means "leave that edge".
+JPG_CROP = {
+    '485': (0.40, 0.0, 1.0, 1.0),
+}
 
 WHITE_THRESHOLD = 235      # below this brightness => fully opaque
 WHITE_FEATHER_END = 252    # above this => fully transparent
@@ -101,6 +109,47 @@ def key_black(im):
     return im
 
 
+def key_corner_color(im, tolerance=40, feather=20):
+    """Sample the four corners and key whichever color they share.
+
+    Useful for raster maps with a flat (white-ish or grey-ish)
+    background that varies enough to miss a fixed white threshold.
+    """
+    im = im.convert('RGBA')
+    w, h = im.size
+    px = im.load()
+    corners = [
+        px[0, 0],
+        px[w - 1, 0],
+        px[0, h - 1],
+        px[w - 1, h - 1],
+    ]
+    # Average corner color (alpha-weighted, ignoring already-transparent).
+    rs, gs, bs, n = 0, 0, 0, 0
+    for r, g, b, a in corners:
+        if a < 16:
+            continue
+        rs += r
+        gs += g
+        bs += b
+        n += 1
+    if not n:
+        return im
+    cr, cg, cb = rs // n, gs // n, bs // n
+    for y in range(h):
+        for x in range(w):
+            r, g, b, a = px[x, y]
+            if a == 0:
+                continue
+            d = max(abs(r - cr), abs(g - cg), abs(b - cb))
+            if d <= tolerance:
+                px[x, y] = (r, g, b, 0)
+            elif d <= tolerance + feather:
+                t = (d - tolerance) / feather
+                px[x, y] = (r, g, b, int(a * t))
+    return im
+
+
 def invert_rgb(im):
     im = im.convert('RGBA')
     px = im.load()
@@ -140,11 +189,20 @@ def tighten(im, padding_frac=0.03):
     )
 
 
-def png_to_svg_image(png_path, svg_path):
-    """Wrap a PNG into a minimal SVG via a base64 <image> tag."""
-    with open(png_path, 'rb') as f:
-        data = base64.b64encode(f.read()).decode('ascii')
-    im = Image.open(png_path)
+def png_to_svg_image(png_path, svg_path, key_bg=True):
+    """Wrap a PNG into a minimal SVG via a base64 <image> tag.
+
+    If key_bg, key out the corner-colored background of the PNG
+    before embedding so the SVG composites with transparency.
+    """
+    im = Image.open(png_path).convert('RGBA')
+    if key_bg:
+        im = key_corner_color(im)
+    from io import BytesIO
+
+    buf = BytesIO()
+    im.save(buf, 'PNG', optimize=True)
+    data = base64.b64encode(buf.getvalue()).decode('ascii')
     w, h = im.size
     svg = (
         f'<svg xmlns="http://www.w3.org/2000/svg" '
@@ -181,17 +239,12 @@ def key_white_svg_image(svg_path):
     if not m:
         return False
     fmt, b64 = m.group(1), m.group(2)
-    raw = base64.b64decode(b64)
-    tmp_in = svg_path + f'.in.{fmt}'
-    with open(tmp_in, 'wb') as f:
-        f.write(raw)
-    im = key_white(Image.open(tmp_in))
-    tmp_out = svg_path + '.out.png'
-    im.save(tmp_out, 'PNG', optimize=True)
-    with open(tmp_out, 'rb') as f:
-        new_b64 = base64.b64encode(f.read()).decode('ascii')
-    os.remove(tmp_in)
-    os.remove(tmp_out)
+    from io import BytesIO
+
+    im = key_corner_color(Image.open(BytesIO(base64.b64decode(b64))))
+    out = BytesIO()
+    im.save(out, 'PNG', optimize=True)
+    new_b64 = base64.b64encode(out.getvalue()).decode('ascii')
     body = re.sub(
         r'href="data:image/(png|jpeg);base64,[^"]+"',
         f'href="data:image/png;base64,{new_b64}"',
@@ -231,6 +284,13 @@ def main():
         svg_path = os.path.join(TRACKS, f'{tid}_map.svg')
         if key_white_svg_image(svg_path):
             changed.append(('svg-key-white', tid))
+    for tid, (t, l, r, b) in JPG_CROP.items():
+        jpg_path = os.path.join(TRACKS, f'{tid}.jpg')
+        im = Image.open(jpg_path)
+        w, h = im.size
+        box = (int(l * w), int(t * h), int(r * w), int(b * h))
+        im.crop(box).save(jpg_path, 'JPEG', quality=88)
+        changed.append(('jpg-crop', tid))
 
     for tid in WHITE_KEY:
         p = os.path.join(TRACKS, f'{tid}_logo.png')
