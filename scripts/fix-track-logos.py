@@ -64,6 +64,7 @@ SVG_KEY_WHITE = ['341']
 # so the home/results banners only show clouds. (top, left, right,
 # bottom) as fractions of the source. None means "leave that edge".
 JPG_CROP = {
+    '149': (0.40, 0.0, 1.0, 1.0),
     '485': (0.40, 0.0, 1.0, 1.0),
 }
 
