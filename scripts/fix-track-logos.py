@@ -29,6 +29,11 @@ PASSTHROUGH = ['18', '145', '319', '345', '349', '463']
 # Indexed-color PNGs -> re-export as RGBA so edges anti-alias.
 REENCODE_RGBA = ['131', '136']
 
+# After white-keying, monochrome-black logos still don't read on the
+# dark track photo. Invert their RGB (alpha preserved) so they
+# render as white-on-transparent.
+INVERT_RGB = ['n1']
+
 WHITE_THRESHOLD = 235      # below this brightness => fully opaque
 WHITE_FEATHER_END = 252    # above this => fully transparent
 
@@ -51,6 +56,17 @@ def key_white(im):
     return im
 
 
+def invert_rgb(im):
+    im = im.convert('RGBA')
+    px = im.load()
+    w, h = im.size
+    for y in range(h):
+        for x in range(w):
+            r, g, b, a = px[x, y]
+            px[x, y] = (255 - r, 255 - g, 255 - b, a)
+    return im
+
+
 def main():
     changed = []
     for tid in WHITE_KEY:
@@ -69,6 +85,11 @@ def main():
         im = Image.open(p).convert('RGBA')
         im.save(p, 'PNG', optimize=True)
         changed.append(('rgba', tid))
+    for tid in INVERT_RGB:
+        p = os.path.join(TRACKS, f'{tid}_logo.png')
+        im = invert_rgb(Image.open(p))
+        im.save(p, 'PNG', optimize=True)
+        changed.append(('invert', tid))
     for kind, tid in changed:
         print(f'{kind:10s} {tid}')
 
