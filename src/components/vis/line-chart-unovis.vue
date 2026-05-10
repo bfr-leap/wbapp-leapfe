@@ -256,9 +256,7 @@ const parsedSeries = computed(() =>
                         backgroundColor: baseColors[i % baseColors.length],
                     }"
                 ></span>
-                <span class="legend-chip__pos">{{
-                    parsedSeries[i].pos
-                }}</span>
+                <span class="legend-chip__pos">{{ parsedSeries[i].pos }}</span>
                 <span
                     v-if="parsedSeries[i].name"
                     class="legend-chip__name d-none d-sm-inline"

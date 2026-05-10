@@ -50,16 +50,16 @@ describe('selectChip', () => {
 
     describe('Default league/season chip', () => {
         it('returns "league-season" on home with both ids resolved', () => {
-            expect(
-                selectChip({}, { league_id: 1, season_id: 5 })
-            ).toBe('league-season');
+            expect(selectChip({}, { league_id: 1, season_id: 5 })).toBe(
+                'league-season'
+            );
         });
 
         it('returns "league-season" on standings/rulings/profile pages', () => {
             for (const m of ['standings', 'rulings', 'profile', 'driver']) {
-                expect(
-                    selectChip({ m }, { league_id: 1, season_id: 5 })
-                ).toBe('league-season');
+                expect(selectChip({ m }, { league_id: 1, season_id: 5 })).toBe(
+                    'league-season'
+                );
             }
         });
 

@@ -55,10 +55,7 @@ function navigate(subsession: string) {
                 : {}
         "
     >
-        <h6
-            v-if="subsessionSummaryEmbedModel.title"
-            class="embed-title"
-        >
+        <h6 v-if="subsessionSummaryEmbedModel.title" class="embed-title">
             {{ subsessionSummaryEmbedModel.title }}
         </h6>
 

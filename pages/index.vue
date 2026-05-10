@@ -89,15 +89,17 @@ interface LgSeasSubCtx {
 
 const lgSeasSubCtx: Ref<LgSeasSubCtx> =
     await asyncDataWithReactiveModel<LgSeasSubCtx>(
-        `indexModel-${route.query.league}-${route.query.season}-${route.query.subsession}-${route.query.simsession || ''}`,
+        `indexModel-${route.query.league}-${route.query.season}-${
+            route.query.subsession
+        }-${route.query.simsession || ''}`,
         fetchModel,
         getDefaultModel,
         [route]
     );
 
 const runtimeConfig = useRuntimeConfig();
-const buildSha = computed(() =>
-    (runtimeConfig.public.BUILD_COMMIT_SHA as string) || 'dev'
+const buildSha = computed(
+    () => (runtimeConfig.public.BUILD_COMMIT_SHA as string) || 'dev'
 );
 const buildShortSha = computed(() => buildSha.value.slice(0, 7));
 
@@ -144,7 +146,11 @@ const isEmbedMode = computed(() =>
 
                 <ResultsScopeChip
                     v-if="headerChip === 'results'"
-                    :key="`results-chip-${lgSeasSubCtx.league_id}-${lgSeasSubCtx.season_id || 0}-${lgSeasSubCtx.subsession_id || 0}-${lgSeasSubCtx.simsession_id || 0}`"
+                    :key="`results-chip-${lgSeasSubCtx.league_id}-${
+                        lgSeasSubCtx.season_id || 0
+                    }-${lgSeasSubCtx.subsession_id || 0}-${
+                        lgSeasSubCtx.simsession_id || 0
+                    }`"
                     v-bind:league="lgSeasSubCtx.league_id.toString()"
                     v-bind:season="(lgSeasSubCtx.season_id || 0).toString()"
                     v-bind:subsession="
@@ -168,7 +174,9 @@ const isEmbedMode = computed(() =>
                 />
                 <LeagueSeasonChip
                     v-else-if="headerChip === 'league-season'"
-                    :key="`chip-${lgSeasSubCtx.league_id}-${lgSeasSubCtx.season_id}-${route.query.m || ''}`"
+                    :key="`chip-${lgSeasSubCtx.league_id}-${
+                        lgSeasSubCtx.season_id
+                    }-${route.query.m || ''}`"
                     v-bind:league="lgSeasSubCtx.league_id.toString()"
                     v-bind:season="lgSeasSubCtx.season_id.toString()"
                     v-bind:target-page="(route.query.m as string) || ''"

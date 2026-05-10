@@ -212,17 +212,11 @@ function onClick(eventInfo: { trackId: string; date: string }) {
             </section>
         </template>
 
-        <section
-            v-if="seasonProfileModel.nextRace.date !== ''"
-            class="section"
-        >
+        <section v-if="seasonProfileModel.nextRace.date !== ''" class="section">
             <header class="section__head">
                 <span class="section__title">Future Events</span>
             </header>
-            <div
-                v-if="seasonProfileModel.nextRace.date !== ''"
-                class="row g-1"
-            >
+            <div v-if="seasonProfileModel.nextRace.date !== ''" class="row g-1">
                 <div class="col-12 col-sm-3 col-lg-2">
                     <div class="row g-1 flex-sm-column h-100">
                         <div
@@ -236,9 +230,7 @@ function onClick(eventInfo: { trackId: string; date: string }) {
                                 "
                                 v-bind:is_next="true"
                                 v-bind:date="
-                                    new Date(
-                                        seasonProfileModel.nextRace.date
-                                    )
+                                    new Date(seasonProfileModel.nextRace.date)
                                 "
                                 v-bind:is_selected="
                                     seasonProfileModel.nextRace.isSelected

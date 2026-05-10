@@ -71,10 +71,7 @@ const penaltySeason = computed<string>(() => {
             </div>
         </section>
 
-        <section
-            v-if="driverProfileModel.dotdProfile?.blurb"
-            class="section"
-        >
+        <section v-if="driverProfileModel.dotdProfile?.blurb" class="section">
             <header class="section__head">
                 <span class="section__title">Driver of the Day Profile</span>
             </header>

@@ -145,7 +145,9 @@ export function renderBodyRow(opts: {
           opts.valueRight != null
               ? `<text x="1040" y="2" text-anchor="end"
             font-family="ui-sans-serif, system-ui, sans-serif"
-            font-size="22" font-weight="600" fill="#e6edf3">${escapeSvg(opts.valueRight)}</text>`
+            font-size="22" font-weight="600" fill="#e6edf3">${escapeSvg(
+                opts.valueRight
+            )}</text>`
               : ''
       }
     </g>`;
@@ -171,7 +173,9 @@ export function podiumBadge(position: number): {
  * an unfurl never produces a blank card while the data backend is
  * unreachable or the parameters point at a not-yet-populated entity.
  */
-export function renderEmptyBody(message = 'Open in LEAP for the latest'): string {
+export function renderEmptyBody(
+    message = 'Open in LEAP for the latest'
+): string {
     return `<text x="600" y="380" text-anchor="middle"
                   font-family="ui-sans-serif, system-ui, sans-serif"
                   font-size="28" fill="#9aa6b2">
