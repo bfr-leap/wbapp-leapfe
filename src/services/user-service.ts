@@ -76,7 +76,15 @@ export async function setUserLeaguesState(
     const namespace = 'ldata-usrdata';
     const type = 'userLeaguesUpd';
     let code = leagueIDList.join('-');
-    return await fetchUncached({ namespace, type, code });
+    const res = await fetchUncached<UserLeaguesState>({
+        namespace,
+        type,
+        code,
+    });
+    // Same SSR-safe coercion as `getUserLeaguesState` — the broker
+    // responds with an error envelope on auth failures, and callers
+    // immediately do `state.findIndex` / `state.length`.
+    return Array.isArray(res) ? res : [];
 }
 
 // ---------------------------------------------------------------------------
@@ -104,7 +112,9 @@ export async function getUserFeatures(): Promise<UserFeatures> {
         _userFeaturesCache = fetchUncached<UserFeatures>({
             namespace,
             type,
-        });
+        }).then((res) => (Array.isArray(res) ? res : []));
+        // Same SSR-safe coercion as `getUserLeaguesState`. Anonymous
+        // SSR requests get a non-array error response from the broker.
     }
 
     return await _userFeaturesCache;
