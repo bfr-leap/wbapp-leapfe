@@ -97,15 +97,21 @@ async function fetchModel() {
         route.query.season as string,
         route.query.subsession as string
     );
+    // The broker can return null for anonymous SSR requests (no auth
+    // token, or upstream timeout). Fall through to the default model
+    // so downstream `lgSeasSubCtx.league_id` accesses don't crash —
+    // the SPA will refetch on the client once Clerk hydrates the
+    // token.
+    if (!def) {
+        return getDefaultModel();
+    }
     // defLgSeasSubCtx doesn't carry simsession; mirror HomeView's
     // pattern of grafting it on from route.query so the header chip
     // can read it without going to route directly.
-    if (def) {
-        const sim = route.query.simsession as string | undefined;
-        (def as { simsession_id?: number | string }).simsession_id = sim
-            ? Number(sim)
-            : 0;
-    }
+    const sim = route.query.simsession as string | undefined;
+    (def as { simsession_id?: number | string }).simsession_id = sim
+        ? Number(sim)
+        : 0;
     return def;
 }
 

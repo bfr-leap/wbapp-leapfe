@@ -1,7 +1,19 @@
 import { middleware as authMiddleware } from './middleware/_auth-user';
 import { getDocument } from '@@/lplib/dtbrkr/ftchdata';
 
+/**
+ * `LEAP_BROKER_DISABLED=1` short-circuits every broker fetch to
+ * `{ doc: null }` instantly — used by the SSR smoke tests
+ * (`npm run test:smoke`) so they exercise the "broker returned
+ * nothing" code path without hanging on multi-second connection
+ * timeouts to a real broker. Production never sets this; if anything
+ * else does, it's a bug.
+ */
+const BROKER_DISABLED = process.env.LEAP_BROKER_DISABLED === '1';
+
 export default defineEventHandler(async (event) => {
+    if (BROKER_DISABLED) return { doc: null };
+
     const req: any = event.node.req;
 
     req.query = getQuery(event);

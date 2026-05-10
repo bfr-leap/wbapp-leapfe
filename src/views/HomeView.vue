@@ -28,12 +28,17 @@ async function fetchModel() {
             route.query.subsession as string
         );
 
-    if (def) {
-        if (route.query.subsession) {
-            def.subsession_id = Number(route.query.subsession);
-        }
-        def.simsession_id = (route.query.simsession as string) || '';
+    // Anonymous SSR can get null back from the broker. Fall through
+    // to the default so template accesses (`lgSeasSubCtx.league_id`)
+    // don't crash; client-side hydration will refetch with auth.
+    if (!def) {
+        return getDefaultModel();
     }
+
+    if (route.query.subsession) {
+        def.subsession_id = Number(route.query.subsession);
+    }
+    def.simsession_id = (route.query.simsession as string) || '';
 
     return def;
 }
