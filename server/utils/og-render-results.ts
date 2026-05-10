@@ -19,6 +19,7 @@ import {
     fetchMembersData,
     resolveSubsessionName,
     buildNameLookup,
+    resolveLgSeasSubCtx,
 } from './og-data';
 import {
     type OgPayload,
@@ -55,9 +56,14 @@ async function fetchResultsCardData(
     event: H3Event,
     query: Record<string, string>
 ): Promise<ResultsCardData | null> {
-    const leagueId = query.league || '';
-    const seasonId = query.season || '';
-    const subsessionId = query.subsession || '';
+    // Defer to the broker for league/season/subsession defaults the
+    // same way `pages/index.vue` does, so a bare `/?m=results` link
+    // lands on the latest race instead of returning null.
+    const {
+        league: leagueId,
+        season: seasonId,
+        subsession: subsessionId,
+    } = await resolveLgSeasSubCtx(event, query);
     // simsession defaults to '0' (typically the race) when absent — the SPA
     // does the same coercion in `index.vue`'s default model.
     const simsessionId = query.simsession || '0';

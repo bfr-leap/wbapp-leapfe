@@ -16,6 +16,7 @@ import {
     fetchCuratedLeagueTeamsInfo,
     fetchSingleMemberData,
     resolveLeagueSeasonLabel,
+    resolveLgSeasSubCtx,
 } from './og-data';
 import {
     type OgPayload,
@@ -35,9 +36,14 @@ async function fetchTeamCardData(
     event: H3Event,
     query: Record<string, string>
 ): Promise<TeamCardData | null> {
-    const league = query.league || '';
+    // `team` is the page identity so it must be in the URL. `league`
+    // resolves through the broker — same as the SPA — so a link with
+    // just `?m=team&team=...` still finds the team in the curated
+    // league's roster.
     const teamId = query.team || '';
-    if (!league || !teamId) return null;
+    if (!teamId) return null;
+    const { league } = await resolveLgSeasSubCtx(event, query);
+    if (!league) return null;
 
     const [teamsInfo, label] = await Promise.all([
         fetchCuratedLeagueTeamsInfo(event, league),
@@ -108,7 +114,9 @@ export async function renderTeamCardSvg(
 
     const title = data?.teamName || 'Team Profile';
     const subtitle = data
-        ? `${data.leagueName} · ${data.driverNames.length} driver${data.driverNames.length === 1 ? '' : 's'}`
+        ? `${data.leagueName} · ${data.driverNames.length} driver${
+              data.driverNames.length === 1 ? '' : 's'
+          }`
         : 'Team roster and standings';
 
     const bodySvg =

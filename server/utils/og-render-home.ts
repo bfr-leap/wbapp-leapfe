@@ -14,8 +14,8 @@
 import type { H3Event } from 'h3';
 import {
     fetchActiveLeagueSchedule,
-    fetchDefLgSeasSubCtx,
     fetchTrackInfoDirectory,
+    resolveLgSeasSubCtx,
 } from './og-data';
 import {
     type OgPayload,
@@ -48,44 +48,22 @@ async function fetchHomeCardData(
     event: H3Event,
     query: Record<string, string>
 ): Promise<HomeCardData | null> {
-    // Resolve the league/season the SAME way the SPA does for anonymous
-    // viewers: defer to the broker's `defLgSeasSubCtx` document, which
-    // takes whatever (possibly empty) hints the URL provides and returns
-    // the canonical default. Falling back to `schedule.leagues[0]` —
-    // which is what we used to do — gave the alphabetically-first league
-    // and the last-indexed season, which doesn't match what the SPA
-    // shows when you open `/` in a browser.
-    const leagueQ = query.league || '';
-    const seasonQ = query.season || '';
-    const subsessionQ = query.subsession || '';
-    const ctx = await fetchDefLgSeasSubCtx(
-        event,
-        leagueQ,
-        seasonQ,
-        subsessionQ
-    );
+    const ctx = await resolveLgSeasSubCtx(event, query);
 
     const schedule = await fetchActiveLeagueSchedule(event);
     if (!schedule) return null;
 
-    // Prefer the broker-resolved league_id; only fall back to the URL
-    // hints + first-league heuristic if the broker is unreachable.
-    const resolvedLeagueId = ctx?.league_id
-        ? ctx.league_id.toString()
-        : leagueQ;
+    // Prefer the broker-resolved league/season; only fall back to the
+    // first-league / last-season heuristic if the broker is unreachable
+    // and the URL didn't carry hints either.
     const leagueInfo =
-        schedule.leagues.find(
-            (l) => l.league_id.toString() === resolvedLeagueId
-        ) || schedule.leagues[0];
+        schedule.leagues.find((l) => l.league_id.toString() === ctx.league) ||
+        schedule.leagues[0];
     if (!leagueInfo) return null;
 
-    const resolvedSeasonId = ctx?.season_id
-        ? ctx.season_id.toString()
-        : seasonQ;
     const seasonInfo =
-        leagueInfo.seasons.find(
-            (s) => s.season_id.toString() === resolvedSeasonId
-        ) || leagueInfo.seasons[leagueInfo.seasons.length - 1];
+        leagueInfo.seasons.find((s) => s.season_id.toString() === ctx.season) ||
+        leagueInfo.seasons[leagueInfo.seasons.length - 1];
     if (!seasonInfo) {
         return {
             leagueName: leagueInfo.name,

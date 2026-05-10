@@ -8,7 +8,11 @@
  */
 
 import type { H3Event } from 'h3';
-import { fetchRulings, resolveLeagueSeasonLabel } from './og-data';
+import {
+    fetchRulings,
+    resolveLeagueSeasonLabel,
+    resolveLgSeasSubCtx,
+} from './og-data';
 import {
     type OgPayload,
     buildOgUrls,
@@ -28,8 +32,10 @@ async function fetchRulingsCardData(
     event: H3Event,
     query: Record<string, string>
 ): Promise<RulingsCardData | null> {
-    const league = query.league || '';
-    const season = query.season || '';
+    // Mirror the SPA's default-context resolution so a bare
+    // `/?m=rulings` (or `/?m=rulings&league=4534` without season) still
+    // lands on the curated default season's ledger.
+    const { league, season } = await resolveLgSeasSubCtx(event, query);
     if (!league || !season) return null;
 
     const [rulings, label] = await Promise.all([
@@ -78,7 +84,8 @@ export async function buildRulingsOgPayload(
     if (!data) {
         return {
             title: 'LEAP — Steward Rulings',
-            description: 'Penalty rulings and steward decisions for the season.',
+            description:
+                'Penalty rulings and steward decisions for the season.',
             ogUrl,
             imageUrl,
         };
@@ -90,7 +97,9 @@ export async function buildRulingsOgPayload(
         .join(', ');
     return {
         title: `${data.leagueName} — Rulings`,
-        description: `${data.seasonLabel} · ${data.totalRulings} ruling${data.totalRulings === 1 ? '' : 's'}${recentNames ? ` · Recent: ${recentNames}` : ''}`,
+        description: `${data.seasonLabel} · ${data.totalRulings} ruling${
+            data.totalRulings === 1 ? '' : 's'
+        }${recentNames ? ` · Recent: ${recentNames}` : ''}`,
         ogUrl,
         imageUrl,
     };
@@ -104,7 +113,9 @@ export async function renderRulingsCardSvg(
 
     const title = data?.leagueName || 'Steward Rulings';
     const subtitle = data
-        ? `${data.seasonLabel} · ${data.totalRulings} ruling${data.totalRulings === 1 ? '' : 's'}`
+        ? `${data.seasonLabel} · ${data.totalRulings} ruling${
+              data.totalRulings === 1 ? '' : 's'
+          }`
         : 'Penalty rulings and steward decisions';
 
     const bodySvg =

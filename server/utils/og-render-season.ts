@@ -15,6 +15,7 @@ import {
     fetchActiveLeagueSchedule,
     fetchTrackInfoDirectory,
     resolveLeagueSeasonLabel,
+    resolveLgSeasSubCtx,
 } from './og-data';
 import {
     type OgPayload,
@@ -45,8 +46,10 @@ async function fetchSeasonCardData(
     event: H3Event,
     query: Record<string, string>
 ): Promise<SeasonCardData | null> {
-    const league = query.league || '';
-    const season = query.season || '';
+    // Mirror the SPA's default-context resolution so a bare
+    // `/?m=season` (or `/?m=season&league=4534` without season) still
+    // lands on the curated default season.
+    const { league, season } = await resolveLgSeasSubCtx(event, query);
     if (!league || !season) return null;
 
     const [schedule, trackInfo, label] = await Promise.all([
@@ -139,7 +142,11 @@ export async function renderSeasonCardSvg(
 
     const title = data?.leagueName || 'Season Profile';
     const subtitle = data
-        ? `${data.seasonLabel}${data.events.length > 0 && data.events[0].isPast ? ' · Recent races' : ''}`
+        ? `${data.seasonLabel}${
+              data.events.length > 0 && data.events[0].isPast
+                  ? ' · Recent races'
+                  : ''
+          }`
         : 'Season schedule and standings';
 
     const bodySvg =

@@ -11,7 +11,11 @@
  */
 
 import type { H3Event } from 'h3';
-import { fetchTrackStats, fetchTrackInfoDirectory } from './og-data';
+import {
+    fetchTrackStats,
+    fetchTrackInfoDirectory,
+    resolveLgSeasSubCtx,
+} from './og-data';
 import {
     type OgPayload,
     buildOgUrls,
@@ -52,10 +56,14 @@ async function fetchTrackCardData(
     event: H3Event,
     query: Record<string, string>
 ): Promise<TrackCardData | null> {
-    const league = query.league || '';
+    // `car` and `track` are page identities so they must be in the URL.
+    // `league` resolves through the broker — same as the SPA — so a
+    // bare `?m=track&car=...&track=...` link is still meaningful.
     const car = query.car || '';
     const track = query.track || '';
-    if (!league || !car || !track) return null;
+    if (!car || !track) return null;
+    const { league } = await resolveLgSeasSubCtx(event, query);
+    if (!league) return null;
 
     const [stats, info] = await Promise.all([
         fetchTrackStats(event, league, car, track),
@@ -65,9 +73,7 @@ async function fetchTrackCardData(
     if (!stats) return null;
 
     const trackName =
-        info?.track_display?.[track] ||
-        stats.display_name ||
-        `Track ${track}`;
+        info?.track_display?.[track] || stats.display_name || `Track ${track}`;
     const carName = info?.car_display?.[car] || `Car ${car}`;
     const leagueName = info?.league_name || `League ${league}`;
 

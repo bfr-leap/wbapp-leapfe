@@ -221,6 +221,47 @@ export async function fetchDefLgSeasSubCtx(
     });
 }
 
+export interface ResolvedContext {
+    league: string;
+    season: string;
+    subsession: string;
+}
+
+/**
+ * The OG counterpart of `pages/index.vue`'s top-level
+ * `defLgSeasSubCtx(...)` call: every shareable URL on the SPA — bare or
+ * with an `m=...` mode — passes through that resolver before any view
+ * data is fetched, so a link with no `league`/`season` lands on the
+ * curated default rather than the alphabetically-first index entry.
+ * Per-mode OG renderers should call this once at the top of their data
+ * fetch and use the returned IDs in place of the raw query strings.
+ *
+ * If the broker is unreachable, the URL hints come back unchanged.
+ * That preserves the prior behavior (hard-fail on missing required
+ * params) instead of silently rendering a confusing default.
+ */
+export async function resolveLgSeasSubCtx(
+    event: H3Event,
+    query: Record<string, string>
+): Promise<ResolvedContext> {
+    const leagueQ = query.league || '';
+    const seasonQ = query.season || '';
+    const subsessionQ = query.subsession || '';
+    const ctx = await fetchDefLgSeasSubCtx(
+        event,
+        leagueQ,
+        seasonQ,
+        subsessionQ
+    );
+    return {
+        league: ctx?.league_id ? ctx.league_id.toString() : leagueQ,
+        season: ctx?.season_id ? ctx.season_id.toString() : seasonQ,
+        subsession: ctx?.subsession_id
+            ? ctx.subsession_id.toString()
+            : subsessionQ,
+    };
+}
+
 export async function fetchRulings(
     event: H3Event,
     league: string,
