@@ -191,6 +191,36 @@ export async function fetchActiveLeagueSchedule(
     });
 }
 
+/**
+ * Mirror the SPA's anonymous default-context resolution: call the
+ * broker's `defLgSeasSubCtx` document with whatever (possibly empty)
+ * query params the visitor provided and let it return the canonical
+ * (league_id, season_id, subsession_id) triple. The bare `/` URL
+ * relies on this to land on the actively curated league/season instead
+ * of the alphabetically-first one in the schedule index — the SPA
+ * does the same in `pages/index.vue` via `defLgSeasSubCtx()`.
+ */
+export interface DefaultLeagueContext {
+    league_id: number;
+    season_id: number;
+    subsession_id: number;
+}
+
+export async function fetchDefLgSeasSubCtx(
+    event: H3Event,
+    league: string,
+    season: string,
+    subsession: string
+): Promise<DefaultLeagueContext | null> {
+    return fetchDoc<DefaultLeagueContext>(event, {
+        namespace: 'ldata-usrcfg',
+        type: 'defLgSeasSubCtx',
+        league,
+        season,
+        subsession,
+    });
+}
+
 export async function fetchRulings(
     event: H3Event,
     league: string,

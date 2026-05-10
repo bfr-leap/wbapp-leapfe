@@ -56,6 +56,7 @@ function renderOgHtml(payload: OgPayload, oembedUrl: string): string {
 <meta property="og:description" content="${d}"/>
 <meta property="og:url" content="${u}"/>
 <meta property="og:image" content="${img}"/>
+<meta property="og:image:type" content="image/png"/>
 <meta property="og:image:width" content="1200"/>
 <meta property="og:image:height" content="630"/>
 
@@ -63,6 +64,7 @@ function renderOgHtml(payload: OgPayload, oembedUrl: string): string {
 <meta name="twitter:title" content="${t}"/>
 <meta name="twitter:description" content="${d}"/>
 <meta name="twitter:image" content="${img}"/>
+<meta name="twitter:image:type" content="image/png"/>
 
 <link rel="alternate" type="application/json+oembed"
       href="${oembed}" title="${t}"/>

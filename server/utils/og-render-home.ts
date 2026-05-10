@@ -14,6 +14,7 @@
 import type { H3Event } from 'h3';
 import {
     fetchActiveLeagueSchedule,
+    fetchDefLgSeasSubCtx,
     fetchTrackInfoDirectory,
 } from './og-data';
 import {
@@ -47,22 +48,44 @@ async function fetchHomeCardData(
     event: H3Event,
     query: Record<string, string>
 ): Promise<HomeCardData | null> {
+    // Resolve the league/season the SAME way the SPA does for anonymous
+    // viewers: defer to the broker's `defLgSeasSubCtx` document, which
+    // takes whatever (possibly empty) hints the URL provides and returns
+    // the canonical default. Falling back to `schedule.leagues[0]` —
+    // which is what we used to do — gave the alphabetically-first league
+    // and the last-indexed season, which doesn't match what the SPA
+    // shows when you open `/` in a browser.
+    const leagueQ = query.league || '';
+    const seasonQ = query.season || '';
+    const subsessionQ = query.subsession || '';
+    const ctx = await fetchDefLgSeasSubCtx(
+        event,
+        leagueQ,
+        seasonQ,
+        subsessionQ
+    );
+
     const schedule = await fetchActiveLeagueSchedule(event);
     if (!schedule) return null;
 
-    // Pick the league + season from the query if present, otherwise the
-    // first active league/season — which mirrors what the SPA's
-    // `defLgSeasSubCtx()` resolves to for an anonymous viewer.
-    const leagueQ = query.league || '';
-    const seasonQ = query.season || '';
+    // Prefer the broker-resolved league_id; only fall back to the URL
+    // hints + first-league heuristic if the broker is unreachable.
+    const resolvedLeagueId = ctx?.league_id
+        ? ctx.league_id.toString()
+        : leagueQ;
     const leagueInfo =
-        schedule.leagues.find((l) => l.league_id.toString() === leagueQ) ||
-        schedule.leagues[0];
+        schedule.leagues.find(
+            (l) => l.league_id.toString() === resolvedLeagueId
+        ) || schedule.leagues[0];
     if (!leagueInfo) return null;
 
+    const resolvedSeasonId = ctx?.season_id
+        ? ctx.season_id.toString()
+        : seasonQ;
     const seasonInfo =
-        leagueInfo.seasons.find((s) => s.season_id.toString() === seasonQ) ||
-        leagueInfo.seasons[leagueInfo.seasons.length - 1];
+        leagueInfo.seasons.find(
+            (s) => s.season_id.toString() === resolvedSeasonId
+        ) || leagueInfo.seasons[leagueInfo.seasons.length - 1];
     if (!seasonInfo) {
         return {
             leagueName: leagueInfo.name,
@@ -135,7 +158,10 @@ export async function renderHomeCardSvg(
     const title = data?.leagueName || 'LEAP';
     const subtitle = data
         ? data.nextRace
-            ? `${data.seasonLabel} · Next race: ${clampLine(data.nextRace.trackName, 40)} · ${data.nextRace.date}`
+            ? `${data.seasonLabel} · Next race: ${clampLine(
+                  data.nextRace.trackName,
+                  40
+              )} · ${data.nextRace.date}`
             : `${data.seasonLabel} · No upcoming races`
         : 'Live Event Analysis and Performance';
 
