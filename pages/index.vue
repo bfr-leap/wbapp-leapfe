@@ -25,6 +25,44 @@ const route = useRoute();
 const auth = useAuth();
 setAuth(auth);
 
+// OG card + SEO meta. Runs during SSR so unfurlers (Discord, Twitter,
+// Slack, etc.) see fully populated `og:*` / `twitter:*` tags in the
+// initial HTML, and `nuxt-og-image` renders the matching PNG when the
+// bot requests it via the og:image URL.
+//
+// Keyed by mode + the params that uniquely identify the page so
+// useFetch's SSR cache works per shareable URL.
+const ogQuery = computed(() => ({
+    m: (route.query.m as string) || '',
+    league: (route.query.league as string) || '',
+    season: (route.query.season as string) || '',
+    subsession: (route.query.subsession as string) || '',
+    simsession: (route.query.simsession as string) || '',
+    driver: (route.query.driver as string) || '',
+    team: (route.query.team as string) || '',
+    car: (route.query.car as string) || '',
+    track: (route.query.track as string) || '',
+}));
+const { data: ogPayload } = await useFetch('/api/og-payload', {
+    query: ogQuery,
+    key: `og-payload-${Object.values(ogQuery.value).join('-')}`,
+    server: true,
+});
+if (ogPayload.value) {
+    useSeoMeta({
+        title: ogPayload.value.metaTitle,
+        description: ogPayload.value.metaDescription,
+        ogTitle: ogPayload.value.metaTitle,
+        ogDescription: ogPayload.value.metaDescription,
+        ogType: 'website',
+        ogSiteName: 'LEAP',
+        twitterCard: 'summary_large_image',
+        twitterTitle: ogPayload.value.metaTitle,
+        twitterDescription: ogPayload.value.metaDescription,
+    });
+    defineOgImage('Card', ogPayload.value.card);
+}
+
 const serverInitialState = useState<AuthObject | undefined>(
     'clerk-initial-state'
 );

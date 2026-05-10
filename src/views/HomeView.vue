@@ -15,17 +15,12 @@ import SeasonCdrAdmin from '@@/src/components/pages/season-cdr-admin-view.vue';
 import RulingsView from '@@/src/components/pages/rulings-view.vue';
 import StewardAdminView from '@@/src/components/pages/steward-admin-view.vue';
 // import { ref, watch } from 'vue';
-import mixpanel from 'mixpanel-browser';
 import { defLgSeasSubCtx } from '@@/src/utils/fetch-util';
 import type { DefaultLeagueContext } from '@@/src/utils/fetch-util';
 
 const route = useRoute();
 
-async function track() {
-    if (!import.meta.server) {
-        mixpanel.track(route.query.m?.toString() || 'home', route.query);
-    }
-
+async function fetchModel() {
     const def: (DefaultLeagueContext & { simsession_id?: string }) | null =
         await defLgSeasSubCtx(
             route.query.league as string,
@@ -66,7 +61,7 @@ const lgSeasSubCtx: Ref<LgSeasSubCtx> =
             route.query.season as string,
             route.query.subsession as string,
         ].join('-')}`,
-        track,
+        fetchModel,
         getDefaultModel,
         [
             () => route.query.m as string,
@@ -76,8 +71,6 @@ const lgSeasSubCtx: Ref<LgSeasSubCtx> =
             () => route.query.simsession as string,
         ]
     );
-
-track();
 </script>
 
 <template>
