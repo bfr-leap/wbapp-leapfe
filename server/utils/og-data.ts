@@ -27,7 +27,26 @@ import type {
     StewardRuling,
     TrackInfoDirectory,
 } from '@@/lplib/endpoint-types/iracing-endpoints';
-import { getRequestOrigin } from './og-bot';
+
+/**
+ * Resolve the canonical absolute URL for the current request, honoring
+ * any reverse-proxy headers Vercel/CDNs set. Used to build a `baseURL`
+ * for internal `$fetch` calls so they work both in dev (where Nitro
+ * resolves relative URLs against `localhost`) and in production (where
+ * Vercel's edge functions expect an absolute origin).
+ */
+function getRequestOrigin(event: H3Event): string {
+    const headers = event.node.req.headers;
+    const proto =
+        (headers['x-forwarded-proto'] as string) ||
+        // @ts-expect-error encrypted may not be typed on all socket implementations
+        (event.node.req.socket?.encrypted ? 'https' : 'http');
+    const host =
+        (headers['x-forwarded-host'] as string) ||
+        (headers['host'] as string) ||
+        'localhost:3000';
+    return `${proto.split(',')[0].trim()}://${host.split(',')[0].trim()}`;
+}
 
 async function fetchDoc<T>(
     event: H3Event,
