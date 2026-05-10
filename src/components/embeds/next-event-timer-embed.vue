@@ -76,9 +76,7 @@ function onClick(eventInfo: { trackId: string; date: string }) {
                     <div
                         class="col"
                         @click="
-                            onClick(
-                                nextEventTimerEmbedModel.schedule.nextRace
-                            )
+                            onClick(nextEventTimerEmbedModel.schedule.nextRace)
                         "
                     >
                         <EventCardSm

@@ -1,5 +1,7 @@
 dist
 .vercel
+.nuxt
+.output
 package-lock.json
 package.json
 .vscode

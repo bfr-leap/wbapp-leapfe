@@ -4,11 +4,14 @@
  * `m` query param to a per-mode renderer via the shared registry;
  * unknown / missing modes get the LEAP brand card.
  *
- * The card is currently SVG. Most major unfurlers (Discord, Slack,
- * Telegram, LinkedIn) accept and proxy SVG `og:image`s; if any platform
- * struggles, swap the renderer here for a rasterized PNG (e.g. via
- * `@resvg/resvg-js`) without touching the middleware that references
- * this endpoint.
+ * Cards are authored in SVG (much easier than imperative canvas), but
+ * served as PNG: Discord, Twitter/X, LinkedIn and similar unfurlers
+ * refuse `image/svg+xml` `og:image`s on security grounds and fall back
+ * to a generic placeholder, which is the bug this endpoint exists to
+ * fix. Rasterization happens in `og-rasterize.ts`.
+ *
+ * `?format=svg` returns the raw SVG instead — handy when iterating on
+ * card layouts locally without round-tripping through the rasterizer.
  */
 
 import { lookupModeRenderer } from '../utils/og-registry';
@@ -18,6 +21,7 @@ import {
     renderCardShell,
     renderEmptyBody,
 } from '../utils/og-render-shared';
+import { rasterizeSvgToPng } from '../utils/og-rasterize';
 
 function renderBrandCardSvg(): string {
     // Brand fallback — used when the URL has no recognized `m=` mode
@@ -74,7 +78,6 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    setResponseHeader(event, 'content-type', 'image/svg+xml; charset=utf-8');
     // Race results don't change after the race; cache aggressively at
     // the CDN so each unique URL only renders once. Short browser TTL
     // so manual refresh during testing actually shows changes.
@@ -83,5 +86,34 @@ export default defineEventHandler(async (event) => {
         'cache-control',
         'public, max-age=60, s-maxage=86400, stale-while-revalidate=604800'
     );
-    return svg;
+
+    if (query.format === 'svg') {
+        setResponseHeader(
+            event,
+            'content-type',
+            'image/svg+xml; charset=utf-8'
+        );
+        return svg;
+    }
+
+    try {
+        const png = await rasterizeSvgToPng(svg);
+        setResponseHeader(event, 'content-type', 'image/png');
+        setResponseHeader(event, 'content-length', String(png.length));
+        return png;
+    } catch (e) {
+        // If the native rasterizer is missing or fails, falling back to
+        // SVG is still better than a 500 — modern browsers render it
+        // when the user opens the image directly, and our cache headers
+        // keep the bad render from sticking once resvg is healthy
+        // again. The unfurlers won't show a preview, but that's the
+        // pre-fix baseline, not a regression.
+        console.error('[og] PNG rasterization failed; serving SVG', e);
+        setResponseHeader(
+            event,
+            'content-type',
+            'image/svg+xml; charset=utf-8'
+        );
+        return svg;
+    }
 });

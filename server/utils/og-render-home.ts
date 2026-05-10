@@ -15,6 +15,7 @@ import type { H3Event } from 'h3';
 import {
     fetchActiveLeagueSchedule,
     fetchTrackInfoDirectory,
+    resolveLgSeasSubCtx,
 } from './og-data';
 import {
     type OgPayload,
@@ -47,21 +48,21 @@ async function fetchHomeCardData(
     event: H3Event,
     query: Record<string, string>
 ): Promise<HomeCardData | null> {
+    const ctx = await resolveLgSeasSubCtx(event, query);
+
     const schedule = await fetchActiveLeagueSchedule(event);
     if (!schedule) return null;
 
-    // Pick the league + season from the query if present, otherwise the
-    // first active league/season — which mirrors what the SPA's
-    // `defLgSeasSubCtx()` resolves to for an anonymous viewer.
-    const leagueQ = query.league || '';
-    const seasonQ = query.season || '';
+    // Prefer the broker-resolved league/season; only fall back to the
+    // first-league / last-season heuristic if the broker is unreachable
+    // and the URL didn't carry hints either.
     const leagueInfo =
-        schedule.leagues.find((l) => l.league_id.toString() === leagueQ) ||
+        schedule.leagues.find((l) => l.league_id.toString() === ctx.league) ||
         schedule.leagues[0];
     if (!leagueInfo) return null;
 
     const seasonInfo =
-        leagueInfo.seasons.find((s) => s.season_id.toString() === seasonQ) ||
+        leagueInfo.seasons.find((s) => s.season_id.toString() === ctx.season) ||
         leagueInfo.seasons[leagueInfo.seasons.length - 1];
     if (!seasonInfo) {
         return {
@@ -135,7 +136,10 @@ export async function renderHomeCardSvg(
     const title = data?.leagueName || 'LEAP';
     const subtitle = data
         ? data.nextRace
-            ? `${data.seasonLabel} · Next race: ${clampLine(data.nextRace.trackName, 40)} · ${data.nextRace.date}`
+            ? `${data.seasonLabel} · Next race: ${clampLine(
+                  data.nextRace.trackName,
+                  40
+              )} · ${data.nextRace.date}`
             : `${data.seasonLabel} · No upcoming races`
         : 'Live Event Analysis and Performance';
 

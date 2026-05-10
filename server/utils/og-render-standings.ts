@@ -12,6 +12,7 @@ import {
     fetchMembersData,
     fetchLeagueDriverStats,
     resolveLeagueSeasonLabel,
+    resolveLgSeasSubCtx,
 } from './og-data';
 import {
     type OgPayload,
@@ -32,8 +33,10 @@ async function fetchStandingsCardData(
     event: H3Event,
     query: Record<string, string>
 ): Promise<StandingsCardData | null> {
-    const league = query.league || '';
-    const season = query.season || '';
+    // Mirror the SPA's default-context resolution so a bare
+    // `/?m=standings` (or `/?m=standings&league=4534` without season)
+    // lands on the curated default instead of returning a brand card.
+    const { league, season } = await resolveLgSeasSubCtx(event, query);
     if (!league || !season) return null;
 
     const [members, allStats, label] = await Promise.all([

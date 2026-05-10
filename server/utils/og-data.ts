@@ -191,6 +191,77 @@ export async function fetchActiveLeagueSchedule(
     });
 }
 
+/**
+ * Mirror the SPA's anonymous default-context resolution: call the
+ * broker's `defLgSeasSubCtx` document with whatever (possibly empty)
+ * query params the visitor provided and let it return the canonical
+ * (league_id, season_id, subsession_id) triple. The bare `/` URL
+ * relies on this to land on the actively curated league/season instead
+ * of the alphabetically-first one in the schedule index — the SPA
+ * does the same in `pages/index.vue` via `defLgSeasSubCtx()`.
+ */
+export interface DefaultLeagueContext {
+    league_id: number;
+    season_id: number;
+    subsession_id: number;
+}
+
+export async function fetchDefLgSeasSubCtx(
+    event: H3Event,
+    league: string,
+    season: string,
+    subsession: string
+): Promise<DefaultLeagueContext | null> {
+    return fetchDoc<DefaultLeagueContext>(event, {
+        namespace: 'ldata-usrcfg',
+        type: 'defLgSeasSubCtx',
+        league,
+        season,
+        subsession,
+    });
+}
+
+export interface ResolvedContext {
+    league: string;
+    season: string;
+    subsession: string;
+}
+
+/**
+ * The OG counterpart of `pages/index.vue`'s top-level
+ * `defLgSeasSubCtx(...)` call: every shareable URL on the SPA — bare or
+ * with an `m=...` mode — passes through that resolver before any view
+ * data is fetched, so a link with no `league`/`season` lands on the
+ * curated default rather than the alphabetically-first index entry.
+ * Per-mode OG renderers should call this once at the top of their data
+ * fetch and use the returned IDs in place of the raw query strings.
+ *
+ * If the broker is unreachable, the URL hints come back unchanged.
+ * That preserves the prior behavior (hard-fail on missing required
+ * params) instead of silently rendering a confusing default.
+ */
+export async function resolveLgSeasSubCtx(
+    event: H3Event,
+    query: Record<string, string>
+): Promise<ResolvedContext> {
+    const leagueQ = query.league || '';
+    const seasonQ = query.season || '';
+    const subsessionQ = query.subsession || '';
+    const ctx = await fetchDefLgSeasSubCtx(
+        event,
+        leagueQ,
+        seasonQ,
+        subsessionQ
+    );
+    return {
+        league: ctx?.league_id ? ctx.league_id.toString() : leagueQ,
+        season: ctx?.season_id ? ctx.season_id.toString() : seasonQ,
+        subsession: ctx?.subsession_id
+            ? ctx.subsession_id.toString()
+            : subsessionQ,
+    };
+}
+
 export async function fetchRulings(
     event: H3Event,
     league: string,

@@ -32,25 +32,25 @@ describe('ScopeChip', () => {
 
     describe('modifier classes', () => {
         it('applies --open when isOpen is true', () => {
-            expect(mountChip({}, true).classes()).toContain(
-                'scope-chip--open'
-            );
+            expect(mountChip({}, true).classes()).toContain('scope-chip--open');
             expect(mountChip({}, false).classes()).not.toContain(
                 'scope-chip--open'
             );
         });
 
         it('applies --secondary when priority is "secondary"', () => {
-            expect(
-                mountChip({ priority: 'secondary' }).classes()
-            ).toContain('scope-chip--secondary');
+            expect(mountChip({ priority: 'secondary' }).classes()).toContain(
+                'scope-chip--secondary'
+            );
         });
 
         it('does not apply --secondary when priority is "primary" or unset', () => {
             expect(mountChip({ priority: 'primary' }).classes()).not.toContain(
                 'scope-chip--secondary'
             );
-            expect(mountChip().classes()).not.toContain('scope-chip--secondary');
+            expect(mountChip().classes()).not.toContain(
+                'scope-chip--secondary'
+            );
         });
 
         it('applies --mono when mono is true', () => {

@@ -15,10 +15,7 @@
 import type { H3Event } from 'h3';
 import { type OgPayload } from './og-render-shared';
 
-import {
-    buildHomeOgPayload,
-    renderHomeCardSvg,
-} from './og-render-home';
+import { buildHomeOgPayload, renderHomeCardSvg } from './og-render-home';
 import {
     buildResultsOgPayload,
     renderResultsCardSvg,
@@ -27,19 +24,10 @@ import {
     buildStandingsOgPayload,
     renderStandingsCardSvg,
 } from './og-render-standings';
-import {
-    buildDriverOgPayload,
-    renderDriverCardSvg,
-} from './og-render-driver';
+import { buildDriverOgPayload, renderDriverCardSvg } from './og-render-driver';
 import { buildTeamOgPayload, renderTeamCardSvg } from './og-render-team';
-import {
-    buildTrackOgPayload,
-    renderTrackCardSvg,
-} from './og-render-track';
-import {
-    buildSeasonOgPayload,
-    renderSeasonCardSvg,
-} from './og-render-season';
+import { buildTrackOgPayload, renderTrackCardSvg } from './og-render-track';
+import { buildSeasonOgPayload, renderSeasonCardSvg } from './og-render-season';
 import {
     buildRulingsOgPayload,
     renderRulingsCardSvg,
@@ -50,10 +38,7 @@ interface OgModeRenderer {
         event: H3Event,
         query: Record<string, string>
     ) => Promise<OgPayload>;
-    image: (
-        event: H3Event,
-        query: Record<string, string>
-    ) => Promise<string>;
+    image: (event: H3Event, query: Record<string, string>) => Promise<string>;
 }
 
 export const OG_MODE_REGISTRY: Record<string, OgModeRenderer> = {

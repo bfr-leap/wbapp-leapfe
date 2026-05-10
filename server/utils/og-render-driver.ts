@@ -16,6 +16,7 @@ import {
     fetchLeagueDriverStats,
     fetchCuratedLeagueTeamsInfo,
     resolveLeagueSeasonLabel,
+    resolveLgSeasSubCtx,
 } from './og-data';
 import {
     type OgPayload,
@@ -47,15 +48,17 @@ async function fetchDriverCardData(
     event: H3Event,
     query: Record<string, string>
 ): Promise<DriverCardData | null> {
-    const league = query.league || '';
+    // `driver` is the page identity (cust_id) so it must be in the URL.
+    // `league` defers to the SPA-style broker resolution so links
+    // missing the league hint still get the curated league's stats and
+    // team affiliations.
     const driver = query.driver || '';
     if (!driver) return null;
+    const { league } = await resolveLgSeasSubCtx(event, query);
 
     const [member, allStats, teamsInfo, label] = await Promise.all([
         fetchSingleMemberData(event, driver),
-        league
-            ? fetchLeagueDriverStats(event, league)
-            : Promise.resolve(null),
+        league ? fetchLeagueDriverStats(event, league) : Promise.resolve(null),
         league
             ? fetchCuratedLeagueTeamsInfo(event, league)
             : Promise.resolve(null),
@@ -110,8 +113,7 @@ export async function buildDriverOgPayload(
     if (!data) {
         return {
             title: 'LEAP — Driver Profile',
-            description:
-                'iRacing driver stats and history within the league.',
+            description: 'iRacing driver stats and history within the league.',
             ogUrl,
             imageUrl,
         };
@@ -145,7 +147,9 @@ function renderStatGrid(data: DriverCardData): string {
             return `
     <g transform="translate(${x} ${y})">
       <text font-family="ui-sans-serif, system-ui, sans-serif"
-            font-size="64" font-weight="700" fill="#e6edf3">${escapeSvg(c.value)}</text>
+            font-size="64" font-weight="700" fill="#e6edf3">${escapeSvg(
+                c.value
+            )}</text>
       <text y="36" font-family="ui-sans-serif, system-ui, sans-serif"
             font-size="20" fill="#9aa6b2"
             letter-spacing="1">${escapeSvg(c.label.toUpperCase())}</text>

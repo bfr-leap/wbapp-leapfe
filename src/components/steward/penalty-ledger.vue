@@ -222,10 +222,7 @@ const standings = computed<DriverLicenseStanding[]>(
         <div v-if="activeTab === 'ledger'">
             <div class="ledger-filters">
                 <div class="ledger-filter">
-                    <label
-                        for="ledgerDriverFilter"
-                        class="ledger-filter-label"
-                    >
+                    <label for="ledgerDriverFilter" class="ledger-filter-label">
                         Driver
                     </label>
                     <input
@@ -237,10 +234,7 @@ const standings = computed<DriverLicenseStanding[]>(
                     />
                 </div>
                 <div class="ledger-filter">
-                    <label
-                        for="ledgerClassFilter"
-                        class="ledger-filter-label"
-                    >
+                    <label for="ledgerClassFilter" class="ledger-filter-label">
                         Classification
                     </label>
                     <select
@@ -249,7 +243,11 @@ const standings = computed<DriverLicenseStanding[]>(
                         v-model="classificationFilter"
                     >
                         <option value="">All classifications</option>
-                        <option v-for="c in classifications" :key="c" :value="c">
+                        <option
+                            v-for="c in classifications"
+                            :key="c"
+                            :value="c"
+                        >
                             {{ c }}
                         </option>
                     </select>
@@ -309,7 +307,9 @@ const standings = computed<DriverLicenseStanding[]>(
                         <span
                             v-if="r.classification"
                             class="tag"
-                            v-bind:class="classificationTagClass(r.classification)"
+                            v-bind:class="
+                                classificationTagClass(r.classification)
+                            "
                         >
                             {{ r.classification }}
                         </span>
@@ -367,10 +367,7 @@ const standings = computed<DriverLicenseStanding[]>(
 
         <!-- ── License Standings Tab ───────────────────────────── -->
         <div v-if="activeTab === 'standings'">
-            <div
-                v-if="!loading && standings.length === 0"
-                class="ledger-empty"
-            >
+            <div v-if="!loading && standings.length === 0" class="ledger-empty">
                 No license points have been issued this season.
             </div>
             <table v-else class="standings-table">
