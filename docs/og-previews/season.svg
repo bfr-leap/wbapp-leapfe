@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="1200" height="630"
+     viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b0d10"/>
+      <stop offset="100%" stop-color="#161b22"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect x="0" y="0" width="1200" height="6" fill="#2f81f7"/>
+  <g transform="translate(80 110)">
+    <text font-family="ui-sans-serif, system-ui, sans-serif"
+          font-size="22" font-weight="600" fill="#2f81f7"
+          letter-spacing="2">LEAP · SEASON PROFILE</text>
+    <text y="56" font-family="ui-sans-serif, system-ui, sans-serif"
+          font-size="48" font-weight="700" fill="#e6edf3">
+      Blue Frog Racing — F4 Series
+    </text>
+    <text y="92" font-family="ui-sans-serif, system-ui, sans-serif"
+          font-size="20" fill="#9aa6b2">
+      Season 18
+    </text>
+  </g>
+  <g transform="translate(80 240)">
+      
+      <text x="0" y="2"
+            font-family="ui-sans-serif, system-ui, sans-serif"
+            font-size="26" font-weight="600" fill="#e6edf3">
+        Watkins Glen International
+      </text>
+      
+      <text x="1040" y="2" text-anchor="end"
+            font-family="ui-sans-serif, system-ui, sans-serif"
+            font-size="22" font-weight="600" fill="#e6edf3">Sat, May 17</text>
+    </g>
+<g transform="translate(80 298)">
+      
+      <text x="0" y="2"
+            font-family="ui-sans-serif, system-ui, sans-serif"
+            font-size="26" font-weight="600" fill="#e6edf3">
+        Road America
+      </text>
+      
+      <text x="1040" y="2" text-anchor="end"
+            font-family="ui-sans-serif, system-ui, sans-serif"
+            font-size="22" font-weight="600" fill="#e6edf3">Sat, May 24</text>
+    </g>
+<g transform="translate(80 356)">
+      
+      <text x="0" y="2"
+            font-family="ui-sans-serif, system-ui, sans-serif"
+            font-size="26" font-weight="600" fill="#e6edf3">
+        Mid-Ohio Sports Car Course
+      </text>
+      
+      <text x="1040" y="2" text-anchor="end"
+            font-family="ui-sans-serif, system-ui, sans-serif"
+            font-size="22" font-weight="600" fill="#e6edf3">Sat, May 31</text>
+    </g>
+<g transform="translate(80 414)">
+      
+      <text x="0" y="2"
+            font-family="ui-sans-serif, system-ui, sans-serif"
+            font-size="26" font-weight="600" fill="#e6edf3">
+        Virginia International Raceway
+      </text>
+      
+      <text x="1040" y="2" text-anchor="end"
+            font-family="ui-sans-serif, system-ui, sans-serif"
+            font-size="22" font-weight="600" fill="#e6edf3">Sat, Jun 7</text>
+    </g>
+  <g transform="translate(80 580)">
+    <text font-family="ui-sans-serif, system-ui, sans-serif"
+          font-size="18" fill="#6e7681">
+      bluefrogracing.com · Live Event Analysis and Performance
+    </text>
+  </g>
+</svg>
