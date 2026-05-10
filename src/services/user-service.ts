@@ -57,7 +57,14 @@ export async function getUserLeaguesState(): Promise<UserLeaguesState> {
         _userLeagueStateCache = fetchUncached<UserLeaguesState>({
             namespace,
             type,
-        });
+        }).then((res) => (Array.isArray(res) ? res : []));
+        // Coerce the broker response to an array. The UserLeaguesState
+        // type says it's always an array, but for anonymous SSR
+        // requests the broker can return null, an empty object, or an
+        // error envelope — and downstream callers do `state.findIndex`
+        // / `state.length`, which crash on non-arrays. SSR amplified
+        // this because the same code path now runs on the server with
+        // no auth header.
     }
 
     return await _userLeagueStateCache;
