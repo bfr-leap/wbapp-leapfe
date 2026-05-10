@@ -18,6 +18,13 @@ import type {
     SimsessionResults,
     MembersData,
     SeasonSimsessionIndex,
+    M_Member,
+    DriverStatsMap,
+    CuratedLeagueTeamsInfo,
+    TrackStats,
+    ActiveLeagueSchedule,
+    StewardRuling,
+    TrackInfoDirectory,
 } from '@@/lplib/endpoint-types/iracing-endpoints';
 import { getRequestOrigin } from './og-bot';
 
@@ -110,4 +117,108 @@ export function buildNameLookup(
         map.set(m.cust_id, m.display_name);
     }
     return (custId: number) => map.get(custId) || `#${custId}`;
+}
+
+// ---------------------------------------------------------------------------
+// Fetchers added for non-results modes
+// ---------------------------------------------------------------------------
+
+export async function fetchSingleMemberData(
+    event: H3Event,
+    custId: string
+): Promise<M_Member | null> {
+    return fetchDoc<M_Member>(event, {
+        namespace: 'ldata-rsltsts',
+        type: 'singleMemberData',
+        custId,
+    });
+}
+
+export async function fetchLeagueDriverStats(
+    event: H3Event,
+    league: string
+): Promise<{ [seasonId: number]: DriverStatsMap } | null> {
+    return fetchDoc<{ [seasonId: number]: DriverStatsMap }>(event, {
+        namespace: 'ldata-rsltsts',
+        type: 'leagueDriverStats',
+        league,
+    });
+}
+
+export async function fetchCuratedLeagueTeamsInfo(
+    event: H3Event,
+    league: string
+): Promise<CuratedLeagueTeamsInfo | null> {
+    return fetchDoc<CuratedLeagueTeamsInfo>(event, {
+        namespace: 'ldata-usrcfg',
+        type: 'leagueTeamsInfo',
+        league,
+    });
+}
+
+export async function fetchTrackStats(
+    event: H3Event,
+    league: string,
+    car: string,
+    track: string
+): Promise<TrackStats | null> {
+    return fetchDoc<TrackStats>(event, {
+        namespace: 'ldata-rsltsts',
+        type: 'trackResults',
+        league,
+        car,
+        track,
+    });
+}
+
+export async function fetchTrackInfoDirectory(
+    event: H3Event,
+    league: string
+): Promise<TrackInfoDirectory | null> {
+    return fetchDoc<TrackInfoDirectory>(event, {
+        namespace: 'ldata-rsltsts',
+        type: 'trackInfoDirectory',
+        league,
+    });
+}
+
+export async function fetchActiveLeagueSchedule(
+    event: H3Event
+): Promise<ActiveLeagueSchedule | null> {
+    return fetchDoc<ActiveLeagueSchedule>(event, {
+        namespace: 'ldata-usrcfg',
+        type: 'activeLeagueSchedule',
+    });
+}
+
+export async function fetchRulings(
+    event: H3Event,
+    league: string,
+    season: string
+): Promise<StewardRuling[] | null> {
+    return fetchDoc<StewardRuling[]>(event, {
+        namespace: 'ldata-stwdcfg',
+        type: 'getRulings',
+        league,
+        season,
+    });
+}
+
+/**
+ * Resolve a (league_id, season_id) to its human-readable league name and
+ * season-id label. Falls back to the raw IDs so the card always has
+ * *something* to show even if the curated schedule is unreachable.
+ */
+export async function resolveLeagueSeasonLabel(
+    event: H3Event,
+    league: string,
+    season: string
+): Promise<{ leagueName: string; seasonLabel: string }> {
+    const schedule = await fetchActiveLeagueSchedule(event);
+    const leagueInfo = schedule?.leagues.find(
+        (l) => l.league_id.toString() === league
+    );
+    const leagueName = leagueInfo?.name || `League ${league || '—'}`;
+    const seasonLabel = season ? `Season ${season}` : 'Season —';
+    return { leagueName, seasonLabel };
 }
