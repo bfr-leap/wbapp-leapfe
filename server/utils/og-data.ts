@@ -23,6 +23,7 @@ import type {
     CuratedLeagueTeamsInfo,
     TrackStats,
     ActiveLeagueSchedule,
+    LeagueSeasons,
     StewardRuling,
     TrackInfoDirectory,
 } from '@@/lplib/endpoint-types/iracing-endpoints';
@@ -276,20 +277,53 @@ export async function fetchRulings(
 }
 
 /**
- * Resolve a (league_id, season_id) to its human-readable league name and
- * season-id label. Falls back to the raw IDs so the card always has
- * *something* to show even if the curated schedule is unreachable.
+ * Per-league listing of seasons with their human-readable names. The
+ * SPA reads this same document to render season chips and dropdowns;
+ * the OG path uses it to print "Season X" rather than "Season 131502"
+ * in card subtitles.
+ */
+export async function fetchLeagueSeasons(
+    event: H3Event,
+    league: string
+): Promise<LeagueSeasons | null> {
+    return fetchDoc<LeagueSeasons>(event, {
+        namespace: 'ldata-irweb',
+        type: 'leagueSeasons',
+        league,
+    });
+}
+
+/**
+ * Resolve a (league_id, season_id) to its human-readable league name
+ * and season name. Falls back to the raw IDs so the card always has
+ * *something* to show even if the curated schedule or the per-league
+ * seasons document is unreachable.
+ *
+ * Two documents back this: `activeLeagueSchedule` carries the league's
+ * display name, and `leagueSeasons` carries each season's display
+ * name. The schedule index doesn't include `season_name` — that's why
+ * the first version of this function fell through to "Season {id}".
  */
 export async function resolveLeagueSeasonLabel(
     event: H3Event,
     league: string,
     season: string
 ): Promise<{ leagueName: string; seasonLabel: string }> {
-    const schedule = await fetchActiveLeagueSchedule(event);
+    const [schedule, seasons] = await Promise.all([
+        fetchActiveLeagueSchedule(event),
+        league ? fetchLeagueSeasons(event, league) : Promise.resolve(null),
+    ]);
     const leagueInfo = schedule?.leagues.find(
         (l) => l.league_id.toString() === league
     );
     const leagueName = leagueInfo?.name || `League ${league || '—'}`;
-    const seasonLabel = season ? `Season ${season}` : 'Season —';
+    const seasonInfo = seasons?.seasons.find(
+        (s) => s.season_id.toString() === season
+    );
+    const seasonLabel = seasonInfo?.season_name
+        ? seasonInfo.season_name
+        : season
+        ? `Season ${season}`
+        : 'Season —';
     return { leagueName, seasonLabel };
 }

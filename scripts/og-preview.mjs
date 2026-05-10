@@ -25,14 +25,17 @@ import { Resvg } from '@resvg/resvg-js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(__dirname, '..');
-const fontDir = resolve(repoRoot, 'server/assets');
 const outDir = resolve(repoRoot, 'tmp/og-preview');
 
+// Read the same WOFF2 sources that get base64-inlined into
+// server/utils/og-fonts-data.ts for production. Reading them here keeps
+// the script standalone (no .ts loader needed) and the bytes are
+// identical to what the live handler hands resvg.
 const fontBuffers = [
     'og-font-400.woff2',
     'og-font-600.woff2',
     'og-font-700.woff2',
-].map((n) => readFileSync(resolve(fontDir, n)));
+].map((n) => readFileSync(resolve(repoRoot, 'server/assets', n)));
 
 // Inline minimal copies of renderCardShell + renderBodyRow + podiumBadge
 // rather than importing the .ts source; this script is intentionally
@@ -118,7 +121,8 @@ const FIXTURES = {
         shell({
             eyebrow: 'LEAP · LEAGUE HOME',
             title: 'League Zero',
-            subtitle: 'Season 131502 · Next race: Hungaroring · Fri, May 15',
+            subtitle:
+                '2026 Spring Season · Next race: Hungaroring · Fri, May 15',
             bodySvg: [
                 { name: 'Hungaroring', date: 'Fri, May 15' },
                 { name: 'Spa-Francorchamps', date: 'Fri, May 22' },
@@ -157,7 +161,7 @@ const FIXTURES = {
         shell({
             eyebrow: 'LEAP · DRIVER STANDINGS',
             title: 'League Zero',
-            subtitle: 'Season 131502',
+            subtitle: '2026 Spring Season',
             bodySvg: [
                 { n: 'Elliot Rolls', p: 142 },
                 { n: 'Jaden Calloway', p: 128 },

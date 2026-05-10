@@ -14,6 +14,7 @@
 import type { H3Event } from 'h3';
 import {
     fetchActiveLeagueSchedule,
+    fetchLeagueSeasons,
     fetchTrackInfoDirectory,
     resolveLgSeasSubCtx,
 } from './og-data';
@@ -73,14 +74,20 @@ async function fetchHomeCardData(
         };
     }
 
-    // Track display names live in the per-league track info directory.
-    // It's a small lookup table, so resolving names is cheap.
-    const trackInfo = await fetchTrackInfoDirectory(
-        event,
-        leagueInfo.league_id.toString()
-    );
+    // Track names live in the per-league track-info directory and
+    // season names live in the per-league seasons document. Fetch both
+    // in parallel — they're small JSON blobs and we always need them.
+    const leagueId = leagueInfo.league_id.toString();
+    const [trackInfo, seasons] = await Promise.all([
+        fetchTrackInfoDirectory(event, leagueId),
+        fetchLeagueSeasons(event, leagueId),
+    ]);
     const trackName = (trackId: number): string =>
         trackInfo?.track_display?.[trackId.toString()] || `Track ${trackId}`;
+
+    const seasonName = seasons?.seasons.find(
+        (s) => s.season_id === seasonInfo.season_id
+    )?.season_name;
 
     const now = Date.now();
     const upcoming = seasonInfo.events
@@ -93,7 +100,7 @@ async function fetchHomeCardData(
 
     return {
         leagueName: leagueInfo.name,
-        seasonLabel: `Season ${seasonInfo.season_id}`,
+        seasonLabel: seasonName || `Season ${seasonInfo.season_id}`,
         nextRace: upcoming[0] || null,
         upcoming,
     };

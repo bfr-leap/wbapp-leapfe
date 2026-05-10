@@ -12,44 +12,23 @@
  * ships without Western fonts, so resvg's `loadSystemFonts` finds
  * nothing on production even though it works fine on a developer Mac
  * or our Linux dev sandbox. The result is a card with shapes but no
- * glyphs (badges visible, names invisible). We vendor a few weights
- * of Inter as WOFF2 in `server/assets/` and pass them to resvg as
- * explicit `fontBuffers`. Nitro auto-registers that directory under
- * the `assets:server` storage namespace, so the same code path works
- * in dev, in `nuxt build`, and on Vercel.
+ * glyphs (badges visible, names invisible).
+ *
+ * We tried `useStorage('assets:server')` against `server/assets/*.woff2`
+ * first; in dev that works, but Nitro's production bundling on Vercel
+ * doesn't reliably inline binary server assets, and `getItemRaw`
+ * returns null in the deployed function. To sidestep that entirely we
+ * base64-inline the three Inter weights into `og-fonts-data.ts` so
+ * the fonts ride the JS bundle wherever it goes — dev, build, Vercel,
+ * or anywhere else Nitro can run.
  */
+
+import { OG_FONT_BUFFERS } from './og-fonts-data';
 
 export const PNG_WIDTH = 1200;
 
-export const OG_FONT_FILES = [
-    'og-font-400.woff2',
-    'og-font-600.woff2',
-    'og-font-700.woff2',
-] as const;
-
-let cachedFontBuffers: Buffer[] | null = null;
-
-async function loadFontBuffers(): Promise<Buffer[]> {
-    if (cachedFontBuffers) return cachedFontBuffers;
-    const storage = useStorage('assets:server');
-    const buffers = await Promise.all(
-        OG_FONT_FILES.map(
-            (n) => storage.getItemRaw(n) as Promise<Buffer | null>
-        )
-    );
-    const ok = buffers.filter((b): b is Buffer => b != null);
-    if (ok.length === 0) {
-        throw new Error(
-            'OG fonts missing — expected server/assets/og-font-{400,600,700}.woff2'
-        );
-    }
-    cachedFontBuffers = ok;
-    return ok;
-}
-
 /**
- * Pure rasterization step — no Nitro context, no I/O. Tests and the
- * CLI preview script feed the WOFF2 buffers in directly so they can
+ * Pure rasterization step — no I/O. Tests and the CLI preview script
  * exercise the same rendering path the request handler uses without
  * bringing up a server.
  */
@@ -77,6 +56,5 @@ export async function rasterizeSvgWithFonts(
 }
 
 export async function rasterizeSvgToPng(svg: string): Promise<Buffer> {
-    const fontBuffers = await loadFontBuffers();
-    return rasterizeSvgWithFonts(svg, fontBuffers);
+    return rasterizeSvgWithFonts(svg, OG_FONT_BUFFERS);
 }

@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { readFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
-import { OG_FONT_FILES, rasterizeSvgWithFonts } from './og-rasterize';
+import { rasterizeSvgWithFonts } from './og-rasterize';
+import { OG_FONT_BUFFERS } from './og-fonts-data';
 import {
     renderCardShell,
     renderBodyRow,
@@ -16,18 +15,11 @@ import {
  * failed in CI before that change reached production.
  */
 
-async function loadVendoredFonts(): Promise<Buffer[]> {
-    const dir = resolve(__dirname, '../assets');
-    return Promise.all(
-        OG_FONT_FILES.map((n) => readFile(resolve(dir, n))) as Promise<Buffer>[]
-    );
-}
-
 const PNG_SIGNATURE = '89504e470d0a1a0a';
 
 describe('rasterizeSvgWithFonts', () => {
     it('produces a valid PNG with the bundled Inter fonts', async () => {
-        const fonts = await loadVendoredFonts();
+        const fonts = OG_FONT_BUFFERS;
         const svg = renderCardShell({
             eyebrow: 'LEAP · RACE RESULTS',
             title: 'St. Petersburg Grand Prix',
@@ -57,7 +49,7 @@ describe('rasterizeSvgWithFonts', () => {
         // Sanity check that text rendering meaningfully contributes to
         // the byte stream. A regression where fonts silently disappear
         // again would close this gap.
-        const fonts = await loadVendoredFonts();
+        const fonts = OG_FONT_BUFFERS;
         const withText = renderCardShell({
             eyebrow: 'LEAP',
             title: 'A long enough headline to render many glyphs here',
