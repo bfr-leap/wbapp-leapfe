@@ -78,6 +78,59 @@ describe('OG image wiring (static)', () => {
         ).toMatch(/['"]LeapOg['"]/);
     });
 
+    it('every horizontally-flexing div in Card.vue carries `flex-row` (defeats satori-html column auto-flip)', () => {
+        // nuxt-og-image's satori `flex` plugin
+        // (runtime/server/og-image/satori/plugins/flex.js) walks every
+        // <div> and, if its `class` does NOT contain the substring
+        // `flex-` AND any child is a block element (div, p, ul, …),
+        // forces `flex-direction: column` on it. So a row container
+        // declared as `class="flex items-center"` silently becomes a
+        // column at render time — children stack vertically and any
+        // `flex: 1` child collapses to zero on the cross axis. The
+        // landed bug: track names and podium row contents stacked
+        // vertically in the rendered OG PNG.
+        //
+        // Pin the lesson: every `class="flex …"` in Card.vue must
+        // include EITHER `flex-row` (we want a horizontal row) or
+        // `flex-col` (we explicitly want a column). Bare `class="flex"`
+        // or `class="flex items-center"` is the trap.
+        const cardPath = resolve(repoRoot, 'components/LeapOg/Card.vue');
+        const source = readFileSync(cardPath, 'utf-8');
+
+        // Only audit class attributes that live inside the <template>
+        // block. The JS doc comment at the top quotes example class
+        // strings to explain the bug; we don't want to false-positive
+        // on those.
+        const tplMatch = source.match(/<template>([\s\S]*)<\/template>/);
+        expect(tplMatch, 'Card.vue is missing a <template> block').toBeTruthy();
+        const template = tplMatch![1];
+
+        const offenders: string[] = [];
+        // Match `class="…"` (and `:class` shouldn't be used statically
+        // for layout in this file, but cover it anyway).
+        const classAttrRe = /(?:^|\s):?class="([^"]*)"/g;
+        for (const m of template.matchAll(classAttrRe)) {
+            const classList = m[1];
+            // Only care about classes that opt into flex layout.
+            // `class="flex"` matches; `class="not-flex"` doesn't (the
+            // regex anchors on a token boundary).
+            const usesFlex = /(?:^|\s)flex(?:\s|$)/.test(classList);
+            if (!usesFlex) continue;
+            const hasDirection = /\bflex-(row|col)\b/.test(classList);
+            if (!hasDirection) offenders.push(classList);
+        }
+
+        expect(
+            offenders,
+            "Found `class=\"flex …\"` without `flex-row`/`flex-col` in " +
+                "Card.vue. nuxt-og-image's flex plugin will flip these to " +
+                '`flex-direction: column` at render time and the OG PNG will ' +
+                'stack children vertically. Add `flex-row` (or `flex-col` if ' +
+                'that was the intent). Offending class strings: ' +
+                JSON.stringify(offenders)
+        ).toEqual([]);
+    });
+
     it('pages/index.vue uses defineOgImageComponent (the positional-args wrapper), not defineOgImage', () => {
         const page = readFileSync(
             resolve(repoRoot, 'pages/index.vue'),

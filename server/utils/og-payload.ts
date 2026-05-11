@@ -233,10 +233,14 @@ async function buildResults(
     if (!simResults) return brandPayload();
 
     const lookup = buildNameLookup(members);
+    // Cap at 4 rows: the Card body fits 5 rows when the title is a
+    // single line, but long titles (e.g. "Watkins Glen International
+    // - Super Formula SF23 - Honda") wrap to 2 lines and the 5th row
+    // clips the footer. 4 rows always fits regardless of title height.
     const top = [...(simResults.results || [])]
         .filter((r) => typeof r.position === 'number' && r.position >= 1)
         .sort((a, b) => a.position - b.position)
-        .slice(0, 5);
+        .slice(0, 4);
 
     const rows: CardRow[] = top.map((r) => ({
         label: lookup(r.cust_id),
@@ -294,7 +298,7 @@ async function buildStandings(
                   }))
                   .filter((r) => r.points > 0)
                   .sort((a, b) => b.points - a.points)
-                  .slice(0, 5)
+                  .slice(0, 4)
             : [];
 
     const rows: CardRow[] = ranked.map((r, i) => ({
@@ -483,7 +487,7 @@ function extractFastestLaps(
         (keys || []).find((k) => /driver|name/i.test(k)) || 'driver';
     const timeKey =
         (keys || []).find((k) => /lap.?time|^time$/i.test(k)) || 'time';
-    return rows.slice(0, 5).map((r) => ({
+    return rows.slice(0, 4).map((r) => ({
         driver: r[driverKey] || '—',
         time: r[timeKey] || '—',
     }));
@@ -639,7 +643,7 @@ async function buildRulings(
         return tb - ta;
     });
 
-    const recent = sorted.slice(0, 5).map((r) => ({
+    const recent = sorted.slice(0, 4).map((r) => ({
         driver: r.driver_name || `#${r.driver_id || '?'}`,
         infraction: r.infraction || r.classification || 'Ruling',
     }));

@@ -24,6 +24,17 @@
  * particular every node must be `display: flex` and font-family
  * resolves through the module's bundled fonts. We avoid advanced
  * selectors and stick to inline-friendly Tailwind utilities.
+ *
+ * One sharp edge worth knowing: nuxt-og-image runs a `flex` plugin
+ * (`runtime/server/og-image/satori/plugins/flex.js`) that walks every
+ * `<div>` and, if its `class` does NOT contain the substring `flex-`
+ * AND any child is a block element (div, p, ul, …), forces
+ * `flex-direction: column` on it. So a row container declared with
+ * just `class="flex items-center"` silently becomes a column at
+ * render time — children stack vertically and any `flex: 1` child
+ * collapses to zero on the cross axis. Every horizontally-flexing div
+ * here therefore needs an explicit `flex-row` class — that's the
+ * magic substring the plugin looks for to leave direction alone.
  */
 
 interface PodiumBadge {
@@ -113,12 +124,12 @@ withDefaults(
                 <div
                     v-for="(row, i) in body.rows"
                     :key="i"
-                    class="flex items-center"
+                    class="flex flex-row items-center"
                     style="margin-bottom: 16px; gap: 24px"
                 >
                     <div
                         v-if="row.badge"
-                        class="flex items-center justify-center"
+                        class="flex flex-row items-center justify-center"
                         :style="{
                             width: '44px',
                             height: '44px',
@@ -164,7 +175,7 @@ withDefaults(
             </template>
 
             <template v-else-if="body.type === 'grid'">
-                <div class="flex" style="gap: 60px">
+                <div class="flex flex-row" style="gap: 60px">
                     <div
                         v-for="(cell, i) in body.cells"
                         :key="i"
@@ -196,7 +207,7 @@ withDefaults(
 
             <template v-else>
                 <div
-                    class="flex items-center justify-center"
+                    class="flex flex-row items-center justify-center"
                     style="flex: 1; color: #9aa6b2; font-size: 28px"
                 >
                     {{ body.message }}
@@ -206,7 +217,7 @@ withDefaults(
 
         <!-- footer -->
         <div
-            class="flex"
+            class="flex flex-row"
             style="padding: 40px 80px; color: #6e7681; font-size: 18px"
         >
             bluefrogracing.com · Live Event Analysis and Performance
