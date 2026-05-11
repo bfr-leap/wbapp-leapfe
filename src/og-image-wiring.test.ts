@@ -1,0 +1,165 @@
+/**
+ * Static checks that the OG image wiring stays load-bearing.
+ *
+ * These aren't end-to-end renders (the smoke suite covers what it
+ * can without a real Clerk dev key), but they catch the two
+ * regression classes we've actually shipped:
+ *
+ *  - The Card template file gets renamed or moved out from under
+ *    `nuxt-og-image`'s component registry. `componentDirs: ['LeapOg']`
+ *    in `nuxt.config.ts` makes the module scan `components/LeapOg/`
+ *    and register files there under their bare name. If the file
+ *    drifts back to a flat `components/LeapOgCard.vue` (which Nuxt
+ *    happily auto-imports as `<LeapOgCard>` but the og-image module
+ *    never sees), `defineOgImage('Card', …)` resolves to a missing
+ *    component and the module silently falls back to its built-in
+ *    default. The Vercel preview then renders a generic "Live Event
+ *    Analysis and Performance" card instead of our per-page Card.
+ *
+ *  - `nuxt.config.ts` drops `'LeapOg'` out of `ogImage.componentDirs`.
+ *    Same end state as above — the module scans a different set of
+ *    dirs and our template never registers.
+ *
+ * Both are config-shaped problems that don't surface in a runtime
+ * smoke test (the page still emits an `og:image` meta + the
+ * `#nuxt-og-image-options` marker; only the actual PNG render
+ * falls back). Easier to assert statically.
+ */
+
+import { describe, it, expect } from 'vitest';
+import { existsSync, readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+const repoRoot = resolve(__dirname, '..');
+
+describe('OG image wiring (static)', () => {
+    it('Card template lives at components/LeapOg/Card.vue', () => {
+        const cardPath = resolve(repoRoot, 'components/LeapOg/Card.vue');
+        expect(
+            existsSync(cardPath),
+            `Expected the Card template at ${cardPath}. nuxt-og-image's ` +
+                `componentDirs option scans \`components/LeapOg/\` and ` +
+                `strips that dir prefix to register the file as \`<Card>\` ` +
+                `for \`defineOgImage('Card', …)\`. A flat ` +
+                `\`components/LeapOgCard.vue\` does NOT work — Nuxt's ` +
+                `auto-importer registers it under a different name and ` +
+                `the og-image module's template lookup misses it, ` +
+                `falling back to the built-in default card on every ` +
+                `Discord unfurl.`
+        ).toBe(true);
+    });
+
+    it('the Card template has a recognisable LEAP footer (so smoke can fingerprint it)', () => {
+        const cardPath = resolve(repoRoot, 'components/LeapOg/Card.vue');
+        const source = readFileSync(cardPath, 'utf-8');
+        expect(source).toContain('bluefrogracing.com');
+    });
+
+    it('nuxt.config.ts keeps `LeapOg` in ogImage.componentDirs', () => {
+        const config = readFileSync(
+            resolve(repoRoot, 'nuxt.config.ts'),
+            'utf-8'
+        );
+        const dirsMatch = config.match(/componentDirs:\s*\[([^\]]+)\]/);
+        expect(
+            dirsMatch,
+            'nuxt.config.ts no longer declares `ogImage.componentDirs` — ' +
+                'the og-image module needs to know `components/LeapOg/` ' +
+                'is a template directory or it will skip our Card.'
+        ).toBeTruthy();
+        const dirsList = dirsMatch![1];
+        expect(
+            dirsList,
+            "`ogImage.componentDirs` no longer includes 'LeapOg'. The " +
+                'og-image module will skip our Card template and unfurlers ' +
+                'will get the built-in default card. Add `LeapOg` back ' +
+                "(the `OgImage` namespace is reserved by the module's own " +
+                'runtime, hence the `LeapOg` prefix).'
+        ).toMatch(/['"]LeapOg['"]/);
+    });
+
+    it('every horizontally-flexing div in Card.vue carries `flex-row` (defeats satori-html column auto-flip)', () => {
+        // nuxt-og-image's satori `flex` plugin
+        // (runtime/server/og-image/satori/plugins/flex.js) walks every
+        // <div> and, if its `class` does NOT contain the substring
+        // `flex-` AND any child is a block element (div, p, ul, …),
+        // forces `flex-direction: column` on it. So a row container
+        // declared as `class="flex items-center"` silently becomes a
+        // column at render time — children stack vertically and any
+        // `flex: 1` child collapses to zero on the cross axis. The
+        // landed bug: track names and podium row contents stacked
+        // vertically in the rendered OG PNG.
+        //
+        // Pin the lesson: every `class="flex …"` in Card.vue must
+        // include EITHER `flex-row` (we want a horizontal row) or
+        // `flex-col` (we explicitly want a column). Bare `class="flex"`
+        // or `class="flex items-center"` is the trap.
+        const cardPath = resolve(repoRoot, 'components/LeapOg/Card.vue');
+        const source = readFileSync(cardPath, 'utf-8');
+
+        // Only audit class attributes that live inside the <template>
+        // block. The JS doc comment at the top quotes example class
+        // strings to explain the bug; we don't want to false-positive
+        // on those.
+        const tplMatch = source.match(/<template>([\s\S]*)<\/template>/);
+        expect(tplMatch, 'Card.vue is missing a <template> block').toBeTruthy();
+        const template = tplMatch![1];
+
+        const offenders: string[] = [];
+        // Match `class="…"` (and `:class` shouldn't be used statically
+        // for layout in this file, but cover it anyway).
+        const classAttrRe = /(?:^|\s):?class="([^"]*)"/g;
+        for (const m of template.matchAll(classAttrRe)) {
+            const classList = m[1];
+            // Only care about classes that opt into flex layout.
+            // `class="flex"` matches; `class="not-flex"` doesn't (the
+            // regex anchors on a token boundary).
+            const usesFlex = /(?:^|\s)flex(?:\s|$)/.test(classList);
+            if (!usesFlex) continue;
+            const hasDirection = /\bflex-(row|col)\b/.test(classList);
+            if (!hasDirection) offenders.push(classList);
+        }
+
+        expect(
+            offenders,
+            "Found `class=\"flex …\"` without `flex-row`/`flex-col` in " +
+                "Card.vue. nuxt-og-image's flex plugin will flip these to " +
+                '`flex-direction: column` at render time and the OG PNG will ' +
+                'stack children vertically. Add `flex-row` (or `flex-col` if ' +
+                'that was the intent). Offending class strings: ' +
+                JSON.stringify(offenders)
+        ).toEqual([]);
+    });
+
+    it('pages/index.vue uses defineOgImageComponent (the positional-args wrapper), not defineOgImage', () => {
+        const page = readFileSync(
+            resolve(repoRoot, 'pages/index.vue'),
+            'utf-8'
+        );
+        // `defineOgImage(_options)` takes a single object — calling it
+        // as `defineOgImage('Card', { … })` silently spreads the string
+        // 'Card' into `props` as `{0:'C',1:'a',2:'r',3:'d'}` and
+        // leaves `component` unset, so the renderer falls back to the
+        // module's default template (NuxtSeo). That's the bug we
+        // shipped to Discord. The correct wrapper for our usage is
+        // `defineOgImageComponent(component, props, options)`.
+        expect(
+            page,
+            "`pages/index.vue` should call `defineOgImageComponent('Card', …)` " +
+                'so the component name binds to the `component` slot. Using ' +
+                '`defineOgImage(\'Card\', …)` instead silently drops the ' +
+                'component name and renders the module default.'
+        ).toMatch(
+            /defineOgImageComponent\(['"]Card['"],\s*ogPayload\.value\?\.card/
+        );
+        // And to be safe, no plain `defineOgImage('…', …)` anywhere in
+        // the page — that signature is the trap above.
+        expect(
+            page,
+            "`pages/index.vue` still calls `defineOgImage('…', …)` " +
+                'somewhere. Use `defineOgImageComponent(…)` for component ' +
+                'rendering or `defineOgImage({ component, props })` if you ' +
+                'really want the object form.'
+        ).not.toMatch(/\bdefineOgImage\(['"]/);
+    });
+});

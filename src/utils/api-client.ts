@@ -49,8 +49,16 @@ async function fetchObjects(urls: string[]): Promise<unknown[]> {
         }
 
         const t0 = Date.now();
+        // SSR runs on Vercel with a 10s function budget. A single
+        // hung broker fetch hangs the entire page render and 504s.
+        // Cap each call at 5s server-side; client-side has no such
+        // budget so let it run as long as needed.
+        const signal = import.meta.server
+            ? AbortSignal.timeout(5000)
+            : undefined;
         const response = await fetch(url, {
             headers: { Authorization: `Bearer ${token}` },
+            signal,
         });
 
         if (!response.ok) {

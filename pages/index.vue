@@ -25,6 +25,62 @@ const route = useRoute();
 const auth = useAuth();
 setAuth(auth);
 
+// OG card + SEO meta. Runs during SSR so unfurlers (Discord, Twitter,
+// Slack, etc.) see fully populated `og:*` / `twitter:*` tags in the
+// initial HTML, and `nuxt-og-image` renders the matching PNG when the
+// bot requests it via the og:image URL.
+//
+// Keyed by mode + the params that uniquely identify the page so
+// useFetch's SSR cache works per shareable URL.
+const ogQuery = computed(() => ({
+    m: (route.query.m as string) || '',
+    league: (route.query.league as string) || '',
+    season: (route.query.season as string) || '',
+    subsession: (route.query.subsession as string) || '',
+    simsession: (route.query.simsession as string) || '',
+    driver: (route.query.driver as string) || '',
+    team: (route.query.team as string) || '',
+    car: (route.query.car as string) || '',
+    track: (route.query.track as string) || '',
+}));
+const { data: ogPayload } = await useFetch('/api/og-payload', {
+    query: ogQuery,
+    key: `og-payload-${Object.values(ogQuery.value).join('-')}`,
+    server: true,
+});
+if (ogPayload.value) {
+    useSeoMeta({
+        title: ogPayload.value.metaTitle,
+        description: ogPayload.value.metaDescription,
+        ogTitle: ogPayload.value.metaTitle,
+        ogDescription: ogPayload.value.metaDescription,
+        ogType: 'website',
+        ogSiteName: 'LEAP',
+        twitterCard: 'summary_large_image',
+        twitterTitle: ogPayload.value.metaTitle,
+        twitterDescription: ogPayload.value.metaDescription,
+    });
+}
+
+// Always register the card. `defineOgImageComponent` is what injects
+// the `#nuxt-og-image-options` marker into the page HTML; without it
+// the og-image module has nothing to extract and falls back to its
+// built-in default template (which renders the site title/description
+// instead of our Card). If `ogPayload` failed to load (auth edge
+// case, broker timeout, transient 500 from the payload endpoint),
+// the Card's `withDefaults` step takes over and we ship a brand-only
+// fallback — still our Card, still on-brand, just without the
+// per-page details.
+//
+// Use `defineOgImageComponent` (the (component, props, options)
+// wrapper), NOT `defineOgImage` directly — the latter takes a
+// single options object, and passing the component name as the first
+// positional argument silently spreads it into `props` as
+// `{0:'C',1:'a',2:'r',3:'d'}` while leaving the component name as
+// the module default (NuxtSeo). That's how we shipped a generic
+// "Live Event Analysis and Performance" card to Discord for weeks.
+defineOgImageComponent('Card', ogPayload.value?.card ?? {});
+
 const serverInitialState = useState<AuthObject | undefined>(
     'clerk-initial-state'
 );
@@ -59,15 +115,21 @@ async function fetchModel() {
         route.query.season as string,
         route.query.subsession as string
     );
+    // The broker can return null for anonymous SSR requests (no auth
+    // token, or upstream timeout). Fall through to the default model
+    // so downstream `lgSeasSubCtx.league_id` accesses don't crash —
+    // the SPA will refetch on the client once Clerk hydrates the
+    // token.
+    if (!def) {
+        return getDefaultModel();
+    }
     // defLgSeasSubCtx doesn't carry simsession; mirror HomeView's
     // pattern of grafting it on from route.query so the header chip
     // can read it without going to route directly.
-    if (def) {
-        const sim = route.query.simsession as string | undefined;
-        (def as { simsession_id?: number | string }).simsession_id = sim
-            ? Number(sim)
-            : 0;
-    }
+    const sim = route.query.simsession as string | undefined;
+    (def as { simsession_id?: number | string }).simsession_id = sim
+        ? Number(sim)
+        : 0;
     return def;
 }
 

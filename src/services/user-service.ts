@@ -57,7 +57,14 @@ export async function getUserLeaguesState(): Promise<UserLeaguesState> {
         _userLeagueStateCache = fetchUncached<UserLeaguesState>({
             namespace,
             type,
-        });
+        }).then((res) => (Array.isArray(res) ? res : []));
+        // Coerce the broker response to an array. The UserLeaguesState
+        // type says it's always an array, but for anonymous SSR
+        // requests the broker can return null, an empty object, or an
+        // error envelope — and downstream callers do `state.findIndex`
+        // / `state.length`, which crash on non-arrays. SSR amplified
+        // this because the same code path now runs on the server with
+        // no auth header.
     }
 
     return await _userLeagueStateCache;
@@ -69,7 +76,15 @@ export async function setUserLeaguesState(
     const namespace = 'ldata-usrdata';
     const type = 'userLeaguesUpd';
     let code = leagueIDList.join('-');
-    return await fetchUncached({ namespace, type, code });
+    const res = await fetchUncached<UserLeaguesState>({
+        namespace,
+        type,
+        code,
+    });
+    // Same SSR-safe coercion as `getUserLeaguesState` — the broker
+    // responds with an error envelope on auth failures, and callers
+    // immediately do `state.findIndex` / `state.length`.
+    return Array.isArray(res) ? res : [];
 }
 
 // ---------------------------------------------------------------------------
@@ -97,7 +112,9 @@ export async function getUserFeatures(): Promise<UserFeatures> {
         _userFeaturesCache = fetchUncached<UserFeatures>({
             namespace,
             type,
-        });
+        }).then((res) => (Array.isArray(res) ? res : []));
+        // Same SSR-safe coercion as `getUserLeaguesState`. Anonymous
+        // SSR requests get a non-array error response from the broker.
     }
 
     return await _userFeaturesCache;
