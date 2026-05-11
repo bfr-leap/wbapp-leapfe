@@ -91,12 +91,21 @@ async function fetchDoc<T>(
     }
     const startedAt = Date.now();
     try {
-        // Anonymous broker call — no auth middleware needed for the
-        // namespaces the OG payload builders touch (data lake +
-        // usrcfg, both read-only and public). Steward rulings would
-        // require auth but we accept brand-fallback for that mode
-        // rather than authenticating a bot crawler.
-        const doc = await getDocument(params.namespace, params);
+        // Race the broker call against a hard timeout. Vercel kills
+        // the function at 10s (Hobby tier); a single hung broker
+        // request will 504 the whole page render, not just the OG
+        // path. Capping each call at 3s leaves room for the 4-5
+        // sequential/parallel calls the OG payload builders make
+        // and still keeps us well under Vercel's budget.
+        const doc = await Promise.race([
+            getDocument(params.namespace, params),
+            new Promise<never>((_, reject) =>
+                setTimeout(
+                    () => reject(new Error('broker timeout after 3000ms')),
+                    3000
+                )
+            ),
+        ]);
         const ok = doc != null;
         console.log(
             `[og-data] fetchDoc ${ok ? 'OK' : 'NULL'} ` +
