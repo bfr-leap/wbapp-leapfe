@@ -116,10 +116,16 @@ describe('buildOgPayloadFromQuery (m=rulings) — license standings card', () =>
                     label: 'Ada Lovelace',
                     valueLeft: '1 ruling',
                     valueRight: '2 pts',
-                    badge: expect.objectContaining({ text: '1' }),
                 },
             ],
         });
+        // License points are a sanction, not a leaderboard — the
+        // card explicitly should NOT decorate rows with a numbered
+        // podium badge.
+        if (payload.card.body.type !== 'rows') {
+            throw new Error('expected rows body');
+        }
+        expect(payload.card.body.rows[0].badge).toBeUndefined();
     });
 
     it('aggregates multiple rulings on the same driver into one row', async () => {
@@ -189,10 +195,9 @@ describe('buildOgPayloadFromQuery (m=rulings) — license standings card', () =>
             'Mid',
             'Low',
         ]);
-        // Meta description threads the top three.
-        expect(payload.metaDescription).toBe(
-            'Season 18 · 1. High · 2. Mid · 3. Low'
-        );
+        // Meta description threads the top three, but without
+        // rank-prefix numbers — license points aren't a leaderboard.
+        expect(payload.metaDescription).toBe('Season 18 · High · Mid · Low');
     });
 
     it('resolves numeric-string driver_id via the season roster', async () => {

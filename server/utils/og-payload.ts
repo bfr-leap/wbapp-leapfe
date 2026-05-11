@@ -739,16 +739,15 @@ async function buildRulings(
         )
         .slice(0, 4);
 
-    const rows: CardRow[] = ranked.map((s, i) => ({
+    const rows: CardRow[] = ranked.map((s) => ({
         label: s.name,
         valueLeft: `${s.rulingCount} ruling${s.rulingCount === 1 ? '' : 's'}`,
         valueRight: `${s.licensePoints} pts`,
-        badge: { text: String(i + 1), ...podiumBadge(i + 1) },
     }));
 
     const leaders = ranked
+        .map((s) => s.name)
         .slice(0, 3)
-        .map((s, i) => `${i + 1}. ${s.name}`)
         .join(' · ');
 
     return {
