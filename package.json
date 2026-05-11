@@ -12,7 +12,7 @@
         "prettier": "npx prettier --write .",
         "lint": "npx eslint .",
         "lint:fix": "npx eslint . --fix",
-        "test": "vitest run",
+        "test": "vitest run && nuxt build && LEAP_SMOKE=1 vitest run",
         "test:watch": "vitest",
         "test:smoke": "nuxt build && LEAP_SMOKE=1 vitest run",
         "dev": "vercel dev"

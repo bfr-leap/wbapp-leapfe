@@ -16,11 +16,11 @@
  * `og:*` meta tags. A 500 means we've shipped a "trust the broker
  * type" bug and the caller didn't guard.
  *
- * This file is in `tests/` — outside the `src/**` and `server/**`
- * patterns the regular unit suite scans — so it only runs when
- * invoked directly via `npm run test:smoke`. The smoke run is slow
- * (boots the server) and requires `nuxt build` to have produced an
- * `.output/`, so it isn't part of the default test pipeline.
+ * `npm test` runs unit first (fast, fails fast), then `nuxt build`,
+ * then this smoke pass with `LEAP_SMOKE=1` (which switches the
+ * vitest include glob from `src/**` to `tests/**`). Use
+ * `npm run test:smoke` to skip the unit pre-pass when iterating on
+ * the harness itself.
  */
 
 import {

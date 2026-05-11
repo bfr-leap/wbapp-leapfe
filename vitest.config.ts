@@ -17,10 +17,13 @@ export default defineConfig({
         // for Vue component tests. Branch on the LEAP_SMOKE flag so
         // each mode picks the right environment.
         environment: process.env.LEAP_SMOKE === '1' ? 'node' : 'happy-dom',
-        // The `tests/` directory holds heavy SSR smoke tests that
-        // require `nuxt build` to have run. Gate them behind
-        // `LEAP_SMOKE=1` so `npm run test` stays fast; `npm run
-        // test:smoke` flips the flag and runs them in isolation.
+        // `LEAP_SMOKE=1` switches between two mutually-exclusive
+        // include sets: the unit suite under `src/**` + `server/**`,
+        // or the SSR smoke suite under `tests/**`. `npm test` runs
+        // both in sequence (`vitest run && nuxt build && LEAP_SMOKE=1
+        // vitest run`) so a single command covers everything.
+        // `npm run test:smoke` flips the flag for smoke-only runs
+        // when iterating on the harness.
         include:
             process.env.LEAP_SMOKE === '1'
                 ? ['tests/**/*.test.ts']
