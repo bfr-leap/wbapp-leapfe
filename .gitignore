@@ -26,4 +26,10 @@ logs
 
 .vercel
 .vscode/*
-!.vscode/extensions.json 
+!.vscode/extensions.json
+
+# Temp broker-capture blobs from `/capture-broker`. Live here briefly
+# while being processed into `tests/fixtures/broker/` by the import
+# script — never committed.
+tests/_capture-blob.json
+tests/_*.json
