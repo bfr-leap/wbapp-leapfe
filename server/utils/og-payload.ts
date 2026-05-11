@@ -631,8 +631,9 @@ async function buildRulings(
     const ctx = await resolveLgSeasSubCtx(event, query);
     if (!ctx.league || !ctx.season) return brandPayload();
 
-    const [rulings, label] = await Promise.all([
+    const [rulings, members, label] = await Promise.all([
         fetchRulings(event, ctx.league, ctx.season),
+        fetchMembersData(event, ctx.league, ctx.season),
         resolveLeagueSeasonLabel(event, ctx.league, ctx.season),
     ]);
 
@@ -643,8 +644,47 @@ async function buildRulings(
         return tb - ta;
     });
 
-    const recent = sorted.slice(0, 4).map((r) => ({
-        driver: r.driver_name || `#${r.driver_id || '?'}`,
+    const lookup = buildNameLookup(members);
+    const topRulings = sorted.slice(0, 4);
+    // Fetch single-member data for any driver_id in the top rulings
+    // that isn't on the season roster — matches the SPA's per-member
+    // fallback in steward-rulings-model so the card never falls back
+    // to a bare cust_id when a name is available.
+    const missingIds = new Set<number>();
+    for (const r of topRulings) {
+        if (r.driver_name) continue;
+        const id = typeof r.driver_id === 'number' ? r.driver_id : null;
+        if (id != null && lookup(id) === `#${id}`) missingIds.add(id);
+    }
+    const fallbackNames = new Map<number, string>();
+    if (missingIds.size > 0) {
+        const fetched = await Promise.all(
+            Array.from(missingIds).map((id) =>
+                fetchSingleMemberData(event, id.toString()).then(
+                    (m) => [id, m?.display_name] as const
+                )
+            )
+        );
+        for (const [id, name] of fetched) {
+            if (name) fallbackNames.set(id, name);
+        }
+    }
+
+    const resolveDriver = (r: typeof topRulings[number]): string => {
+        if (r.driver_name) return r.driver_name;
+        if (typeof r.driver_id === 'number') {
+            const fromRoster = lookup(r.driver_id);
+            if (fromRoster !== `#${r.driver_id}`) return fromRoster;
+            const fromMember = fallbackNames.get(r.driver_id);
+            if (fromMember) return fromMember;
+        }
+        if (r.discord_user_id) return r.discord_user_id;
+        if (r.driver_id != null) return `Driver ${r.driver_id}`;
+        return 'Unknown';
+    };
+
+    const recent = topRulings.map((r) => ({
+        driver: resolveDriver(r),
         infraction: r.infraction || r.classification || 'Ruling',
     }));
 
