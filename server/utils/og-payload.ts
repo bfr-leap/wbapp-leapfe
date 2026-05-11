@@ -646,6 +646,20 @@ async function buildRulings(
 
     const lookup = buildNameLookup(members);
     const topRulings = sorted.slice(0, 4);
+    // The broker serialises iRacing cust_ids inconsistently — some
+    // documents type them as `number`, others as numeric strings. The
+    // ruling docs we see in production come back stringified, so a
+    // strict `typeof === 'number'` check skips the roster lookup and
+    // the card falls all the way through to the raw discord_user_id.
+    // Match the SPA's `coerceDriverId` in steward-rulings-model.
+    const coerceDriverId = (raw: unknown): number | null => {
+        if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
+        if (typeof raw === 'string' && /^\d+$/.test(raw)) {
+            return Number.parseInt(raw, 10);
+        }
+        return null;
+    };
+
     // Fetch single-member data for any driver_id in the top rulings
     // that isn't on the season roster — matches the SPA's per-member
     // fallback in steward-rulings-model so the card never falls back
@@ -653,7 +667,7 @@ async function buildRulings(
     const missingIds = new Set<number>();
     for (const r of topRulings) {
         if (r.driver_name) continue;
-        const id = typeof r.driver_id === 'number' ? r.driver_id : null;
+        const id = coerceDriverId(r.driver_id);
         if (id != null && lookup(id) === `#${id}`) missingIds.add(id);
     }
     const fallbackNames = new Map<number, string>();
@@ -672,10 +686,11 @@ async function buildRulings(
 
     const resolveDriver = (r: typeof topRulings[number]): string => {
         if (r.driver_name) return r.driver_name;
-        if (typeof r.driver_id === 'number') {
-            const fromRoster = lookup(r.driver_id);
-            if (fromRoster !== `#${r.driver_id}`) return fromRoster;
-            const fromMember = fallbackNames.get(r.driver_id);
+        const id = coerceDriverId(r.driver_id);
+        if (id != null) {
+            const fromRoster = lookup(id);
+            if (fromRoster !== `#${id}`) return fromRoster;
+            const fromMember = fallbackNames.get(id);
             if (fromMember) return fromMember;
         }
         if (r.discord_user_id) return r.discord_user_id;
