@@ -74,6 +74,14 @@ export async function bootSmokeServer(
             CLERK_SECRET_KEY: 'sk_test_smoke',
             CLERK_JWT_KEY: 'smoke',
             NODE_ENV: 'production',
+            // The stub Clerk key passes format checks but Clerk's SDK
+            // rejects it on real use, which breaks every API endpoint
+            // — and (critically) the og-image module's internal page
+            // fetch when rendering `/__og-image__/image/og.png`.
+            // Disable the middleware entirely under smoke so the full
+            // Discord-unfurl path can run end-to-end. Production never
+            // sets this flag.
+            LEAP_DISABLE_CLERK: '1',
             ...opts.env,
         },
         stdio: ['ignore', 'pipe', 'pipe'],
@@ -236,6 +244,89 @@ export async function assertRenders(
                 `fallback template was selected instead of our Card. ` +
                 `Check the call to \`defineOgImageComponent('Card', …)\` ` +
                 `in pages/index.vue.`
+        );
+    }
+
+    // End-to-end OG render: follow the exact URL the page emits in
+    // its `og:image` meta tag — that's what Discord, Twitter, and
+    // every other unfurler fetch. The og-image module encodes the
+    // page's route query as a single `_query={…JSON…}` param;
+    // hitting `og.png?m=…&league=…` directly takes a different code
+    // path that doesn't reconstruct the basePath. Possible to render
+    // locally only because the smoke harness sets `LEAP_DISABLE_CLERK=1` —
+    // the og module's internal page fetch goes through every server
+    // middleware including Clerk, and the stub publishable key the
+    // harness uses gets rejected on real invocation.
+    const metaMatch = html.match(
+        /<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/
+    );
+    if (!metaMatch) {
+        throw new Error(`Couldn't extract og:image meta URL from ${url}`);
+    }
+    const ogPngUrl = metaMatch[1];
+    // Use the .html variant for the body fingerprint check (faster
+    // and easier to grep than satori-rendered PNG bytes), but keep
+    // the same query string the page emitted.
+    const ogHtmlUrl = ogPngUrl.replace(/\/og\.png(\?|$)/, '/og.html$1');
+    const ogHtmlRes = await fetch(ogHtmlUrl, {
+        signal: AbortSignal.timeout(30_000),
+    });
+    const ogHtml = await ogHtmlRes.text();
+    if (ogHtmlRes.status >= 500) {
+        console.error(
+            `--- smoke server stderr (last 4KB) for og.html ${url} ---\n${stderrBuf
+                .join('')
+                .slice(-4096)}\n--- end ---`
+        );
+        throw new Error(
+            `og.html HTTP ${ogHtmlRes.status} for ${url}: ` +
+                `${ogHtml.slice(0, 400)}`
+        );
+    }
+    if (!ogHtml.includes('bluefrogracing.com')) {
+        throw new Error(
+            `og.html for ${url} doesn't render the LEAP Card template ` +
+                `(no "bluefrogracing.com" footer — that's the unique ` +
+                `fingerprint of components/LeapOg/Card.vue). The module ` +
+                `probably resolved to a different template. Inspect ` +
+                `the marker on the page response and check ` +
+                `\`pages/index.vue\` / \`nuxt.config.ts\`.`
+        );
+    }
+
+    const ogPngRes = await fetch(ogPngUrl, {
+        signal: AbortSignal.timeout(30_000),
+    });
+    if (ogPngRes.status >= 500) {
+        const body = await ogPngRes.text();
+        console.error(
+            `--- smoke server stderr (last 4KB) for og.png ${url} ---\n${stderrBuf
+                .join('')
+                .slice(-4096)}\n--- end ---`
+        );
+        throw new Error(
+            `og.png HTTP ${ogPngRes.status} for ${url}: ${body.slice(0, 400)}`
+        );
+    }
+    const ogPngBuf = Buffer.from(await ogPngRes.arrayBuffer());
+    if (ogPngBuf.length < 1000) {
+        throw new Error(
+            `og.png for ${url} is suspiciously small (${ogPngBuf.length} ` +
+                `bytes). A real Satori render is tens of KB; this is ` +
+                `probably an error JSON body.`
+        );
+    }
+    // PNG magic bytes: 89 50 4E 47 0D 0A 1A 0A
+    const isPng =
+        ogPngBuf[0] === 0x89 &&
+        ogPngBuf[1] === 0x50 &&
+        ogPngBuf[2] === 0x4e &&
+        ogPngBuf[3] === 0x47;
+    if (!isPng) {
+        throw new Error(
+            `og.png for ${url} isn't a PNG — first bytes ` +
+                `${ogPngBuf.slice(0, 8).toString('hex')}. ` +
+                `Body: ${ogPngBuf.slice(0, 200).toString('utf-8')}`
         );
     }
 }

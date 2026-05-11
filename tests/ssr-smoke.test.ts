@@ -118,6 +118,14 @@ beforeAll(async () => {
             // hit production when an anonymous user (or a refresh
             // before client hydration) renders an SSR page.
             LEAP_BROKER_DISABLED: '1',
+            // Clerk's SDK rejects the stub publishable key on real
+            // invocation (i.e. on any API endpoint, plus on the
+            // og-image module's internal page fetch). The OG-render
+            // smoke check in `assertRenders` won't work without
+            // bypass. `server/middleware/clerk.ts` reads this and
+            // installs an anonymous no-op auth context. Production
+            // never sets it.
+            LEAP_DISABLE_CLERK: '1',
         },
         stdio: ['ignore', 'pipe', 'pipe'],
     });
