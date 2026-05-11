@@ -194,10 +194,48 @@ export async function assertRenders(
     if (!html.includes('nuxt-og-image-options')) {
         throw new Error(
             `OG image payload marker missing on ${url}. The page ` +
-                `should always call \`defineOgImage('Card', …)\` so the ` +
-                `module has something to render — check that the call ` +
+                `should always call \`defineOgImageComponent('Card', …)\` ` +
+                `so the module has something to render — check the call ` +
                 `isn't behind an \`if (ogPayload.value)\` guard or ` +
                 `otherwise gated on a request that can fail.`
+        );
+    }
+    // Pull the marker contents and confirm the resolved component
+    // is OUR Card, not the module's default fallback. The script tag
+    // body is devalue-encoded, but the resolved pascalName appears as
+    // a quoted string regardless. Two assertions:
+    //   - `LeapOgCard` is present  → our template was matched
+    //   - `NuxtSeo`   is absent    → the fallback wasn't chosen
+    // (NuxtSeo is the community-default template the module reaches
+    // for when the call site passes a bad component name, e.g. by
+    // using `defineOgImage('Card', …)` instead of
+    // `defineOgImageComponent('Card', …)`. The string-as-options
+    // mistake spreads 'Card' into `props` as `{0:'C',1:'a',...}` and
+    // leaves `component` unset.)
+    const markerMatch = html.match(
+        /<script[^>]*id="nuxt-og-image-options"[^>]*>([^<]+)<\/script>/
+    );
+    if (!markerMatch) {
+        throw new Error(
+            `Couldn't extract the og-image-options script body on ${url}`
+        );
+    }
+    const markerBody = markerMatch[1];
+    if (!markerBody.includes('"LeapOgCard"')) {
+        throw new Error(
+            `OG image marker on ${url} doesn't resolve to LeapOgCard — ` +
+                `got body: ${markerBody.slice(0, 300)}…\n` +
+                `Likely cause: \`pages/index.vue\` calls ` +
+                `\`defineOgImage('Card', …)\` (string positional) instead ` +
+                `of \`defineOgImageComponent('Card', …)\`.`
+        );
+    }
+    if (markerBody.includes('"NuxtSeo"')) {
+        throw new Error(
+            `OG image marker on ${url} contains "NuxtSeo" — the module ` +
+                `fallback template was selected instead of our Card. ` +
+                `Check the call to \`defineOgImageComponent('Card', …)\` ` +
+                `in pages/index.vue.`
         );
     }
 }

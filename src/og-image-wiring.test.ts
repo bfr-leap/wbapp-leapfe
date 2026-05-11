@@ -78,23 +78,35 @@ describe('OG image wiring (static)', () => {
         ).toMatch(/['"]LeapOg['"]/);
     });
 
-    it('pages/index.vue calls defineOgImage unconditionally so the marker ships even when /api/og-payload fails', () => {
+    it('pages/index.vue uses defineOgImageComponent (the positional-args wrapper), not defineOgImage', () => {
         const page = readFileSync(
             resolve(repoRoot, 'pages/index.vue'),
             'utf-8'
         );
-        // Crude but effective: `defineOgImage` must not be the
-        // syntactic child of an `if (ogPayload.value)` block. We
-        // look for the marker comment we wrote next to the call.
-        // If you refactor that comment away, please update this
-        // test along with it.
+        // `defineOgImage(_options)` takes a single object — calling it
+        // as `defineOgImage('Card', { … })` silently spreads the string
+        // 'Card' into `props` as `{0:'C',1:'a',2:'r',3:'d'}` and
+        // leaves `component` unset, so the renderer falls back to the
+        // module's default template (NuxtSeo). That's the bug we
+        // shipped to Discord. The correct wrapper for our usage is
+        // `defineOgImageComponent(component, props, options)`.
         expect(
             page,
-            "`pages/index.vue` should always call `defineOgImage('Card', …)` " +
-                'so the page emits the `#nuxt-og-image-options` marker even ' +
-                'when /api/og-payload fails. Without that marker the ' +
-                'og-image module crashes with "Failed to read the path …" ' +
-                'on every Discord unfurl.'
-        ).toMatch(/defineOgImage\(['"]Card['"],\s*ogPayload\.value\?\.card/);
+            "`pages/index.vue` should call `defineOgImageComponent('Card', …)` " +
+                'so the component name binds to the `component` slot. Using ' +
+                '`defineOgImage(\'Card\', …)` instead silently drops the ' +
+                'component name and renders the module default.'
+        ).toMatch(
+            /defineOgImageComponent\(['"]Card['"],\s*ogPayload\.value\?\.card/
+        );
+        // And to be safe, no plain `defineOgImage('…', …)` anywhere in
+        // the page — that signature is the trap above.
+        expect(
+            page,
+            "`pages/index.vue` still calls `defineOgImage('…', …)` " +
+                'somewhere. Use `defineOgImageComponent(…)` for component ' +
+                'rendering or `defineOgImage({ component, props })` if you ' +
+                'really want the object form.'
+        ).not.toMatch(/\bdefineOgImage\(['"]/);
     });
 });

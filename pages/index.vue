@@ -62,15 +62,24 @@ if (ogPayload.value) {
     });
 }
 
-// Always register the card. `defineOgImage` is what injects the
-// `#nuxt-og-image-options` marker into the page HTML; without it the
-// og-image module has nothing to extract and crashes with "Failed to
-// read the path …". If `ogPayload` failed to load (auth edge case,
-// broker timeout, transient 500 from the payload endpoint), the
-// Card's `withDefaults` takes over and we ship a brand-only
+// Always register the card. `defineOgImageComponent` is what injects
+// the `#nuxt-og-image-options` marker into the page HTML; without it
+// the og-image module has nothing to extract and falls back to its
+// built-in default template (which renders the site title/description
+// instead of our Card). If `ogPayload` failed to load (auth edge
+// case, broker timeout, transient 500 from the payload endpoint),
+// the Card's `withDefaults` step takes over and we ship a brand-only
 // fallback — still our Card, still on-brand, just without the
 // per-page details.
-defineOgImage('Card', ogPayload.value?.card ?? {});
+//
+// Use `defineOgImageComponent` (the (component, props, options)
+// wrapper), NOT `defineOgImage` directly — the latter takes a
+// single options object, and passing the component name as the first
+// positional argument silently spreads it into `props` as
+// `{0:'C',1:'a',2:'r',3:'d'}` while leaving the component name as
+// the module default (NuxtSeo). That's how we shipped a generic
+// "Live Event Analysis and Performance" card to Discord for weeks.
+defineOgImageComponent('Card', ogPayload.value?.card ?? {});
 
 const serverInitialState = useState<AuthObject | undefined>(
     'clerk-initial-state'
