@@ -52,14 +52,30 @@ async function fetchDoc<T>(
     event: H3Event,
     params: Record<string, string>
 ): Promise<T | null> {
+    const baseURL = getRequestOrigin(event);
+    const startedAt = Date.now();
     try {
         const res = await $fetch<{ doc: T | null }>('/api/fetch-document', {
-            baseURL: getRequestOrigin(event),
+            baseURL,
             query: params,
         });
+        const ok = res?.doc != null;
+        console.log(
+            `[og-data] fetchDoc ${ok ? 'OK' : 'NULL'} ` +
+                `${params.namespace}/${params.type} ` +
+                `via ${baseURL} in ${Date.now() - startedAt}ms ` +
+                (ok ? '' : `(doc=${JSON.stringify(res?.doc)})`)
+        );
         return res?.doc ?? null;
     } catch (e) {
-        console.warn('[og-data] fetchDoc failed', params, e);
+        const headers = event.node.req.headers;
+        console.warn(
+            `[og-data] fetchDoc THREW ${params.namespace}/${params.type} ` +
+                `via ${baseURL} in ${Date.now() - startedAt}ms — ` +
+                `host=${headers.host} xfh=${headers['x-forwarded-host']} ` +
+                `xfp=${headers['x-forwarded-proto']} ` +
+                `err=${e instanceof Error ? e.message : String(e)}`
+        );
         return null;
     }
 }
