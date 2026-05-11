@@ -23,17 +23,11 @@
  * the harness itself.
  */
 
-import {
-    describe,
-    it,
-    expect,
-    beforeAll,
-    afterAll,
-    onTestFinished,
-} from 'vitest';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { spawn, type ChildProcess } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { SMOKE_URLS, assertRenders } from './_smoke-helpers';
 
 const PORT = 4567;
 const BASE = `http://127.0.0.1:${PORT}`;
@@ -141,80 +135,15 @@ afterAll(() => {
     }
 });
 
-interface SmokeUrl {
-    label: string;
-    url: string;
-}
-
-// Cover every share-URL shape we know exists in the wild. The query
-// strings come straight from Discord-shared LEAP links so we
-// regression-test the same shapes users actually paste.
-const URLS: SmokeUrl[] = [
-    { label: 'home (bare)', url: '/' },
-    {
-        label: 'home (league + season hints)',
-        url: '/?league=4534&season=131502',
-    },
-    {
-        label: 'results',
-        url: '/?m=results&league=4534&season=131502&subsession=84522154&simsession=0',
-    },
-    {
-        label: 'standings',
-        url: '/?m=standings&league=4534&season=131502',
-    },
-    {
-        label: 'season',
-        url: '/?m=season&league=4534&season=131502',
-    },
-    {
-        label: 'rulings',
-        url: '/?m=rulings&league=4534&season=131502',
-    },
-    {
-        label: 'driver',
-        url: '/?m=driver&league=4534&driver=174470',
-    },
-];
-
 describe('SSR smoke — anonymous renders should not 500', () => {
-    for (const { label, url } of URLS) {
-        it(`renders ${label} (${url})`, async () => {
-            // The OS may not resolve `broker-unreachable.invalid`
-            // immediately; allow a generous per-request timeout.
-            const res = await fetch(`${BASE}${url}`, {
-                signal: AbortSignal.timeout(20_000),
-            });
-            const html = await res.text();
-            if (res.status >= 500) {
-                // Surface the server's most recent stderr so the
-                // failing run is debuggable from CI logs.
-                console.error(
-                    `--- smoke server stderr (last 4KB) for ${url} ---\n${stderrBuf
-                        .join('')
-                        .slice(-4096)}\n--- end ---`
-                );
-            }
-
-            expect(
-                res.status,
-                `HTTP status for ${url}\n${html.slice(0, 500)}`
-            ).toBeLessThan(500);
-            expect(
-                html,
-                `body of ${url} contains a Nuxt error template`
-            ).not.toMatch(/userLeaguesState\.findIndex/);
-            expect(
-                html,
-                `body of ${url} contains a generic 500 marker`
-            ).not.toMatch(/<title>500/);
-            // Every page should at least carry the LEAP og:site_name
-            // (set by the og-image module + our useSeoMeta call).
-            // If meta-tag injection silently broke, this catches it.
-            expect(html, `og:image meta missing on ${url}`).toMatch(
-                /property=["']og:image["']/
-            );
-        }, 30_000);
+    for (const { label, url } of SMOKE_URLS) {
+        it(
+            `renders ${label} (${url})`,
+            async () => {
+                await assertRenders(BASE, url, stderrBuf);
+            },
+            30_000
+        );
     }
 });
 

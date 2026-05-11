@@ -151,6 +151,25 @@ export const SMOKE_URLS: SmokeUrl[] = [
 /**
  * Standard assertions every smoke URL must satisfy regardless of
  * which broker mode is active.
+ *
+ * Three checks on each rendered page:
+ *  - Status < 500 (page didn't blow up SSR-side).
+ *  - `og:image` meta tag present (crawlers have a URL to fetch).
+ *  - `#nuxt-og-image-options` script tag present (the marker the
+ *    og-image module reads to recover the `defineOgImage` payload).
+ *    Without it, the module crashes with "Failed to read the path …"
+ *    on every Discord/Twitter unfurl. The marker is what we caught
+ *    going missing the first time around, when the `defineOgImage`
+ *    call was guarded behind `if (ogPayload.value)` and a transient
+ *    payload failure removed the entire OG card from the page.
+ *
+ * The full end-to-end "did the Card template actually render" check
+ * would hit `/__og-image__/image/og.html?…`, but that endpoint makes
+ * an internal Nitro fetch that hits the Clerk middleware in a way
+ * that fails with the stub publishable key the smoke harness uses.
+ * Rather than wire up a real Clerk dev key for tests, the file-
+ * existence check in `ssr-smoke-static.test.ts` covers the
+ * "Card template moved" regression class statically.
  */
 export async function assertRenders(
     base: string,
@@ -167,11 +186,18 @@ export async function assertRenders(
                 .join('')
                 .slice(-4096)}\n--- end ---`
         );
-    }
-    if (res.status >= 500) {
         throw new Error(`HTTP ${res.status} for ${url}: ${html.slice(0, 400)}`);
     }
     if (!/property=["']og:image["']/.test(html)) {
         throw new Error(`og:image meta missing on ${url}`);
+    }
+    if (!html.includes('nuxt-og-image-options')) {
+        throw new Error(
+            `OG image payload marker missing on ${url}. The page ` +
+                `should always call \`defineOgImage('Card', …)\` so the ` +
+                `module has something to render — check that the call ` +
+                `isn't behind an \`if (ogPayload.value)\` guard or ` +
+                `otherwise gated on a request that can fail.`
+        );
     }
 }

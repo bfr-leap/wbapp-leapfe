@@ -60,8 +60,17 @@ if (ogPayload.value) {
         twitterTitle: ogPayload.value.metaTitle,
         twitterDescription: ogPayload.value.metaDescription,
     });
-    defineOgImage('Card', ogPayload.value.card);
 }
+
+// Always register the card. `defineOgImage` is what injects the
+// `#nuxt-og-image-options` marker into the page HTML; without it the
+// og-image module has nothing to extract and crashes with "Failed to
+// read the path …". If `ogPayload` failed to load (auth edge case,
+// broker timeout, transient 500 from the payload endpoint), the
+// Card's `withDefaults` takes over and we ship a brand-only
+// fallback — still our Card, still on-brand, just without the
+// per-page details.
+defineOgImage('Card', ogPayload.value?.card ?? {});
 
 const serverInitialState = useState<AuthObject | undefined>(
     'clerk-initial-state'

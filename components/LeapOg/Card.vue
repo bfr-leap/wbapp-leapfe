@@ -8,12 +8,17 @@
  * prop, so the page only computes the right payload for its current
  * `m=` mode and hands it here.
  *
- * Filename note: the file is `LeapOgCard.vue` (not `OgImageCard.vue`)
- * because Nuxt's component scanner — and `addComponent` registration —
- * silently exclude any name beginning with `OgImage` outside the
- * module's own runtime. With `componentDirs: ['…', 'LeapOg']` in
- * nuxt.config the module strips the `LeapOg` prefix and registers this
- * template as `<Card>` for `defineOgImage('Card', { ... })`.
+ * Located at `components/LeapOg/Card.vue` so that nuxt-og-image picks
+ * it up. The module's `componentDirs: ['…', 'LeapOg']` setting scans
+ * `components/LeapOg/` and strips the directory prefix, registering
+ * this file as `<Card>` — exactly what `defineOgImage('Card', { … })`
+ * asks for. A flat `components/LeapOgCard.vue` doesn't work: Nuxt's
+ * own scanner auto-imports it as `<LeapOgCard>`, but the og-image
+ * template registry never sees it, so requests fall through to the
+ * module's built-in default card. The `LeapOg` prefix (rather than
+ * `OgImage`) is required because Nuxt silently skips any component
+ * whose pascalName begins with `OgImage` outside the module's own
+ * runtime.
  *
  * Satori (the renderer the OG module uses) supports a CSS subset; in
  * particular every node must be `display: flex` and font-family

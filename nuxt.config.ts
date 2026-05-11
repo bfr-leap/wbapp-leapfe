@@ -13,11 +13,14 @@ export default defineNuxtConfig({
     ogImage: {
         enabled: true,
         runtimeCacheStorage: 'default',
-        // Add `LeapOg` so the module's name-prefix filter picks up our
-        // template. The `OgImage` namespace is reserved by the module's
-        // own components and Nuxt's scanner / addComponent registration
-        // both fail silently for files starting with `OgImage` outside
-        // the module's own registrations.
+        // `componentDirs` tells the module which directories under
+        // `components/` hold OG templates. Files in those dirs have the
+        // dir-name prefix stripped and become available under their
+        // bare name — `components/LeapOg/Card.vue` registers as
+        // `<Card>` for `defineOgImage('Card', { … })`. The `LeapOg`
+        // prefix (instead of `OgImage`) is required because Nuxt's
+        // component scanner silently skips any file whose pascalName
+        // begins with `OgImage` outside the module's own runtime.
         componentDirs: ['OgImage', 'OgImageTemplate', 'LeapOg'],
         defaults: {
             renderer: 'satori',
