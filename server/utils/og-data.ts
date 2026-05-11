@@ -1,16 +1,26 @@
 /**
  * Server-side data accessors for the OG preview path.
  *
- * These mirror a subset of `src/services/*` but call the local Nitro
- * `/api/fetch-document` endpoint directly via `$fetch`, instead of going
- * through the browser-oriented `api-client.ts`. Reasons:
- *   1. `api-client.ts` requires `setApiBaseURL` / `setAuth` initialization
- *      that's wired up in `app.vue` — not from a server middleware.
- *   2. The api-client maintains a global cache shared with the SPA. Bot
- *      requests should not pollute (or share) that cache.
- *   3. `$fetch` resolves internal Nitro routes with no extra config and
- *      handles the auth middleware path the same way an anonymous SPA
- *      request would.
+ * These mirror a subset of `src/services/*` but call the broker
+ * library (`@@/lplib/dtbrkr/ftchdata.getDocument`) directly, instead
+ * of going through HTTP via `/api/fetch-document`. Reasons:
+ *
+ *   1. `api-client.ts` requires `setApiBaseURL` / `setAuth`
+ *      initialization wired up in `app.vue` — not available on a
+ *      server middleware.
+ *   2. Direct broker calls eliminate the recursive HTTP loop
+ *      (`og endpoint → page → /api/og-payload → /api/fetch-document`)
+ *      which adds latency and surface area on Vercel: each hop is a
+ *      separate function-to-function invocation that has to resolve
+ *      its own absolute origin, pass through middleware, and burn a
+ *      slice of the function's time budget. Calling the broker lib
+ *      directly is a single in-process call.
+ *   3. The two test-mode env vars `LEAP_BROKER_DISABLED` and
+ *      `LEAP_BROKER_FIXTURES` are still honoured here (the smoke
+ *      harness depends on them); the short-circuits just live in
+ *      this file now instead of in `/api/fetch-document`. The
+ *      fixture-key calculation matches `import-broker-fixtures.mjs`
+ *      and the older `/api/fetch-document` logic.
  */
 
 import type { H3Event } from 'h3';
@@ -27,53 +37,78 @@ import type {
     StewardRuling,
     TrackInfoDirectory,
 } from '@@/lplib/endpoint-types/iracing-endpoints';
+import { getDocument } from '@@/lplib/dtbrkr/ftchdata';
+import { createHash } from 'node:crypto';
+import { existsSync, readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
-/**
- * Resolve the canonical absolute URL for the current request, honoring
- * any reverse-proxy headers Vercel/CDNs set. Used to build a `baseURL`
- * for internal `$fetch` calls so they work both in dev (where Nitro
- * resolves relative URLs against `localhost`) and in production (where
- * Vercel's edge functions expect an absolute origin).
- */
-function getRequestOrigin(event: H3Event): string {
-    const headers = event.node.req.headers;
-    const proto =
-        (headers['x-forwarded-proto'] as string) ||
-        // @ts-expect-error encrypted may not be typed on all socket implementations
-        (event.node.req.socket?.encrypted ? 'https' : 'http');
-    const host =
-        (headers['x-forwarded-host'] as string) ||
-        (headers['host'] as string) ||
-        'localhost:3000';
-    return `${proto.split(',')[0].trim()}://${host.split(',')[0].trim()}`;
+const BROKER_DISABLED = process.env.LEAP_BROKER_DISABLED === '1';
+const BROKER_FIXTURE_DIR = process.env.LEAP_BROKER_FIXTURES;
+
+function fixtureKey(
+    namespace: string,
+    type: string,
+    query: Record<string, unknown>
+): string {
+    const filtered: Record<string, string> = {};
+    for (const [k, v] of Object.entries(query)) {
+        if (k === 'userID' || k === '_authHeader' || k === 'namespace')
+            continue;
+        if (v == null || v === '') continue;
+        filtered[k] = String(v);
+    }
+    const keys = Object.keys(filtered).sort();
+    const canon = keys.map((k) => `${k}=${filtered[k]}`).join('&');
+    const hash = createHash('sha1').update(canon).digest('hex').slice(0, 10);
+    const slug = `${namespace}__${type}__${hash}`;
+    return slug.replace(/[^a-zA-Z0-9._-]/g, '_');
 }
 
 async function fetchDoc<T>(
-    event: H3Event,
+    _event: H3Event,
     params: Record<string, string>
 ): Promise<T | null> {
-    const baseURL = getRequestOrigin(event);
+    if (BROKER_DISABLED) {
+        console.log(
+            `[og-data] fetchDoc DISABLED ${params.namespace}/${params.type}`
+        );
+        return null;
+    }
+    if (BROKER_FIXTURE_DIR) {
+        const key = fixtureKey(params.namespace, params.type, params);
+        const path = resolve(BROKER_FIXTURE_DIR, `${key}.json`);
+        if (!existsSync(path)) {
+            console.warn(
+                `[og-data] fetchDoc FIXTURE-MISSING ${params.namespace}/${params.type} (key=${key})`
+            );
+            return null;
+        }
+        const doc = JSON.parse(readFileSync(path, 'utf-8'));
+        console.log(
+            `[og-data] fetchDoc FIXTURE ${params.namespace}/${params.type} (key=${key})`
+        );
+        return doc as T;
+    }
     const startedAt = Date.now();
     try {
-        const res = await $fetch<{ doc: T | null }>('/api/fetch-document', {
-            baseURL,
-            query: params,
-        });
-        const ok = res?.doc != null;
+        // Anonymous broker call — no auth middleware needed for the
+        // namespaces the OG payload builders touch (data lake +
+        // usrcfg, both read-only and public). Steward rulings would
+        // require auth but we accept brand-fallback for that mode
+        // rather than authenticating a bot crawler.
+        const doc = await getDocument(params.namespace, params);
+        const ok = doc != null;
         console.log(
             `[og-data] fetchDoc ${ok ? 'OK' : 'NULL'} ` +
                 `${params.namespace}/${params.type} ` +
-                `via ${baseURL} in ${Date.now() - startedAt}ms ` +
-                (ok ? '' : `(doc=${JSON.stringify(res?.doc)})`)
+                `in ${Date.now() - startedAt}ms ` +
+                (ok ? '' : `(doc=${JSON.stringify(doc)})`)
         );
-        return res?.doc ?? null;
+        return (doc as T) ?? null;
     } catch (e) {
-        const headers = event.node.req.headers;
         console.warn(
             `[og-data] fetchDoc THREW ${params.namespace}/${params.type} ` +
-                `via ${baseURL} in ${Date.now() - startedAt}ms — ` +
-                `host=${headers.host} xfh=${headers['x-forwarded-host']} ` +
-                `xfp=${headers['x-forwarded-proto']} ` +
+                `in ${Date.now() - startedAt}ms — ` +
                 `err=${e instanceof Error ? e.message : String(e)}`
         );
         return null;
