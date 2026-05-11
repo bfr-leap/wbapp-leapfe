@@ -621,7 +621,10 @@ async function buildSeason(
 }
 
 // -----------------------------------------------------------------------------
-// m=rulings
+// m=rulings — surfaces the page's "License Standings" tab, not the raw
+// ruling list. The standings view is the more informative summary at a
+// glance: who's accumulating points, sorted by total. Mirrors the
+// aggregation in `src/models/steward/steward-rulings-model`.
 // -----------------------------------------------------------------------------
 
 async function buildRulings(
@@ -631,51 +634,140 @@ async function buildRulings(
     const ctx = await resolveLgSeasSubCtx(event, query);
     if (!ctx.league || !ctx.season) return brandPayload();
 
-    const [rulings, label] = await Promise.all([
+    const [rulings, members, label] = await Promise.all([
         fetchRulings(event, ctx.league, ctx.season),
+        fetchMembersData(event, ctx.league, ctx.season),
         resolveLeagueSeasonLabel(event, ctx.league, ctx.season),
     ]);
 
     const list = Array.isArray(rulings) ? rulings : [];
-    const sorted = [...list].sort((a, b) => {
-        const ta = new Date(a.ruling_date).getTime() || 0;
-        const tb = new Date(b.ruling_date).getTime() || 0;
-        return tb - ta;
-    });
 
-    const recent = sorted.slice(0, 4).map((r) => ({
-        driver: r.driver_name || `#${r.driver_id || '?'}`,
-        infraction: r.infraction || r.classification || 'Ruling',
+    // The broker serialises iRacing cust_ids inconsistently — some
+    // documents type them as `number`, others as numeric strings. The
+    // ruling docs we see in production come back stringified, so a
+    // strict `typeof === 'number'` check skips the roster lookup and
+    // the card falls all the way through to the raw discord_user_id.
+    // Match the SPA's `coerceDriverId` in steward-rulings-model.
+    const coerceDriverId = (raw: unknown): number | null => {
+        if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
+        if (typeof raw === 'string' && /^\d+$/.test(raw)) {
+            return Number.parseInt(raw, 10);
+        }
+        return null;
+    };
+
+    const lookup = buildNameLookup(members);
+
+    // Single-member fallback for any cust_id that appears in rulings
+    // without a name and isn't on the season roster. Walks the *full*
+    // ruling list (not just the top 4) because the standings view
+    // aggregates everyone — a driver buried in the long tail might
+    // still be the one we're rendering after the sort.
+    const missingIds = new Set<number>();
+    for (const r of list) {
+        if (r.driver_name) continue;
+        const id = coerceDriverId(r.driver_id);
+        if (id != null && lookup(id) === `#${id}`) missingIds.add(id);
+    }
+    const fallbackNames = new Map<number, string>();
+    if (missingIds.size > 0) {
+        const fetched = await Promise.all(
+            Array.from(missingIds).map((id) =>
+                fetchSingleMemberData(event, id.toString()).then(
+                    (m) => [id, m?.display_name] as const
+                )
+            )
+        );
+        for (const [id, name] of fetched) {
+            if (name) fallbackNames.set(id, name);
+        }
+    }
+
+    const resolveDriver = (r: typeof list[number]): string => {
+        if (r.driver_name) return r.driver_name;
+        const id = coerceDriverId(r.driver_id);
+        if (id != null) {
+            const fromRoster = lookup(id);
+            if (fromRoster !== `#${id}`) return fromRoster;
+            const fromMember = fallbackNames.get(id);
+            if (fromMember) return fromMember;
+        }
+        if (r.discord_user_id) return r.discord_user_id;
+        if (r.driver_id != null) return `Driver ${r.driver_id}`;
+        return 'Unknown';
+    };
+
+    // Aggregate per-driver license standings. Key precedence matches
+    // `rulingDriverKey` in the SPA: discord_user_id first (stable
+    // across iRacing accounts) then driver_id.
+    interface Standing {
+        name: string;
+        licensePoints: number;
+        rulingCount: number;
+    }
+    const standingsMap = new Map<string, Standing>();
+    for (const r of list) {
+        const key = r.discord_user_id
+            ? `d:${r.discord_user_id}`
+            : r.driver_id != null
+            ? `i:${r.driver_id}`
+            : 'unknown';
+        let entry = standingsMap.get(key);
+        if (!entry) {
+            entry = {
+                name: resolveDriver(r),
+                licensePoints: 0,
+                rulingCount: 0,
+            };
+            standingsMap.set(key, entry);
+        }
+        entry.licensePoints += r.license_points || 0;
+        entry.rulingCount += 1;
+        // A later ruling with an explicit driver_name wins over the
+        // earlier roster/discord-derived guess.
+        if (r.driver_name && entry.name !== r.driver_name) {
+            entry.name = r.driver_name;
+        }
+    }
+
+    const ranked = Array.from(standingsMap.values())
+        .filter((s) => s.licensePoints > 0)
+        .sort(
+            (a, b) =>
+                b.licensePoints - a.licensePoints ||
+                b.rulingCount - a.rulingCount
+        )
+        .slice(0, 4);
+
+    const rows: CardRow[] = ranked.map((s) => ({
+        label: s.name,
+        valueLeft: `${s.rulingCount} ruling${s.rulingCount === 1 ? '' : 's'}`,
+        valueRight: `${s.licensePoints} pts`,
     }));
 
-    const recentNames = recent
+    const leaders = ranked
+        .map((s) => s.name)
         .slice(0, 3)
-        .map((r) => r.driver)
-        .join(', ');
+        .join(' · ');
 
     return {
-        metaTitle: `${label.leagueName} — Rulings`,
-        metaDescription: `${label.seasonLabel} · ${list.length} ruling${
-            list.length === 1 ? '' : 's'
-        }${recentNames ? ` · Recent: ${recentNames}` : ''}`,
+        metaTitle: `${label.leagueName} — License Standings`,
+        metaDescription:
+            ranked.length > 0
+                ? `${label.seasonLabel} · ${leaders}`
+                : `${label.seasonLabel} · No license points issued yet`,
         card: {
-            eyebrow: 'LEAP · STEWARD RULINGS',
+            eyebrow: 'LEAP · LICENSE STANDINGS',
             title: label.leagueName,
             subtitle: `${label.seasonLabel} · ${list.length} ruling${
                 list.length === 1 ? '' : 's'
             }`,
             body:
-                recent.length > 0
-                    ? {
-                          type: 'rows',
-                          rows: recent.map((r) => ({
-                              label: r.driver,
-                              valueLeft: r.infraction,
-                          })),
-                      }
+                rows.length > 0
+                    ? { type: 'rows', rows }
                     : {
                           type: 'empty',
-                          message: 'No rulings yet this season',
+                          message: 'No license points issued yet',
                       },
         },
     };
