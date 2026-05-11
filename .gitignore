@@ -33,3 +33,4 @@ logs
 # script — never committed.
 tests/_capture-blob.json
 tests/_*.json
+temp/

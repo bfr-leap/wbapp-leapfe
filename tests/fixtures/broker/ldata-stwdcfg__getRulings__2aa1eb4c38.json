@@ -1,0 +1,497 @@
+[
+  {
+    "ruling_id": "discord-537",
+    "source_message_id": "537",
+    "league_id": "4534",
+    "season_id": "131502",
+    "discord_user_id": "985640",
+    "driver_id": "410106",
+    "session_type": "Sprint Race",
+    "lap": 4,
+    "classification": "Major Penalty",
+    "infraction": "Causing a Collision",
+    "license_points": 2,
+    "sanctions": [
+      {
+        "description": "[redacted]",
+        "type": "championship_point_deduction",
+        "value": 5
+      },
+      {
+        "description": "[redacted]",
+        "type": "qualifying_ban",
+        "value": 1
+      },
+      {
+        "description": "[redacted]",
+        "type": "license_points",
+        "value": 2
+      }
+    ],
+    "evidence_urls": [
+      "https://discord.com/channels/428127436601950208/1480425528321376429"
+    ],
+    "steward_notes": "[redacted]",
+    "ruling_date": "2026-03-21 04:51:36"
+  },
+  {
+    "ruling_id": "discord-538",
+    "source_message_id": "538",
+    "league_id": "4534",
+    "season_id": "131502",
+    "discord_user_id": "750035",
+    "driver_id": "906526",
+    "session_type": "Feature Race",
+    "lap": 1,
+    "classification": "Major Penalty",
+    "infraction": "Causing a Collision",
+    "license_points": 2,
+    "sanctions": [
+      {
+        "description": "[redacted]",
+        "type": "championship_point_deduction",
+        "value": 5
+      },
+      {
+        "description": "[redacted]",
+        "type": "qualifying_ban",
+        "value": 1
+      },
+      {
+        "description": "[redacted]",
+        "type": "license_points",
+        "value": 2
+      }
+    ],
+    "evidence_urls": [
+      "https://discord.com/channels/428127436601950208/1480425528321376429"
+    ],
+    "steward_notes": null,
+    "ruling_date": "2026-03-21 04:51:54"
+  },
+  {
+    "ruling_id": "discord-539",
+    "source_message_id": "539",
+    "league_id": "4534",
+    "season_id": "131502",
+    "discord_user_id": "174653",
+    "driver_id": "818472",
+    "session_type": "Feature Race",
+    "lap": 6,
+    "classification": "Major Penalty",
+    "infraction": "Unsafe Rejoin",
+    "license_points": 2,
+    "sanctions": [
+      {
+        "description": "[redacted]",
+        "type": "championship_point_deduction",
+        "value": 5
+      },
+      {
+        "description": "[redacted]",
+        "type": "qualifying_ban",
+        "value": 1
+      },
+      {
+        "description": "[redacted]",
+        "type": "license_points",
+        "value": 2
+      }
+    ],
+    "evidence_urls": [
+      "https://discord.com/channels/428127436601950208/1480425528321376429"
+    ],
+    "steward_notes": null,
+    "ruling_date": "2026-03-21 04:52:10"
+  },
+  {
+    "ruling_id": "discord-729",
+    "source_message_id": "729",
+    "league_id": "4534",
+    "season_id": "131502",
+    "discord_user_id": "762282",
+    "driver_id": "430315",
+    "session_type": "Sprint Race",
+    "lap": 7,
+    "classification": "Minor Penalty",
+    "infraction": "Causing a Collision",
+    "license_points": 1,
+    "sanctions": [
+      {
+        "description": "[redacted]",
+        "type": "time_penalty",
+        "value": 5
+      },
+      {
+        "description": "[redacted]",
+        "type": "license_points",
+        "value": 1
+      }
+    ],
+    "evidence_urls": [
+      "https://discord.com/channels/428127436601950208/1480425528321376429"
+    ],
+    "steward_notes": "[redacted]",
+    "ruling_date": "2026-03-27 02:33:05"
+  },
+  {
+    "ruling_id": "discord-731",
+    "source_message_id": "731",
+    "league_id": "4534",
+    "season_id": "131502",
+    "discord_user_id": "158100",
+    "driver_id": "354152",
+    "session_type": "Qualifying",
+    "lap": 8,
+    "classification": "Minor Penalty",
+    "infraction": "Impeding during Qualifying",
+    "license_points": 1,
+    "sanctions": [
+      {
+        "description": "[redacted]",
+        "type": "license_points",
+        "value": 1
+      }
+    ],
+    "evidence_urls": [
+      "https://discord.com/channels/428127436601950208/1480425528321376429"
+    ],
+    "steward_notes": null,
+    "ruling_date": "2026-03-27 02:35:33"
+  },
+  {
+    "ruling_id": "discord-823",
+    "source_message_id": "823",
+    "league_id": "4534",
+    "season_id": "131502",
+    "discord_user_id": "119450",
+    "driver_id": "152730",
+    "session_type": "Qualifying",
+    "lap": 1,
+    "classification": "Major Penalty",
+    "infraction": "Impeding during Qualifying (Causing a Collision)",
+    "license_points": 2,
+    "sanctions": [
+      {
+        "description": "[redacted]",
+        "type": "license_points",
+        "value": 2
+      }
+    ],
+    "evidence_urls": [
+      "https://discord.com/channels/428127436601950208/1480425528321376429"
+    ],
+    "steward_notes": "[redacted]",
+    "ruling_date": "2026-04-03 02:22:27"
+  },
+  {
+    "ruling_id": "discord-824",
+    "source_message_id": "824",
+    "league_id": "4534",
+    "season_id": "131502",
+    "discord_user_id": "802879",
+    "driver_id": "247294",
+    "session_type": "Feature Race",
+    "lap": 1,
+    "classification": "Major Penalty",
+    "infraction": "Causing a Collision",
+    "license_points": 2,
+    "sanctions": [
+      {
+        "description": "[redacted]",
+        "type": "championship_point_deduction",
+        "value": 5
+      },
+      {
+        "description": "[redacted]",
+        "type": "qualifying_ban",
+        "value": 1
+      },
+      {
+        "description": "[redacted]",
+        "type": "license_points",
+        "value": 2
+      }
+    ],
+    "evidence_urls": [
+      "https://discord.com/channels/428127436601950208/1480425528321376429"
+    ],
+    "steward_notes": null,
+    "ruling_date": "2026-04-03 02:25:11"
+  },
+  {
+    "ruling_id": "discord-1043",
+    "source_message_id": "1043",
+    "league_id": "4534",
+    "season_id": "131502",
+    "discord_user_id": "787452",
+    "driver_id": "116648",
+    "session_type": "Feature Race",
+    "lap": 3,
+    "classification": "Major Penalty",
+    "infraction": "Causing a Collision",
+    "license_points": 2,
+    "sanctions": [
+      {
+        "description": "[redacted]",
+        "type": "championship_point_deduction",
+        "value": 5
+      },
+      {
+        "description": "[redacted]",
+        "type": "license_points",
+        "value": 2
+      }
+    ],
+    "evidence_urls": [
+      "https://discord.com/channels/428127436601950208/1480425528321376429"
+    ],
+    "steward_notes": "[redacted]",
+    "ruling_date": "2026-04-10 02:20:21"
+  },
+  {
+    "ruling_id": "discord-1153",
+    "source_message_id": "1153",
+    "league_id": "4534",
+    "season_id": "131502",
+    "discord_user_id": "750035",
+    "driver_id": "906526",
+    "session_type": "",
+    "lap": 0,
+    "classification": "N/A",
+    "infraction": "N/A",
+    "license_points": -1,
+    "sanctions": [
+      {
+        "description": "[redacted]",
+        "type": "license_points",
+        "value": -1
+      }
+    ],
+    "evidence_urls": [
+      "https://discord.com/channels/428127436601950208/1480425528321376429"
+    ],
+    "steward_notes": "[redacted]",
+    "ruling_date": "2026-04-17 02:13:37"
+  },
+  {
+    "ruling_id": "discord-1154",
+    "source_message_id": "1154",
+    "league_id": "4534",
+    "season_id": "131502",
+    "discord_user_id": "985640",
+    "driver_id": "410106",
+    "session_type": "",
+    "lap": 0,
+    "classification": "N/A",
+    "infraction": "N/A",
+    "license_points": -1,
+    "sanctions": [
+      {
+        "description": "[redacted]",
+        "type": "license_points",
+        "value": -1
+      }
+    ],
+    "evidence_urls": [
+      "https://discord.com/channels/428127436601950208/1480425528321376429"
+    ],
+    "steward_notes": "[redacted]",
+    "ruling_date": "2026-04-17 02:14:37"
+  },
+  {
+    "ruling_id": "discord-1157",
+    "source_message_id": "1157",
+    "league_id": "4534",
+    "season_id": "131502",
+    "discord_user_id": "802879",
+    "driver_id": "247294",
+    "session_type": null,
+    "lap": 1,
+    "classification": "Major Penalty",
+    "infraction": "Causing a Collision",
+    "license_points": 2,
+    "sanctions": [
+      {
+        "description": "[redacted]",
+        "type": "championship_point_deduction",
+        "value": 5
+      },
+      {
+        "description": "[redacted]",
+        "type": "qualifying_ban",
+        "value": 1
+      },
+      {
+        "description": "[redacted]",
+        "type": "license_points",
+        "value": 2
+      }
+    ],
+    "evidence_urls": [
+      "https://discord.com/channels/428127436601950208/1480425528321376429"
+    ],
+    "steward_notes": "[redacted]",
+    "ruling_date": "2026-04-17 02:15:47"
+  },
+  {
+    "ruling_id": "discord-1158",
+    "source_message_id": "1158",
+    "league_id": "4534",
+    "season_id": "131502",
+    "discord_user_id": "119450",
+    "driver_id": "152730",
+    "session_type": "Feature Race",
+    "lap": 1,
+    "classification": "Major Penalty",
+    "infraction": "Causing a Collision",
+    "license_points": 2,
+    "sanctions": [
+      {
+        "description": "[redacted]",
+        "type": "championship_point_deduction",
+        "value": 5
+      },
+      {
+        "description": "[redacted]",
+        "type": "qualifying_ban",
+        "value": 1
+      },
+      {
+        "description": "[redacted]",
+        "type": "license_points",
+        "value": 2
+      }
+    ],
+    "evidence_urls": [
+      "https://discord.com/channels/428127436601950208/1480425528321376429"
+    ],
+    "steward_notes": null,
+    "ruling_date": "2026-04-17 02:17:33"
+  },
+  {
+    "ruling_id": "discord-1177",
+    "source_message_id": "1177",
+    "league_id": "4534",
+    "season_id": "131502",
+    "discord_user_id": "762282",
+    "driver_id": "430315",
+    "session_type": null,
+    "lap": 20,
+    "classification": "Major Penalty",
+    "infraction": "Causing a Collision",
+    "license_points": 2,
+    "sanctions": [
+      {
+        "description": "[redacted]",
+        "type": "championship_point_deduction",
+        "value": 5
+      },
+      {
+        "description": "[redacted]",
+        "type": "qualifying_ban",
+        "value": 1
+      },
+      {
+        "description": "[redacted]",
+        "type": "license_points",
+        "value": 2
+      }
+    ],
+    "evidence_urls": [
+      "https://discord.com/channels/428127436601950208/1480425528321376429"
+    ],
+    "steward_notes": null,
+    "ruling_date": "2026-04-17 02:21:07"
+  },
+  {
+    "ruling_id": "discord-1178",
+    "source_message_id": "1178",
+    "league_id": "4534",
+    "season_id": "131502",
+    "discord_user_id": "762282",
+    "driver_id": "430315",
+    "session_type": null,
+    "lap": null,
+    "classification": "Misuse of Voice Chat",
+    "infraction": "Infraction of Article 4.6.1",
+    "license_points": 0,
+    "sanctions": [
+      {
+        "description": "[redacted]",
+        "type": "voice_chat_ban",
+        "value": 1
+      }
+    ],
+    "evidence_urls": [
+      "https://discord.com/channels/428127436601950208/1480425528321376429"
+    ],
+    "steward_notes": "[redacted]",
+    "ruling_date": "2026-04-17 02:22:28"
+  },
+  {
+    "ruling_id": "discord-1181",
+    "source_message_id": "1181",
+    "league_id": "4534",
+    "season_id": "131502",
+    "discord_user_id": "119450",
+    "driver_id": "152730",
+    "session_type": null,
+    "lap": 1,
+    "classification": "Minor Penalty",
+    "infraction": "Causing a Collision",
+    "license_points": 1,
+    "sanctions": [
+      {
+        "description": "[redacted]",
+        "type": "time_penalty",
+        "value": 5
+      },
+      {
+        "description": "[redacted]",
+        "type": "license_points",
+        "value": 1
+      }
+    ],
+    "evidence_urls": [
+      "https://discord.com/channels/428127436601950208/1480425528321376429"
+    ],
+    "steward_notes": "[redacted]",
+    "ruling_date": "2026-04-17 02:30:42"
+  },
+  {
+    "ruling_id": "discord-1291",
+    "source_message_id": "1291",
+    "league_id": "4534",
+    "season_id": "131502",
+    "discord_user_id": "985640",
+    "driver_id": "410106",
+    "session_type": "Protest Review",
+    "lap": 3,
+    "classification": "Major Penalty",
+    "infraction": "Causing a Collision",
+    "license_points": 2,
+    "sanctions": [
+      {
+        "description": "[redacted]",
+        "type": "championship_point_deduction",
+        "value": 5
+      },
+      {
+        "description": "[redacted]",
+        "type": "pit_lane_start",
+        "value": 1
+      },
+      {
+        "description": "[redacted]",
+        "type": "license_points",
+        "value": 2
+      }
+    ],
+    "evidence_urls": [
+      "https://discord.com/channels/428127436601950208/1480425528321376429"
+    ],
+    "steward_notes": "[redacted]",
+    "ruling_date": "2026-04-28 03:17:37"
+  }
+]
