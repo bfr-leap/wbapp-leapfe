@@ -79,16 +79,20 @@ function readJson(filename) {
     return JSON.parse(readFileSync(path, 'utf-8'));
 }
 
+/**
+ * Write a synthetic fixture only when one doesn't already exist on
+ * disk. The script's job is to fill gaps so the audit renders
+ * something coherent; any fixture captured live from the real broker
+ * via `/capture-broker` should always win over a synthesized stub.
+ * Re-running synth after an import is a no-op for anything captured.
+ */
 function writeFixture(filename, value) {
     const path = resolve(FIXTURE_DIR, filename);
-    const next = JSON.stringify(value, null, 2) + '\n';
     if (existsSync(path)) {
-        const current = readFileSync(path, 'utf-8');
-        if (current === next) {
-            skipped++;
-            return;
-        }
+        skipped++;
+        return;
     }
+    const next = JSON.stringify(value, null, 2) + '\n';
     if (DRY_RUN) {
         console.log(`[dry-run] would write ${filename}`);
     } else {
@@ -144,45 +148,15 @@ writeFixture('ldata-usrcfg__defLgSeasSubCtx__9769ed1076.json', {
 });
 
 // -----------------------------------------------------------------------------
-// 2. leagueDriverStats — re-keyed for season 131502
+// 2. (intentionally empty — `leagueDriverStats` is captured live now)
 //
-// The stats fixture as captured covers seasons 126152..992708 — none
-// overlap with the simsessionIndex's 131502. The standings page does
-// `stats[seasonId]` and renders "Standings not Available" when that
-// lookup misses. We graft a season-131502 entry onto the stats by
-// taking the densest existing season (largest driver count) and
-// re-mapping its drivers onto cust_ids that EXIST in membersData —
-// otherwise the standings would render rows with no driver names.
+// An earlier version of this script grafted a fake season-131502
+// entry onto the standings fixture by re-keying donor data onto
+// membersData cust_ids. Removed once `/capture-broker` started
+// pulling the real broker response, which carries the active season
+// directly. If a future audit run reports `leagueDriverStats` missing,
+// re-run `/capture-broker` on a deployed preview to refresh it.
 // -----------------------------------------------------------------------------
-
-if (!leagueDriverStats[SEASON_ID]) {
-    const memberIds = members.members.map((m) => m.cust_id);
-
-    // Pick the season with the most drivers as the donor — gives the
-    // standings table the longest, most representative roster.
-    let donorSeason = null;
-    let donorCount = -1;
-    for (const [seasonKey, seasonStats] of Object.entries(leagueDriverStats)) {
-        const n = Object.keys(seasonStats).length;
-        if (n > donorCount) {
-            donorCount = n;
-            donorSeason = seasonKey;
-        }
-    }
-    const donorEntries = Object.values(leagueDriverStats[donorSeason]);
-    const limit = Math.min(donorEntries.length, memberIds.length);
-    const remapped = {};
-    for (let i = 0; i < limit; i++) {
-        const newCustId = memberIds[i];
-        const stat = { ...donorEntries[i], cust_id: newCustId };
-        remapped[newCustId] = stat;
-    }
-    const augmented = { ...leagueDriverStats, [SEASON_ID]: remapped };
-    writeFixture(
-        'ldata-rsltsts__leagueDriverStats__ee4990d64b.json',
-        augmented
-    );
-}
 
 // -----------------------------------------------------------------------------
 // 3. trackDisplayInfo — derive from trackInfoDirectory
