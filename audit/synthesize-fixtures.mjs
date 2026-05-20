@@ -31,9 +31,31 @@
  *   node audit/synthesize-fixtures.mjs --dry-run
  */
 
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+/**
+ * Mirror of `fixtureKey()` in `server/api/fetch-document.ts` — given a
+ * (namespace, type, query) tuple, compute the filename the broker
+ * fixture-replay mode looks up. Used here so we can generate stubs
+ * for parameterized callers (per-driver fetches, etc.) without
+ * hand-computing each hash.
+ */
+function fixtureKey(namespace, type, query) {
+    const filtered = {};
+    for (const [k, v] of Object.entries({ namespace, type, ...query })) {
+        if (k === 'userID' || k === '_authHeader' || k === 'namespace')
+            continue;
+        if (v == null || v === '') continue;
+        filtered[k] = String(v);
+    }
+    const keys = Object.keys(filtered).sort();
+    const canon = keys.map((k) => `${k}=${filtered[k]}`).join('&');
+    const hash = createHash('sha1').update(canon).digest('hex').slice(0, 10);
+    return `${namespace}__${type}__${hash}`.replace(/[^a-zA-Z0-9._-]/g, '_');
+}
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURE_DIR = resolve(__dirname, '../tests/fixtures/broker');
@@ -217,7 +239,90 @@ const stubs = [
     ['ldata-charts__startFinishChartData__cb7f777297.json', null],
     ['ldata-gentxt__simsessionSummary__d530356d6b.json', null],
     ['ldata-irrpy__telemetrySubsessions__b8596b3f37.json', []],
+    // DotdProfile is nullable in the service signature — null fine.
+    ['ldata-gentxt__dotdProfile__12d2ce19a5.json', null],
 ];
+
+// driverSessionResults stubs for EVERY cust_id the page might fetch.
+// The driver profile model early-returns to a fully-defaulted view when
+// ANY of race/sprint/quali is null, so all three must be present and
+// non-null. The home page's DriverSpotlight component additionally
+// resolves a "protagonist" from the league roster and fetches that
+// driver's race results — which means the URL we hit (driver=174470)
+// is not the only cust_id the page asks about; standings, season, and
+// spotlight callers can ask for any cust_id in `members.cust_ids` or
+// the rekeyed leagueDriverStats roster. Generating an empty stub for
+// every (cust_id, sessionType) avoids whack-a-mole.
+const candidateCustIds = new Set();
+for (const cid of members.cust_ids || []) candidateCustIds.add(String(cid));
+for (const m of members.members || []) candidateCustIds.add(String(m.cust_id));
+// Whichever drivers ended up in the augmented standings — same set we
+// re-keyed onto in step 2 above.
+const augmentedSeason = readJson(
+    'ldata-rsltsts__leagueDriverStats__ee4990d64b.json'
+)?.[SEASON_ID];
+for (const cid of Object.keys(augmentedSeason || {})) {
+    candidateCustIds.add(String(cid));
+}
+candidateCustIds.add(String(DRIVER_CUST_ID));
+
+for (const custId of candidateCustIds) {
+    for (const sessionType of ['race', 'sprint', 'quali']) {
+        const filename =
+            fixtureKey('ldata-rsltsts', 'driverSessionResults', {
+                type: 'driverSessionResults',
+                league: String(LEAGUE_ID),
+                custId,
+                sessionType,
+            }) + '.json';
+        stubs.push([filename, {}]);
+    }
+}
+
+// -----------------------------------------------------------------------------
+// 6. leagueRoster — derive from membersData
+//
+// The roster page (and a few sidebar surfaces) pulls a flat list of
+// drivers with car numbers via `getLeagueRoster`. Synthesizing it
+// from `membersData.members[]` gives the roster real (anonymized)
+// names; the car_number field defaults to position-in-list since the
+// number isn't available in the donor data — it's just a label.
+// -----------------------------------------------------------------------------
+
+const rosterEntries = (members.members || []).map((m, i) => ({
+    cust_id: m.cust_id,
+    car_number: String((i + 1) * 7), // arbitrary but stable labels
+    display_name: m.display_name,
+}));
+writeFixture('ldata-irweb__leagueRoster__f1b7ebebf1.json', {
+    roster: rosterEntries,
+});
+
+// -----------------------------------------------------------------------------
+// 7. Default-state (league=0 / season=0) calls
+//
+// Several components fire an initial fetch before route params have
+// settled, with `league=0` (and sometimes `season=0` or `season=""`).
+// Production sees a null/empty response for these too — they're
+// intentionally cheap "do we have anything?" probes. Stubbing them as
+// null keeps the LEAP_BROKER_FIXTURES throw from cluttering the audit
+// log and lets the gap reporter focus on REAL holes in the corpus.
+// -----------------------------------------------------------------------------
+
+/** @type {Array<[string, unknown]>} */
+const defaultStateStubs = [
+    ['ldata-irweb__leagueRoster__6173721449.json', null], // league=0
+    ['ldata-irweb__leagueSeasons__d59c844785.json', null], // league=0
+    ['ldata-irweb__leagueSeasonSessions__9517d0f826.json', null], // league=0,season=0
+    ['ldata-irweb__membersData__8dcef39f0f.json', null], // league=0,season=""
+    ['ldata-irweb__membersData__ff19e7dbaa.json', null], // league=0,season=0
+    ['ldata-rsltsts__leagueDriverStats__839a8b499f.json', null], // league=0
+    ['ldata-rsltsts__leagueSimsessionIndex__beb70d7030.json', null], // league=0
+    ['ldata-usrcfg__leagueTeamsInfo__66af979c52.json', null], // league=0
+];
+for (const [filename, value] of defaultStateStubs) {
+    writeFixture(filename, value);
+}
 
 for (const [filename, value] of stubs) {
     writeFixture(filename, value);
