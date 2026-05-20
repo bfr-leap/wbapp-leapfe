@@ -31,6 +31,7 @@
  */
 
 import { spawn } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import {
     existsSync,
     mkdirSync,
@@ -89,6 +90,105 @@ function parseArgs(argv) {
         }
     }
     return opts;
+}
+
+// -----------------------------------------------------------------------------
+// Fixture gap reporting
+// -----------------------------------------------------------------------------
+
+/**
+ * Stable filename for a (namespace, type, query) tuple — mirrors the
+ * scheme in `server/api/fetch-document.ts` exactly. Used here to label
+ * the fixtures the audit run discovered are missing, so a follow-up
+ * step can populate them without guessing the filename.
+ */
+function fixtureKey(namespace, type, query) {
+    const filtered = {};
+    for (const [k, v] of Object.entries(query)) {
+        if (k === 'userID' || k === '_authHeader' || k === 'namespace')
+            continue;
+        if (v == null || v === '') continue;
+        filtered[k] = String(v);
+    }
+    const keys = Object.keys(filtered).sort();
+    const canon = keys.map((k) => `${k}=${filtered[k]}`).join('&');
+    const hash = createHash('sha1').update(canon).digest('hex').slice(0, 10);
+    return `${namespace}__${type}__${hash}`.replace(/[^a-zA-Z0-9._-]/g, '_');
+}
+
+/**
+ * Walk the server's combined stdout+stderr looking for the two
+ * complementary lines `LEAP_BROKER_FIXTURES` mode emits when a page
+ * asks for a tuple that wasn't recorded:
+ *
+ *   1. The throw inside `fetch-document.ts` itself:
+ *      `[broker-fixture] missing fixture for <ns>/<type> (key=<key>).`
+ *   2. The caller's "fetch failed" line, which is richer because it
+ *      contains the full query string:
+ *      `Failed to fetch http://.../api/fetch-document?namespace=...&type=...&league=...`
+ *
+ * (2) is what we actually want — it lets us reconstruct the exact
+ * query that needs a fixture, not just the namespace/type. The (1)
+ * lines are still parsed as a safety net in case the caller line
+ * doesn't make it to the log (e.g. an SSR path that swallows the
+ * error before logging the URL).
+ *
+ * Returns a deduplicated list keyed on fixture filename. Each entry
+ * has enough info for a follow-up step (either an agent or the
+ * `/capture-broker` workflow) to populate the missing fixture without
+ * re-running the audit just to find the filename.
+ */
+function parseMissingFixtures(text) {
+    const byFilename = new Map();
+
+    // Pass 1: URL-level errors. These give us the full query, so we
+    // can compute the filename locally and emit the params verbatim.
+    const urlRe =
+        /Failed to fetch (https?:\/\/[^\s]+\/api\/fetch-document\?[^\s:]+)/g;
+    let m;
+    while ((m = urlRe.exec(text))) {
+        try {
+            const u = new URL(m[1]);
+            const query = {};
+            for (const [k, v] of u.searchParams.entries()) query[k] = v;
+            const namespace = query.namespace || '';
+            const type = query.type || '';
+            if (!namespace || !type) continue;
+            const filename = `${fixtureKey(namespace, type, query)}.json`;
+            if (!byFilename.has(filename)) {
+                byFilename.set(filename, {
+                    filename,
+                    namespace,
+                    type,
+                    query,
+                });
+            }
+        } catch {
+            // ignore malformed URLs
+        }
+    }
+
+    // Pass 2: bare missing-fixture lines, in case the URL line didn't
+    // also make it through. We can only report namespace+type+key,
+    // not the query params.
+    const bareRe =
+        /missing fixture for ([^\s/]+)\/(\S+?) \(key=([A-Za-z0-9._-]+)\)/g;
+    while ((m = bareRe.exec(text))) {
+        const [, namespace, type, key] = m;
+        const filename = `${key}.json`;
+        if (!byFilename.has(filename)) {
+            byFilename.set(filename, {
+                filename,
+                namespace,
+                type,
+                query: null,
+            });
+        }
+    }
+
+    return [...byFilename.values()].sort((a, b) =>
+        a.filename.localeCompare(b.filename)
+    );
 }
 
 // -----------------------------------------------------------------------------
@@ -261,14 +361,23 @@ async function capturePage(browser, route, viewportName, viewport, outDir) {
     const filePath = resolve(outDir, file);
     let error = null;
     let bytes = 0;
+    let httpStatus = null;
     try {
-        await page.goto(`${BASE}${route.url}`, {
+        const response = await page.goto(`${BASE}${route.url}`, {
             waitUntil: 'load',
             timeout: 30_000,
         });
+        httpStatus = response?.status() ?? null;
         await settlePage(page, route);
         const buf = await page.screenshot({ path: filePath, fullPage: true });
         bytes = buf.length;
+        // A 500 SSR error still paints a screenshot (Nuxt's error page),
+        // but visually it's just "500 Cannot read properties of undefined".
+        // Flag it as an error so it stands out in the run summary — the
+        // PNG is left in place for diagnostic inspection.
+        if (httpStatus !== null && httpStatus >= 500) {
+            error = `HTTP ${httpStatus} (page rendered Nuxt error template)`;
+        }
     } catch (e) {
         error = e instanceof Error ? e.message : String(e);
     } finally {
@@ -282,6 +391,7 @@ async function capturePage(browser, route, viewportName, viewport, outDir) {
         url: route.url,
         file,
         bytes,
+        httpStatus,
         error,
     };
 }
@@ -458,6 +568,15 @@ async function main() {
         server.kill();
     }
 
+    // Parse the server's log for missing-fixture errors. A successful
+    // screenshot run can still mean every page rendered an empty-state
+    // because broker fetches 500'd and the model layer caught the
+    // error and returned defaults. Surfacing the gaps here makes that
+    // failure mode loud instead of silent.
+    const serverLog =
+        server.stdoutBuf.join('') + '\n' + server.stderrBuf.join('');
+    const missingFixtures = parseMissingFixtures(serverLog);
+
     const manifest = {
         capturedAt: new Date().toISOString(),
         base: BASE,
@@ -471,23 +590,48 @@ async function main() {
             notes: r.notes,
         })),
         captures,
+        missingFixtures,
         summary: {
             pages: pagesDone,
             pagesFailed,
             og: captures.filter((c) => c.kind === 'og' && !c.error).length,
             ogFailed: captures.filter((c) => c.kind === 'og' && c.error).length,
+            missingFixtures: missingFixtures.length,
         },
     };
     writeFileSync(
         resolve(outDir, 'manifest.json'),
         JSON.stringify(manifest, null, 2) + '\n'
     );
+    if (missingFixtures.length > 0) {
+        writeFileSync(
+            resolve(outDir, 'missing-fixtures.json'),
+            JSON.stringify(missingFixtures, null, 2) + '\n'
+        );
+    }
 
     console.log(
         `[audit] done. pages: ${pagesDone} ok, ${pagesFailed} failed. ` +
             `og: ${manifest.summary.og} ok, ${manifest.summary.ogFailed} failed.`
     );
-    if (pagesFailed > 0 || manifest.summary.ogFailed > 0) {
+    if (missingFixtures.length > 0) {
+        console.log(
+            `[audit] WARNING: ${missingFixtures.length} broker tuple(s) had ` +
+                `no fixture — pages probably rendered empty states. See ` +
+                `${resolve(outDir, 'missing-fixtures.json')}:`
+        );
+        for (const m of missingFixtures.slice(0, 20)) {
+            console.log(`         ${m.filename}`);
+        }
+        if (missingFixtures.length > 20) {
+            console.log(`         … and ${missingFixtures.length - 20} more`);
+        }
+    }
+    if (
+        pagesFailed > 0 ||
+        manifest.summary.ogFailed > 0 ||
+        missingFixtures.length > 0
+    ) {
         process.exitCode = 1;
     }
 }

@@ -1,976 +1,976 @@
 {
-  "subscribed": false,
-  "seasons": [
-    {
-      "league_id": 4534,
-      "season_id": 131502,
-      "points_system_id": 1,
-      "season_name": "Season 18",
-      "active": true,
-      "hidden": false,
-      "num_drops": 0,
-      "no_drops_on_or_after_race_num": -1,
-      "points_cars": [
+    "subscribed": false,
+    "seasons": [
         {
-          "car_id": 172,
-          "car_name": "Super Formula SF23 - Honda"
+            "league_id": 4534,
+            "season_id": 131502,
+            "points_system_id": 1,
+            "season_name": "Season 18",
+            "active": true,
+            "hidden": false,
+            "num_drops": 0,
+            "no_drops_on_or_after_race_num": -1,
+            "points_cars": [
+                {
+                    "car_id": 172,
+                    "car_name": "Super Formula SF23 - Honda"
+                },
+                {
+                    "car_id": 171,
+                    "car_name": "Super Formula SF23 - Toyota"
+                }
+            ],
+            "driver_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 171,
+                            "car_name": "Super Formula SF23 - Toyota"
+                        },
+                        {
+                            "car_id": 172,
+                            "car_name": "Super Formula SF23 - Honda"
+                        },
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        }
+                    ]
+                }
+            ],
+            "team_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        }
+                    ]
+                }
+            ],
+            "points_system_name": "None",
+            "points_system_desc": "No points will be awarded.  The league administrator will assign points at a later date."
         },
         {
-          "car_id": 171,
-          "car_name": "Super Formula SF23 - Toyota"
-        }
-      ],
-      "driver_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 171,
-              "car_name": "Super Formula SF23 - Toyota"
-            },
-            {
-              "car_id": 172,
-              "car_name": "Super Formula SF23 - Honda"
-            },
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            }
-          ]
-        }
-      ],
-      "team_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            }
-          ]
-        }
-      ],
-      "points_system_name": "None",
-      "points_system_desc": "No points will be awarded.  The league administrator will assign points at a later date."
-    },
-    {
-      "league_id": 4534,
-      "season_id": 58618,
-      "points_system_id": 2122,
-      "season_name": "Season 1",
-      "active": false,
-      "hidden": false,
-      "num_drops": 0,
-      "no_drops_on_or_after_race_num": -1,
-      "points_cars": [
-        {
-          "car_id": 106,
-          "car_name": "Dallara F3"
-        }
-      ],
-      "driver_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            },
-            {
-              "car_id": 106,
-              "car_name": "Dallara F3"
-            }
-          ]
-        }
-      ],
-      "team_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            }
-          ]
-        }
-      ],
-      "points_system_name": "Formula 3 Points System",
-      "points_system_desc": "Real life Formula 3 Points System (League Zero)"
-    },
-    {
-      "league_id": 4534,
-      "season_id": 105035,
-      "points_system_id": 10461,
-      "season_name": "Season 10",
-      "active": false,
-      "hidden": false,
-      "num_drops": 1,
-      "no_drops_on_or_after_race_num": -1,
-      "points_cars": [
-        {
-          "car_id": 172,
-          "car_name": "Super Formula SF23 - Honda"
+            "league_id": 4534,
+            "season_id": 58618,
+            "points_system_id": 2122,
+            "season_name": "Season 1",
+            "active": false,
+            "hidden": false,
+            "num_drops": 0,
+            "no_drops_on_or_after_race_num": -1,
+            "points_cars": [
+                {
+                    "car_id": 106,
+                    "car_name": "Dallara F3"
+                }
+            ],
+            "driver_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        },
+                        {
+                            "car_id": 106,
+                            "car_name": "Dallara F3"
+                        }
+                    ]
+                }
+            ],
+            "team_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        }
+                    ]
+                }
+            ],
+            "points_system_name": "Formula 3 Points System",
+            "points_system_desc": "Real life Formula 3 Points System (League Zero)"
         },
         {
-          "car_id": 171,
-          "car_name": "Super Formula SF23 - Toyota"
-        }
-      ],
-      "driver_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 171,
-              "car_name": "Super Formula SF23 - Toyota"
-            },
-            {
-              "car_id": 172,
-              "car_name": "Super Formula SF23 - Honda"
-            },
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            }
-          ]
-        }
-      ],
-      "team_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            }
-          ]
-        }
-      ],
-      "points_system_name": "SF Points S9",
-      "points_system_desc": " "
-    },
-    {
-      "league_id": 4534,
-      "season_id": 111025,
-      "points_system_id": 13243,
-      "season_name": "Season 11",
-      "active": false,
-      "hidden": false,
-      "num_drops": 1,
-      "no_drops_on_or_after_race_num": 8,
-      "points_cars": [
-        {
-          "car_id": 178,
-          "car_name": "Super Formula Lights"
-        }
-      ],
-      "driver_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            },
-            {
-              "car_id": 178,
-              "car_name": "Super Formula Lights"
-            }
-          ]
-        }
-      ],
-      "team_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            }
-          ]
-        }
-      ],
-      "points_system_name": "SFL Season 11",
-      "points_system_desc": " "
-    },
-    {
-      "league_id": 4534,
-      "season_id": 113028,
-      "points_system_id": 13243,
-      "season_name": "Season 12",
-      "active": false,
-      "hidden": false,
-      "num_drops": 1,
-      "no_drops_on_or_after_race_num": 4,
-      "points_cars": [
-        {
-          "car_id": 172,
-          "car_name": "Super Formula SF23 - Honda"
+            "league_id": 4534,
+            "season_id": 105035,
+            "points_system_id": 10461,
+            "season_name": "Season 10",
+            "active": false,
+            "hidden": false,
+            "num_drops": 1,
+            "no_drops_on_or_after_race_num": -1,
+            "points_cars": [
+                {
+                    "car_id": 172,
+                    "car_name": "Super Formula SF23 - Honda"
+                },
+                {
+                    "car_id": 171,
+                    "car_name": "Super Formula SF23 - Toyota"
+                }
+            ],
+            "driver_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 171,
+                            "car_name": "Super Formula SF23 - Toyota"
+                        },
+                        {
+                            "car_id": 172,
+                            "car_name": "Super Formula SF23 - Honda"
+                        },
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        }
+                    ]
+                }
+            ],
+            "team_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        }
+                    ]
+                }
+            ],
+            "points_system_name": "SF Points S9",
+            "points_system_desc": " "
         },
         {
-          "car_id": 171,
-          "car_name": "Super Formula SF23 - Toyota"
-        }
-      ],
-      "driver_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 171,
-              "car_name": "Super Formula SF23 - Toyota"
-            },
-            {
-              "car_id": 172,
-              "car_name": "Super Formula SF23 - Honda"
-            },
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            }
-          ]
-        }
-      ],
-      "team_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            }
-          ]
-        }
-      ],
-      "points_system_name": "SFL Season 11",
-      "points_system_desc": " "
-    },
-    {
-      "league_id": 4534,
-      "season_id": 114680,
-      "points_system_id": 13243,
-      "season_name": "Season 13",
-      "active": false,
-      "hidden": false,
-      "num_drops": 1,
-      "no_drops_on_or_after_race_num": -1,
-      "points_cars": [
-        {
-          "car_id": 172,
-          "car_name": "Super Formula SF23 - Honda"
+            "league_id": 4534,
+            "season_id": 111025,
+            "points_system_id": 13243,
+            "season_name": "Season 11",
+            "active": false,
+            "hidden": false,
+            "num_drops": 1,
+            "no_drops_on_or_after_race_num": 8,
+            "points_cars": [
+                {
+                    "car_id": 178,
+                    "car_name": "Super Formula Lights"
+                }
+            ],
+            "driver_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        },
+                        {
+                            "car_id": 178,
+                            "car_name": "Super Formula Lights"
+                        }
+                    ]
+                }
+            ],
+            "team_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        }
+                    ]
+                }
+            ],
+            "points_system_name": "SFL Season 11",
+            "points_system_desc": " "
         },
         {
-          "car_id": 171,
-          "car_name": "Super Formula SF23 - Toyota"
-        }
-      ],
-      "driver_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 171,
-              "car_name": "Super Formula SF23 - Toyota"
-            },
-            {
-              "car_id": 172,
-              "car_name": "Super Formula SF23 - Honda"
-            },
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            }
-          ]
-        }
-      ],
-      "team_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            }
-          ]
-        }
-      ],
-      "points_system_name": "SFL Season 11",
-      "points_system_desc": " "
-    },
-    {
-      "league_id": 4534,
-      "season_id": 118784,
-      "points_system_id": 13243,
-      "season_name": "Season 14",
-      "active": false,
-      "hidden": false,
-      "num_drops": 1,
-      "no_drops_on_or_after_race_num": -1,
-      "points_cars": [
-        {
-          "car_id": 172,
-          "car_name": "Super Formula SF23 - Honda"
+            "league_id": 4534,
+            "season_id": 113028,
+            "points_system_id": 13243,
+            "season_name": "Season 12",
+            "active": false,
+            "hidden": false,
+            "num_drops": 1,
+            "no_drops_on_or_after_race_num": 4,
+            "points_cars": [
+                {
+                    "car_id": 172,
+                    "car_name": "Super Formula SF23 - Honda"
+                },
+                {
+                    "car_id": 171,
+                    "car_name": "Super Formula SF23 - Toyota"
+                }
+            ],
+            "driver_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 171,
+                            "car_name": "Super Formula SF23 - Toyota"
+                        },
+                        {
+                            "car_id": 172,
+                            "car_name": "Super Formula SF23 - Honda"
+                        },
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        }
+                    ]
+                }
+            ],
+            "team_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        }
+                    ]
+                }
+            ],
+            "points_system_name": "SFL Season 11",
+            "points_system_desc": " "
         },
         {
-          "car_id": 171,
-          "car_name": "Super Formula SF23 - Toyota"
-        }
-      ],
-      "driver_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 171,
-              "car_name": "Super Formula SF23 - Toyota"
-            },
-            {
-              "car_id": 172,
-              "car_name": "Super Formula SF23 - Honda"
-            },
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            }
-          ]
-        }
-      ],
-      "team_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            }
-          ]
-        }
-      ],
-      "points_system_name": "SFL Season 11",
-      "points_system_desc": " "
-    },
-    {
-      "league_id": 4534,
-      "season_id": 122101,
-      "points_system_id": 16283,
-      "season_name": "Season 15",
-      "active": false,
-      "hidden": false,
-      "num_drops": 1,
-      "no_drops_on_or_after_race_num": 11,
-      "points_cars": [
-        {
-          "car_id": 172,
-          "car_name": "Super Formula SF23 - Honda"
+            "league_id": 4534,
+            "season_id": 114680,
+            "points_system_id": 13243,
+            "season_name": "Season 13",
+            "active": false,
+            "hidden": false,
+            "num_drops": 1,
+            "no_drops_on_or_after_race_num": -1,
+            "points_cars": [
+                {
+                    "car_id": 172,
+                    "car_name": "Super Formula SF23 - Honda"
+                },
+                {
+                    "car_id": 171,
+                    "car_name": "Super Formula SF23 - Toyota"
+                }
+            ],
+            "driver_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 171,
+                            "car_name": "Super Formula SF23 - Toyota"
+                        },
+                        {
+                            "car_id": 172,
+                            "car_name": "Super Formula SF23 - Honda"
+                        },
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        }
+                    ]
+                }
+            ],
+            "team_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        }
+                    ]
+                }
+            ],
+            "points_system_name": "SFL Season 11",
+            "points_system_desc": " "
         },
         {
-          "car_id": 171,
-          "car_name": "Super Formula SF23 - Toyota"
-        }
-      ],
-      "driver_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 171,
-              "car_name": "Super Formula SF23 - Toyota"
-            },
-            {
-              "car_id": 172,
-              "car_name": "Super Formula SF23 - Honda"
-            },
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            }
-          ]
-        }
-      ],
-      "team_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            }
-          ]
-        }
-      ],
-      "points_system_name": "LZ 15",
-      "points_system_desc": " "
-    },
-    {
-      "league_id": 4534,
-      "season_id": 125220,
-      "points_system_id": 13243,
-      "season_name": "Season 16",
-      "active": false,
-      "hidden": false,
-      "num_drops": 1,
-      "no_drops_on_or_after_race_num": -1,
-      "points_cars": [
-        {
-          "car_id": 172,
-          "car_name": "Super Formula SF23 - Honda"
+            "league_id": 4534,
+            "season_id": 118784,
+            "points_system_id": 13243,
+            "season_name": "Season 14",
+            "active": false,
+            "hidden": false,
+            "num_drops": 1,
+            "no_drops_on_or_after_race_num": -1,
+            "points_cars": [
+                {
+                    "car_id": 172,
+                    "car_name": "Super Formula SF23 - Honda"
+                },
+                {
+                    "car_id": 171,
+                    "car_name": "Super Formula SF23 - Toyota"
+                }
+            ],
+            "driver_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 171,
+                            "car_name": "Super Formula SF23 - Toyota"
+                        },
+                        {
+                            "car_id": 172,
+                            "car_name": "Super Formula SF23 - Honda"
+                        },
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        }
+                    ]
+                }
+            ],
+            "team_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        }
+                    ]
+                }
+            ],
+            "points_system_name": "SFL Season 11",
+            "points_system_desc": " "
         },
         {
-          "car_id": 171,
-          "car_name": "Super Formula SF23 - Toyota"
-        }
-      ],
-      "driver_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 171,
-              "car_name": "Super Formula SF23 - Toyota"
-            },
-            {
-              "car_id": 172,
-              "car_name": "Super Formula SF23 - Honda"
-            },
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            }
-          ]
-        }
-      ],
-      "team_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            }
-          ]
-        }
-      ],
-      "points_system_name": "SFL Season 11",
-      "points_system_desc": " "
-    },
-    {
-      "league_id": 4534,
-      "season_id": 128679,
-      "points_system_id": 18181,
-      "season_name": "Season 17",
-      "active": false,
-      "hidden": false,
-      "num_drops": 1,
-      "no_drops_on_or_after_race_num": 100,
-      "points_cars": [
-        {
-          "car_id": 172,
-          "car_name": "Super Formula SF23 - Honda"
+            "league_id": 4534,
+            "season_id": 122101,
+            "points_system_id": 16283,
+            "season_name": "Season 15",
+            "active": false,
+            "hidden": false,
+            "num_drops": 1,
+            "no_drops_on_or_after_race_num": 11,
+            "points_cars": [
+                {
+                    "car_id": 172,
+                    "car_name": "Super Formula SF23 - Honda"
+                },
+                {
+                    "car_id": 171,
+                    "car_name": "Super Formula SF23 - Toyota"
+                }
+            ],
+            "driver_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 171,
+                            "car_name": "Super Formula SF23 - Toyota"
+                        },
+                        {
+                            "car_id": 172,
+                            "car_name": "Super Formula SF23 - Honda"
+                        },
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        }
+                    ]
+                }
+            ],
+            "team_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        }
+                    ]
+                }
+            ],
+            "points_system_name": "LZ 15",
+            "points_system_desc": " "
         },
         {
-          "car_id": 171,
-          "car_name": "Super Formula SF23 - Toyota"
-        }
-      ],
-      "driver_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 171,
-              "car_name": "Super Formula SF23 - Toyota"
-            },
-            {
-              "car_id": 172,
-              "car_name": "Super Formula SF23 - Honda"
-            },
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            }
-          ]
-        }
-      ],
-      "team_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            }
-          ]
-        }
-      ],
-      "points_system_name": "SF S17",
-      "points_system_desc": " "
-    },
-    {
-      "league_id": 4534,
-      "season_id": 65777,
-      "points_system_id": 2122,
-      "season_name": "Season 2",
-      "active": false,
-      "hidden": false,
-      "num_drops": 0,
-      "no_drops_on_or_after_race_num": -1,
-      "points_cars": [
-        {
-          "car_id": 106,
-          "car_name": "Dallara F3"
-        }
-      ],
-      "driver_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            },
-            {
-              "car_id": 106,
-              "car_name": "Dallara F3"
-            }
-          ]
-        }
-      ],
-      "team_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            }
-          ]
-        }
-      ],
-      "points_system_name": "Formula 3 Points System",
-      "points_system_desc": "Real life Formula 3 Points System (League Zero)"
-    },
-    {
-      "league_id": 4534,
-      "season_id": 75532,
-      "points_system_id": 6513,
-      "season_name": "Season 3",
-      "active": false,
-      "hidden": false,
-      "num_drops": 0,
-      "no_drops_on_or_after_race_num": -1,
-      "points_cars": [
-        {
-          "car_id": 106,
-          "car_name": "Dallara F3"
-        }
-      ],
-      "driver_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            },
-            {
-              "car_id": 106,
-              "car_name": "Dallara F3"
-            }
-          ]
-        }
-      ],
-      "team_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            }
-          ]
-        }
-      ],
-      "points_system_name": "F3 New Points S3",
-      "points_system_desc": " "
-    },
-    {
-      "league_id": 4534,
-      "season_id": 80261,
-      "points_system_id": 6513,
-      "season_name": "Season 4",
-      "active": false,
-      "hidden": false,
-      "num_drops": 0,
-      "no_drops_on_or_after_race_num": -1,
-      "points_cars": [
-        {
-          "car_id": 106,
-          "car_name": "Dallara F3"
-        }
-      ],
-      "driver_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            },
-            {
-              "car_id": 106,
-              "car_name": "Dallara F3"
-            }
-          ]
-        }
-      ],
-      "team_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            }
-          ]
-        }
-      ],
-      "points_system_name": "F3 New Points S3",
-      "points_system_desc": " "
-    },
-    {
-      "league_id": 4534,
-      "season_id": 84890,
-      "points_system_id": 8449,
-      "season_name": "Season 5",
-      "active": false,
-      "hidden": false,
-      "num_drops": 0,
-      "no_drops_on_or_after_race_num": -1,
-      "points_cars": [
-        {
-          "car_id": 106,
-          "car_name": "Dallara F3"
-        }
-      ],
-      "driver_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            },
-            {
-              "car_id": 106,
-              "car_name": "Dallara F3"
-            }
-          ]
-        }
-      ],
-      "team_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            }
-          ]
-        }
-      ],
-      "points_system_name": "F3 New Points S5",
-      "points_system_desc": " "
-    },
-    {
-      "league_id": 4534,
-      "season_id": 88501,
-      "points_system_id": 8449,
-      "season_name": "Season 6",
-      "active": false,
-      "hidden": false,
-      "num_drops": 0,
-      "no_drops_on_or_after_race_num": -1,
-      "points_cars": [
-        {
-          "car_id": 106,
-          "car_name": "Dallara F3"
-        }
-      ],
-      "driver_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            },
-            {
-              "car_id": 106,
-              "car_name": "Dallara F3"
-            }
-          ]
-        }
-      ],
-      "team_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            }
-          ]
-        }
-      ],
-      "points_system_name": "F3 New Points S5",
-      "points_system_desc": " "
-    },
-    {
-      "league_id": 4534,
-      "season_id": 92111,
-      "points_system_id": 8585,
-      "season_name": "Season 7",
-      "active": false,
-      "hidden": false,
-      "num_drops": 2,
-      "no_drops_on_or_after_race_num": -1,
-      "points_cars": [
-        {
-          "car_id": 106,
-          "car_name": "Dallara F3"
-        }
-      ],
-      "driver_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            },
-            {
-              "car_id": 106,
-              "car_name": "Dallara F3"
-            }
-          ]
-        }
-      ],
-      "team_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            }
-          ]
-        }
-      ],
-      "points_system_name": "F3 Points Season 7",
-      "points_system_desc": " "
-    },
-    {
-      "league_id": 4534,
-      "season_id": 95267,
-      "points_system_id": 8585,
-      "season_name": "Season 8",
-      "active": false,
-      "hidden": false,
-      "num_drops": 4,
-      "no_drops_on_or_after_race_num": -1,
-      "points_cars": [
-        {
-          "car_id": 5,
-          "car_name": "Legends Ford '34 Coupe"
+            "league_id": 4534,
+            "season_id": 125220,
+            "points_system_id": 13243,
+            "season_name": "Season 16",
+            "active": false,
+            "hidden": false,
+            "num_drops": 1,
+            "no_drops_on_or_after_race_num": -1,
+            "points_cars": [
+                {
+                    "car_id": 172,
+                    "car_name": "Super Formula SF23 - Honda"
+                },
+                {
+                    "car_id": 171,
+                    "car_name": "Super Formula SF23 - Toyota"
+                }
+            ],
+            "driver_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 171,
+                            "car_name": "Super Formula SF23 - Toyota"
+                        },
+                        {
+                            "car_id": 172,
+                            "car_name": "Super Formula SF23 - Honda"
+                        },
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        }
+                    ]
+                }
+            ],
+            "team_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        }
+                    ]
+                }
+            ],
+            "points_system_name": "SFL Season 11",
+            "points_system_desc": " "
         },
         {
-          "car_id": 172,
-          "car_name": "Super Formula SF23 - Honda"
+            "league_id": 4534,
+            "season_id": 128679,
+            "points_system_id": 18181,
+            "season_name": "Season 17",
+            "active": false,
+            "hidden": false,
+            "num_drops": 1,
+            "no_drops_on_or_after_race_num": 100,
+            "points_cars": [
+                {
+                    "car_id": 172,
+                    "car_name": "Super Formula SF23 - Honda"
+                },
+                {
+                    "car_id": 171,
+                    "car_name": "Super Formula SF23 - Toyota"
+                }
+            ],
+            "driver_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 171,
+                            "car_name": "Super Formula SF23 - Toyota"
+                        },
+                        {
+                            "car_id": 172,
+                            "car_name": "Super Formula SF23 - Honda"
+                        },
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        }
+                    ]
+                }
+            ],
+            "team_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        }
+                    ]
+                }
+            ],
+            "points_system_name": "SF S17",
+            "points_system_desc": " "
         },
         {
-          "car_id": 171,
-          "car_name": "Super Formula SF23 - Toyota"
+            "league_id": 4534,
+            "season_id": 65777,
+            "points_system_id": 2122,
+            "season_name": "Season 2",
+            "active": false,
+            "hidden": false,
+            "num_drops": 0,
+            "no_drops_on_or_after_race_num": -1,
+            "points_cars": [
+                {
+                    "car_id": 106,
+                    "car_name": "Dallara F3"
+                }
+            ],
+            "driver_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        },
+                        {
+                            "car_id": 106,
+                            "car_name": "Dallara F3"
+                        }
+                    ]
+                }
+            ],
+            "team_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        }
+                    ]
+                }
+            ],
+            "points_system_name": "Formula 3 Points System",
+            "points_system_desc": "Real life Formula 3 Points System (League Zero)"
         },
         {
-          "car_id": 172,
-          "car_name": "Super Formula SF23 - Honda"
+            "league_id": 4534,
+            "season_id": 75532,
+            "points_system_id": 6513,
+            "season_name": "Season 3",
+            "active": false,
+            "hidden": false,
+            "num_drops": 0,
+            "no_drops_on_or_after_race_num": -1,
+            "points_cars": [
+                {
+                    "car_id": 106,
+                    "car_name": "Dallara F3"
+                }
+            ],
+            "driver_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        },
+                        {
+                            "car_id": 106,
+                            "car_name": "Dallara F3"
+                        }
+                    ]
+                }
+            ],
+            "team_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        }
+                    ]
+                }
+            ],
+            "points_system_name": "F3 New Points S3",
+            "points_system_desc": " "
         },
         {
-          "car_id": 171,
-          "car_name": "Super Formula SF23 - Toyota"
+            "league_id": 4534,
+            "season_id": 80261,
+            "points_system_id": 6513,
+            "season_name": "Season 4",
+            "active": false,
+            "hidden": false,
+            "num_drops": 0,
+            "no_drops_on_or_after_race_num": -1,
+            "points_cars": [
+                {
+                    "car_id": 106,
+                    "car_name": "Dallara F3"
+                }
+            ],
+            "driver_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        },
+                        {
+                            "car_id": 106,
+                            "car_name": "Dallara F3"
+                        }
+                    ]
+                }
+            ],
+            "team_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        }
+                    ]
+                }
+            ],
+            "points_system_name": "F3 New Points S3",
+            "points_system_desc": " "
+        },
+        {
+            "league_id": 4534,
+            "season_id": 84890,
+            "points_system_id": 8449,
+            "season_name": "Season 5",
+            "active": false,
+            "hidden": false,
+            "num_drops": 0,
+            "no_drops_on_or_after_race_num": -1,
+            "points_cars": [
+                {
+                    "car_id": 106,
+                    "car_name": "Dallara F3"
+                }
+            ],
+            "driver_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        },
+                        {
+                            "car_id": 106,
+                            "car_name": "Dallara F3"
+                        }
+                    ]
+                }
+            ],
+            "team_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        }
+                    ]
+                }
+            ],
+            "points_system_name": "F3 New Points S5",
+            "points_system_desc": " "
+        },
+        {
+            "league_id": 4534,
+            "season_id": 88501,
+            "points_system_id": 8449,
+            "season_name": "Season 6",
+            "active": false,
+            "hidden": false,
+            "num_drops": 0,
+            "no_drops_on_or_after_race_num": -1,
+            "points_cars": [
+                {
+                    "car_id": 106,
+                    "car_name": "Dallara F3"
+                }
+            ],
+            "driver_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        },
+                        {
+                            "car_id": 106,
+                            "car_name": "Dallara F3"
+                        }
+                    ]
+                }
+            ],
+            "team_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        }
+                    ]
+                }
+            ],
+            "points_system_name": "F3 New Points S5",
+            "points_system_desc": " "
+        },
+        {
+            "league_id": 4534,
+            "season_id": 92111,
+            "points_system_id": 8585,
+            "season_name": "Season 7",
+            "active": false,
+            "hidden": false,
+            "num_drops": 2,
+            "no_drops_on_or_after_race_num": -1,
+            "points_cars": [
+                {
+                    "car_id": 106,
+                    "car_name": "Dallara F3"
+                }
+            ],
+            "driver_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        },
+                        {
+                            "car_id": 106,
+                            "car_name": "Dallara F3"
+                        }
+                    ]
+                }
+            ],
+            "team_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        }
+                    ]
+                }
+            ],
+            "points_system_name": "F3 Points Season 7",
+            "points_system_desc": " "
+        },
+        {
+            "league_id": 4534,
+            "season_id": 95267,
+            "points_system_id": 8585,
+            "season_name": "Season 8",
+            "active": false,
+            "hidden": false,
+            "num_drops": 4,
+            "no_drops_on_or_after_race_num": -1,
+            "points_cars": [
+                {
+                    "car_id": 5,
+                    "car_name": "Legends Ford '34 Coupe"
+                },
+                {
+                    "car_id": 172,
+                    "car_name": "Super Formula SF23 - Honda"
+                },
+                {
+                    "car_id": 171,
+                    "car_name": "Super Formula SF23 - Toyota"
+                },
+                {
+                    "car_id": 172,
+                    "car_name": "Super Formula SF23 - Honda"
+                },
+                {
+                    "car_id": 171,
+                    "car_name": "Super Formula SF23 - Toyota"
+                }
+            ],
+            "driver_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 171,
+                            "car_name": "Super Formula SF23 - Toyota"
+                        },
+                        {
+                            "car_id": 172,
+                            "car_name": "Super Formula SF23 - Honda"
+                        },
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        },
+                        {
+                            "car_id": 5,
+                            "car_name": "Legends Ford '34 Coupe"
+                        }
+                    ]
+                },
+                {
+                    "car_class_id": 4033,
+                    "name": "Driver 9771",
+                    "cars_in_class": [
+                        {
+                            "car_id": 171,
+                            "car_name": "Super Formula SF23 - Toyota"
+                        },
+                        {
+                            "car_id": 172,
+                            "car_name": "Super Formula SF23 - Honda"
+                        },
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        }
+                    ]
+                }
+            ],
+            "team_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        }
+                    ]
+                }
+            ],
+            "points_system_name": "F3 Points Season 7",
+            "points_system_desc": " "
+        },
+        {
+            "league_id": 4534,
+            "season_id": 98603,
+            "points_system_id": 10461,
+            "season_name": "Season 9",
+            "active": false,
+            "hidden": false,
+            "num_drops": 2,
+            "no_drops_on_or_after_race_num": 20,
+            "points_cars": [
+                {
+                    "car_id": 172,
+                    "car_name": "Super Formula SF23 - Honda"
+                },
+                {
+                    "car_id": 171,
+                    "car_name": "Super Formula SF23 - Toyota"
+                },
+                {
+                    "car_id": 172,
+                    "car_name": "Super Formula SF23 - Honda"
+                },
+                {
+                    "car_id": 171,
+                    "car_name": "Super Formula SF23 - Toyota"
+                }
+            ],
+            "driver_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 171,
+                            "car_name": "Super Formula SF23 - Toyota"
+                        },
+                        {
+                            "car_id": 172,
+                            "car_name": "Super Formula SF23 - Honda"
+                        },
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        }
+                    ]
+                },
+                {
+                    "car_class_id": 4033,
+                    "name": "Driver 9771",
+                    "cars_in_class": [
+                        {
+                            "car_id": 171,
+                            "car_name": "Super Formula SF23 - Toyota"
+                        },
+                        {
+                            "car_id": 172,
+                            "car_name": "Super Formula SF23 - Honda"
+                        },
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        }
+                    ]
+                }
+            ],
+            "team_points_car_classes": [
+                {
+                    "car_class_id": 0,
+                    "name": "Driver 6627",
+                    "cars_in_class": [
+                        {
+                            "car_id": 0,
+                            "car_name": "All Cars"
+                        }
+                    ]
+                }
+            ],
+            "points_system_name": "SF Points S9",
+            "points_system_desc": " "
         }
-      ],
-      "driver_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 171,
-              "car_name": "Super Formula SF23 - Toyota"
-            },
-            {
-              "car_id": 172,
-              "car_name": "Super Formula SF23 - Honda"
-            },
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            },
-            {
-              "car_id": 5,
-              "car_name": "Legends Ford '34 Coupe"
-            }
-          ]
-        },
-        {
-          "car_class_id": 4033,
-          "name": "Driver 9771",
-          "cars_in_class": [
-            {
-              "car_id": 171,
-              "car_name": "Super Formula SF23 - Toyota"
-            },
-            {
-              "car_id": 172,
-              "car_name": "Super Formula SF23 - Honda"
-            },
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            }
-          ]
-        }
-      ],
-      "team_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            }
-          ]
-        }
-      ],
-      "points_system_name": "F3 Points Season 7",
-      "points_system_desc": " "
-    },
-    {
-      "league_id": 4534,
-      "season_id": 98603,
-      "points_system_id": 10461,
-      "season_name": "Season 9",
-      "active": false,
-      "hidden": false,
-      "num_drops": 2,
-      "no_drops_on_or_after_race_num": 20,
-      "points_cars": [
-        {
-          "car_id": 172,
-          "car_name": "Super Formula SF23 - Honda"
-        },
-        {
-          "car_id": 171,
-          "car_name": "Super Formula SF23 - Toyota"
-        },
-        {
-          "car_id": 172,
-          "car_name": "Super Formula SF23 - Honda"
-        },
-        {
-          "car_id": 171,
-          "car_name": "Super Formula SF23 - Toyota"
-        }
-      ],
-      "driver_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 171,
-              "car_name": "Super Formula SF23 - Toyota"
-            },
-            {
-              "car_id": 172,
-              "car_name": "Super Formula SF23 - Honda"
-            },
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            }
-          ]
-        },
-        {
-          "car_class_id": 4033,
-          "name": "Driver 9771",
-          "cars_in_class": [
-            {
-              "car_id": 171,
-              "car_name": "Super Formula SF23 - Toyota"
-            },
-            {
-              "car_id": 172,
-              "car_name": "Super Formula SF23 - Honda"
-            },
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            }
-          ]
-        }
-      ],
-      "team_points_car_classes": [
-        {
-          "car_class_id": 0,
-          "name": "Driver 6627",
-          "cars_in_class": [
-            {
-              "car_id": 0,
-              "car_name": "All Cars"
-            }
-          ]
-        }
-      ],
-      "points_system_name": "SF Points S9",
-      "points_system_desc": " "
-    }
-  ],
-  "success": true,
-  "retired": true,
-  "league_id": 4534
+    ],
+    "success": true,
+    "retired": true,
+    "league_id": 4534
 }

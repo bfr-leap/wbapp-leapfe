@@ -1,0 +1,202 @@
+{
+    "18": {
+        "display": "Road America",
+        "short_display": "Road America"
+    },
+    "41": {
+        "display": "[Legacy] Silverstone Circuit - 2008",
+        "short_display": "[Legacy] Silverstone Circuit - 2008"
+    },
+    "95": {
+        "display": "Sebring International Raceway",
+        "short_display": "Sebring International Raceway"
+    },
+    "98": {
+        "display": "Sonoma Raceway",
+        "short_display": "Sonoma Raceway"
+    },
+    "127": {
+        "display": "Road Atlanta",
+        "short_display": "Road Atlanta"
+    },
+    "144": {
+        "display": "Canadian Tire Motorsports Park",
+        "short_display": "Canadian Tire Motorsports Park"
+    },
+    "145": {
+        "display": "Brands Hatch Circuit",
+        "short_display": "Brands Hatch Circuit"
+    },
+    "149": {
+        "display": "Circuit Park Zandvoort",
+        "short_display": "Circuit Park Zandvoort"
+    },
+    "152": {
+        "display": "Phillip Island Circuit",
+        "short_display": "Phillip Island Circuit"
+    },
+    "153": {
+        "display": "Mid-Ohio Sports Car Course",
+        "short_display": "Mid-Ohio Sports Car Course"
+    },
+    "163": {
+        "display": "Circuit de Spa-Francorchamps",
+        "short_display": "Circuit de Spa-Francorchamps"
+    },
+    "166": {
+        "display": "Okayama International Circuit",
+        "short_display": "Okayama International Circuit"
+    },
+    "168": {
+        "display": "Suzuka International Racing Course",
+        "short_display": "Suzuka International Racing Course"
+    },
+    "179": {
+        "display": "Long Beach Street Circuit",
+        "short_display": "Long Beach Street Circuit"
+    },
+    "180": {
+        "display": "Oulton Park Circuit",
+        "short_display": "Oulton Park Circuit"
+    },
+    "195": {
+        "display": "Mobility Resort Motegi",
+        "short_display": "Mobility Resort Motegi"
+    },
+    "212": {
+        "display": "Autódromo José Carlos Pace",
+        "short_display": "Autódromo José Carlos Pace"
+    },
+    "218": {
+        "display": "Circuit Gilles Villeneuve",
+        "short_display": "Circuit Gilles Villeneuve"
+    },
+    "219": {
+        "display": "Mount Panorama Circuit",
+        "short_display": "Mount Panorama Circuit"
+    },
+    "229": {
+        "display": "Circuit of the Americas",
+        "short_display": "Circuit of the Americas"
+    },
+    "233": {
+        "display": "Donington Park Racing Circuit",
+        "short_display": "Donington Park Racing Circuit"
+    },
+    "239": {
+        "display": "Autodromo Nazionale Monza",
+        "short_display": "Autodromo Nazionale Monza"
+    },
+    "250": {
+        "display": "Nürburgring Grand-Prix-Strecke",
+        "short_display": "Nürburgring Grand-Prix-Strecke"
+    },
+    "255": {
+        "display": "Nürburgring Grand-Prix-Strecke",
+        "short_display": "Nürburgring Grand-Prix-Strecke"
+    },
+    "266": {
+        "display": "Autodromo Internazionale Enzo e Dino Ferrari",
+        "short_display": "Autodromo Internazionale Enzo e Dino Ferrari"
+    },
+    "341": {
+        "display": "Silverstone Circuit",
+        "short_display": "Silverstone Circuit"
+    },
+    "345": {
+        "display": "Circuit de Barcelona Catalunya",
+        "short_display": "Circuit de Barcelona Catalunya"
+    },
+    "349": {
+        "display": "Circuit de Barcelona Catalunya",
+        "short_display": "Circuit de Barcelona Catalunya"
+    },
+    "350": {
+        "display": "[Retired] Charlotte Motor Speedway",
+        "short_display": "[Retired] Charlotte Motor Speedway"
+    },
+    "390": {
+        "display": "Hockenheimring Baden-Württemberg",
+        "short_display": "Hockenheimring Baden-Württemberg"
+    },
+    "403": {
+        "display": "Red Bull Ring",
+        "short_display": "Red Bull Ring"
+    },
+    "413": {
+        "display": "Hungaroring",
+        "short_display": "Hungaroring"
+    },
+    "434": {
+        "display": "Watkins Glen International",
+        "short_display": "Watkins Glen International"
+    },
+    "435": {
+        "display": "Watkins Glen International",
+        "short_display": "Watkins Glen International"
+    },
+    "444": {
+        "display": "Fuji International Speedway",
+        "short_display": "Fuji International Speedway"
+    },
+    "445": {
+        "display": "Fuji International Speedway",
+        "short_display": "Fuji International Speedway"
+    },
+    "448": {
+        "display": "Indianapolis Motor Speedway",
+        "short_display": "Indianapolis Motor Speedway"
+    },
+    "451": {
+        "display": "Rudskogen Motorsenter",
+        "short_display": "Rudskogen Motorsenter"
+    },
+    "463": {
+        "display": "Circuit de Nevers Magny-Cours",
+        "short_display": "Circuit de Nevers Magny-Cours"
+    },
+    "465": {
+        "display": "Virginia International Raceway",
+        "short_display": "Virginia International Raceway"
+    },
+    "474": {
+        "display": "Circuito de Jerez - Ángel Nieto",
+        "short_display": "Circuito de Jerez - Ángel Nieto"
+    },
+    "478": {
+        "display": "MotorLand Aragón",
+        "short_display": "MotorLand Aragón"
+    },
+    "485": {
+        "display": "Circuit Zandvoort",
+        "short_display": "Circuit Zandvoort"
+    },
+    "498": {
+        "display": "Autodromo Internazionale del Mugello",
+        "short_display": "Autodromo Internazionale del Mugello"
+    },
+    "509": {
+        "display": "Algarve International Circuit",
+        "short_display": "Algarve International Circuit"
+    },
+    "523": {
+        "display": "Circuit de Spa-Francorchamps",
+        "short_display": "Circuit de Spa-Francorchamps"
+    },
+    "536": {
+        "display": "Portland International Raceway",
+        "short_display": "Portland International Raceway"
+    },
+    "539": {
+        "display": "Miami International Autodrome",
+        "short_display": "Miami International Autodrome"
+    },
+    "572": {
+        "display": "Autódromo Hermanos Rodríguez",
+        "short_display": "Autódromo Hermanos Rodríguez"
+    },
+    "584": {
+        "display": "St. Petersburg Grand Prix",
+        "short_display": "St. Petersburg Grand Prix"
+    }
+}
