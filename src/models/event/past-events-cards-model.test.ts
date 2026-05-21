@@ -12,17 +12,22 @@ vi.mock('@@/src/utils/fetch-util', () => ({
     getLeagueSeasonSessions: vi.fn(),
     getLeagueSimsessionIndex: vi.fn(),
     getDriverResults: vi.fn(),
+    getGeneratedSimsessionSummary: vi.fn(),
 }));
 
 import {
     getLeagueSeasonSessions,
     getLeagueSimsessionIndex,
     getDriverResults,
+    getGeneratedSimsessionSummary,
 } from '@@/src/utils/fetch-util';
 
 const mockGetLeagueSeasonSessions = vi.mocked(getLeagueSeasonSessions);
 const mockGetLeagueSimsessionIndex = vi.mocked(getLeagueSimsessionIndex);
 const mockGetDriverResults = vi.mocked(getDriverResults);
+const mockGetGeneratedSimsessionSummary = vi.mocked(
+    getGeneratedSimsessionSummary
+);
 
 // ---------------------------------------------------------------------------
 // Test data
@@ -40,6 +45,8 @@ function makeSessions() {
                 launch_at: '2025-01-15T20:00:00Z',
                 track: { track_id: 301, track_name: 'Daytona' },
                 has_results: true,
+                winner_id: 9001,
+                winner_name: 'Adam Merchant',
             },
             {
                 subsession_id: 200,
@@ -47,6 +54,8 @@ function makeSessions() {
                 launch_at: '2025-01-22T20:00:00Z',
                 track: { track_id: 302, track_name: 'Spa' },
                 has_results: true,
+                winner_id: 9002,
+                winner_name: 'Elliot Cawte',
             },
         ],
         success: true,
@@ -99,6 +108,8 @@ describe('getDefaultPastEventCardsModel', () => {
 describe('getPastEventCardsModel', () => {
     beforeEach(() => {
         vi.resetAllMocks();
+        // Default to no summary — individual tests opt in.
+        mockGetGeneratedSimsessionSummary.mockResolvedValue(null);
     });
 
     it('returns empty model when league is empty', async () => {
@@ -203,5 +214,58 @@ describe('getPastEventCardsModel', () => {
         await getPastEventCardsModel(LEAGUE, SEASON);
 
         expect(mockGetDriverResults).not.toHaveBeenCalled();
+    });
+
+    it('carries the winner name from leagueSeasonSessions onto each card', async () => {
+        mockGetLeagueSeasonSessions.mockResolvedValue(makeSessions() as any);
+        mockGetLeagueSimsessionIndex.mockResolvedValue(
+            makeSimsessionIndex() as any
+        );
+
+        const model = await getPastEventCardsModel(LEAGUE, SEASON);
+
+        expect(model.pastRaces[0].winnerName).toBe('Adam Merchant');
+        expect(model.pastRaces[1].winnerName).toBe('Elliot Cawte');
+    });
+
+    it('populates each card headline from the AI summary when present', async () => {
+        mockGetLeagueSeasonSessions.mockResolvedValue(makeSessions() as any);
+        mockGetLeagueSimsessionIndex.mockResolvedValue(
+            makeSimsessionIndex() as any
+        );
+        mockGetGeneratedSimsessionSummary.mockImplementation(
+            async (sub: number) =>
+                sub === 100
+                    ? ({ title: 'Daytona Drama', text: '...' } as any)
+                    : ({ title: 'Spa Symphony', text: '...' } as any)
+        );
+
+        const model = await getPastEventCardsModel(LEAGUE, SEASON);
+
+        expect(model.pastRaces[0].headline).toBe('Daytona Drama');
+        expect(model.pastRaces[1].headline).toBe('Spa Symphony');
+    });
+
+    it('falls through when the summary fetch fails or returns null', async () => {
+        mockGetLeagueSeasonSessions.mockResolvedValue(makeSessions() as any);
+        mockGetLeagueSimsessionIndex.mockResolvedValue(
+            makeSimsessionIndex() as any
+        );
+        mockGetGeneratedSimsessionSummary.mockImplementation(
+            async (sub: number) => {
+                if (sub === 100) throw new Error('boom');
+                return null;
+            }
+        );
+
+        const model = await getPastEventCardsModel(LEAGUE, SEASON);
+
+        // Both cards still appear — winner + date survive — just
+        // without an AI headline. The strip never goes blank because
+        // gentxt is having a bad day.
+        expect(model.pastRaces).toHaveLength(2);
+        expect(model.pastRaces[0].headline).toBeUndefined();
+        expect(model.pastRaces[1].headline).toBeUndefined();
+        expect(model.pastRaces[0].winnerName).toBe('Adam Merchant');
     });
 });
