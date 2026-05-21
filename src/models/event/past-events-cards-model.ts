@@ -117,5 +117,12 @@ export async function getPastEventCardsModel(
         ret.pastRaces.push(entries[i].entry);
     }
 
+    // Newest race first — the cards are large enough now that the
+    // top-of-strip position is prime real estate; the most recent
+    // round deserves it.
+    ret.pastRaces.sort(
+        (a, b) => Date.parse(b.date) - Date.parse(a.date)
+    );
+
     return ret;
 }
