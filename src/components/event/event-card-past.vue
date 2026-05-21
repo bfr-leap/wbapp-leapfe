@@ -1,6 +1,10 @@
 <script setup lang="ts">
-import { getshortTrackName } from '@@/src/utils/track-utils';
 import type { Ref } from 'vue';
+import type { EventCardPastModel } from '@@/src/models/event/event-card-past-model';
+import {
+    getEventCardPastModel,
+    getDefaultEventCardPastModel,
+} from '@@/src/models/event/event-card-past-model';
 
 const props = defineProps<{
     track_id: string;
@@ -26,16 +30,13 @@ const shortMonthNames = [
     'Dec',
 ];
 
-async function fetchModel() {
-    return await getshortTrackName(props.track_id);
-}
-
-const shortName: Ref<string> = await asyncDataWithReactiveModel<string>(
-    `EventCardPastModel-${props.track_id}`,
-    fetchModel,
-    () => '',
-    [() => props.track_id, () => props.date, () => props.is_selected]
-);
+const model: Ref<EventCardPastModel> =
+    await asyncDataWithReactiveModel<EventCardPastModel>(
+        `EventCardPastModel-${props.track_id}`,
+        () => getEventCardPastModel(props.track_id),
+        getDefaultEventCardPastModel,
+        [() => props.track_id, () => props.date, () => props.is_selected]
+    );
 </script>
 
 <template>
@@ -51,7 +52,7 @@ const shortName: Ref<string> = await asyncDataWithReactiveModel<string>(
                         {{ shortMonthNames[new Date(date).getMonth()] }}
                         {{ new Date(date).getDate() }}
                     </span>
-                    <span class="meta__track">{{ shortName }}</span>
+                    <span class="meta__track">{{ model.shortTrackName }}</span>
                 </div>
                 <span
                     v-if="protagonist_finish"
@@ -65,7 +66,7 @@ const shortName: Ref<string> = await asyncDataWithReactiveModel<string>(
             <div class="body">
                 <h3 v-if="headline" class="headline">{{ headline }}</h3>
                 <h3 v-else class="headline headline--fallback">
-                    {{ shortName || 'Race Recap' }}
+                    {{ model.shortTrackName || 'Race Recap' }}
                 </h3>
             </div>
 
