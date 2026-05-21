@@ -2,6 +2,9 @@
 import type { Ref } from 'vue';
 import DriverTag from './driver-tag.vue';
 import TeamTag from '../team/team-tag.vue';
+import FormStrip from './form-strip.vue';
+import GapToLeader from './gap-to-leader.vue';
+import PositionMovement from './position-movement.vue';
 import type { DriverStandingsModel } from '@@/src/models/driver/driver-standings-model';
 import {
     getDriverStandingsModel,
@@ -63,8 +66,13 @@ const view: Ref<DriverStandingsModel> =
                 >
                     <span class="eyebrow">LEAP Points</span>
                 </div>
+                <div
+                    class="d-none d-lg-flex col-lg-2 text-center justify-content-center align-items-center"
+                >
+                    <span class="eyebrow">Form (last 3)</span>
+                </div>
                 <div class="col-2 col-lg-1 text-center"></div>
-                <div class="col-7 col-sm-6 col-lg-7 d-flex align-items-center">
+                <div class="col-7 col-sm-6 col-lg-5 d-flex align-items-center">
                     <span class="eyebrow">Driver</span>
                 </div>
             </div>
@@ -77,29 +85,56 @@ const view: Ref<DriverStandingsModel> =
                     <div
                         class="col-3 justify-content-center d-flex d-sm-none text-center flex-column"
                     >
-                        <div class="fs-2 num">
-                            {{ member.position }}
+                        <div
+                            class="d-flex align-items-baseline justify-content-center gap-2"
+                        >
+                            <span class="fs-2 num">{{ member.position }}</span>
+                            <PositionMovement
+                                v-if="member.positionChange !== undefined"
+                                v-bind:change="member.positionChange"
+                            />
                         </div>
                         <div class="num d-flex justify-content-center pts-line">
                             <span>{{ member.points }} pts</span>
+                            <GapToLeader
+                                v-if="member.pointsBehindLeader !== undefined"
+                                v-bind:gap="member.pointsBehindLeader"
+                                class="ms-2"
+                            />
                         </div>
                     </div>
                     <div
-                        class="col-2 d-none d-sm-flex justify-content-center fs-2 num"
+                        class="col-2 d-none d-sm-flex justify-content-center align-items-center gap-2"
                     >
-                        <div>{{ member.position }}</div>
+                        <span class="fs-2 num">{{ member.position }}</span>
+                        <PositionMovement
+                            v-if="member.positionChange !== undefined"
+                            v-bind:change="member.positionChange"
+                        />
                     </div>
                     <div
-                        class="col-2 d-none d-sm-flex justify-content-center fs-4 num"
+                        class="col-2 d-none d-sm-flex justify-content-center align-items-baseline fs-4 num gap-2"
                     >
-                        <div>{{ member.points }}</div>
+                        <span>{{ member.points }}</span>
+                        <GapToLeader
+                            v-if="member.pointsBehindLeader !== undefined"
+                            v-bind:gap="member.pointsBehindLeader"
+                        />
+                    </div>
+                    <div
+                        class="d-none d-lg-flex col-lg-2 align-items-center justify-content-center"
+                    >
+                        <FormStrip
+                            v-if="member.recentFinishes?.length"
+                            v-bind:finishes="member.recentFinishes"
+                        />
                     </div>
                     <div class="col-2 col-lg-1 text-center">
                         <div
                             v-bind:class="`driver-img club-${member.clubId}`"
                         ></div>
                     </div>
-                    <div class="col-7 col-sm-6 col-lg-7">
+                    <div class="col-7 col-sm-6 col-lg-5">
                         <DriverTag
                             v-bind:lastName="member.lastName"
                             v-bind:firstName="member.firstName"
