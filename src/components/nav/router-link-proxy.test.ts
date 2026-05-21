@@ -25,6 +25,11 @@ vi.mock('vue-clerk', () => ({
             return () => null;
         },
     }),
+    // The component gates `<SignedIn>` / `<SignedOut>` on
+    // `useAuth().isLoaded` so the fallback link keeps rendering the
+    // slot during the Clerk-bootstrap window. The test mock reports
+    // loaded=true so the auth-gated branches behave like before.
+    useAuth: () => ({ isLoaded: { value: true } }),
 }));
 
 // ─────────────────────────────────────────────────────────────────────

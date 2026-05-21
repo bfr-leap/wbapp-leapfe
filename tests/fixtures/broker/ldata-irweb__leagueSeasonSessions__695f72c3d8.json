@@ -1,0 +1,471 @@
+{
+    "success": true,
+    "subscribed": false,
+    "league_id": 4534,
+    "season_id": 131502,
+    "sessions": [
+        {
+            "cars": [
+                {
+                    "car_id": 172,
+                    "car_name": "Super Formula SF23 - Honda",
+                    "car_class_id": 0,
+                    "car_class_name": "Hosted All Cars Class"
+                },
+                {
+                    "car_id": 171,
+                    "car_name": "Super Formula SF23 - Toyota",
+                    "car_class_id": 0,
+                    "car_class_name": "Hosted All Cars Class"
+                }
+            ],
+            "driver_changes": false,
+            "entry_count": 0,
+            "has_results": true,
+            "launch_at": "2026-03-20T00:00:00Z",
+            "league_id": 4534,
+            "league_season_id": 131502,
+            "lone_qualify": false,
+            "pace_car_class_id": null,
+            "pace_car_id": null,
+            "password_protected": false,
+            "practice_length": 20,
+            "private_session_id": 5069535,
+            "qualify_laps": 1,
+            "qualify_length": 20,
+            "race_laps": 0,
+            "race_length": 20,
+            "session_id": 303795699,
+            "status": 4,
+            "subsession_id": 84340245,
+            "team_entry_count": 0,
+            "time_limit": 180,
+            "track": {
+                "config_name": "Grand Prix",
+                "track_id": 403,
+                "track_name": "Red Bull Ring"
+            },
+            "winner_id": 807711,
+            "winner_name": "Jaden Calloway"
+        },
+        {
+            "cars": [
+                {
+                    "car_id": 172,
+                    "car_name": "Super Formula SF23 - Honda",
+                    "car_class_id": 0,
+                    "car_class_name": "Hosted All Cars Class"
+                },
+                {
+                    "car_id": 171,
+                    "car_name": "Super Formula SF23 - Toyota",
+                    "car_class_id": 0,
+                    "car_class_name": "Hosted All Cars Class"
+                }
+            ],
+            "driver_changes": false,
+            "entry_count": 0,
+            "has_results": true,
+            "launch_at": "2026-03-27T00:00:00Z",
+            "league_id": 4534,
+            "league_season_id": 131502,
+            "lone_qualify": false,
+            "pace_car_class_id": null,
+            "pace_car_id": null,
+            "password_protected": false,
+            "practice_length": 20,
+            "private_session_id": 5083404,
+            "qualify_laps": 1,
+            "qualify_length": 20,
+            "race_laps": 0,
+            "race_length": 20,
+            "session_id": 304537831,
+            "status": 4,
+            "subsession_id": 84522154,
+            "team_entry_count": 0,
+            "time_limit": 180,
+            "track": {
+                "config_name": "Boot",
+                "track_id": 434,
+                "track_name": "Watkins Glen International"
+            },
+            "winner_id": 555362,
+            "winner_name": "Adam Merchant"
+        },
+        {
+            "cars": [
+                {
+                    "car_id": 172,
+                    "car_name": "Super Formula SF23 - Honda",
+                    "car_class_id": 0,
+                    "car_class_name": "Hosted All Cars Class"
+                },
+                {
+                    "car_id": 171,
+                    "car_name": "Super Formula SF23 - Toyota",
+                    "car_class_id": 0,
+                    "car_class_name": "Hosted All Cars Class"
+                }
+            ],
+            "driver_changes": false,
+            "entry_count": 0,
+            "has_results": true,
+            "launch_at": "2026-04-03T00:00:00Z",
+            "league_id": 4534,
+            "league_season_id": 131502,
+            "lone_qualify": false,
+            "pace_car_class_id": null,
+            "pace_car_id": null,
+            "password_protected": false,
+            "practice_length": 20,
+            "private_session_id": 5083409,
+            "qualify_laps": 1,
+            "qualify_length": 20,
+            "race_laps": 0,
+            "race_length": 20,
+            "session_id": 305274756,
+            "status": 4,
+            "subsession_id": 84700093,
+            "team_entry_count": 0,
+            "time_limit": 180,
+            "track": {
+                "config_name": "Grand Prix",
+                "track_id": 195,
+                "track_name": "Mobility Resort Motegi"
+            },
+            "winner_id": 555362,
+            "winner_name": "Adam Merchant"
+        },
+        {
+            "cars": [
+                {
+                    "car_id": 172,
+                    "car_name": "Super Formula SF23 - Honda",
+                    "car_class_id": 0,
+                    "car_class_name": "Hosted All Cars Class"
+                },
+                {
+                    "car_id": 171,
+                    "car_name": "Super Formula SF23 - Toyota",
+                    "car_class_id": 0,
+                    "car_class_name": "Hosted All Cars Class"
+                }
+            ],
+            "driver_changes": false,
+            "entry_count": 0,
+            "has_results": true,
+            "launch_at": "2026-04-10T00:00:00Z",
+            "league_id": 4534,
+            "league_season_id": 131502,
+            "lone_qualify": false,
+            "pace_car_class_id": null,
+            "pace_car_id": null,
+            "password_protected": false,
+            "practice_length": 20,
+            "private_session_id": 5083411,
+            "qualify_laps": 1,
+            "qualify_length": 20,
+            "race_laps": 0,
+            "race_length": 20,
+            "session_id": 306008921,
+            "status": 4,
+            "subsession_id": 84879951,
+            "team_entry_count": 0,
+            "time_limit": 180,
+            "track": {
+                "config_name": "Grand Prix",
+                "track_id": 390,
+                "track_name": "Hockenheimring Baden-Württemberg"
+            },
+            "winner_id": 599655,
+            "winner_name": "Elliot Cawte"
+        },
+        {
+            "cars": [
+                {
+                    "car_id": 172,
+                    "car_name": "Super Formula SF23 - Honda",
+                    "car_class_id": 0,
+                    "car_class_name": "Hosted All Cars Class"
+                },
+                {
+                    "car_id": 171,
+                    "car_name": "Super Formula SF23 - Toyota",
+                    "car_class_id": 0,
+                    "car_class_name": "Hosted All Cars Class"
+                }
+            ],
+            "driver_changes": false,
+            "entry_count": 0,
+            "has_results": true,
+            "launch_at": "2026-04-17T00:00:00Z",
+            "league_id": 4534,
+            "league_season_id": 131502,
+            "lone_qualify": false,
+            "pace_car_class_id": null,
+            "pace_car_id": null,
+            "password_protected": false,
+            "practice_length": 20,
+            "private_session_id": 5117064,
+            "qualify_laps": 1,
+            "qualify_length": 20,
+            "race_laps": 0,
+            "race_length": 20,
+            "session_id": 306748625,
+            "status": 4,
+            "subsession_id": 85056343,
+            "team_entry_count": 0,
+            "time_limit": 180,
+            "track": {
+                "config_name": "Grand Prix",
+                "track_id": 485,
+                "track_name": "Circuit Zandvoort"
+            },
+            "winner_id": 585611,
+            "winner_name": "Finley Fitzsimmons"
+        },
+        {
+            "cars": [
+                {
+                    "car_id": 172,
+                    "car_name": "Super Formula SF23 - Honda",
+                    "car_class_id": 0,
+                    "car_class_name": "Hosted All Cars Class"
+                },
+                {
+                    "car_id": 171,
+                    "car_name": "Super Formula SF23 - Toyota",
+                    "car_class_id": 0,
+                    "car_class_name": "Hosted All Cars Class"
+                }
+            ],
+            "driver_changes": false,
+            "entry_count": 0,
+            "has_results": true,
+            "launch_at": "2026-04-24T00:00:00Z",
+            "league_id": 4534,
+            "league_season_id": 131502,
+            "lone_qualify": false,
+            "pace_car_class_id": null,
+            "pace_car_id": null,
+            "password_protected": false,
+            "practice_length": 20,
+            "private_session_id": 5117016,
+            "qualify_laps": 1,
+            "qualify_length": 20,
+            "race_laps": 0,
+            "race_length": 20,
+            "session_id": 307489417,
+            "status": 4,
+            "subsession_id": 85228727,
+            "team_entry_count": 0,
+            "time_limit": 180,
+            "track": {
+                "config_name": "Grand Prix",
+                "track_id": 584,
+                "track_name": "St. Petersburg Grand Prix"
+            },
+            "winner_id": 986846,
+            "winner_name": "Elliot Rolls"
+        },
+        {
+            "cars": [
+                {
+                    "car_id": 172,
+                    "car_name": "Super Formula SF23 - Honda",
+                    "car_class_id": 0,
+                    "car_class_name": "Hosted All Cars Class"
+                },
+                {
+                    "car_id": 171,
+                    "car_name": "Super Formula SF23 - Toyota",
+                    "car_class_id": 0,
+                    "car_class_name": "Hosted All Cars Class"
+                }
+            ],
+            "driver_changes": false,
+            "entry_count": 0,
+            "has_results": true,
+            "launch_at": "2026-05-01T00:00:00Z",
+            "league_id": 4534,
+            "league_season_id": 131502,
+            "lone_qualify": false,
+            "pace_car_class_id": null,
+            "pace_car_id": null,
+            "password_protected": false,
+            "practice_length": 20,
+            "private_session_id": 5117023,
+            "qualify_laps": 1,
+            "qualify_length": 20,
+            "race_laps": 0,
+            "race_length": 20,
+            "session_id": 308225127,
+            "status": 4,
+            "subsession_id": 85402874,
+            "team_entry_count": 0,
+            "time_limit": 180,
+            "track": {
+                "config_name": "Grand Prix",
+                "track_id": 341,
+                "track_name": "Silverstone Circuit"
+            },
+            "winner_id": 599655,
+            "winner_name": "Elliot Cawte"
+        },
+        {
+            "cars": [
+                {
+                    "car_id": 172,
+                    "car_name": "Super Formula SF23 - Honda",
+                    "car_class_id": 0,
+                    "car_class_name": "Hosted All Cars Class"
+                },
+                {
+                    "car_id": 171,
+                    "car_name": "Super Formula SF23 - Toyota",
+                    "car_class_id": 0,
+                    "car_class_name": "Hosted All Cars Class"
+                }
+            ],
+            "driver_changes": false,
+            "entry_count": 0,
+            "has_results": false,
+            "launch_at": "2026-05-15T00:00:00Z",
+            "league_id": 4534,
+            "league_season_id": 131502,
+            "lone_qualify": false,
+            "pace_car_class_id": null,
+            "pace_car_id": null,
+            "password_protected": false,
+            "practice_length": 20,
+            "private_session_id": 5117031,
+            "qualify_laps": 1,
+            "qualify_length": 20,
+            "race_laps": 0,
+            "race_length": 20,
+            "status": 1,
+            "team_entry_count": 0,
+            "time_limit": 180,
+            "track": { "track_id": 413, "track_name": "Hungaroring" }
+        },
+        {
+            "cars": [
+                {
+                    "car_id": 172,
+                    "car_name": "Super Formula SF23 - Honda",
+                    "car_class_id": 0,
+                    "car_class_name": "Hosted All Cars Class"
+                },
+                {
+                    "car_id": 171,
+                    "car_name": "Super Formula SF23 - Toyota",
+                    "car_class_id": 0,
+                    "car_class_name": "Hosted All Cars Class"
+                }
+            ],
+            "driver_changes": false,
+            "entry_count": 0,
+            "has_results": false,
+            "launch_at": "2026-05-22T00:00:00Z",
+            "league_id": 4534,
+            "league_season_id": 131502,
+            "lone_qualify": false,
+            "pace_car_class_id": null,
+            "pace_car_id": null,
+            "password_protected": false,
+            "practice_length": 20,
+            "private_session_id": 5117051,
+            "qualify_laps": 1,
+            "qualify_length": 20,
+            "race_laps": 0,
+            "race_length": 20,
+            "status": 1,
+            "team_entry_count": 0,
+            "time_limit": 180,
+            "track": {
+                "config_name": "Grand Prix",
+                "track_id": 168,
+                "track_name": "Suzuka International Racing Course"
+            }
+        },
+        {
+            "cars": [
+                {
+                    "car_id": 172,
+                    "car_name": "Super Formula SF23 - Honda",
+                    "car_class_id": 0,
+                    "car_class_name": "Hosted All Cars Class"
+                },
+                {
+                    "car_id": 171,
+                    "car_name": "Super Formula SF23 - Toyota",
+                    "car_class_id": 0,
+                    "car_class_name": "Hosted All Cars Class"
+                }
+            ],
+            "driver_changes": false,
+            "entry_count": 0,
+            "has_results": false,
+            "launch_at": "2026-05-29T00:00:00Z",
+            "league_id": 4534,
+            "league_season_id": 131502,
+            "lone_qualify": false,
+            "pace_car_class_id": null,
+            "pace_car_id": null,
+            "password_protected": false,
+            "practice_length": 20,
+            "private_session_id": 5117067,
+            "qualify_laps": 1,
+            "qualify_length": 20,
+            "race_laps": 0,
+            "race_length": 20,
+            "status": 1,
+            "team_entry_count": 0,
+            "time_limit": 180,
+            "track": {
+                "track_id": 179,
+                "track_name": "Long Beach Street Circuit"
+            }
+        },
+        {
+            "cars": [
+                {
+                    "car_id": 172,
+                    "car_name": "Super Formula SF23 - Honda",
+                    "car_class_id": 0,
+                    "car_class_name": "Hosted All Cars Class"
+                },
+                {
+                    "car_id": 171,
+                    "car_name": "Super Formula SF23 - Toyota",
+                    "car_class_id": 0,
+                    "car_class_name": "Hosted All Cars Class"
+                }
+            ],
+            "driver_changes": false,
+            "entry_count": 0,
+            "has_results": false,
+            "launch_at": "2026-06-05T00:00:00Z",
+            "league_id": 4534,
+            "league_season_id": 131502,
+            "lone_qualify": false,
+            "pace_car_class_id": null,
+            "pace_car_id": null,
+            "password_protected": false,
+            "practice_length": 20,
+            "private_session_id": 5117074,
+            "qualify_laps": 1,
+            "qualify_length": 20,
+            "race_laps": 0,
+            "race_length": 20,
+            "status": 1,
+            "team_entry_count": 0,
+            "time_limit": 180,
+            "track": {
+                "config_name": "Grand Prix",
+                "track_id": 212,
+                "track_name": "Autódromo José Carlos Pace"
+            }
+        }
+    ]
+}

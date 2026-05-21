@@ -1,8 +1,12 @@
 <script setup lang="ts">
-import { ref, watchEffect } from 'vue';
+import { ref } from 'vue';
 import type { Ref } from 'vue';
-import { getTrackName } from '@@/src/utils/track-utils';
 import RouterLinkProxy from '@@/src/components/nav/router-link-proxy.vue';
+import type { EventCardLgModel } from '@@/src/models/event/event-card-lg-model';
+import {
+    getEventCardLgModel,
+    getDefaultEventCardLgModel,
+} from '@@/src/models/event/event-card-lg-model';
 
 const props = defineProps<{
     track_id: string;
@@ -16,12 +20,7 @@ const props = defineProps<{
 let countdown: Ref<String> = ref('---');
 let timer: ReturnType<typeof setTimeout> | 0 = 0;
 
-async function fetchModel() {
-    updateTimer();
-    return await getTrackName(props.track_id);
-}
-
-async function updateTimer() {
+function updateTimer() {
     if (!timer) {
         timer = setTimeout(() => {
             timer = 0;
@@ -40,19 +39,20 @@ async function updateTimer() {
     countdown.value = `${d} D  ${h} H  ${min} M  ${sec < 10 ? 0 : ''}${sec} S`;
 }
 
-const trackName: Ref<string> = await asyncDataWithReactiveModel<string>(
-    `EventCardLgModel-${props.track_id}`,
-    fetchModel,
-    () => '---',
-    [
-        () => props.track_id,
-        () => props.is_next,
-        () => props.date,
-        () => props.car_id,
-        () => props.league_id,
-        () => props.embed_mode,
-    ]
-);
+const model: Ref<EventCardLgModel> =
+    await asyncDataWithReactiveModel<EventCardLgModel>(
+        `EventCardLgModel-${props.track_id}`,
+        () => getEventCardLgModel(props.track_id),
+        getDefaultEventCardLgModel,
+        [
+            () => props.track_id,
+            () => props.is_next,
+            () => props.date,
+            () => props.car_id,
+            () => props.league_id,
+            () => props.embed_mode,
+        ]
+    );
 
 updateTimer();
 </script>
@@ -71,7 +71,7 @@ updateTimer();
             <div class="content">
                 <div class="row text-center">
                     <div class="col fs-1 padded-title">
-                        {{ trackName }}
+                        {{ model.trackName }}
                     </div>
                 </div>
                 <div class="row text-center">

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Ref } from 'vue';
 import { useAuth } from 'vue-clerk';
-import EventCardSm from '@@/src/components/event/event-card-sm.vue';
+import EventCardPast from '@@/src/components/event/event-card-past.vue';
 import type { PastEventCardsModel } from '@@/src/models/event/past-events-cards-model';
 import {
     getPastEventCardsModel,
@@ -40,61 +40,42 @@ const pastEventCardsModel: Ref<PastEventCardsModel> =
 </script>
 
 <template>
-    <div class="row g-1">
-        <div class="col-12">
-            <div
-                v-if="pastEventCardsModel.pastRaces.length"
-                class="row g-1 h-100"
+    <div
+        v-if="pastEventCardsModel.pastRaces.length"
+        class="row g-2 g-md-3 past-grid"
+    >
+        <div
+            v-for="race in pastEventCardsModel.pastRaces"
+            v-bind:key="race.sessionId"
+            class="col-12 col-sm-6 col-lg-4"
+        >
+            <RouterLinkProxy
+                :style="{ textDecoration: 'none', display: 'block' }"
+                class="link-light card-link"
+                v-bind:to="`?m=results&league=${props.league}&season=${props.season}&subsession=${race.sessionId}&simsession=${race.simsessionId}`"
             >
-                <div v-for="race in pastEventCardsModel.pastRaces" class="col">
-                    <RouterLinkProxy
-                        :style="{ textDecoration: 'none' }"
-                        class="link-light"
-                        v-bind:to="`?m=results&league=${props.league}&season=${props.season}&subsession=${race.sessionId}&simsession=${race.simsessionId}`"
-                    >
-                        <div class="chip-wrap h-100">
-                            <EventCardSm
-                                class="h-100"
-                                v-bind:track_id="race.trackId"
-                                v-bind:is_next="false"
-                                v-bind:date="new Date(race.date)"
-                                v-bind:is_selected="race.isSelected"
-                            ></EventCardSm>
-                            <span
-                                v-if="race.protagonistFinish"
-                                class="finish-badge"
-                                >P{{ race.protagonistFinish }}</span
-                            >
-                        </div>
-                    </RouterLinkProxy>
-                </div>
-            </div>
-            <div v-else class="row g-1 h-100">
-                <div class="col">No events yet</div>
-            </div>
+                <EventCardPast
+                    v-bind:track_id="race.trackId"
+                    v-bind:date="new Date(race.date)"
+                    v-bind:is_selected="race.isSelected"
+                    v-bind:winner_name="race.winnerName"
+                    v-bind:headline="race.headline"
+                    v-bind:protagonist_finish="race.protagonistFinish"
+                />
+            </RouterLinkProxy>
         </div>
     </div>
+    <div v-else class="past-empty">No events yet</div>
 </template>
 
 <style scoped>
-.chip-wrap {
-    position: relative;
+.card-link {
+    height: 100%;
 }
-.finish-badge {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    z-index: 3;
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    font-weight: 700;
-    line-height: 1;
-    padding: 2px 5px;
-    border-radius: var(--radius-sm);
-    background: rgba(0, 0, 0, 0.7);
-    border: 1px solid var(--border-subtle);
-    color: var(--text-primary);
-    font-variant-numeric: tabular-nums;
-    pointer-events: none;
+.past-empty {
+    padding: 1rem;
+    color: var(--text-muted, var(--text-primary));
+    opacity: 0.7;
+    font-style: italic;
 }
 </style>

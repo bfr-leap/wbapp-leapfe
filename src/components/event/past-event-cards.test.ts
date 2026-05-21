@@ -15,11 +15,19 @@ vi.stubGlobal('useAsyncData', mockUseAsyncData);
 import { asyncDataWithReactiveModel } from '@@/composables/async-data-with-reactive-model';
 vi.stubGlobal('asyncDataWithReactiveModel', asyncDataWithReactiveModel);
 
-vi.mock('@@/src/components/event/event-card-sm.vue', () => ({
+vi.mock('@@/src/components/event/event-card-past.vue', () => ({
     default: {
-        name: 'EventCardSm',
-        props: ['track_id', 'is_next', 'date', 'is_selected'],
-        template: '<div class="event-card-sm-stub">{{ track_id }}</div>',
+        name: 'EventCardPast',
+        props: [
+            'track_id',
+            'date',
+            'is_selected',
+            'winner_name',
+            'headline',
+            'protagonist_finish',
+        ],
+        template:
+            '<div class="event-card-past-stub" :data-winner="winner_name" :data-headline="headline">{{ track_id }}</div>',
     },
 }));
 vi.mock('@@/src/components/nav/router-link-proxy.vue', () => ({
@@ -110,8 +118,8 @@ describe('PastEventCards — prop reactivity', () => {
             '131502',
             '174470'
         );
-        expect(wrapper.findAll('.event-card-sm-stub')).toHaveLength(1);
-        expect(wrapper.findAll('.event-card-sm-stub')[0].text()).toBe('301');
+        expect(wrapper.findAll('.event-card-past-stub')).toHaveLength(1);
+        expect(wrapper.findAll('.event-card-past-stub')[0].text()).toBe('301');
 
         mockGetPastEventCardsModel.mockResolvedValueOnce({
             pastRaces: [
@@ -141,8 +149,33 @@ describe('PastEventCards — prop reactivity', () => {
             '128679',
             '174470'
         );
-        const chips = wrapper.findAll('.event-card-sm-stub');
+        const chips = wrapper.findAll('.event-card-past-stub');
         expect(chips).toHaveLength(2);
         expect(chips.map((c) => c.text())).toEqual(['402', '403']);
+    });
+
+    it('passes winnerName and headline through to each card', async () => {
+        mockGetPastEventCardsModel.mockResolvedValueOnce({
+            pastRaces: [
+                {
+                    sessionId: 's18-1',
+                    simsessionId: '1',
+                    trackId: '301',
+                    date: '2026-04-01T00:00:00Z',
+                    isSelected: false,
+                    winnerName: 'Adam Merchant',
+                    headline: 'Merchant Devours Glen',
+                },
+            ],
+        });
+
+        const wrapper = mount(SuspenseWrapper, {
+            props: { league: '4534', season: '131502' },
+        });
+        await flush();
+
+        const card = wrapper.find('.event-card-past-stub');
+        expect(card.attributes('data-winner')).toBe('Adam Merchant');
+        expect(card.attributes('data-headline')).toBe('Merchant Devours Glen');
     });
 });

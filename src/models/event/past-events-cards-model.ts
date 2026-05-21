@@ -1,5 +1,6 @@
 import {
     getDriverResults,
+    getGeneratedSimsessionSummary,
     getLeagueSeasonSessions,
     getLeagueSimsessionIndex,
 } from '@@/src/utils/fetch-util';
@@ -11,6 +12,15 @@ export interface PastEventCardEntry {
     trackId: string;
     date: string;
     isSelected: boolean;
+    /** The race winner's display name, from `leagueSeasonSessions`. */
+    winnerName?: string;
+    /**
+     * The AI-generated headline for the race (e.g.
+     * "Merchant Devours Glen, Shocks Universe"). Pulled from the
+     * `simsessionSummary` document per race; missing when the
+     * summary hasn't been generated yet.
+     */
+    headline?: string;
     protagonistFinish?: number;
     protagonistStart?: number;
 }
@@ -49,6 +59,9 @@ export async function getPastEventCardsModel(
 
     const seasonResults = driverResults?.[Number.parseInt(season)] ?? null;
 
+    // First pass: assemble the entries we can build without an extra
+    // broker call.
+    const entries: { entry: PastEventCardEntry; subId: number; raceSim: number }[] = [];
     for (let session of leagueSeasonSessions?.sessions || []) {
         if (session?.subsession_id) {
             let ssiSession: SSI_Session | undefined =
@@ -70,15 +83,46 @@ export async function getPastEventCardsModel(
                 simsessionId: simsessionId?.toString() || '',
             };
 
+            if (session.winner_name) {
+                entry.winnerName = session.winner_name;
+            }
+
             const result = seasonResults?.[session.subsession_id];
             if (result) {
                 entry.protagonistFinish = result.position;
                 entry.protagonistStart = result.start_position;
             }
 
-            ret.pastRaces.push(entry);
+            entries.push({
+                entry,
+                subId: session.subsession_id,
+                raceSim: typeof simsessionId === 'number' ? simsessionId : 0,
+            });
         }
     }
+
+    // Second pass: fetch AI-generated headlines in parallel. A
+    // missing summary is the common case for in-progress seasons —
+    // we just drop the headline rather than erroring the whole strip.
+    const summaries = await Promise.all(
+        entries.map(({ subId, raceSim }) =>
+            getGeneratedSimsessionSummary(subId, raceSim).catch(() => null)
+        )
+    );
+    for (let i = 0; i < entries.length; i++) {
+        const summary = summaries[i];
+        if (summary?.title) {
+            entries[i].entry.headline = summary.title;
+        }
+        ret.pastRaces.push(entries[i].entry);
+    }
+
+    // Newest race first — the cards are large enough now that the
+    // top-of-strip position is prime real estate; the most recent
+    // round deserves it.
+    ret.pastRaces.sort(
+        (a, b) => Date.parse(b.date) - Date.parse(a.date)
+    );
 
     return ret;
 }

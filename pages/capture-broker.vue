@@ -40,12 +40,15 @@ interface CaptureTuple {
     query: Record<string, string>;
 }
 
-// Hand-enumerated list of (namespace, type, query) tuples the smoke
-// suite touches. Add more as `LEAP_BROKER_FIXTURES` smoke runs surface
-// "missing fixture for ..." errors — they tell you exactly which
-// tuple to add.
+// Hand-enumerated list of (namespace, type, query) tuples the audit
+// + smoke suite touch. Add more as `LEAP_BROKER_FIXTURES` runs surface
+// "missing fixture for ..." errors — `audit/output/<run>/missing-fixtures.json`
+// lists exact query params for each gap, ready to paste in here.
 const TUPLES: CaptureTuple[] = [
-    // Broker default-context resolution, in three configurations.
+    // -------------------------------------------------------------
+    // Default-context resolution. Three variants because routes can
+    // arrive with no hints, league-only, or league + season + subsession.
+    // -------------------------------------------------------------
     {
         label: 'defLgSeasSubCtx — empty hints',
         query: {
@@ -67,6 +70,16 @@ const TUPLES: CaptureTuple[] = [
         },
     },
     {
+        label: 'defLgSeasSubCtx — league + season (home page)',
+        query: {
+            namespace: 'ldata-usrcfg',
+            type: 'defLgSeasSubCtx',
+            league: '4534',
+            season: '131502',
+            subsession: '',
+        },
+    },
+    {
         label: 'defLgSeasSubCtx — full smoke URL',
         query: {
             namespace: 'ldata-usrcfg',
@@ -76,7 +89,9 @@ const TUPLES: CaptureTuple[] = [
             subsession: '84522154',
         },
     },
-    // Curated league + season schedule.
+    // -------------------------------------------------------------
+    // Global / config-shaped lookups.
+    // -------------------------------------------------------------
     {
         label: 'activeLeagueSchedule',
         query: {
@@ -85,10 +100,44 @@ const TUPLES: CaptureTuple[] = [
         },
     },
     {
+        label: 'trackDisplayInfo',
+        query: {
+            namespace: 'ldata-usrcfg',
+            type: 'trackDisplayInfo',
+        },
+    },
+    {
+        label: 'blockedSeasons',
+        query: {
+            namespace: 'ldata-irweb',
+            type: 'blockedSeasons',
+        },
+    },
+    // -------------------------------------------------------------
+    // League- and season-scoped metadata.
+    // -------------------------------------------------------------
+    {
         label: 'leagueSeasons',
         query: {
             namespace: 'ldata-irweb',
             type: 'leagueSeasons',
+            league: '4534',
+        },
+    },
+    {
+        label: 'leagueSeasonSessions — race schedule with tracks',
+        query: {
+            namespace: 'ldata-irweb',
+            type: 'leagueSeasonSessions',
+            league: '4534',
+            season: '131502',
+        },
+    },
+    {
+        label: 'leagueRoster',
+        query: {
+            namespace: 'ldata-irweb',
+            type: 'leagueRoster',
             league: '4534',
         },
     },
@@ -108,12 +157,60 @@ const TUPLES: CaptureTuple[] = [
             league: '4534',
         },
     },
-    // Results view's underlying broker calls.
+    {
+        label: 'telemetrySubsessions',
+        query: {
+            namespace: 'ldata-irrpy',
+            type: 'telemetrySubsessions',
+            league: '4534',
+        },
+    },
+    // -------------------------------------------------------------
+    // Results view — race results + per-driver lookups + chart data.
+    // -------------------------------------------------------------
     {
         label: 'simSessionResults',
         query: {
             namespace: 'ldata-rsltsts',
             type: 'simSessionResults',
+            subsession: '84522154',
+            simsession: '0',
+        },
+    },
+    {
+        label: 'simsessionSummary',
+        query: {
+            namespace: 'ldata-gentxt',
+            type: 'simsessionSummary',
+            subsession: '84522154',
+            simsession: '0',
+        },
+    },
+    {
+        label: 'lapChartData',
+        query: {
+            namespace: 'ldata-irweb',
+            type: 'lapChartData',
+            subsession: '84522154',
+            simsession: '0',
+        },
+    },
+    {
+        label: 'cumulativeDeltaChartData',
+        query: {
+            namespace: 'ldata-charts',
+            type: 'cumulativeDeltaChartData',
+            league: '4534',
+            subsession: '84522154',
+            simsession: '0',
+        },
+    },
+    {
+        label: 'startFinishChartData',
+        query: {
+            namespace: 'ldata-charts',
+            type: 'startFinishChartData',
+            league: '4534',
             subsession: '84522154',
             simsession: '0',
         },
@@ -135,7 +232,9 @@ const TUPLES: CaptureTuple[] = [
             league: '4534',
         },
     },
-    // Standings view's broker calls.
+    // -------------------------------------------------------------
+    // Standings view.
+    // -------------------------------------------------------------
     {
         label: 'leagueDriverStats',
         query: {
@@ -144,7 +243,9 @@ const TUPLES: CaptureTuple[] = [
             league: '4534',
         },
     },
+    // -------------------------------------------------------------
     // Rulings view.
+    // -------------------------------------------------------------
     {
         label: 'getRulings',
         query: {
@@ -154,13 +255,54 @@ const TUPLES: CaptureTuple[] = [
             season: '131502',
         },
     },
-    // Driver profile.
+    // -------------------------------------------------------------
+    // Driver profile — identity, dotd blurb, race/sprint/quali stats.
+    // -------------------------------------------------------------
     {
         label: 'singleMemberData',
         query: {
             namespace: 'ldata-rsltsts',
             type: 'singleMemberData',
             custId: '174470',
+        },
+    },
+    {
+        label: 'dotdProfile',
+        query: {
+            namespace: 'ldata-gentxt',
+            type: 'dotdProfile',
+            league: '4534',
+            custId: '174470',
+        },
+    },
+    {
+        label: 'driverSessionResults — race',
+        query: {
+            namespace: 'ldata-rsltsts',
+            type: 'driverSessionResults',
+            league: '4534',
+            custId: '174470',
+            sessionType: 'race',
+        },
+    },
+    {
+        label: 'driverSessionResults — sprint',
+        query: {
+            namespace: 'ldata-rsltsts',
+            type: 'driverSessionResults',
+            league: '4534',
+            custId: '174470',
+            sessionType: 'sprint',
+        },
+    },
+    {
+        label: 'driverSessionResults — quali',
+        query: {
+            namespace: 'ldata-rsltsts',
+            type: 'driverSessionResults',
+            league: '4534',
+            custId: '174470',
+            sessionType: 'quali',
         },
     },
 ];

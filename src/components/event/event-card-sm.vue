@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import { getshortTrackName } from '@@/src/utils/track-utils';
-import { ref, watchEffect } from 'vue';
 import type { Ref } from 'vue';
+import type { EventCardSmModel } from '@@/src/models/event/event-card-sm-model';
+import {
+    getEventCardSmModel,
+    getDefaultEventCardSmModel,
+} from '@@/src/models/event/event-card-sm-model';
+
 const props = defineProps<{
     track_id: string;
     is_next: boolean;
@@ -24,21 +28,18 @@ const shortMonthNames = [
     'Dec',
 ];
 
-async function fetchModel() {
-    return await getshortTrackName(props.track_id);
-}
-
-const shortName: Ref<string> = await asyncDataWithReactiveModel<string>(
-    `EventCardsSmallModel-${props.track_id}`,
-    fetchModel,
-    () => '',
-    [
-        () => props.track_id,
-        () => props.is_next,
-        () => props.date,
-        () => props.is_selected,
-    ]
-);
+const model: Ref<EventCardSmModel> =
+    await asyncDataWithReactiveModel<EventCardSmModel>(
+        `EventCardsSmallModel-${props.track_id}`,
+        () => getEventCardSmModel(props.track_id),
+        getDefaultEventCardSmModel,
+        [
+            () => props.track_id,
+            () => props.is_next,
+            () => props.date,
+            () => props.is_selected,
+        ]
+    );
 </script>
 
 <template>
@@ -92,17 +93,17 @@ const shortName: Ref<string> = await asyncDataWithReactiveModel<string>(
             <div
                 class="fs-6 d-flex d-sm-none flex-grow-1 justify-content-center align-items-center"
             >
-                {{ shortName }}
+                {{ model.shortTrackName }}
             </div>
             <div
                 class="fs-3 d-none d-sm-flex d-md-none flex-grow-1 justify-content-center align-items-center"
             >
-                {{ shortName }}
+                {{ model.shortTrackName }}
             </div>
             <div
                 class="fs-2 d-none d-sm-none d-md-flex flex-grow-1 justify-content-center align-items-center"
             >
-                {{ shortName }}
+                {{ model.shortTrackName }}
             </div>
         </div>
     </div>
