@@ -6,15 +6,11 @@ const props = defineProps<{
 </script>
 
 <template>
+    <!-- The leader's row is self-evident from the P1 position;
+         a chip would just add chrome. Render nothing for gap=0. -->
     <span
-        v-if="gap === 0"
-        class="gap gap--leader"
-        title="Championship leader"
-        >LEAD</span
-    >
-    <span
-        v-else
-        class="gap gap--behind"
+        v-if="gap > 0"
+        class="gap"
         v-bind:title="`${gap} points behind leader`"
         >−{{ gap }}</span
     >
@@ -28,17 +24,6 @@ const props = defineProps<{
     line-height: 1;
     font-variant-numeric: tabular-nums;
     letter-spacing: 0.02em;
-}
-.gap--leader {
-    color: var(--accent, #2f81f7);
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    padding: 2px 5px;
-    border: 1px solid var(--accent, #2f81f7);
-    border-radius: var(--radius-sm, 3px);
-    font-size: 0.62rem;
-}
-.gap--behind {
     color: var(--text-muted, #8b949e);
     opacity: 0.85;
 }
