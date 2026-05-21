@@ -1,15 +1,108 @@
 [
-{"season_id":131502,"season_title":"Season 18","sessions":[
-{"session_id":303795699,"subsession_id":84340245,"session_title":"Red Bull Ring - Super Formula SF23 - Honda","simsessions":[{"simsession_id":0,"type":"race"},{"simsession_id":-1,"type":"practice"},{"simsession_id":-2,"type":"sprint"},{"simsession_id":-3,"type":"qualify"},{"simsession_id":-4,"type":"practice"}]},
-{"session_id":304537831,"subsession_id":84522154,"session_title":"Watkins Glen International - Super Formula SF23 - Honda","simsessions":[{"simsession_id":0,"type":"race"},{"simsession_id":-1,"type":"practice"},{"simsession_id":-2,"type":"sprint"},{"simsession_id":-3,"type":"qualify"},{"simsession_id":-4,"type":"practice"}]},
-{"session_id":305274756,"subsession_id":84700093,"session_title":"Mobility Resort Motegi - Super Formula SF23 - Honda","simsessions":[{"simsession_id":0,"type":"race"},{"simsession_id":-1,"type":"practice"},{"simsession_id":-2,"type":"sprint"},{"simsession_id":-3,"type":"qualify"},{"simsession_id":-4,"type":"practice"}]},
-{"session_id":306008921,"subsession_id":84879951,"session_title":"Hockenheimring Baden-Württemberg - Super Formula SF23 - Honda","simsessions":[{"simsession_id":0,"type":"race"},{"simsession_id":-1,"type":"practice"},{"simsession_id":-2,"type":"sprint"},{"simsession_id":-3,"type":"qualify"},{"simsession_id":-4,"type":"practice"}]},
-{"session_id":306748625,"subsession_id":85056343,"session_title":"Circuit Zandvoort - Super Formula SF23 - Honda","simsessions":[{"simsession_id":0,"type":"race"},{"simsession_id":-1,"type":"practice"},{"simsession_id":-2,"type":"sprint"},{"simsession_id":-3,"type":"qualify"},{"simsession_id":-4,"type":"practice"}]},
-{"session_id":307489417,"subsession_id":85228727,"session_title":"St. Petersburg Grand Prix - Super Formula SF23 - Honda","simsessions":[{"simsession_id":0,"type":"race"},{"simsession_id":-1,"type":"practice"},{"simsession_id":-2,"type":"sprint"},{"simsession_id":-3,"type":"qualify"},{"simsession_id":-4,"type":"practice"}]},
-{"session_id":308225127,"subsession_id":85402874,"session_title":"Silverstone Circuit - Super Formula SF23 - Honda","simsessions":[{"simsession_id":0,"type":"race"},{"simsession_id":-1,"type":"practice"},{"simsession_id":-2,"type":"sprint"},{"simsession_id":-3,"type":"qualify"},{"simsession_id":-4,"type":"practice"}]},
-{"session_title":"Hungaroring - Super Formula SF23 - Honda","simsessions":[]},
-{"session_title":"Suzuka International Racing Course - Super Formula SF23 - Honda","simsessions":[]},
-{"session_title":"Long Beach Street Circuit - Super Formula SF23 - Honda","simsessions":[]},
-{"session_title":"Autódromo José Carlos Pace - Super Formula SF23 - Honda","simsessions":[]}
-]}
+    {
+        "season_id": 131502,
+        "season_title": "Season 18",
+        "sessions": [
+            {
+                "session_id": 303795699,
+                "subsession_id": 84340245,
+                "session_title": "Red Bull Ring - Super Formula SF23 - Honda",
+                "simsessions": [
+                    { "simsession_id": 0, "type": "race" },
+                    { "simsession_id": -1, "type": "practice" },
+                    { "simsession_id": -2, "type": "sprint" },
+                    { "simsession_id": -3, "type": "qualify" },
+                    { "simsession_id": -4, "type": "practice" }
+                ]
+            },
+            {
+                "session_id": 304537831,
+                "subsession_id": 84522154,
+                "session_title": "Watkins Glen International - Super Formula SF23 - Honda",
+                "simsessions": [
+                    { "simsession_id": 0, "type": "race" },
+                    { "simsession_id": -1, "type": "practice" },
+                    { "simsession_id": -2, "type": "sprint" },
+                    { "simsession_id": -3, "type": "qualify" },
+                    { "simsession_id": -4, "type": "practice" }
+                ]
+            },
+            {
+                "session_id": 305274756,
+                "subsession_id": 84700093,
+                "session_title": "Mobility Resort Motegi - Super Formula SF23 - Honda",
+                "simsessions": [
+                    { "simsession_id": 0, "type": "race" },
+                    { "simsession_id": -1, "type": "practice" },
+                    { "simsession_id": -2, "type": "sprint" },
+                    { "simsession_id": -3, "type": "qualify" },
+                    { "simsession_id": -4, "type": "practice" }
+                ]
+            },
+            {
+                "session_id": 306008921,
+                "subsession_id": 84879951,
+                "session_title": "Hockenheimring Baden-Württemberg - Super Formula SF23 - Honda",
+                "simsessions": [
+                    { "simsession_id": 0, "type": "race" },
+                    { "simsession_id": -1, "type": "practice" },
+                    { "simsession_id": -2, "type": "sprint" },
+                    { "simsession_id": -3, "type": "qualify" },
+                    { "simsession_id": -4, "type": "practice" }
+                ]
+            },
+            {
+                "session_id": 306748625,
+                "subsession_id": 85056343,
+                "session_title": "Circuit Zandvoort - Super Formula SF23 - Honda",
+                "simsessions": [
+                    { "simsession_id": 0, "type": "race" },
+                    { "simsession_id": -1, "type": "practice" },
+                    { "simsession_id": -2, "type": "sprint" },
+                    { "simsession_id": -3, "type": "qualify" },
+                    { "simsession_id": -4, "type": "practice" }
+                ]
+            },
+            {
+                "session_id": 307489417,
+                "subsession_id": 85228727,
+                "session_title": "St. Petersburg Grand Prix - Super Formula SF23 - Honda",
+                "simsessions": [
+                    { "simsession_id": 0, "type": "race" },
+                    { "simsession_id": -1, "type": "practice" },
+                    { "simsession_id": -2, "type": "sprint" },
+                    { "simsession_id": -3, "type": "qualify" },
+                    { "simsession_id": -4, "type": "practice" }
+                ]
+            },
+            {
+                "session_id": 308225127,
+                "subsession_id": 85402874,
+                "session_title": "Silverstone Circuit - Super Formula SF23 - Honda",
+                "simsessions": [
+                    { "simsession_id": 0, "type": "race" },
+                    { "simsession_id": -1, "type": "practice" },
+                    { "simsession_id": -2, "type": "sprint" },
+                    { "simsession_id": -3, "type": "qualify" },
+                    { "simsession_id": -4, "type": "practice" }
+                ]
+            },
+            {
+                "session_title": "Hungaroring - Super Formula SF23 - Honda",
+                "simsessions": []
+            },
+            {
+                "session_title": "Suzuka International Racing Course - Super Formula SF23 - Honda",
+                "simsessions": []
+            },
+            {
+                "session_title": "Long Beach Street Circuit - Super Formula SF23 - Honda",
+                "simsessions": []
+            },
+            {
+                "session_title": "Autódromo José Carlos Pace - Super Formula SF23 - Honda",
+                "simsessions": []
+            }
+        ]
+    }
 ]
