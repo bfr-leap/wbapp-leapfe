@@ -302,4 +302,203 @@ for (const [filename, value] of stubs) {
     writeFixture(filename, value);
 }
 
+// -----------------------------------------------------------------------------
+// 8. Per-race simSessionResults + simsessionSummary + photoIndex
+//
+// `/capture-broker` only fetches the canonical Watkins Glen tuple
+// (subsession 84522154). Production renders the season-schedule
+// page by walking every race's results, summary, and photo index —
+// each of those becomes its own broker call with a unique
+// (subsession, simsession) hash. Rather than enumerating 25+ more
+// tuples on the capture page, synthesize them from the schedule we
+// already have: borrow the Watkins driver list, rotate finishing
+// positions so each race has the correct winner from
+// `leagueSeasonSessions.sessions[].winner_id`, and write a short
+// AI-style race recap keyed on the track name. Same idempotency
+// guarantee as the rest of this script — a live capture for any of
+// these wins automatically.
+// -----------------------------------------------------------------------------
+
+const seasonSessions = readJson(
+    'ldata-irweb__leagueSeasonSessions__695f72c3d8.json'
+);
+const watkinsResults = readJson(
+    'ldata-rsltsts__simSessionResults__1ffc9a70d9.json'
+);
+
+if (
+    seasonSessions?.sessions &&
+    Array.isArray(watkinsResults?.results) &&
+    watkinsResults.results.length > 0
+) {
+    const baseResults = watkinsResults.results;
+    const trackHeadlines = {
+        'Red Bull Ring': {
+            title: 'Calloway Steals Spielberg In Final-Lap Shocker',
+            highlightWord: 'Calloway',
+        },
+        'Mobility Resort Motegi': {
+            title: 'Merchant Tames Motegi In Crosswinds',
+            highlightWord: 'Merchant',
+        },
+        'Hockenheimring Baden-Württemberg': {
+            title: 'Cawte Cracks Hockenheim Open',
+            highlightWord: 'Cawte',
+        },
+        'Circuit Zandvoort': {
+            title: 'Fitzsimmons Flies The Dunes',
+            highlightWord: 'Fitzsimmons',
+        },
+        'St. Petersburg Grand Prix': {
+            title: 'Rolls Threads The Pits Of St. Pete',
+            highlightWord: 'Rolls',
+        },
+        'Silverstone Circuit': {
+            title: 'Cawte Conducts Maggotts-Becketts Symphony',
+            highlightWord: 'Cawte',
+        },
+        'Watkins Glen International': {
+            title: 'Merchant Devours Glen, Shocks Universe',
+            highlightWord: 'Merchant',
+        },
+    };
+
+    /**
+     * Rotate the captured Watkins finishing order so a target
+     * cust_id lands at position 1. Preserves the rest of the field
+     * order (and incident counts / lap times / fastest laps), which
+     * is plenty to drive the table + chart layouts.
+     */
+    function rotateToWinner(targetCustId) {
+        const ordered = baseResults.map((r) => ({ ...r }));
+        const winnerIdx = ordered.findIndex(
+            (r) => r.cust_id === targetCustId
+        );
+        if (winnerIdx < 0) return ordered;
+        // Move winner to front, shift others down — only the
+        // `position` field is rewritten so the visual story
+        // (interval gaps, incident clusters) stays believable.
+        const winner = ordered.splice(winnerIdx, 1)[0];
+        ordered.unshift(winner);
+        ordered.forEach((r, i) => {
+            r.position = i + 1;
+        });
+        return ordered;
+    }
+
+    function raceRecap(trackName, winnerName) {
+        const headline = trackHeadlines[trackName] || {
+            title: `${winnerName.split(' ').pop()} Takes ${trackName}`,
+            highlightWord: winnerName.split(' ').pop(),
+        };
+        return {
+            title: headline.title,
+            highlightWord: headline.highlightWord,
+            text:
+                `The Feature at ${trackName} did not lack for ` +
+                `theatre. ${winnerName} controlled the front of the ` +
+                `field after a tense opening sequence, while the ` +
+                `midfield traded paint through the long sequences ` +
+                `and the slow corners. The strategy split was wider ` +
+                `than the gap between top and bottom of the table by ` +
+                `the time the lead car crossed the line.\n\nA ` +
+                `handful of incidents reshuffled the back third — ` +
+                `the usual mix of off-track excursions and ` +
+                `optimistic dive-bombs the stewards will be sifting ` +
+                `through this week. Up front, ${winnerName} drove a ` +
+                `mature race and never gave the chasers a sniff. ` +
+                `Next round should keep the title fight on a knife ` +
+                `edge.`,
+        };
+    }
+
+    for (const sess of seasonSessions.sessions) {
+        if (
+            !sess.subsession_id ||
+            !sess.has_results ||
+            !sess.winner_id ||
+            !sess.track?.track_name
+        )
+            continue;
+        const sub = String(sess.subsession_id);
+        const trackName = sess.track.track_name;
+        const winnerName = sess.winner_name || 'The Winner';
+
+        const raceResults = rotateToWinner(sess.winner_id);
+        const raceFixture = fixtureKey('ldata-rsltsts', 'simSessionResults', {
+            type: 'simSessionResults',
+            subsession: sub,
+            simsession: '0',
+        });
+        writeFixture(`${raceFixture}.json`, {
+            subsession_id: sess.subsession_id,
+            simsession_number: 0,
+            results: raceResults,
+        });
+
+        // Sprint usually has a different lead. Borrow the runner-up
+        // from the race to make it feel non-redundant.
+        const sprintLeader =
+            raceResults[1]?.cust_id ?? raceResults[0]?.cust_id;
+        const sprintResults = rotateToWinner(sprintLeader);
+        const sprintFixture = fixtureKey('ldata-rsltsts', 'simSessionResults', {
+            type: 'simSessionResults',
+            subsession: sub,
+            simsession: '-2',
+        });
+        writeFixture(`${sprintFixture}.json`, {
+            subsession_id: sess.subsession_id,
+            simsession_number: -2,
+            results: sprintResults,
+        });
+
+        const summaryFixture = fixtureKey('ldata-gentxt', 'simsessionSummary', {
+            type: 'simsessionSummary',
+            subsession: sub,
+            simsession: '0',
+        });
+        writeFixture(`${summaryFixture}.json`, raceRecap(trackName, winnerName));
+
+        const photoFixture = fixtureKey('ldata-photos', 'photoIndex', {
+            type: 'photoIndex',
+            subsession: sub,
+            simsession: '0',
+        });
+        // No photo pipeline in this league — empty index is the
+        // honest response. The component degrades gracefully when
+        // there's nothing to show.
+        writeFixture(`${photoFixture}.json`, []);
+    }
+}
+
+// -----------------------------------------------------------------------------
+// 9. Cross-season membersData fallbacks
+//
+// Pages that surface historical seasons (driver profile, results
+// detail) probe membersData for each prior season. Production
+// returns the same roster shape; we reuse the captured one so the
+// pages stop emitting "missing fixture" warnings — it's only the
+// names that bleed into older-season views, and they're the same
+// anonymized roster.
+// -----------------------------------------------------------------------------
+
+const currentMembers = readJson('ldata-irweb__membersData__95a253d21c.json');
+if (currentMembers) {
+    for (const priorSeason of ['118784', '122101', '125220', '128679']) {
+        const fname =
+            fixtureKey('ldata-irweb', 'membersData', {
+                type: 'membersData',
+                league: String(LEAGUE_ID),
+                season: priorSeason,
+            }) + '.json';
+        writeFixture(fname, currentMembers);
+    }
+    // Default-state (no params at all) membersData probe — null is
+    // what production returns until a league is selected.
+    const emptyFname =
+        fixtureKey('ldata-irweb', 'membersData', { type: 'membersData' }) +
+        '.json';
+    writeFixture(emptyFname, null);
+}
+
 console.log(`[synth] done. ${written} file(s) written, ${skipped} unchanged.`);
