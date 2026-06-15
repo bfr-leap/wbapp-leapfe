@@ -34,49 +34,93 @@ export async function getCdrAdminModel(
 ): Promise<CdrAdminModel> {
     let ret = getDefaultCdrAdminModel();
 
-    let activeLeagueSchedule = await getCuratedActiveLeagueSchedule();
+    // The track picker is independent of the league/season lookup, so load
+    // it first and populate `tracks` unconditionally. This keeps the calendar
+    // admin usable during the transitional window where a brand-new season has
+    // been resolved upstream (defLgSeasSubCtx) but has not yet propagated into
+    // the curated activeLeagueSchedule — the admin can still add the first
+    // events for the new season instead of facing a blank, dead page.
+    let trackDisplayInfo = await getCuratedTrackDisplayInfo();
+    if (trackDisplayInfo) {
+        ret.tracks = Object.keys(trackDisplayInfo)
+            .map((k) => {
+                return {
+                    id: Number.parseInt(k, 10),
+                    name: trackDisplayInfo[k].display,
+                };
+            })
+            .sort((a, b) => a.name.localeCompare(b.name));
+    } else {
+        console.warn(
+            '[CDR-ADMIN][read] getCuratedTrackDisplayInfo() returned ' +
+                'null/undefined — track picker will be empty'
+        );
+    }
 
+    let activeLeagueSchedule = await getCuratedActiveLeagueSchedule();
     if (!activeLeagueSchedule) {
+        console.warn(
+            '[CDR-ADMIN][read] getCuratedActiveLeagueSchedule() returned ' +
+                'null/undefined — rendering empty calendar'
+        );
         return ret;
     }
 
     let leagueInfo = activeLeagueSchedule.leagues.find(
         (v) => v.league_id.toString() === league
     );
-    if (!leagueInfo) {
-        return ret;
-    }
-
-    let seasonInfo = leagueInfo.seasons.find(
+    let seasonInfo = leagueInfo?.seasons.find(
         (v) => v.season_id.toString() === season
     );
-    if (!seasonInfo) {
+
+    if (!leagueInfo || !seasonInfo) {
+        // Transitional state: the season is live upstream but the curated
+        // schedule has not caught up yet. Degrade gracefully to an empty
+        // (but populatable) calendar rather than blanking the page.
+        console.warn(
+            '[CDR-ADMIN][read] league/season not yet present in ' +
+                'activeLeagueSchedule — rendering empty calendar (transitional)',
+            {
+                requestedLeague: league,
+                requestedSeason: season,
+                leagueFound: !!leagueInfo,
+                availableSeasonIds: leagueInfo?.seasons.map((v) =>
+                    v.season_id.toString()
+                ),
+            }
+        );
         return ret;
     }
 
-    let trackDisplayInfo = await getCuratedTrackDisplayInfo();
     if (!trackDisplayInfo) {
+        // No track names available (already warned above); we can still
+        // surface the events, just without resolved display names.
+        ret.events = seasonInfo.events.map((e) => ({
+            trackDisplayName: '',
+            trackId: e.track_id,
+            time: new Date(e.time),
+            eventId: e.event_id,
+        }));
         return ret;
     }
 
-    let events = seasonInfo.events;
-    ret.events = events.map((e) => {
+    ret.events = seasonInfo.events.map((e) => {
+        if (!trackDisplayInfo[e.track_id]) {
+            // A track_id present on an event but absent from trackDisplayInfo
+            // would otherwise throw here mid-map and blank the render.
+            console.warn(
+                '[CDR-ADMIN][read] event references a track_id missing from ' +
+                    'trackDisplayInfo',
+                { eventId: e.event_id, trackId: e.track_id }
+            );
+        }
         return {
-            trackDisplayName: trackDisplayInfo[e.track_id].display,
+            trackDisplayName: trackDisplayInfo[e.track_id]?.display ?? '',
             trackId: e.track_id,
             time: new Date(e.time),
             eventId: e.event_id,
         };
     });
-
-    ret.tracks = Object.keys(trackDisplayInfo)
-        .map((k) => {
-            return {
-                id: Number.parseInt(k, 10),
-                name: trackDisplayInfo[k].display,
-            };
-        })
-        .sort((a, b) => a.name.localeCompare(b.name));
 
     return ret;
 }

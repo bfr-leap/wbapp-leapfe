@@ -102,7 +102,21 @@ function showToast(message: string, isError: boolean) {
 // -- Actions --
 
 async function fetchModel() {
+    // [CDR-ADMIN][component] Instrumentation for the empty-calendar bug.
+    // Uses console.log (not console.debug) so it shows at the browser's
+    // default log level, and tags each line with where it ran so the
+    // client-side (hydration) pass is visible without disabling SSR.
+    // Remove once the empty-calendar bug is diagnosed.
+    const where = import.meta.client ? 'client' : 'server';
+    console.log(`[CDR-ADMIN][component] (${where}) fetchModel props`, {
+        league: props.league,
+        season: props.season,
+    });
     cdrAdminModel.value = await getCdrAdminModel(props.league, props.season);
+    console.log(`[CDR-ADMIN][component] (${where}) model resolved`, {
+        eventCount: cdrAdminModel.value.events.length,
+        trackCount: cdrAdminModel.value.tracks.length,
+    });
 }
 
 function onEdit(event: CdrAdminEvent) {
