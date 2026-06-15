@@ -195,7 +195,9 @@ async function loadRows() {
     try {
         const where: Record<string, string> = {};
         for (const [k, v] of Object.entries(filters.value)) {
-            const trimmed = (v ?? '').trim();
+            // Number-typed filter inputs bind a number via v-model, so
+            // coerce to a string before trimming.
+            const trimmed = String(v ?? '').trim();
             if (trimmed !== '') where[k] = trimmed;
         }
         const r = await listCrudRows(selectedTable.value, {
@@ -439,12 +441,15 @@ function closeForm() {
 
 function coerceValue(
     col: SchemaColumn,
-    raw: string | null,
+    raw: string | number | null,
     isNull: boolean
 ): string | number | null | undefined {
     if (isNull) return null;
-    if (raw === null) return null;
-    const trimmed = raw.trim();
+    if (raw === null || raw === undefined) return null;
+    // Vue casts v-model on <input type="number"> to a number (even without
+    // the .number modifier), so `raw` arrives as a number for INTEGER
+    // columns. Normalize to a string before trimming.
+    const trimmed = String(raw).trim();
     if (trimmed === '') {
         if (!col.notnull) return null;
         return undefined;
