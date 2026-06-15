@@ -102,7 +102,20 @@ function showToast(message: string, isError: boolean) {
 // -- Actions --
 
 async function fetchModel() {
+    // [CDR-ADMIN][component] Instrumentation for the empty-calendar bug:
+    // capture the props this component receives (they flow from
+    // HomeView's lgSeasSubCtx, which can fall back to a hardcoded
+    // default) and the event count the model resolves to. Remove once
+    // the empty-calendar bug is diagnosed.
+    console.debug('[CDR-ADMIN][component] fetchModel props', {
+        league: props.league,
+        season: props.season,
+    });
     cdrAdminModel.value = await getCdrAdminModel(props.league, props.season);
+    console.debug('[CDR-ADMIN][component] model resolved', {
+        eventCount: cdrAdminModel.value.events.length,
+        trackCount: cdrAdminModel.value.tracks.length,
+    });
 }
 
 function onEdit(event: CdrAdminEvent) {

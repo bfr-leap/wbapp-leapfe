@@ -34,16 +34,49 @@ export async function getCdrAdminModel(
 ): Promise<CdrAdminModel> {
     let ret = getDefaultCdrAdminModel();
 
+    // [CDR-ADMIN][read] Instrumentation: the read path has four silent
+    // early-return points that each yield an empty page. Log the inputs
+    // and which guard (if any) trips so we can tell *why* it's empty.
+    // Remove once the empty-calendar bug is diagnosed.
+    console.debug('[CDR-ADMIN][read] getCdrAdminModel called', {
+        league,
+        season,
+        leagueType: typeof league,
+        seasonType: typeof season,
+    });
+
     let activeLeagueSchedule = await getCuratedActiveLeagueSchedule();
 
     if (!activeLeagueSchedule) {
+        console.warn(
+            '[CDR-ADMIN][read] guard #1: getCuratedActiveLeagueSchedule() ' +
+                'returned null/undefined — returning empty model',
+            { activeLeagueSchedule }
+        );
         return ret;
     }
+
+    console.debug('[CDR-ADMIN][read] schedule loaded', {
+        leagueCount: activeLeagueSchedule.leagues?.length,
+        availableLeagueIds: activeLeagueSchedule.leagues?.map((v) =>
+            v.league_id?.toString()
+        ),
+    });
 
     let leagueInfo = activeLeagueSchedule.leagues.find(
         (v) => v.league_id.toString() === league
     );
     if (!leagueInfo) {
+        console.warn(
+            '[CDR-ADMIN][read] guard #2: no league in schedule matches the ' +
+                'requested league id — returning empty model',
+            {
+                requestedLeague: league,
+                availableLeagueIds: activeLeagueSchedule.leagues.map((v) =>
+                    v.league_id.toString()
+                ),
+            }
+        );
         return ret;
     }
 
@@ -51,18 +84,50 @@ export async function getCdrAdminModel(
         (v) => v.season_id.toString() === season
     );
     if (!seasonInfo) {
+        console.warn(
+            '[CDR-ADMIN][read] guard #3: no season in league matches the ' +
+                'requested season id — returning empty model',
+            {
+                requestedSeason: season,
+                requestedLeague: league,
+                availableSeasonIds: leagueInfo.seasons.map((v) =>
+                    v.season_id.toString()
+                ),
+            }
+        );
         return ret;
     }
 
+    console.debug('[CDR-ADMIN][read] season matched', {
+        league,
+        season,
+        eventCount: seasonInfo.events?.length,
+    });
+
     let trackDisplayInfo = await getCuratedTrackDisplayInfo();
     if (!trackDisplayInfo) {
+        console.warn(
+            '[CDR-ADMIN][read] guard #4: getCuratedTrackDisplayInfo() ' +
+                'returned null/undefined — returning empty model',
+            { trackDisplayInfo }
+        );
         return ret;
     }
 
     let events = seasonInfo.events;
     ret.events = events.map((e) => {
+        // [CDR-ADMIN][read] A track_id present on an event but absent from
+        // trackDisplayInfo would throw here mid-map and blank the render.
+        // Surface it explicitly instead of letting it crash silently.
+        if (!trackDisplayInfo[e.track_id]) {
+            console.warn(
+                '[CDR-ADMIN][read] event references a track_id missing from ' +
+                    'trackDisplayInfo',
+                { eventId: e.event_id, trackId: e.track_id }
+            );
+        }
         return {
-            trackDisplayName: trackDisplayInfo[e.track_id].display,
+            trackDisplayName: trackDisplayInfo[e.track_id]?.display,
             trackId: e.track_id,
             time: new Date(e.time),
             eventId: e.event_id,
