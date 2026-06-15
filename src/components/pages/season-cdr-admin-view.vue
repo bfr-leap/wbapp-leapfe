@@ -7,7 +7,7 @@ import { useAuth } from 'vue-clerk';
 
 import SeasonCdrAdmin from '@@/src/components/admin/season-cdr-admin.vue';
 
-const { isSignedIn } = useAuth();
+const { isLoaded, isSignedIn } = useAuth();
 
 const router = useRouter();
 
@@ -17,7 +17,10 @@ const props = defineProps<{
 }>();
 
 async function fetchModel() {
-    if (!isSignedIn.value) {
+    // Wait until Clerk has hydrated before deciding. Otherwise the initial
+    // (still-loading) pass sees isSignedIn=false and bounces a signed-in
+    // user straight back to the home page.
+    if (isLoaded.value && !isSignedIn.value) {
         router.replace({ path: '' });
     }
 }

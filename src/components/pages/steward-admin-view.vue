@@ -8,11 +8,13 @@ const props = defineProps<{
     league: string;
 }>();
 
-const { isSignedIn } = useAuth();
+const { isLoaded, isSignedIn } = useAuth();
 const router = useRouter();
 
 async function fetchModel() {
-    if (!isSignedIn.value) {
+    // Wait until Clerk has hydrated before redirecting, otherwise the
+    // still-loading initial pass bounces a signed-in user back to home.
+    if (isLoaded.value && !isSignedIn.value) {
         router.replace({ path: '' });
     }
 }
