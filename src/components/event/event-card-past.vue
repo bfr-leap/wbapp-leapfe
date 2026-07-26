@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue';
 import type { Ref } from 'vue';
 import type { EventCardPastModel } from '@@/src/models/event/event-card-past-model';
 import {
@@ -13,7 +14,20 @@ const props = defineProps<{
     winner_name?: string;
     headline?: string;
     protagonist_finish?: number;
+    subsession_id?: string;
 }>();
+
+// The winner's finish-line capture layers over the generic track
+// photo when it loads; capture coverage is still sparse, so falling
+// back to the track photo on a 404 is the common case, not an error
+// state.
+const winnerCaptureFailed = ref(false);
+watch(
+    () => props.subsession_id,
+    () => {
+        winnerCaptureFailed.value = false;
+    }
+);
 
 const shortMonthNames = [
     'Jan',
@@ -45,8 +59,18 @@ const model: Ref<EventCardPastModel> =
             class="bg"
             v-bind:src="`./tracks/${track_id.replace('-', 'n')}.jpg`"
         />
+        <img
+            v-if="subsession_id && !winnerCaptureFailed"
+            class="bg bg--winner"
+            v-bind:src="`/api/trkcam/winner/${subsession_id}`"
+            alt=""
+            loading="lazy"
+            @error="winnerCaptureFailed = true"
+        />
         <div class="content">
-            <header class="top d-flex justify-content-between align-items-start">
+            <header
+                class="top d-flex justify-content-between align-items-start"
+            >
                 <div class="meta">
                     <span class="meta__date">
                         {{ shortMonthNames[new Date(date).getMonth()] }}
@@ -119,6 +143,10 @@ const model: Ref<EventCardPastModel> =
     object-fit: cover;
     opacity: 0.7;
     z-index: 0;
+}
+
+.bg--winner {
+    opacity: 0.85;
 }
 
 .content {

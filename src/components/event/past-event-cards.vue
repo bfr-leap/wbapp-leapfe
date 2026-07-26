@@ -61,6 +61,7 @@ const pastEventCardsModel: Ref<PastEventCardsModel> =
                     v-bind:winner_name="race.winnerName"
                     v-bind:headline="race.headline"
                     v-bind:protagonist_finish="race.protagonistFinish"
+                    v-bind:subsession_id="race.sessionId"
                 />
             </RouterLinkProxy>
         </div>
