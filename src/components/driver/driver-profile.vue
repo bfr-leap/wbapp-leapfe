@@ -2,6 +2,7 @@
 import Stats from './driver-stats.vue';
 import DriverTag from './driver-tag.vue';
 import DriverPenaltySummary from './driver-penalty-summary.vue';
+import WinnerCaptureSection from '../event/winner-capture-section.vue';
 import { computed } from 'vue';
 import type { Ref } from 'vue';
 import { useRoute } from 'vue-router';
@@ -70,6 +71,11 @@ const penaltySeason = computed<string>(() => {
                 />
             </div>
         </section>
+
+        <WinnerCaptureSection
+            v-bind:src="`/api/trkcam/driver/${props.driver}/latest`"
+            title="Latest Win"
+        />
 
         <section v-if="driverProfileModel.dotdProfile?.blurb" class="section">
             <header class="section__head">
