@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, watchEffect } from 'vue';
+import { ref, computed, watchEffect } from 'vue';
 import { getPastEventCardsModel } from '@@/src/models/event/past-events-cards-model';
 import { getSubsessionSummaryEmbedModel } from '@@/src/models/embeds/subsession-summary-embed-model';
 import RouterLinkProxy from '@@/src/components/nav/router-link-proxy.vue';
+import PhotoGallery from './photo-gallery.vue';
 
 const props = defineProps<{
     league: string;
@@ -49,6 +50,20 @@ async function fetchSummary() {
 }
 
 watchEffect(fetchSummary);
+
+// Same PhotoGallery surface as the results page's Race Summary —
+// today just the winner's finish-line capture, extensible to more
+// per-event photos later without a redesign.
+const galleryPhotos = computed(() =>
+    subsession.value
+        ? [
+              {
+                  src: `/api/trkcam/winner/${subsession.value}`,
+                  alt: 'Winner finish-line capture',
+              },
+          ]
+        : []
+);
 </script>
 
 <template>
@@ -62,11 +77,14 @@ watchEffect(fetchSummary);
                 >See full results →
             </RouterLinkProxy>
         </header>
-        <div
-            class="summary-content"
-            v-bind:class="{ 'summary-content--collapsed': !expanded }"
-        >
-            <p v-for="(p, i) in summaryText" :key="i">{{ p }}</p>
+        <div class="summary-body">
+            <PhotoGallery v-bind:photos="galleryPhotos" />
+            <div
+                class="summary-content"
+                v-bind:class="{ 'summary-content--collapsed': !expanded }"
+            >
+                <p v-for="(p, i) in summaryText" :key="i">{{ p }}</p>
+            </div>
         </div>
         <button
             type="button"
@@ -79,6 +97,12 @@ watchEffect(fetchSummary);
 </template>
 
 <style scoped>
+.summary-body {
+    /* Clearfix: contains the gallery's floated photo(s) so the
+       section's height wraps around them too, not just the text. */
+    overflow: hidden;
+}
+
 .summary-content {
     line-height: 1.5;
     color: var(--text-primary);

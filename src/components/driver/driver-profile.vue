@@ -26,15 +26,22 @@ const driverId = computed(() => Number.parseInt(props.driver));
 
 // The driver's most recent winner-capture, used as the profile
 // header's backdrop photo; falls back to the plain header (today's
-// look) whenever they have no captured win yet.
+// look) whenever they have no captured win yet. Starts hidden and
+// only reveals once the image actually loads, so the common
+// no-capture case never shows anything to flicker away. No
+// `loading="lazy"` here deliberately — a lazy image with no layout
+// box (display:none) never intersects the viewport, so the browser
+// never fetches it and @load/@error never fire, leaving it hidden
+// forever.
 const latestWinPhotoSrc = computed(() =>
     props.driver ? `/api/trkcam/driver/${props.driver}/latest` : ''
 );
-const { failed: latestWinPhotoFailed, onError: onLatestWinPhotoError } =
-    useImageFallback(latestWinPhotoSrc);
-const hasLatestWinPhoto = computed(
-    () => !!latestWinPhotoSrc.value && !latestWinPhotoFailed.value
-);
+const {
+    ready: hasLatestWinPhoto,
+    onError: onLatestWinPhotoError,
+    onLoad: onLatestWinPhotoLoad,
+    imgEl: latestWinPhotoImgEl,
+} = useImageFallback(latestWinPhotoSrc);
 
 const driverProfileModel: Ref<DriverProfileModel> =
     await asyncDataWithReactiveModel<DriverProfileModel>(
@@ -67,11 +74,12 @@ const penaltySeason = computed<string>(() => {
         >
             <img
                 v-if="latestWinPhotoSrc"
-                v-show="!latestWinPhotoFailed"
+                ref="latestWinPhotoImgEl"
+                v-show="hasLatestWinPhoto"
                 class="profile-header__bg"
                 v-bind:src="latestWinPhotoSrc"
                 alt=""
-                loading="lazy"
+                @load="onLatestWinPhotoLoad"
                 @error="onLatestWinPhotoError"
             />
             <div

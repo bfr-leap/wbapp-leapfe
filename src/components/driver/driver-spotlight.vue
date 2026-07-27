@@ -29,10 +29,20 @@ async function fetchModel() {
 watchEffect(fetchModel);
 watch(() => [props.league, props.season, isSignedIn.value], fetchModel);
 
+// Starts hidden and only reveals once the image actually loads, so
+// the common no-capture case never shows anything to flicker away
+// (borders/gradient/padding only ever appear, never disappear). No
+// `loading="lazy"` here deliberately — a lazy image with no layout
+// box (display:none) never intersects the viewport, so the browser
+// never fetches it and @load/@error never fire, leaving it hidden
+// forever.
 const heroPhotoUrl = computed(() => model.value.heroPhotoUrl);
-const { failed: heroPhotoFailed, onError: onHeroPhotoError } =
-    useImageFallback(heroPhotoUrl);
-const hasPhoto = computed(() => !!heroPhotoUrl.value && !heroPhotoFailed.value);
+const {
+    ready: hasPhoto,
+    onError: onHeroPhotoError,
+    onLoad: onHeroPhotoLoad,
+    imgEl: heroPhotoImgEl,
+} = useImageFallback(heroPhotoUrl);
 </script>
 
 <template>
@@ -43,11 +53,12 @@ const hasPhoto = computed(() => !!heroPhotoUrl.value && !heroPhotoFailed.value);
     >
         <img
             v-if="model.heroPhotoUrl"
-            v-show="!heroPhotoFailed"
+            ref="heroPhotoImgEl"
+            v-show="hasPhoto"
             class="spotlight__bg"
             v-bind:src="model.heroPhotoUrl"
             alt=""
-            loading="lazy"
+            @load="onHeroPhotoLoad"
             @error="onHeroPhotoError"
         />
 

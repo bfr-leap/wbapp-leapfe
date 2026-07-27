@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, onMounted } from 'vue';
 
 export interface GalleryPhoto {
     src: string;
@@ -18,12 +18,31 @@ const failed = reactive(new Set<string>());
 function onError(src: string) {
     failed.add(src);
 }
+
+// A cached/fast-failing image can 404 before Vue finishes hydrating
+// and attaches @error, and a DOM event fired with no listener
+// attached is simply lost. Check each image's already-resolved state
+// once mounted so that race doesn't leave a broken-image icon stuck
+// in the gallery.
+const imgEls = new Map<string, HTMLImageElement>();
+
+function setImgEl(src: string, el: Element | null) {
+    if (el instanceof HTMLImageElement) imgEls.set(src, el);
+    else imgEls.delete(src);
+}
+
+onMounted(() => {
+    for (const [src, el] of imgEls) {
+        if (el.complete && el.naturalWidth === 0) onError(src);
+    }
+});
 </script>
 
 <template>
     <template v-for="photo in photos" :key="photo.src">
         <img
             v-if="!failed.has(photo.src)"
+            v-bind:ref="(el) => setImgEl(photo.src, el as Element | null)"
             class="gallery-photo"
             v-bind:src="photo.src"
             v-bind:alt="photo.alt || ''"

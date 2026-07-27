@@ -21,8 +21,11 @@ const props = defineProps<{
 // photo when it loads; capture coverage is still sparse, so falling
 // back to the track photo on a 404 is the common case, not an error
 // state.
-const { failed: winnerCaptureFailed, onError: onWinnerCaptureError } =
-    useImageFallback(toRef(props, 'subsession_id'));
+const {
+    failed: winnerCaptureFailed,
+    onError: onWinnerCaptureError,
+    imgEl: winnerCaptureImgEl,
+} = useImageFallback(toRef(props, 'subsession_id'));
 
 const shortMonthNames = [
     'Jan',
@@ -56,6 +59,7 @@ const model: Ref<EventCardPastModel> =
         />
         <img
             v-if="subsession_id && !winnerCaptureFailed"
+            ref="winnerCaptureImgEl"
             class="bg bg--winner"
             v-bind:src="`/api/trkcam/winner/${subsession_id}`"
             alt=""
