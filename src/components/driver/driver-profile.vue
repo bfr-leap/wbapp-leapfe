@@ -2,7 +2,6 @@
 import Stats from './driver-stats.vue';
 import DriverTag from './driver-tag.vue';
 import DriverPenaltySummary from './driver-penalty-summary.vue';
-import WinnerCaptureSection from '../event/winner-capture-section.vue';
 import { computed } from 'vue';
 import type { Ref } from 'vue';
 import { useRoute } from 'vue-router';
@@ -24,6 +23,18 @@ async function fetchModelData() {
 }
 
 const driverId = computed(() => Number.parseInt(props.driver));
+
+// The driver's most recent winner-capture, used as the profile
+// header's backdrop photo; falls back to the plain header (today's
+// look) whenever they have no captured win yet.
+const latestWinPhotoSrc = computed(() =>
+    props.driver ? `/api/trkcam/driver/${props.driver}/latest` : ''
+);
+const { failed: latestWinPhotoFailed, onError: onLatestWinPhotoError } =
+    useImageFallback(latestWinPhotoSrc);
+const hasLatestWinPhoto = computed(
+    () => !!latestWinPhotoSrc.value && !latestWinPhotoFailed.value
+);
 
 const driverProfileModel: Ref<DriverProfileModel> =
     await asyncDataWithReactiveModel<DriverProfileModel>(
@@ -50,7 +61,19 @@ const penaltySeason = computed<string>(() => {
 
 <template>
     <div class="page">
-        <section class="section profile-header">
+        <section
+            class="section profile-header"
+            :class="{ 'profile-header--has-photo': hasLatestWinPhoto }"
+        >
+            <img
+                v-if="latestWinPhotoSrc"
+                v-show="!latestWinPhotoFailed"
+                class="profile-header__bg"
+                v-bind:src="latestWinPhotoSrc"
+                alt=""
+                loading="lazy"
+                @error="onLatestWinPhotoError"
+            />
             <div
                 v-bind:class="`driver-img club-${driverProfileModel.memberView.clubId}`"
             ></div>
@@ -71,11 +94,6 @@ const penaltySeason = computed<string>(() => {
                 />
             </div>
         </section>
-
-        <WinnerCaptureSection
-            v-bind:src="`/api/trkcam/driver/${props.driver}/latest`"
-            title="Latest Win"
-        />
 
         <section v-if="driverProfileModel.dotdProfile?.blurb" class="section">
             <header class="section__head">
@@ -123,10 +141,50 @@ const penaltySeason = computed<string>(() => {
 
 <style scoped>
 .profile-header {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
     display: flex;
     align-items: center;
     gap: var(--space-4);
 }
+
+.profile-header--has-photo {
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-subtle);
+    padding: var(--space-3);
+}
+
+.profile-header__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    opacity: 0.55;
+    z-index: 0;
+}
+
+.profile-header--has-photo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.45) 0%,
+        rgba(0, 0, 0, 0.75) 100%
+    );
+    z-index: 1;
+    pointer-events: none;
+}
+
+.driver-img,
+.profile-info {
+    position: relative;
+    z-index: 2;
+}
+
 .profile-info {
     flex: 1;
     min-width: 0;
