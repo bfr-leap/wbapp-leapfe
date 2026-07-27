@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watchEffect } from 'vue';
+import { ref, computed, watchEffect } from 'vue';
 import type { Ref } from 'vue';
 import CumulativeDeltaChart from '@@/src/components/vis/cumulative-delta-chart.vue';
 import StartFinishChart from '../vis/start-finish-chart.vue';
@@ -7,6 +7,7 @@ import PaceChart from '../vis/pace-chart.vue';
 import BestQualifyLapChart from '@@/src/components/vis/best-qualify-lap-chart.vue';
 import GenericTable from '../vis/generic-table.vue';
 import TrackBanner from '../track/track-banner.vue';
+import PhotoGallery from '../event/photo-gallery.vue';
 import type { ResultsModel } from '@@/src/models/pages/results-model';
 import {
     getDefaultResultsModel,
@@ -48,6 +49,23 @@ const resultsModel: Ref<ResultsModel> =
     );
 
 const summaryExpanded = ref(false);
+
+// The race's photo gallery, embedded in the Race Summary text rather
+// than as a page-wide banner. Only the winner's finish-line capture
+// exists today, but trkcam is expected to grow more photos per event
+// over time — PhotoGallery already takes an array so that just means
+// more entries here later, not a redesign.
+const galleryPhotos = computed(() => {
+    const m = resultsModel.value;
+    const isRace = m.simsessionType === 'race' || m.simsessionType === 'sprint';
+    if (!isRace || !m.subsessionId) return [];
+    return [
+        {
+            src: `/api/trkcam/winner/${m.subsessionId}`,
+            alt: 'Winner finish-line capture',
+        },
+    ];
+});
 </script>
 
 <template>
@@ -134,13 +152,16 @@ const summaryExpanded = ref(false);
                 <header class="section__head">
                     <span class="section__title">Race Summary</span>
                 </header>
-                <div
-                    class="summary-content"
-                    v-bind:class="{
-                        'summary-content--collapsed': !summaryExpanded,
-                    }"
-                    v-html="resultsModel.summary[0]"
-                ></div>
+                <div class="summary-body">
+                    <PhotoGallery v-bind:photos="galleryPhotos" />
+                    <div
+                        class="summary-content"
+                        v-bind:class="{
+                            'summary-content--collapsed': !summaryExpanded,
+                        }"
+                        v-html="resultsModel.summary[0]"
+                    ></div>
+                </div>
                 <button
                     type="button"
                     class="summary-toggle"
@@ -173,6 +194,12 @@ const summaryExpanded = ref(false);
     text-align: center;
     padding: var(--space-6) 0;
     font-size: var(--text-sm);
+}
+
+.summary-body {
+    /* Clearfix: contains the gallery's floated photo(s) so the
+       section's height wraps around them too, not just the text. */
+    overflow: hidden;
 }
 
 .summary-content--collapsed {

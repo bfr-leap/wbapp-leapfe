@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watchEffect, watch } from 'vue';
+import { ref, watchEffect, watch, computed } from 'vue';
 import type { Ref } from 'vue';
 import { useAuth } from 'vue-clerk';
 import DriverTag from '@@/src/components/driver/driver-tag.vue';
@@ -28,19 +28,39 @@ async function fetchModel() {
 
 watchEffect(fetchModel);
 watch(() => [props.league, props.season, isSignedIn.value], fetchModel);
+
+// Starts hidden and only reveals once the image actually loads, so
+// the common no-capture case never shows anything to flicker away
+// (borders/gradient/padding only ever appear, never disappear). No
+// `loading="lazy"` here deliberately — a lazy image with no layout
+// box (display:none) never intersects the viewport, so the browser
+// never fetches it and @load/@error never fire, leaving it hidden
+// forever.
+const heroPhotoUrl = computed(() => model.value.heroPhotoUrl);
+const {
+    ready: hasPhoto,
+    onError: onHeroPhotoError,
+    onLoad: onHeroPhotoLoad,
+    imgEl: heroPhotoImgEl,
+} = useImageFallback(heroPhotoUrl);
 </script>
 
 <template>
     <section
         v-if="model.hasDriver && model.driver"
         class="section spotlight"
-        :class="{ 'spotlight--has-photo': model.heroPhotoUrl }"
+        :class="{ 'spotlight--has-photo': hasPhoto }"
     >
-        <div
+        <img
             v-if="model.heroPhotoUrl"
+            ref="heroPhotoImgEl"
+            v-show="hasPhoto"
             class="spotlight__bg"
-            :style="{ backgroundImage: `url(${model.heroPhotoUrl})` }"
-        ></div>
+            v-bind:src="model.heroPhotoUrl"
+            alt=""
+            @load="onHeroPhotoLoad"
+            @error="onHeroPhotoError"
+        />
 
         <header class="section__head spotlight__head">
             <span class="section__title">Driver Spotlight</span>
@@ -124,8 +144,10 @@ watch(() => [props.league, props.season, isSignedIn.value], fetchModel);
 .spotlight__bg {
     position: absolute;
     inset: 0;
-    background-size: cover;
-    background-position: center;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
     opacity: 0.55;
     z-index: 0;
 }
