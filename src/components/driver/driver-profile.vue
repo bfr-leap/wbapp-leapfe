@@ -2,6 +2,7 @@
 import Stats from './driver-stats.vue';
 import DriverTag from './driver-tag.vue';
 import DriverPenaltySummary from './driver-penalty-summary.vue';
+import PhotoGallery from '../event/photo-gallery.vue';
 import { computed } from 'vue';
 import type { Ref } from 'vue';
 import { useRoute } from 'vue-router';
@@ -50,6 +51,21 @@ const driverProfileModel: Ref<DriverProfileModel> =
         getDefaultDriverProfileModel,
         [() => props.league, () => props.driver]
     );
+
+// Photo gallery surface for the driver, separate from the header
+// backdrop above. Only the latest-win capture exists today, but
+// PhotoGallery takes an array so more per-driver photos later is
+// just more entries here, not a redesign.
+const galleryPhotos = computed(() =>
+    props.driver
+        ? [
+              {
+                  src: `/api/trkcam/driver/${props.driver}/latest`,
+                  alt: `${driverProfileModel.value.memberView.firstName} ${driverProfileModel.value.memberView.lastName}'s latest win`,
+              },
+          ]
+        : []
+);
 
 /**
  * Season for the penalty summary. Prefers an explicit season from the
@@ -100,6 +116,19 @@ const penaltySeason = computed<string>(() => {
                     v-bind:teamName="driverProfileModel.memberView.teamName"
                     v-bind:clubId="driverProfileModel.memberView.clubId"
                 />
+            </div>
+        </section>
+
+        <!-- Gated on the header photo's own load state (same URL
+             today) rather than a separate check, so this section
+             doesn't render an empty "Photos" header for the common
+             no-capture case. -->
+        <section v-if="hasLatestWinPhoto" class="section">
+            <header class="section__head">
+                <span class="section__title">Photos</span>
+            </header>
+            <div class="gallery-body">
+                <PhotoGallery v-bind:photos="galleryPhotos" />
             </div>
         </section>
 
@@ -196,6 +225,12 @@ const penaltySeason = computed<string>(() => {
 .profile-info {
     flex: 1;
     min-width: 0;
+}
+
+.gallery-body {
+    /* Clearfix: contains the gallery's floated photo(s) so the
+       section's height wraps around them too. */
+    overflow: hidden;
 }
 
 .dotd-profile-text {
