@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { toRef } from 'vue';
 import type { Ref } from 'vue';
 import type { EventCardPastModel } from '@@/src/models/event/event-card-past-model';
 import {
@@ -21,13 +21,8 @@ const props = defineProps<{
 // photo when it loads; capture coverage is still sparse, so falling
 // back to the track photo on a 404 is the common case, not an error
 // state.
-const winnerCaptureFailed = ref(false);
-watch(
-    () => props.subsession_id,
-    () => {
-        winnerCaptureFailed.value = false;
-    }
-);
+const { failed: winnerCaptureFailed, onError: onWinnerCaptureError } =
+    useImageFallback(toRef(props, 'subsession_id'));
 
 const shortMonthNames = [
     'Jan',
@@ -65,7 +60,7 @@ const model: Ref<EventCardPastModel> =
             v-bind:src="`/api/trkcam/winner/${subsession_id}`"
             alt=""
             loading="lazy"
-            @error="winnerCaptureFailed = true"
+            @error="onWinnerCaptureError"
         />
         <div class="content">
             <header

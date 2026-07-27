@@ -1,19 +1,12 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { toRef } from 'vue';
 
 const props = defineProps<{
     src: string;
     title: string;
 }>();
 
-const failed = ref(false);
-
-watch(
-    () => props.src,
-    () => {
-        failed.value = false;
-    }
-);
+const { failed, onError } = useImageFallback(toRef(props, 'src'));
 </script>
 
 <template>
@@ -26,7 +19,7 @@ watch(
             v-bind:src="src"
             alt="Winner finish-line capture"
             loading="lazy"
-            @error="failed = true"
+            @error="onError"
         />
     </section>
 </template>

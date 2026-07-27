@@ -7,7 +7,6 @@ import {
     getSimsessionResults,
     getTrackInfoDirectory,
 } from '@@/src/utils/fetch-util';
-import { getPhotoIndex, pickHeroPhoto } from '@@/src/services/photo-service';
 import { resolveProtagonistCustId } from './protagonist';
 
 export interface SpotlightLastRace {
@@ -95,10 +94,9 @@ export async function getDriverSpotlightModel(
     const latest = completed[0];
     if (!latest) return ret;
 
-    const [sim, trackInfo, photoIndex] = await Promise.all([
+    const [sim, trackInfo] = await Promise.all([
         getSimsessionResults(latest.sessionId, latest.simsessionId),
         getTrackInfoDirectory(league),
-        getPhotoIndex(latest.sessionId, latest.simsessionId),
     ]);
     const entry = sim?.results.find(
         (r) => r.cust_id.toString() === pick.custId
@@ -114,10 +112,16 @@ export async function getDriverSpotlightModel(
         positionsGained: entry.start_position - entry.position,
     };
 
-    const hero = pickHeroPhoto(photoIndex?.photos ?? [], pick.custId);
-    if (hero) {
-        ret.heroPhotoUrl = hero.url;
-        ret.heroPhotoCaption = hero.caption ?? null;
+    // Winner captures (trkcam) only exist for the subsession's actual
+    // winner, so a protagonist who won their last race gets that
+    // exact capture; otherwise fall back to their most recent win
+    // overall (a different race than the one just described).
+    if (entry.position === 1) {
+        ret.heroPhotoUrl = `/api/trkcam/winner/${latest.sessionId}`;
+        ret.heroPhotoCaption = `Winner at ${ret.lastRace.trackName}`;
+    } else {
+        ret.heroPhotoUrl = `/api/trkcam/driver/${pick.custId}/latest`;
+        ret.heroPhotoCaption = null;
     }
 
     return ret;

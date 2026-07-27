@@ -7,7 +7,6 @@ import PaceChart from '../vis/pace-chart.vue';
 import BestQualifyLapChart from '@@/src/components/vis/best-qualify-lap-chart.vue';
 import GenericTable from '../vis/generic-table.vue';
 import TrackBanner from '../track/track-banner.vue';
-import WinnerCaptureSection from '../event/winner-capture-section.vue';
 import type { ResultsModel } from '@@/src/models/pages/results-model';
 import {
     getDefaultResultsModel,
@@ -61,17 +60,16 @@ const summaryExpanded = ref(false);
             "
         >
             <section class="section">
-                <TrackBanner v-bind:track-id="resultsModel.trackId" />
+                <TrackBanner
+                    v-bind:track-id="resultsModel.trackId"
+                    v-bind:subsession-id="
+                        resultsModel.simsessionType === 'race' ||
+                        resultsModel.simsessionType === 'sprint'
+                            ? resultsModel.subsessionId
+                            : undefined
+                    "
+                />
             </section>
-
-            <WinnerCaptureSection
-                v-if="
-                    resultsModel.simsessionType === 'race' ||
-                    resultsModel.simsessionType === 'sprint'
-                "
-                v-bind:src="`/api/trkcam/winner/${resultsModel.subsessionId}`"
-                title="Winner"
-            />
 
             <section
                 v-if="
