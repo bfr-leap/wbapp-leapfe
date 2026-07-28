@@ -8,6 +8,7 @@ import BestQualifyLapChart from '@@/src/components/vis/best-qualify-lap-chart.vu
 import GenericTable from '../vis/generic-table.vue';
 import TrackBanner from '../track/track-banner.vue';
 import PhotoGallery from '../event/photo-gallery.vue';
+import PhotoCarousel from '../event/photo-carousel.vue';
 import type { ResultsModel } from '@@/src/models/pages/results-model';
 import {
     getDefaultResultsModel,
@@ -54,9 +55,10 @@ const resultsModel: Ref<ResultsModel> =
 
 const summaryExpanded = ref(false);
 
-// The race's photo gallery, embedded in the Race Summary text rather
-// than as a page-wide banner: the winner's finish-line capture first,
-// then any battles/crashes/overtakes/starts stills for the subsession.
+// The winner's finish-line capture, embedded in the Race Summary text
+// rather than as a page-wide banner. Just the one photo — the battles/
+// crashes/overtakes/starts highlights get their own carousel section
+// below instead of piling into this gallery.
 const galleryPhotos = computed(() => {
     const m = resultsModel.value;
     const isRace = m.simsessionType === 'race' || m.simsessionType === 'sprint';
@@ -66,12 +68,16 @@ const galleryPhotos = computed(() => {
             src: `/api/trkcam/winner/${m.subsessionId}`,
             alt: 'Winner finish-line capture',
         },
-        ...m.highlights.map((h) => ({
-            src: highlightImageUrl(h),
-            alt: HIGHLIGHT_CATEGORY_LABELS[h.category] || 'Highlight',
-        })),
     ];
 });
+
+const highlightPhotos = computed(() =>
+    resultsModel.value.highlights.map((h) => ({
+        src: highlightImageUrl(h),
+        alt: HIGHLIGHT_CATEGORY_LABELS[h.category] || 'Highlight',
+        caption: HIGHLIGHT_CATEGORY_LABELS[h.category] || 'Highlight',
+    }))
+);
 </script>
 
 <template>
@@ -175,6 +181,16 @@ const galleryPhotos = computed(() => {
                 >
                     {{ summaryExpanded ? 'Show less' : 'Read more →' }}
                 </button>
+            </section>
+
+            <section v-if="highlightPhotos.length" class="section">
+                <header class="section__head">
+                    <span class="section__title">Highlights</span>
+                </header>
+                <PhotoCarousel
+                    v-bind:id="`highlights-${resultsModel.subsessionId}`"
+                    v-bind:photos="highlightPhotos"
+                />
             </section>
 
             <section class="section">

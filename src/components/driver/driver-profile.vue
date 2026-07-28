@@ -2,7 +2,7 @@
 import Stats from './driver-stats.vue';
 import DriverTag from './driver-tag.vue';
 import DriverPenaltySummary from './driver-penalty-summary.vue';
-import PhotoGallery from '../event/photo-gallery.vue';
+import PhotoCarousel from '../event/photo-carousel.vue';
 import { computed } from 'vue';
 import type { Ref } from 'vue';
 import { useRoute } from 'vue-router';
@@ -56,20 +56,22 @@ const driverProfileModel: Ref<DriverProfileModel> =
         [() => props.league, () => props.driver]
     );
 
-// Photo gallery surface for the driver, separate from the header
+// Photo carousel surface for the driver, separate from the header
 // backdrop above: the latest-win capture first, then any
 // battles/crashes/overtakes/starts highlights featuring this driver
-// across all their races (not just wins).
+// across all their races (not just wins) — never another driver's.
 const galleryPhotos = computed(() =>
     props.driver
         ? [
               {
                   src: `/api/trkcam/driver/${props.driver}/latest`,
                   alt: `${driverProfileModel.value.memberView.firstName} ${driverProfileModel.value.memberView.lastName}'s latest win`,
+                  caption: 'Latest Win',
               },
               ...driverProfileModel.value.driverHighlights.map((h) => ({
                   src: highlightImageUrl(h),
                   alt: HIGHLIGHT_CATEGORY_LABELS[h.category] || 'Highlight',
+                  caption: HIGHLIGHT_CATEGORY_LABELS[h.category] || 'Highlight',
               })),
           ]
         : []
@@ -144,9 +146,10 @@ const penaltySeason = computed<string>(() => {
             <header class="section__head">
                 <span class="section__title">Photos</span>
             </header>
-            <div class="gallery-body">
-                <PhotoGallery v-bind:photos="galleryPhotos" />
-            </div>
+            <PhotoCarousel
+                v-bind:id="`photo-carousel-driver-${props.driver}`"
+                v-bind:photos="galleryPhotos"
+            />
         </section>
 
         <section v-if="driverProfileModel.dotdProfile?.blurb" class="section">
@@ -242,12 +245,6 @@ const penaltySeason = computed<string>(() => {
 .profile-info {
     flex: 1;
     min-width: 0;
-}
-
-.gallery-body {
-    /* Clearfix: contains the gallery's floated photo(s) so the
-       section's height wraps around them too. */
-    overflow: hidden;
 }
 
 .dotd-profile-text {

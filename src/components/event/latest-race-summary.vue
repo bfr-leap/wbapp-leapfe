@@ -2,12 +2,6 @@
 import { ref, computed, watchEffect } from 'vue';
 import { getPastEventCardsModel } from '@@/src/models/event/past-events-cards-model';
 import { getSubsessionSummaryEmbedModel } from '@@/src/models/embeds/subsession-summary-embed-model';
-import {
-    getHighlightsForSubsession,
-    highlightImageUrl,
-    HIGHLIGHT_CATEGORY_LABELS,
-} from '@@/src/services/highlights-service';
-import type { HighlightEntry } from '@@/lplib/endpoint-types/trkcam-endpoints';
 import RouterLinkProxy from '@@/src/components/nav/router-link-proxy.vue';
 import PhotoGallery from './photo-gallery.vue';
 
@@ -19,14 +13,12 @@ const props = defineProps<{
 const summaryText = ref<string[]>([]);
 const subsession = ref('');
 const simsession = ref('');
-const highlights = ref<HighlightEntry[]>([]);
 const expanded = ref(false);
 
 async function fetchSummary() {
     summaryText.value = [];
     subsession.value = '';
     simsession.value = '';
-    highlights.value = [];
 
     if (!props.league || !props.season) return;
 
@@ -55,14 +47,14 @@ async function fetchSummary() {
         ''
     );
     summaryText.value = (summary?.summaryText || []).filter((t) => t.trim());
-    highlights.value = await getHighlightsForSubsession(latest.sessionId);
 }
 
 watchEffect(fetchSummary);
 
-// Same PhotoGallery surface as the results page's Race Summary — the
-// winner's finish-line capture first, then any battles/crashes/
-// overtakes/starts highlights for the subsession.
+// Same PhotoGallery surface as the results page's Race Summary —
+// just the winner's finish-line capture; the front page doesn't need
+// the full highlight set (see the event page's own Highlights
+// carousel for that).
 const galleryPhotos = computed(() =>
     subsession.value
         ? [
@@ -70,10 +62,6 @@ const galleryPhotos = computed(() =>
                   src: `/api/trkcam/winner/${subsession.value}`,
                   alt: 'Winner finish-line capture',
               },
-              ...highlights.value.map((h) => ({
-                  src: highlightImageUrl(h),
-                  alt: HIGHLIGHT_CATEGORY_LABELS[h.category] || 'Highlight',
-              })),
           ]
         : []
 );
