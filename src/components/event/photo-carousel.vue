@@ -164,5 +164,11 @@ watch(
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.04em;
+    /* A light/bright photo can wash out plain white text, so layer a
+       tight dark shadow (legibility on any background) with a wider
+       soft glow (a halo so the letterforms read against busy detail
+       right behind them, not just a flat backdrop). */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95), 0 0 3px rgba(0, 0, 0, 0.95),
+        0 0 10px rgba(0, 0, 0, 0.8);
 }
 </style>
