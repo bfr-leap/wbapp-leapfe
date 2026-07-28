@@ -71,15 +71,30 @@ const galleryPhotos = computed(() => {
     ];
 });
 
-const highlightPhotos = computed(() =>
-    resultsModel.value.highlights.map((h) => ({
-        src: highlightImageUrl(h),
-        alt: `${h.driverName} — ${
-            HIGHLIGHT_CATEGORY_LABELS[h.category] || 'Highlight'
-        }`,
-        caption: h.driverName,
-    }))
-);
+// The Highlights carousel: the winner's finish-line capture first (also
+// shown next to the Race Summary above — this is a fuller gallery, not
+// a replacement for it), then the battles/crashes/overtakes/starts
+// stills.
+const highlightPhotos = computed(() => {
+    const m = resultsModel.value;
+    const isRace = m.simsessionType === 'race' || m.simsessionType === 'sprint';
+    if (!isRace || !m.subsessionId) return [];
+    const winnerCaption = m.winnerName || 'Winner';
+    return [
+        {
+            src: `/api/trkcam/winner/${m.subsessionId}`,
+            alt: `${winnerCaption} — winner finish-line capture`,
+            caption: winnerCaption,
+        },
+        ...m.highlights.map((h) => ({
+            src: highlightImageUrl(h),
+            alt: `${h.driverName} — ${
+                HIGHLIGHT_CATEGORY_LABELS[h.category] || 'Highlight'
+            }`,
+            caption: h.driverName,
+        })),
+    ];
+});
 </script>
 
 <template>

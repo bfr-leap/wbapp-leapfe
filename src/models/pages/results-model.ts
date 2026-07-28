@@ -33,6 +33,7 @@ export interface ResultsModel {
     }[];
     summary: string[];
     highlights: ResultsHighlight[];
+    winnerName: string;
 }
 
 export function getDefaultResultsModel(): ResultsModel {
@@ -47,6 +48,7 @@ export function getDefaultResultsModel(): ResultsModel {
         results: [],
         summary: [],
         highlights: [],
+        winnerName: '',
     };
 }
 
@@ -190,13 +192,18 @@ export async function getResultsModel(
         -1 !==
         (telemetrySubsessionIds?.indexOf(parseInt(ret.subsessionId, 10)) || -1);
 
-    // Highlights (battles, crashes, overtakes, starts) only exist for
-    // race/sprint subsessions — skip the round-trip for qualify/practice.
+    // Highlights (battles, crashes, overtakes, starts) and the winner's
+    // name only apply to race/sprint subsessions — skip the round-trips
+    // for qualify/practice.
     if (ret.simsessionType === 'race' || ret.simsessionType === 'sprint') {
         const rawHighlights = await getHighlightsForSubsession(
             ret.subsessionId
         );
-        if (rawHighlights.length > 0) {
+        const winnerRow = (simsessionResults?.results || []).find(
+            (row) => row.position === 1
+        );
+
+        if (rawHighlights.length > 0 || winnerRow) {
             const members = await getMembersData(leagueId, ret.seasonId);
             const nameByCustId = new Map<number, string>();
             for (const m of members?.members || []) {
@@ -208,6 +215,11 @@ export async function getResultsModel(
                     nameByCustId.get(h.driver_user_id) ||
                     `Driver #${h.driver_user_id}`,
             }));
+            if (winnerRow) {
+                ret.winnerName =
+                    nameByCustId.get(winnerRow.cust_id) ||
+                    `Driver #${winnerRow.cust_id}`;
+            }
         }
     }
 
