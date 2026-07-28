@@ -22,6 +22,14 @@ const props = defineProps<{
     photos: CarouselPhoto[];
 }>();
 
+// Lets a caller avoid wrapping this in a section header that would
+// otherwise sit empty: `photos` can include unconfirmed "guessed URL"
+// entries (e.g. a winner capture) that all 404, leaving nothing to
+// show even though the prop list itself was non-empty.
+const emit = defineEmits<{
+    (e: 'update:hasPhotos', value: boolean): void;
+}>();
+
 // Photos are pre-confirmed to exist (built from a broker index) except
 // possibly the caller's own "guessed URL" entries (e.g. a winner
 // capture) — track failures per-src so those quietly drop out instead
@@ -32,6 +40,12 @@ function onImgError(src: string) {
 }
 const visiblePhotos = computed(() =>
     props.photos.filter((p) => !failed.has(p.src))
+);
+
+watch(
+    () => visiblePhotos.value.length > 0,
+    (hasPhotos) => emit('update:hasPhotos', hasPhotos),
+    { immediate: true }
 );
 
 // Bootstrap ships no TypeScript types for the standalone bundle; only

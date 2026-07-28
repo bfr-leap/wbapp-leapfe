@@ -55,6 +55,13 @@ const resultsModel: Ref<ResultsModel> =
 
 const summaryExpanded = ref(false);
 
+// Whether the Highlights carousel actually has anything to show, per
+// its own `update:hasPhotos` — distinct from `highlightPhotos.length`,
+// which stays >0 even when its lone "guessed URL" winner entry 404s
+// and there are no real highlights for this subsession. Without this,
+// the section would render its header over an empty carousel.
+const highlightsVisible = ref(false);
+
 // The winner's finish-line capture, embedded in the Race Summary text
 // rather than as a page-wide banner. Just the one photo — the battles/
 // crashes/overtakes/starts highlights get their own carousel section
@@ -200,13 +207,18 @@ const highlightPhotos = computed(() => {
                 </button>
             </section>
 
-            <section v-if="highlightPhotos.length" class="section">
+            <section
+                v-if="highlightPhotos.length"
+                v-show="highlightsVisible"
+                class="section"
+            >
                 <header class="section__head">
                     <span class="section__title">Highlights</span>
                 </header>
                 <PhotoCarousel
                     v-bind:id="`highlights-${resultsModel.subsessionId}`"
                     v-bind:photos="highlightPhotos"
+                    @update:has-photos="highlightsVisible = $event"
                 />
             </section>
 

@@ -88,4 +88,49 @@ describe('PhotoCarousel', () => {
             wrapper.find('.carousel-control-next').attributes('data-bs-target')
         ).toBe('#my-carousel-42');
     });
+
+    describe('update:hasPhotos', () => {
+        it('emits true immediately when there are photos', async () => {
+            const wrapper = mount(PhotoCarousel, {
+                props: { id: 'has-photos', photos: PHOTOS },
+            });
+            await flushPromises();
+            expect(wrapper.emitted('update:hasPhotos')?.[0]).toEqual([true]);
+        });
+
+        it('emits false immediately when there are no photos', async () => {
+            const wrapper = mount(PhotoCarousel, {
+                props: { id: 'no-photos', photos: [] },
+            });
+            await flushPromises();
+            expect(wrapper.emitted('update:hasPhotos')?.[0]).toEqual([false]);
+        });
+
+        it('emits false once every photo fails, so a caller can hide a wrapping section instead of leaving it empty', async () => {
+            const wrapper = mount(PhotoCarousel, {
+                props: { id: 'all-fail', photos: [PHOTOS[0]] },
+            });
+            await flushPromises();
+            expect(wrapper.emitted('update:hasPhotos')?.[0]).toEqual([true]);
+
+            await wrapper.find('img').trigger('error');
+            await flushPromises();
+
+            const emissions = wrapper.emitted('update:hasPhotos') || [];
+            expect(emissions[emissions.length - 1]).toEqual([false]);
+        });
+
+        it('stays true if only some photos fail', async () => {
+            const wrapper = mount(PhotoCarousel, {
+                props: { id: 'some-fail', photos: PHOTOS },
+            });
+            await flushPromises();
+
+            await wrapper.findAll('img')[0].trigger('error');
+            await flushPromises();
+
+            const emissions = wrapper.emitted('update:hasPhotos') || [];
+            expect(emissions[emissions.length - 1]).toEqual([true]);
+        });
+    });
 });
