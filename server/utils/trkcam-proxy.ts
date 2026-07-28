@@ -1,8 +1,8 @@
 /**
- * Proxies the broker's `/trkcam/*` endpoints, which are the only ones
- * that return `image/png` bytes instead of JSON. Kept separate from
+ * Proxies the broker's `/trkcam/*` endpoints directly, bypassing
  * `fetch-document.ts` because that handler's fixture/record machinery
- * assumes a JSON body throughout.
+ * assumes a namespace/type-keyed JSON body throughout, and the image
+ * routes below return `image/png` bytes instead.
  */
 
 import type { H3Event } from 'h3';
@@ -45,4 +45,31 @@ export async function proxyTrkcamImage(
     if (cacheControl) setResponseHeader(event, 'cache-control', cacheControl);
 
     return Buffer.from(await res.arrayBuffer());
+}
+
+/**
+ * Proxies one of the highlight index endpoints (`/trkcam/highlights/*`),
+ * which return JSON on both success and error — unlike
+ * `proxyTrkcamImage`, there are no binary bytes or image headers to
+ * forward here.
+ */
+export async function proxyTrkcamJson(
+    event: H3Event,
+    path: string
+): Promise<unknown> {
+    let res: Response;
+    try {
+        res = await fetch(`${BASE_URL}${path}`, {
+            signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+        });
+    } catch (e) {
+        setResponseStatus(event, 502);
+        return { error: 'Highlight index service unavailable' };
+    }
+
+    setResponseStatus(event, res.status);
+
+    return await res
+        .json()
+        .catch(() => ({ error: 'Highlight index not found' }));
 }

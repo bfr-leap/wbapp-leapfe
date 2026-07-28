@@ -11,6 +11,10 @@ import {
     getDefaultDriverProfileModel,
     getDriverProfileModel,
 } from '@@/src/models/driver/driver-profile-model';
+import {
+    highlightImageUrl,
+    HIGHLIGHT_CATEGORY_LABELS,
+} from '@@/src/services/highlights-service';
 
 const props = defineProps<{
     league: string;
@@ -53,9 +57,9 @@ const driverProfileModel: Ref<DriverProfileModel> =
     );
 
 // Photo gallery surface for the driver, separate from the header
-// backdrop above. Only the latest-win capture exists today, but
-// PhotoGallery takes an array so more per-driver photos later is
-// just more entries here, not a redesign.
+// backdrop above: the latest-win capture first, then any
+// battles/crashes/overtakes/starts highlights featuring this driver
+// across all their races (not just wins).
 const galleryPhotos = computed(() =>
     props.driver
         ? [
@@ -63,8 +67,22 @@ const galleryPhotos = computed(() =>
                   src: `/api/trkcam/driver/${props.driver}/latest`,
                   alt: `${driverProfileModel.value.memberView.firstName} ${driverProfileModel.value.memberView.lastName}'s latest win`,
               },
+              ...driverProfileModel.value.driverHighlights.map((h) => ({
+                  src: highlightImageUrl(h),
+                  alt: HIGHLIGHT_CATEGORY_LABELS[h.category] || 'Highlight',
+              })),
           ]
         : []
+);
+
+// Gates the "Photos" section: the header backdrop's own load state
+// covers the latest-win capture, but a driver can have highlights
+// (battles, crashes, overtakes, starts) without ever having won, so
+// the section should still show up for those.
+const hasGalleryPhotos = computed(
+    () =>
+        hasLatestWinPhoto.value ||
+        driverProfileModel.value.driverHighlights.length > 0
 );
 
 /**
@@ -119,11 +137,10 @@ const penaltySeason = computed<string>(() => {
             </div>
         </section>
 
-        <!-- Gated on the header photo's own load state (same URL
-             today) rather than a separate check, so this section
-             doesn't render an empty "Photos" header for the common
-             no-capture case. -->
-        <section v-if="hasLatestWinPhoto" class="section">
+        <!-- Gated on hasGalleryPhotos (header photo load state OR any
+             driver highlights) so this section doesn't render an empty
+             "Photos" header for the common no-capture case. -->
+        <section v-if="hasGalleryPhotos" class="section">
             <header class="section__head">
                 <span class="section__title">Photos</span>
             </header>

@@ -3,6 +3,7 @@ import type {
     SSI_Session,
     SSI_Simsession,
 } from 'lplib/endpoint-types/iracing-endpoints';
+import type { HighlightEntry } from '@@/lplib/endpoint-types/trkcam-endpoints';
 import {
     getLeagueSimsessionIndex,
     getLeagueSeasonSessions,
@@ -10,6 +11,7 @@ import {
     getTelemetrySubsessionIds,
     getGeneratedSimsessionSummary,
 } from '@@/src/utils/fetch-util';
+import { getHighlightsForSubsession } from '@@/src/services/highlights-service';
 import MarkdownIt from 'markdown-it';
 
 export interface ResultsModel {
@@ -24,6 +26,7 @@ export interface ResultsModel {
         [name: string]: string;
     }[];
     summary: string[];
+    highlights: HighlightEntry[];
 }
 
 export function getDefaultResultsModel(): ResultsModel {
@@ -37,6 +40,7 @@ export function getDefaultResultsModel(): ResultsModel {
         trackId: '',
         results: [],
         summary: [],
+        highlights: [],
     };
 }
 
@@ -179,6 +183,12 @@ export async function getResultsModel(
     ret.hasTelemetry =
         -1 !==
         (telemetrySubsessionIds?.indexOf(parseInt(ret.subsessionId, 10)) || -1);
+
+    // Highlights (battles, crashes, overtakes, starts) only exist for
+    // race/sprint subsessions — skip the round-trip for qualify/practice.
+    if (ret.simsessionType === 'race' || ret.simsessionType === 'sprint') {
+        ret.highlights = await getHighlightsForSubsession(ret.subsessionId);
+    }
 
     return ret;
 }

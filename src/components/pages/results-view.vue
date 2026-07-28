@@ -13,6 +13,10 @@ import {
     getDefaultResultsModel,
     getResultsModel,
 } from '@@/src/models/pages/results-model';
+import {
+    highlightImageUrl,
+    HIGHLIGHT_CATEGORY_LABELS,
+} from '@@/src/services/highlights-service';
 
 const props = defineProps<{
     league: string;
@@ -51,10 +55,8 @@ const resultsModel: Ref<ResultsModel> =
 const summaryExpanded = ref(false);
 
 // The race's photo gallery, embedded in the Race Summary text rather
-// than as a page-wide banner. Only the winner's finish-line capture
-// exists today, but trkcam is expected to grow more photos per event
-// over time — PhotoGallery already takes an array so that just means
-// more entries here later, not a redesign.
+// than as a page-wide banner: the winner's finish-line capture first,
+// then any battles/crashes/overtakes/starts stills for the subsession.
 const galleryPhotos = computed(() => {
     const m = resultsModel.value;
     const isRace = m.simsessionType === 'race' || m.simsessionType === 'sprint';
@@ -64,6 +66,10 @@ const galleryPhotos = computed(() => {
             src: `/api/trkcam/winner/${m.subsessionId}`,
             alt: 'Winner finish-line capture',
         },
+        ...m.highlights.map((h) => ({
+            src: highlightImageUrl(h),
+            alt: HIGHLIGHT_CATEGORY_LABELS[h.category] || 'Highlight',
+        })),
     ];
 });
 </script>

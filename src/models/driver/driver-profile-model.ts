@@ -8,6 +8,7 @@ import type {
     SSR_ResultsEntry,
     DotdProfile,
 } from '@@/lplib/endpoint-types/iracing-endpoints';
+import type { HighlightEntry } from '@@/lplib/endpoint-types/trkcam-endpoints';
 
 import {
     getCuratedLeagueTeamsInfo,
@@ -17,6 +18,7 @@ import {
     getSingleMemberData,
     getDotdProfile,
 } from '@@/src/utils/fetch-util';
+import { getHighlightsForDriver } from '@@/src/services/highlights-service';
 
 import { getMemberViewFromM_Member } from '@@/src/utils/driver-utils';
 
@@ -50,6 +52,7 @@ export interface DriverProfileModel {
     allTimeResults: DriverResultsModel;
     memberView: MemberView;
     dotdProfile: DotdProfile | null;
+    driverHighlights: HighlightEntry[];
 }
 
 export function getDefaultDriverProfileModel(): DriverProfileModel {
@@ -71,6 +74,7 @@ export function getDefaultDriverProfileModel(): DriverProfileModel {
             teamId: 0,
         },
         dotdProfile: null,
+        driverHighlights: [],
     };
 }
 
@@ -104,6 +108,11 @@ export async function getDriverProfileModel(league: string, driver: string) {
     const driverStatsMap = await getLeagueDriverStats(league);
     const leagueTeamsInfo = await getCuratedLeagueTeamsInfo(league);
     const singleMemberData = await getSingleMemberData(driver);
+    // Featured moments across all of the driver's races, not just wins —
+    // independent of the session-results fetches below, so it's assigned
+    // on every return path.
+    const driverHighlights = await getHighlightsForDriver(driver);
+    ret.driverHighlights = driverHighlights;
 
     const leagueSeasons = await getLeagueSeasons(league);
     const dotdProfile = await getDotdProfile(league, driver);
