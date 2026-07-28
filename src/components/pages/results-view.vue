@@ -118,6 +118,21 @@ const highlightPhotos = computed(() => {
             </section>
 
             <section
+                v-if="highlightPhotos.length"
+                v-show="highlightsVisible"
+                class="section"
+            >
+                <header class="section__head">
+                    <span class="section__title">Highlights</span>
+                </header>
+                <PhotoCarousel
+                    v-bind:id="`highlights-${resultsModel.subsessionId}`"
+                    v-bind:photos="highlightPhotos"
+                    @update:has-photos="highlightsVisible = $event"
+                />
+            </section>
+
+            <section
                 v-if="
                     resultsModel.simsessionType === 'race' ||
                     resultsModel.simsessionType === 'sprint'
@@ -205,21 +220,6 @@ const highlightPhotos = computed(() => {
                 >
                     {{ summaryExpanded ? 'Show less' : 'Read more →' }}
                 </button>
-            </section>
-
-            <section
-                v-if="highlightPhotos.length"
-                v-show="highlightsVisible"
-                class="section"
-            >
-                <header class="section__head">
-                    <span class="section__title">Highlights</span>
-                </header>
-                <PhotoCarousel
-                    v-bind:id="`highlights-${resultsModel.subsessionId}`"
-                    v-bind:photos="highlightPhotos"
-                    @update:has-photos="highlightsVisible = $event"
-                />
             </section>
 
             <section class="section">
