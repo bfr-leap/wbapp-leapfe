@@ -70,8 +70,10 @@ const galleryPhotos = computed(() =>
               },
               ...driverProfileModel.value.driverHighlights.map((h) => ({
                   src: highlightImageUrl(h),
-                  alt: HIGHLIGHT_CATEGORY_LABELS[h.category] || 'Highlight',
-                  caption: HIGHLIGHT_CATEGORY_LABELS[h.category] || 'Highlight',
+                  alt: `${driverProfileModel.value.memberView.firstName} ${
+                      driverProfileModel.value.memberView.lastName
+                  } — ${HIGHLIGHT_CATEGORY_LABELS[h.category] || 'Highlight'}`,
+                  caption: `${driverProfileModel.value.memberView.firstName} ${driverProfileModel.value.memberView.lastName}`,
               })),
           ]
         : []

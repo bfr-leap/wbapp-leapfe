@@ -74,8 +74,10 @@ const galleryPhotos = computed(() => {
 const highlightPhotos = computed(() =>
     resultsModel.value.highlights.map((h) => ({
         src: highlightImageUrl(h),
-        alt: HIGHLIGHT_CATEGORY_LABELS[h.category] || 'Highlight',
-        caption: HIGHLIGHT_CATEGORY_LABELS[h.category] || 'Highlight',
+        alt: `${h.driverName} — ${
+            HIGHLIGHT_CATEGORY_LABELS[h.category] || 'Highlight'
+        }`,
+        caption: h.driverName,
     }))
 );
 </script>

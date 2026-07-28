@@ -10,9 +10,15 @@ import {
     getSimsessionResults,
     getTelemetrySubsessionIds,
     getGeneratedSimsessionSummary,
+    getMembersData,
 } from '@@/src/utils/fetch-util';
 import { getHighlightsForSubsession } from '@@/src/services/highlights-service';
 import MarkdownIt from 'markdown-it';
+
+/** A highlight with its `driver_user_id` resolved to a display name. */
+export interface ResultsHighlight extends HighlightEntry {
+    driverName: string;
+}
 
 export interface ResultsModel {
     hasTelemetry: boolean;
@@ -26,7 +32,7 @@ export interface ResultsModel {
         [name: string]: string;
     }[];
     summary: string[];
-    highlights: HighlightEntry[];
+    highlights: ResultsHighlight[];
 }
 
 export function getDefaultResultsModel(): ResultsModel {
@@ -187,7 +193,22 @@ export async function getResultsModel(
     // Highlights (battles, crashes, overtakes, starts) only exist for
     // race/sprint subsessions — skip the round-trip for qualify/practice.
     if (ret.simsessionType === 'race' || ret.simsessionType === 'sprint') {
-        ret.highlights = await getHighlightsForSubsession(ret.subsessionId);
+        const rawHighlights = await getHighlightsForSubsession(
+            ret.subsessionId
+        );
+        if (rawHighlights.length > 0) {
+            const members = await getMembersData(leagueId, ret.seasonId);
+            const nameByCustId = new Map<number, string>();
+            for (const m of members?.members || []) {
+                nameByCustId.set(m.cust_id, m.display_name);
+            }
+            ret.highlights = rawHighlights.map((h) => ({
+                ...h,
+                driverName:
+                    nameByCustId.get(h.driver_user_id) ||
+                    `Driver #${h.driver_user_id}`,
+            }));
+        }
     }
 
     return ret;
