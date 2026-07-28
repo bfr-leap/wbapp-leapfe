@@ -52,8 +52,9 @@ async function fetchSummary() {
 watchEffect(fetchSummary);
 
 // Same PhotoGallery surface as the results page's Race Summary —
-// today just the winner's finish-line capture, extensible to more
-// per-event photos later without a redesign.
+// just the winner's finish-line capture; the front page doesn't need
+// the full highlight set (see the event page's own Highlights
+// carousel for that).
 const galleryPhotos = computed(() =>
     subsession.value
         ? [

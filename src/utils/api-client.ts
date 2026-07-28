@@ -234,3 +234,17 @@ export async function fetchUncached<T = unknown>(args: {
     let ret = await fetchObjects([source]);
     return (ret[0] as { doc: T } | null)?.doc as T;
 }
+
+/**
+ * Fetch an arbitrary same-origin JSON path, uncached and without the
+ * `/api/fetch-document` namespace wrapper — for data accessors that proxy
+ * a broker surface directly instead of going through `getDocument()`
+ * (e.g. the trkcam highlight index, `server/api/trkcam/highlights/*`).
+ * Returns `null` on any error, matching `fetchObjects`' own fallback.
+ */
+export async function fetchJsonPath<T = unknown>(
+    path: string
+): Promise<T | null> {
+    const [result] = await fetchObjects([path]);
+    return (result as T | null) ?? null;
+}

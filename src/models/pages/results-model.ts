@@ -3,14 +3,22 @@ import type {
     SSI_Session,
     SSI_Simsession,
 } from 'lplib/endpoint-types/iracing-endpoints';
+import type { HighlightEntry } from '@@/lplib/endpoint-types/trkcam-endpoints';
 import {
     getLeagueSimsessionIndex,
     getLeagueSeasonSessions,
     getSimsessionResults,
     getTelemetrySubsessionIds,
     getGeneratedSimsessionSummary,
+    getMembersData,
 } from '@@/src/utils/fetch-util';
+import { getHighlightsForSubsession } from '@@/src/services/highlights-service';
 import MarkdownIt from 'markdown-it';
+
+/** A highlight with its `driver_user_id` resolved to a display name. */
+export interface ResultsHighlight extends HighlightEntry {
+    driverName: string;
+}
 
 export interface ResultsModel {
     hasTelemetry: boolean;
@@ -24,6 +32,8 @@ export interface ResultsModel {
         [name: string]: string;
     }[];
     summary: string[];
+    highlights: ResultsHighlight[];
+    winnerName: string;
 }
 
 export function getDefaultResultsModel(): ResultsModel {
@@ -37,6 +47,8 @@ export function getDefaultResultsModel(): ResultsModel {
         trackId: '',
         results: [],
         summary: [],
+        highlights: [],
+        winnerName: '',
     };
 }
 
@@ -179,6 +191,37 @@ export async function getResultsModel(
     ret.hasTelemetry =
         -1 !==
         (telemetrySubsessionIds?.indexOf(parseInt(ret.subsessionId, 10)) || -1);
+
+    // Highlights (battles, crashes, overtakes, starts) and the winner's
+    // name only apply to race/sprint subsessions — skip the round-trips
+    // for qualify/practice.
+    if (ret.simsessionType === 'race' || ret.simsessionType === 'sprint') {
+        const rawHighlights = await getHighlightsForSubsession(
+            ret.subsessionId
+        );
+        const winnerRow = (simsessionResults?.results || []).find(
+            (row) => row.position === 1
+        );
+
+        if (rawHighlights.length > 0 || winnerRow) {
+            const members = await getMembersData(leagueId, ret.seasonId);
+            const nameByCustId = new Map<number, string>();
+            for (const m of members?.members || []) {
+                nameByCustId.set(m.cust_id, m.display_name);
+            }
+            ret.highlights = rawHighlights.map((h) => ({
+                ...h,
+                driverName:
+                    nameByCustId.get(h.driver_user_id) ||
+                    `Driver #${h.driver_user_id}`,
+            }));
+            if (winnerRow) {
+                ret.winnerName =
+                    nameByCustId.get(winnerRow.cust_id) ||
+                    `Driver #${winnerRow.cust_id}`;
+            }
+        }
+    }
 
     return ret;
 }

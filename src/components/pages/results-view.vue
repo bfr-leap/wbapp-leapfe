@@ -8,11 +8,16 @@ import BestQualifyLapChart from '@@/src/components/vis/best-qualify-lap-chart.vu
 import GenericTable from '../vis/generic-table.vue';
 import TrackBanner from '../track/track-banner.vue';
 import PhotoGallery from '../event/photo-gallery.vue';
+import PhotoCarousel from '../event/photo-carousel.vue';
 import type { ResultsModel } from '@@/src/models/pages/results-model';
 import {
     getDefaultResultsModel,
     getResultsModel,
 } from '@@/src/models/pages/results-model';
+import {
+    highlightImageUrl,
+    HIGHLIGHT_CATEGORY_LABELS,
+} from '@@/src/services/highlights-service';
 
 const props = defineProps<{
     league: string;
@@ -50,11 +55,17 @@ const resultsModel: Ref<ResultsModel> =
 
 const summaryExpanded = ref(false);
 
-// The race's photo gallery, embedded in the Race Summary text rather
-// than as a page-wide banner. Only the winner's finish-line capture
-// exists today, but trkcam is expected to grow more photos per event
-// over time — PhotoGallery already takes an array so that just means
-// more entries here later, not a redesign.
+// Whether the Highlights carousel actually has anything to show, per
+// its own `update:hasPhotos` — distinct from `highlightPhotos.length`,
+// which stays >0 even when its lone "guessed URL" winner entry 404s
+// and there are no real highlights for this subsession. Without this,
+// the section would render its header over an empty carousel.
+const highlightsVisible = ref(false);
+
+// The winner's finish-line capture, embedded in the Race Summary text
+// rather than as a page-wide banner. Just the one photo — the battles/
+// crashes/overtakes/starts highlights get their own carousel section
+// below instead of piling into this gallery.
 const galleryPhotos = computed(() => {
     const m = resultsModel.value;
     const isRace = m.simsessionType === 'race' || m.simsessionType === 'sprint';
@@ -64,6 +75,31 @@ const galleryPhotos = computed(() => {
             src: `/api/trkcam/winner/${m.subsessionId}`,
             alt: 'Winner finish-line capture',
         },
+    ];
+});
+
+// The Highlights carousel: the winner's finish-line capture first (also
+// shown next to the Race Summary above — this is a fuller gallery, not
+// a replacement for it), then the battles/crashes/overtakes/starts
+// stills.
+const highlightPhotos = computed(() => {
+    const m = resultsModel.value;
+    const isRace = m.simsessionType === 'race' || m.simsessionType === 'sprint';
+    if (!isRace || !m.subsessionId) return [];
+    const winnerCaption = m.winnerName || 'Winner';
+    return [
+        {
+            src: `/api/trkcam/winner/${m.subsessionId}`,
+            alt: `${winnerCaption} — winner finish-line capture`,
+            caption: winnerCaption,
+        },
+        ...m.highlights.map((h) => ({
+            src: highlightImageUrl(h),
+            alt: `${h.driverName} — ${
+                HIGHLIGHT_CATEGORY_LABELS[h.category] || 'Highlight'
+            }`,
+            caption: h.driverName,
+        })),
     ];
 });
 </script>
@@ -169,6 +205,21 @@ const galleryPhotos = computed(() => {
                 >
                     {{ summaryExpanded ? 'Show less' : 'Read more →' }}
                 </button>
+            </section>
+
+            <section
+                v-if="highlightPhotos.length"
+                v-show="highlightsVisible"
+                class="section"
+            >
+                <header class="section__head">
+                    <span class="section__title">Highlights</span>
+                </header>
+                <PhotoCarousel
+                    v-bind:id="`highlights-${resultsModel.subsessionId}`"
+                    v-bind:photos="highlightPhotos"
+                    @update:has-photos="highlightsVisible = $event"
+                />
             </section>
 
             <section class="section">

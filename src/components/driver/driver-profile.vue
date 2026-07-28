@@ -2,7 +2,7 @@
 import Stats from './driver-stats.vue';
 import DriverTag from './driver-tag.vue';
 import DriverPenaltySummary from './driver-penalty-summary.vue';
-import PhotoGallery from '../event/photo-gallery.vue';
+import PhotoCarousel from '../event/photo-carousel.vue';
 import { computed } from 'vue';
 import type { Ref } from 'vue';
 import { useRoute } from 'vue-router';
@@ -11,6 +11,10 @@ import {
     getDefaultDriverProfileModel,
     getDriverProfileModel,
 } from '@@/src/models/driver/driver-profile-model';
+import {
+    highlightImageUrl,
+    HIGHLIGHT_CATEGORY_LABELS,
+} from '@@/src/services/highlights-service';
 
 const props = defineProps<{
     league: string;
@@ -52,19 +56,37 @@ const driverProfileModel: Ref<DriverProfileModel> =
         [() => props.league, () => props.driver]
     );
 
-// Photo gallery surface for the driver, separate from the header
-// backdrop above. Only the latest-win capture exists today, but
-// PhotoGallery takes an array so more per-driver photos later is
-// just more entries here, not a redesign.
+// Photo carousel surface for the driver, separate from the header
+// backdrop above: the latest-win capture first, then any
+// battles/crashes/overtakes/starts highlights featuring this driver
+// across all their races (not just wins) — never another driver's.
 const galleryPhotos = computed(() =>
     props.driver
         ? [
               {
                   src: `/api/trkcam/driver/${props.driver}/latest`,
                   alt: `${driverProfileModel.value.memberView.firstName} ${driverProfileModel.value.memberView.lastName}'s latest win`,
+                  caption: 'Latest Win',
               },
+              ...driverProfileModel.value.driverHighlights.map((h) => ({
+                  src: highlightImageUrl(h),
+                  alt: `${driverProfileModel.value.memberView.firstName} ${
+                      driverProfileModel.value.memberView.lastName
+                  } — ${HIGHLIGHT_CATEGORY_LABELS[h.category] || 'Highlight'}`,
+                  caption: `${driverProfileModel.value.memberView.firstName} ${driverProfileModel.value.memberView.lastName}`,
+              })),
           ]
         : []
+);
+
+// Gates the "Photos" section: the header backdrop's own load state
+// covers the latest-win capture, but a driver can have highlights
+// (battles, crashes, overtakes, starts) without ever having won, so
+// the section should still show up for those.
+const hasGalleryPhotos = computed(
+    () =>
+        hasLatestWinPhoto.value ||
+        driverProfileModel.value.driverHighlights.length > 0
 );
 
 /**
@@ -119,17 +141,17 @@ const penaltySeason = computed<string>(() => {
             </div>
         </section>
 
-        <!-- Gated on the header photo's own load state (same URL
-             today) rather than a separate check, so this section
-             doesn't render an empty "Photos" header for the common
-             no-capture case. -->
-        <section v-if="hasLatestWinPhoto" class="section">
+        <!-- Gated on hasGalleryPhotos (header photo load state OR any
+             driver highlights) so this section doesn't render an empty
+             "Photos" header for the common no-capture case. -->
+        <section v-if="hasGalleryPhotos" class="section">
             <header class="section__head">
                 <span class="section__title">Photos</span>
             </header>
-            <div class="gallery-body">
-                <PhotoGallery v-bind:photos="galleryPhotos" />
-            </div>
+            <PhotoCarousel
+                v-bind:id="`photo-carousel-driver-${props.driver}`"
+                v-bind:photos="galleryPhotos"
+            />
         </section>
 
         <section v-if="driverProfileModel.dotdProfile?.blurb" class="section">
@@ -225,12 +247,6 @@ const penaltySeason = computed<string>(() => {
 .profile-info {
     flex: 1;
     min-width: 0;
-}
-
-.gallery-body {
-    /* Clearfix: contains the gallery's floated photo(s) so the
-       section's height wraps around them too. */
-    overflow: hidden;
 }
 
 .dotd-profile-text {
