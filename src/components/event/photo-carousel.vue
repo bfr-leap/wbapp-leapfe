@@ -186,13 +186,13 @@ watch(
 @media (max-width: 576px) {
     /* Bootstrap's default 15% side insets assume a short decorative
        caption; a driver's full name needs the extra width on narrow
-       phones to avoid wrapping/clipping. */
+       phones to avoid wrapping/clipping. Keep the default `bottom`/
+       padding, though — those keep the caption clear of
+       `.carousel-indicators`, which sit in the same bottom-of-slide
+       corner. */
     .carousel-caption {
         right: 5%;
-        bottom: 0.75rem;
         left: 5%;
-        padding-top: 0.5rem;
-        padding-bottom: 0.5rem;
     }
 }
 </style>
