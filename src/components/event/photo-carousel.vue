@@ -122,10 +122,7 @@ watch(
                     v-bind:alt="p.alt || ''"
                     v-on:error="onImgError(p.src)"
                 />
-                <div
-                    v-if="p.caption"
-                    class="carousel-caption d-none d-md-block"
-                >
+                <div v-if="p.caption" class="carousel-caption">
                     <p>{{ p.caption }}</p>
                 </div>
             </div>
@@ -184,5 +181,18 @@ watch(
        right behind them, not just a flat backdrop). */
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95), 0 0 3px rgba(0, 0, 0, 0.95),
         0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+@media (max-width: 576px) {
+    /* Bootstrap's default 15% side insets assume a short decorative
+       caption; a driver's full name needs the extra width on narrow
+       phones to avoid wrapping/clipping. */
+    .carousel-caption {
+        right: 5%;
+        bottom: 0.75rem;
+        left: 5%;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
 }
 </style>
