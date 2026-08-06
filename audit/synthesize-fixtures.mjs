@@ -371,9 +371,7 @@ if (
      */
     function rotateToWinner(targetCustId) {
         const ordered = baseResults.map((r) => ({ ...r }));
-        const winnerIdx = ordered.findIndex(
-            (r) => r.cust_id === targetCustId
-        );
+        const winnerIdx = ordered.findIndex((r) => r.cust_id === targetCustId);
         if (winnerIdx < 0) return ordered;
         // Move winner to front, shift others down — only the
         // `position` field is rewritten so the visual story
@@ -438,8 +436,7 @@ if (
 
         // Sprint usually has a different lead. Borrow the runner-up
         // from the race to make it feel non-redundant.
-        const sprintLeader =
-            raceResults[1]?.cust_id ?? raceResults[0]?.cust_id;
+        const sprintLeader = raceResults[1]?.cust_id ?? raceResults[0]?.cust_id;
         const sprintResults = rotateToWinner(sprintLeader);
         const sprintFixture = fixtureKey('ldata-rsltsts', 'simSessionResults', {
             type: 'simSessionResults',
@@ -457,7 +454,10 @@ if (
             subsession: sub,
             simsession: '0',
         });
-        writeFixture(`${summaryFixture}.json`, raceRecap(trackName, winnerName));
+        writeFixture(
+            `${summaryFixture}.json`,
+            raceRecap(trackName, winnerName)
+        );
 
         const photoFixture = fixtureKey('ldata-photos', 'photoIndex', {
             type: 'photoIndex',
@@ -500,5 +500,48 @@ if (currentMembers) {
         '.json';
     writeFixture(emptyFname, null);
 }
+
+// -----------------------------------------------------------------------------
+// ldata-srhweb — negative fixtures for every season WITHOUT championship data
+//
+// `readFixture` in server/api/fetch-document.ts THROWS on a miss, so the
+// moment the standings model asks srhweb about a season, every route that
+// resolves to a different season 500s in fixture mode. Only 4534/134456 is
+// covered in the lake (captured live); everything else legitimately has no
+// srhweb data, and `null` is exactly what the broker returns for it.
+//
+// These are what exercises the fallback path in the audit and smoke runs —
+// the common case, since most leagues will never be on simracerhub.
+// -----------------------------------------------------------------------------
+
+const SRHWEB_COVERED = new Set(['4534:134456']);
+
+// Every (league, season) an existing smoke URL or audit route resolves to.
+// Keep in sync with tests/_smoke-helpers.ts SMOKE_URLS and audit/routes.mjs.
+const SRHWEB_UNCOVERED = [
+    { league: String(LEAGUE_ID), season: String(SEASON_ID) },
+    { league: String(LEAGUE_ID), season: '118784' },
+    { league: String(LEAGUE_ID), season: '122101' },
+    { league: String(LEAGUE_ID), season: '125220' },
+    { league: String(LEAGUE_ID), season: '128679' },
+];
+
+for (const { league, season } of SRHWEB_UNCOVERED) {
+    if (SRHWEB_COVERED.has(`${league}:${season}`)) continue;
+    const fname =
+        fixtureKey('ldata-srhweb', 'seasonInfo', {
+            type: 'seasonInfo',
+            league,
+            season,
+        }) + '.json';
+    writeFixture(fname, null);
+}
+
+// Default-state probe: the bare `/` route resolves its context before it
+// knows a league, so the model can fire with no params at all.
+writeFixture(
+    fixtureKey('ldata-srhweb', 'seasonInfo', { type: 'seasonInfo' }) + '.json',
+    null
+);
 
 console.log(`[synth] done. ${written} file(s) written, ${skipped} unchanged.`);

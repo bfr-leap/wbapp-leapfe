@@ -94,7 +94,7 @@ function writeFixture(
     if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
     const key = fixtureKey(namespace, type, query);
     const path = fixturePath(dir, key);
-    const anonymized = anonymizeBrokerDoc(doc);
+    const anonymized = anonymizeBrokerDoc(doc, namespace);
     writeFileSync(path, JSON.stringify(anonymized, null, 2) + '\n');
 }
 

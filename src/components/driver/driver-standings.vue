@@ -11,6 +11,7 @@ import {
     getDefaultStandingsModel,
 } from '@@/src/models/driver/driver-standings-model';
 import RouterLinkProxy from '@@/src/components/nav/router-link-proxy.vue';
+import SrhPointsBar from './srh-points-bar.vue';
 
 const props = defineProps<{
     league: string;
@@ -57,14 +58,18 @@ const view: Ref<DriverStandingsModel> =
                     <span class="eyebrow">POS · PTS</span>
                 </div>
                 <div
-                    class="col-2 d-none d-sm-flex text-center justify-content-center align-items-center"
+                    class="col-2 col-xl-1 d-none d-sm-flex text-center justify-content-center align-items-center"
                 >
-                    <span class="eyebrow">LEAP Ranking</span>
+                    <span class="eyebrow">{{
+                        view.srh ? 'Pos' : 'LEAP Ranking'
+                    }}</span>
                 </div>
                 <div
                     class="col-2 d-none d-sm-flex text-center justify-content-center align-items-center"
                 >
-                    <span class="eyebrow">LEAP Points</span>
+                    <span class="eyebrow">{{
+                        view.srh ? 'Points' : 'LEAP Points'
+                    }}</span>
                 </div>
                 <div
                     class="d-none d-lg-flex col-lg-2 text-center justify-content-center align-items-center"
@@ -72,8 +77,16 @@ const view: Ref<DriverStandingsModel> =
                     <span class="eyebrow">Form (last 3)</span>
                 </div>
                 <div class="col-2 col-lg-1 text-center"></div>
-                <div class="col-7 col-sm-6 col-lg-5 d-flex align-items-center">
+                <div
+                    class="col-7 col-sm-6 col-lg-5 col-xl-4 d-flex align-items-center"
+                >
                     <span class="eyebrow">Driver</span>
+                </div>
+                <div
+                    v-if="view.srh"
+                    class="d-none d-xl-flex col-xl-2 text-center justify-content-center align-items-center"
+                >
+                    <span class="eyebrow">Starts · W · Pod · Inc</span>
                 </div>
             </div>
 
@@ -93,6 +106,12 @@ const view: Ref<DriverStandingsModel> =
                                 v-if="member.positionChange !== undefined"
                                 v-bind:change="member.positionChange"
                             />
+                            <span
+                                v-else-if="member.srh?.delta.kind === 'new'"
+                                class="new-chip"
+                                title="First season — no previous position to compare against"
+                                >NEW</span
+                            >
                         </div>
                         <div class="num d-flex justify-content-center pts-line">
                             <span>{{ member.points }} pts</span>
@@ -104,21 +123,33 @@ const view: Ref<DriverStandingsModel> =
                         </div>
                     </div>
                     <div
-                        class="col-2 d-none d-sm-flex justify-content-center align-items-center gap-2"
+                        class="col-2 col-xl-1 d-none d-sm-flex justify-content-center align-items-center gap-2"
                     >
                         <span class="fs-2 num">{{ member.position }}</span>
                         <PositionMovement
                             v-if="member.positionChange !== undefined"
                             v-bind:change="member.positionChange"
                         />
+                        <span
+                            v-else-if="member.srh?.delta.kind === 'new'"
+                            class="new-chip"
+                            title="First season — no previous position to compare against"
+                            >NEW</span
+                        >
                     </div>
                     <div
-                        class="col-2 d-none d-sm-flex justify-content-center align-items-baseline fs-4 num gap-2"
+                        class="col-2 d-none d-sm-flex flex-column justify-content-center align-items-center"
                     >
-                        <span>{{ member.points }}</span>
-                        <GapToLeader
-                            v-if="member.pointsBehindLeader !== undefined"
-                            v-bind:gap="member.pointsBehindLeader"
+                        <div class="d-flex align-items-baseline fs-4 num gap-2">
+                            <span>{{ member.points }}</span>
+                            <GapToLeader
+                                v-if="member.pointsBehindLeader !== undefined"
+                                v-bind:gap="member.pointsBehindLeader"
+                            />
+                        </div>
+                        <SrhPointsBar
+                            v-if="member.srh"
+                            v-bind:points="member.srh.points"
                         />
                     </div>
                     <div
@@ -134,7 +165,7 @@ const view: Ref<DriverStandingsModel> =
                             v-bind:class="`driver-img club-${member.clubId}`"
                         ></div>
                     </div>
-                    <div class="col-7 col-sm-6 col-lg-5">
+                    <div class="col-7 col-sm-6 col-lg-5 col-xl-4">
                         <DriverTag
                             v-bind:lastName="member.lastName"
                             v-bind:firstName="member.firstName"
@@ -147,6 +178,33 @@ const view: Ref<DriverStandingsModel> =
                             v-bind:teamId="member.teamId?.toString()"
                             v-bind:leagueId="view.leagueId"
                         />
+                    </div>
+                    <div
+                        v-if="view.srh && member.srh"
+                        class="d-none d-xl-flex col-xl-2 align-items-center justify-content-center num srh-stats"
+                    >
+                        <span v-bind:title="`${member.srh.starts} starts`">{{
+                            member.srh.starts
+                        }}</span>
+                        <span class="sep">·</span>
+                        <span v-bind:title="`${member.srh.wins} wins`">{{
+                            member.srh.wins
+                        }}</span>
+                        <span class="sep">·</span>
+                        <span v-bind:title="`${member.srh.podiums} podiums`">{{
+                            member.srh.podiums
+                        }}</span>
+                        <span class="sep">·</span>
+                        <span
+                            v-bind:title="`${member.srh.incidents} incidents`"
+                            >{{ member.srh.incidents }}</span
+                        >
+                        <span
+                            v-if="member.srh.unattributedStarts > 0"
+                            class="unattributed"
+                            v-bind:title="`${member.srh.unattributedStarts} start(s) scored by the league but not yet itemised to a session — their points are in the total but have no race detail`"
+                            >+{{ member.srh.unattributedStarts }}?</span
+                        >
                     </div>
                 </div>
             </template>
@@ -233,6 +291,38 @@ const view: Ref<DriverStandingsModel> =
 </template>
 
 <style scoped>
+/* --- srhweb-backed surfaces --------------------------------------------- */
+
+/* A debutant has no previous position, so the published position_change is a
+   sentinel artefact. This chip replaces the movement arrow entirely. */
+.new-chip {
+    font-size: 0.6rem;
+    letter-spacing: 0.06em;
+    padding: 0.05rem 0.3rem;
+    border-radius: 3px;
+    border: 1px solid var(--border, #30363d);
+    color: var(--text-secondary, #8b949e);
+    background: var(--surface-2, #1c2128);
+}
+
+.srh-stats {
+    gap: 0.3rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary, #8b949e);
+}
+
+.srh-stats .sep {
+    opacity: 0.4;
+}
+
+/* Marks a driver whose season total includes starts we cannot itemise —
+   the league has scored a race the lake has not resolved to a subsession. */
+.srh-stats .unattributed {
+    margin-left: 0.2rem;
+    color: var(--warning, #d29922);
+    cursor: help;
+}
+
 .standings-row {
     align-items: center;
     padding: var(--space-3) 0;

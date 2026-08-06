@@ -21,11 +21,14 @@
  *    match `/^\d+$/` are treated the same way (broker is loose about
  *    int-vs-string for ids).
  *  - PII_NAME_KEYS: display_name, team_name, etc. → `Driver N`.
+ *  - PII_SORT_NAME_KEYS: sort_name → `Driver N, Test`, preserving the
+ *    `"Last, First"` comma form consumers split on.
  *  - PII_EMAIL_KEYS: email → `user-N@example.test`.
  *  - PII_REDACT_KEYS: free-text fields likely to contain real names
  *    in prose (`steward_notes`, etc.). The whole value is replaced
  *    with `[redacted]` because we can't safely scrub names out of
- *    arbitrary English without false positives.
+ *    arbitrary English without false positives. Narrow, per-namespace
+ *    exemptions live in REDACT_EXEMPTIONS.
  *
  * Plus one structural rewrite: broker `leagueDriverStats` (and a few
  * other endpoints) return objects keyed by cust_id. Those outer keys
@@ -35,6 +38,14 @@
 
 const PII_NUMBER_KEYS = new Set([
     'cust_id',
+    // `ldata-srhweb` TeamStanding.cust_ids — the team roster, as a bare
+    // number[]. Without this it passes through untouched: real cust_ids get
+    // committed to the repo, AND the roster stops joining to the `drivers`
+    // map, whose keys ARE rewritten by isCustKeyedMap. The array branch in
+    // walkValue() maps each element through syntheticNumber, and because
+    // syntheticNumber stringifies its input, `174470` and `'174470'` hash
+    // identically — so the join survives.
+    'cust_ids',
     'driver_id',
     'iracing_id',
     'user_id',
@@ -59,6 +70,37 @@ const PII_NAME_KEYS = new Set([
 ]);
 
 const PII_EMAIL_KEYS = new Set(['email', 'email_address']);
+
+/**
+ * Names published as `"Last, First"` — `ldata-srhweb` SeasonDriver.sort_name.
+ * A real name, so it has to go, but the comma form is load-bearing: consumers
+ * split on it to get first/last. Anonymize to the same shape rather than a
+ * flat `Driver N`, so fixtures exercise the same code path production does.
+ */
+const PII_SORT_NAME_KEYS = new Set(['sort_name']);
+
+/**
+ * Redaction exemptions, by namespace.
+ *
+ * PII_REDACT_KEYS is deliberately blunt — it stamps out whole free-text
+ * fields because names can't be scrubbed from arbitrary prose. But `blunt`
+ * costs real information when a field is free text in name only.
+ *
+ * `ldata-srhweb` adjudication `description` is a league-authored label for a
+ * points adjustment: "Fastest race lap", "Pole position", "Major Penalty" —
+ * three distinct values across an entire season, no personal names. It is
+ * also the whole point of the stewarding ledger. Redacting it would leave
+ * every fixture-mode render and every audit screenshot showing `[redacted]`
+ * where the reason should be.
+ *
+ * Keep these narrow and per-namespace: an exemption is a decision that a
+ * specific producer's specific field is safe, not a general relaxation.
+ */
+const REDACT_EXEMPTIONS: Record<string, ReadonlySet<string>> = {
+    'ldata-srhweb': new Set(['description']),
+};
+
+const NO_EXEMPTIONS: ReadonlySet<string> = new Set();
 
 /**
  * Free-text fields that frequently embed real driver names in English
@@ -106,17 +148,27 @@ function syntheticEmail(original: string): string {
     return `user-${1000 + (djb2(`email:${original}`) % 9000)}@example.test`;
 }
 
+/** Preserves the `"Last, First"` shape while replacing both halves. */
+function syntheticSortName(original: string): string {
+    const n = 1000 + (djb2(`name:${original}`) % 9000);
+    return `Driver${n}, Test`;
+}
+
 /**
  * Walk arbitrary JSON, replacing PII-shaped values keyed by known
  * field names. Pure: returns a new object, doesn't mutate input.
+ *
+ * `namespace` is optional and only selects redaction exemptions — omitting it
+ * is always the safe direction (more redaction, never less).
  */
-export function anonymizeBrokerDoc(doc: unknown): unknown {
-    return walk(doc);
+export function anonymizeBrokerDoc(doc: unknown, namespace?: string): unknown {
+    const exempt = (namespace && REDACT_EXEMPTIONS[namespace]) || NO_EXEMPTIONS;
+    return walk(doc, exempt);
 }
 
-function walk(node: unknown): unknown {
+function walk(node: unknown, exempt: ReadonlySet<string>): unknown {
     if (Array.isArray(node)) {
-        return node.map((item) => walk(item));
+        return node.map((item) => walk(item, exempt));
     }
     if (node && typeof node === 'object') {
         const obj = node as Record<string, unknown>;
@@ -126,13 +178,13 @@ function walk(node: unknown): unknown {
         if (isCustKeyedMap(keys, obj)) {
             for (const k of keys) {
                 const newKey = String(syntheticNumber(k));
-                out[newKey] = walk(obj[k]);
+                out[newKey] = walk(obj[k], exempt);
             }
             return out;
         }
 
         for (const key of keys) {
-            out[key] = walkValue(key, obj[key]);
+            out[key] = walkValue(key, obj[key], exempt);
         }
         return out;
     }
@@ -152,8 +204,12 @@ function isCustKeyedMap(keys: string[], obj: Record<string, unknown>): boolean {
     return keys.every((k) => obj[k] !== null && typeof obj[k] === 'object');
 }
 
-function walkValue(key: string, value: unknown): unknown {
-    if (PII_REDACT_KEYS.has(key)) {
+function walkValue(
+    key: string,
+    value: unknown,
+    exempt: ReadonlySet<string>
+): unknown {
+    if (PII_REDACT_KEYS.has(key) && !exempt.has(key)) {
         if (typeof value === 'string') return '[redacted]';
         if (value == null) return value;
         // Structured notes (rare): redact to an empty marker rather
@@ -176,10 +232,10 @@ function walkValue(key: string, value: unknown): unknown {
                 if (typeof v === 'string' && NUMERIC_STRING.test(v)) {
                     return String(syntheticNumber(v));
                 }
-                return walk(v);
+                return walk(v, exempt);
             });
         }
-        return walk(value);
+        return walk(value, exempt);
     }
 
     if (
@@ -198,6 +254,9 @@ function walkValue(key: string, value: unknown): unknown {
         );
     }
 
+    if (PII_SORT_NAME_KEYS.has(key) && typeof value === 'string') {
+        return value.length === 0 ? value : syntheticSortName(value);
+    }
     if (PII_NAME_KEYS.has(key) && typeof value === 'string') {
         return value.length === 0 ? value : syntheticName(value);
     }
@@ -205,5 +264,5 @@ function walkValue(key: string, value: unknown): unknown {
         return value.length === 0 ? value : syntheticEmail(value);
     }
 
-    return walk(value);
+    return walk(value, exempt);
 }
