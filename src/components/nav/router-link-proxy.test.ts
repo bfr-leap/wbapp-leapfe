@@ -207,3 +207,71 @@ describe('RouterLinkProxy', () => {
         expect(links.length).toBeGreaterThanOrEqual(3);
     });
 });
+
+// ─────────────────────────────────────────────────────────────────────
+// Sign-up gate toggle
+//
+// `OPEN_LINKS_FOR_EVERYONE` in the component decides whether signed-out
+// visitors get real links or a `#` href that bounces them to sign-up. It is a
+// manual, recruiting-season switch, so these assertions describe the position
+// it is currently in — and fail loudly if someone flips it without meaning to.
+//
+// If you ARE flipping it deliberately, invert these two expectations. The
+// failure is the tripwire working, not a bug.
+//
+// The `vue-clerk` mock above renders BOTH <SignedIn> and <SignedOut> slots
+// unconditionally, so a gated build would emit the `#` link here. Its absence
+// is therefore real evidence the gate is open, not an artefact of the mock.
+// ─────────────────────────────────────────────────────────────────────
+describe('RouterLinkProxy — sign-up gate', () => {
+    beforeEach(() => {
+        redirectRenderCount = 0;
+    });
+
+    async function mountProxy() {
+        const RouterLinkStub = defineComponent({
+            props: ['to'],
+            template: '<a :href="to" @click="$emit(\'click\')"><slot /></a>',
+        });
+        const RouterLinkProxy = (
+            await import('@@/src/components/nav/router-link-proxy.vue')
+        ).default;
+
+        const wrapper = mount(RouterLinkProxy, {
+            props: { to: '?m=standings&league=4534' },
+            slots: { default: 'Standings' },
+            global: { components: { RouterLink: RouterLinkStub } },
+        });
+        await flushPromises();
+        await nextTick();
+        return wrapper;
+    }
+
+    it('gate is OPEN: links carry their real destination', async () => {
+        const wrapper = await mountProxy();
+        const hrefs = wrapper.findAll('a').map((a) => a.attributes('href'));
+
+        expect(
+            hrefs,
+            'expected a real destination — if OPEN_LINKS_FOR_EVERYONE was ' +
+                'just set to false, invert this assertion'
+        ).toContain('?m=standings&league=4534');
+        expect(hrefs).not.toContain('#');
+    });
+
+    it('gate is OPEN: clicking never redirects to sign-up', async () => {
+        const wrapper = await mountProxy();
+        await wrapper.find('a').trigger('click');
+        await nextTick();
+
+        expect(
+            redirectRenderCount,
+            'RedirectToSignUp rendered — the gate is armed'
+        ).toBe(0);
+    });
+
+    it('renders exactly one link, not one per auth branch', async () => {
+        const wrapper = await mountProxy();
+        expect(wrapper.findAll('a')).toHaveLength(1);
+    });
+});

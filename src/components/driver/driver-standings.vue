@@ -58,7 +58,7 @@ const view: Ref<DriverStandingsModel> =
                     <span class="eyebrow">POS · PTS</span>
                 </div>
                 <div
-                    class="col-2 d-none d-sm-flex text-center justify-content-center align-items-center"
+                    class="col-2 col-xl-1 d-none d-sm-flex text-center justify-content-center align-items-center"
                 >
                     <span class="eyebrow">{{
                         view.srh ? 'Pos' : 'LEAP Ranking'
@@ -76,15 +76,17 @@ const view: Ref<DriverStandingsModel> =
                 >
                     <span class="eyebrow">Form (last 3)</span>
                 </div>
+                <div class="col-2 col-lg-1 text-center"></div>
+                <div
+                    class="col-7 col-sm-6 col-lg-5 col-xl-4 d-flex align-items-center"
+                >
+                    <span class="eyebrow">Driver</span>
+                </div>
                 <div
                     v-if="view.srh"
                     class="d-none d-xl-flex col-xl-2 text-center justify-content-center align-items-center"
                 >
                     <span class="eyebrow">Starts · W · Pod · Inc</span>
-                </div>
-                <div class="col-2 col-lg-1 text-center"></div>
-                <div class="col-7 col-sm-6 col-lg-5 d-flex align-items-center">
-                    <span class="eyebrow">Driver</span>
                 </div>
             </div>
 
@@ -121,7 +123,7 @@ const view: Ref<DriverStandingsModel> =
                         </div>
                     </div>
                     <div
-                        class="col-2 d-none d-sm-flex justify-content-center align-items-center gap-2"
+                        class="col-2 col-xl-1 d-none d-sm-flex justify-content-center align-items-center gap-2"
                     >
                         <span class="fs-2 num">{{ member.position }}</span>
                         <PositionMovement
@@ -158,6 +160,25 @@ const view: Ref<DriverStandingsModel> =
                             v-bind:finishes="member.recentFinishes"
                         />
                     </div>
+                    <div class="col-2 col-lg-1 text-center">
+                        <div
+                            v-bind:class="`driver-img club-${member.clubId}`"
+                        ></div>
+                    </div>
+                    <div class="col-7 col-sm-6 col-lg-5 col-xl-4">
+                        <DriverTag
+                            v-bind:lastName="member.lastName"
+                            v-bind:firstName="member.firstName"
+                            v-bind:licenseLevel="member.licenseLevel"
+                            v-bind:iRating="member.iRating"
+                            v-bind:safetyRating="member.safetyRating"
+                            v-bind:teamName="member.teamName"
+                            v-bind:clubId="member.clubId"
+                            v-bind:driverId="member.custId"
+                            v-bind:teamId="member.teamId?.toString()"
+                            v-bind:leagueId="view.leagueId"
+                        />
+                    </div>
                     <div
                         v-if="view.srh && member.srh"
                         class="d-none d-xl-flex col-xl-2 align-items-center justify-content-center num srh-stats"
@@ -184,25 +205,6 @@ const view: Ref<DriverStandingsModel> =
                             v-bind:title="`${member.srh.unattributedStarts} start(s) scored by the league but not yet itemised to a session — their points are in the total but have no race detail`"
                             >+{{ member.srh.unattributedStarts }}?</span
                         >
-                    </div>
-                    <div class="col-2 col-lg-1 text-center">
-                        <div
-                            v-bind:class="`driver-img club-${member.clubId}`"
-                        ></div>
-                    </div>
-                    <div class="col-7 col-sm-6 col-lg-5">
-                        <DriverTag
-                            v-bind:lastName="member.lastName"
-                            v-bind:firstName="member.firstName"
-                            v-bind:licenseLevel="member.licenseLevel"
-                            v-bind:iRating="member.iRating"
-                            v-bind:safetyRating="member.safetyRating"
-                            v-bind:teamName="member.teamName"
-                            v-bind:clubId="member.clubId"
-                            v-bind:driverId="member.custId"
-                            v-bind:teamId="member.teamId?.toString()"
-                            v-bind:leagueId="view.leagueId"
-                        />
                     </div>
                 </div>
             </template>
