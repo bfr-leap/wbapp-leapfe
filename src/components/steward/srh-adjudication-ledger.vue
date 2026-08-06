@@ -23,11 +23,11 @@ import { listRacedSessionKeys } from '@@/src/models/driver/srh-standings-model';
 
 const props = defineProps<{ info: SeasonInfo }>();
 
+const raceCount = computed(() => listRacedSessionKeys(props.info).length);
+
 const detail = ref<SrhRaceDetailModel>(getDefaultSrhRaceDetailModel());
 const loading = ref(false);
 const activeFilter = ref<string | null>(null);
-
-const raceCount = computed(() => listRacedSessionKeys(props.info).length);
 
 onMounted(async () => {
     loading.value = true;
@@ -70,7 +70,14 @@ function toggle(f: string) {
         </p>
 
         <p v-if="loading" class="muted">
-            Loading per-race detail ({{ raceCount * 2 }} documents)…
+            Loading steward decisions ({{ raceCount }} races)…
+        </p>
+
+        <!-- A failed fetch must say so. Falling through to the empty state
+             would read as "no adjustments this season", which is a different
+             and much more misleading claim. -->
+        <p v-else-if="detail.failed" class="muted">
+            Steward decisions could not be loaded.
         </p>
 
         <template v-else-if="detail.loaded">
@@ -110,13 +117,7 @@ function toggle(f: string) {
                             v-bind:class="`row--${r.kind}`"
                         >
                             <td class="num">{{ r.round }}</td>
-                            <td class="muted">
-                                {{
-                                    r.simsessionNumber === 0
-                                        ? 'Feature'
-                                        : `Heat ${Math.abs(r.simsessionNumber)}`
-                                }}
-                            </td>
+                            <td class="muted">{{ r.sessionLabel }}</td>
                             <td>{{ r.driverName }}</td>
                             <td class="num num-col" v-bind:class="r.kind">
                                 {{ r.signedPoints > 0 ? '+' : ''

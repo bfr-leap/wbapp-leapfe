@@ -6,18 +6,20 @@
  * eagerly. This module covers what needs the per-race documents: the
  * stewarding ledger, and the per-race points inside the drop-week grid.
  *
- * That is two documents per race — 20 for a five-round heat season — so it is
- * client-only and on demand. Never call this during SSR: `api-client` aborts
- * each request at 5s and the serverless budget is 10s total.
+ * One document per race — 12 for the sample season — so it is client-only and
+ * on demand. Never call this during SSR: `api-client` aborts each request at
+ * 5s and the serverless budget is 10s total.
+ *
+ * Only `raceAdjudications` is fetched. An earlier version also pulled
+ * `raceResults` for a per-race points column in the drop-week grid; that
+ * column was never built, so the fetch was pure cost — half the requests for
+ * data nothing read. Add it back alongside the feature that needs it, not
+ * before.
  */
 
-import {
-    getSrhRaceResults,
-    getSrhRaceAdjudications,
-} from '@@/src/services/srhweb-service';
+import { getSrhRaceAdjudications } from '@@/src/services/srhweb-service';
 import type {
     SeasonInfo,
-    RaceResults,
     RaceAdjudications,
     SessionKey,
 } from '@@/src/services/srhweb-types';
@@ -43,6 +45,8 @@ export interface SrhLedgerRow {
     simsessionNumber: number;
     /** Calendar label for the event this session belongs to. */
     eventLabel: string;
+    /** The league's name for this session — "Feature", "Heat 1", … */
+    sessionLabel: string;
     /** 1-based round number within the season calendar. */
     round: number;
     custId: number;
@@ -57,21 +61,26 @@ export interface SrhLedgerRow {
 
 export interface SrhRaceDetailModel {
     loaded: boolean;
+    /** Set when the fetch ran and failed, so the UI can say so rather than
+     *  rendering an empty section that looks like "no adjustments". */
+    failed: boolean;
     /** Keyed by `sessionKeyId`. */
-    resultsByKey: Record<string, RaceResults>;
     adjudicationsByKey: Record<string, RaceAdjudications>;
     ledger: SrhLedgerRow[];
     /** Races omitted because of MAX_DETAIL_RACES. 0 when nothing was dropped. */
     omittedRaces: number;
+    /** How many documents this model did (or would) fetch. */
+    documentCount: number;
 }
 
 export function getDefaultSrhRaceDetailModel(): SrhRaceDetailModel {
     return {
         loaded: false,
-        resultsByKey: {},
+        failed: false,
         adjudicationsByKey: {},
         ledger: [],
         omittedRaces: 0,
+        documentCount: 0,
     };
 }
 
@@ -107,11 +116,34 @@ export function buildAdjudicationLedger(
 ): SrhLedgerRow[] {
     const roundOf = new Map<number, number>();
     const labelOf = new Map<number, string>();
+    // Session naming has to come from the event's own race ordering, not from
+    // the session number. iRacing counts backwards from the closing race, so
+    // simsession -2 is the league's HEAT 1, not "heat 2" — deriving the name
+    // arithmetically from the number is off by the number of heats.
+    const sessionNameOf = new Map<string, string>();
     info.schedule.forEach((event, i) => {
-        if (event.subsession_id !== null) {
-            roundOf.set(event.subsession_id, i + 1);
-            labelOf.set(event.subsession_id, eventLabel(event));
-        }
+        if (event.subsession_id === null) return;
+        roundOf.set(event.subsession_id, i + 1);
+        labelOf.set(event.subsession_id, eventLabel(event));
+
+        const races = (event.sessions || [])
+            .filter((s) => s.is_race)
+            .sort((a, b) => a.simsession_number - b.simsession_number);
+        races.forEach((race, idx) => {
+            const key = sessionKeyId([
+                event.subsession_id as number,
+                race.simsession_number,
+            ]);
+            // The closing race is the feature; everything before it is a heat,
+            // numbered in running order.
+            const isLast = idx === races.length - 1;
+            sessionNameOf.set(
+                key,
+                isLast && race.simsession_number === 0
+                    ? 'Feature'
+                    : `Heat ${idx + 1}`
+            );
+        });
     });
 
     const rows: SrhLedgerRow[] = [];
@@ -130,6 +162,7 @@ export function buildAdjudicationLedger(
                     simsessionNumber: doc.simsession_number,
                     eventLabel:
                         labelOf.get(doc.subsession_id) ?? 'Unknown event',
+                    sessionLabel: sessionNameOf.get(key) ?? 'Race',
                     round: roundOf.get(doc.subsession_id) ?? 0,
                     custId: adj.cust_id,
                     driverName: (() => {
@@ -184,33 +217,35 @@ export async function getSrhRaceDetailModel(
 
     const racedKeyIds = new Set(races.map(sessionKeyId));
 
-    const settled = await Promise.all(
-        races.flatMap(([sub, sim]) => [
-            getSrhRaceResults(sub, sim),
-            getSrhRaceAdjudications(sub, sim),
-        ])
-    );
+    let docs: (RaceAdjudications | null)[];
+    try {
+        docs = await Promise.all(
+            races.map(([sub, sim]) => getSrhRaceAdjudications(sub, sim))
+        );
+    } catch {
+        return {
+            ...getDefaultSrhRaceDetailModel(),
+            failed: true,
+            documentCount: races.length,
+        };
+    }
 
-    const resultsByKey: Record<string, RaceResults> = {};
     const adjudicationsByKey: Record<string, RaceAdjudications> = {};
-    const adjudicationDocs: RaceAdjudications[] = [];
-
+    const present: RaceAdjudications[] = [];
     races.forEach(([sub, sim], i) => {
-        const key = sessionKeyId([sub, sim]);
-        const results = settled[i * 2] as RaceResults | null;
-        const adj = settled[i * 2 + 1] as RaceAdjudications | null;
-        if (results) resultsByKey[key] = results;
-        if (adj) {
-            adjudicationsByKey[key] = adj;
-            adjudicationDocs.push(adj);
+        const doc = docs[i];
+        if (doc) {
+            adjudicationsByKey[sessionKeyId([sub, sim])] = doc;
+            present.push(doc);
         }
     });
 
     return {
         loaded: true,
-        resultsByKey,
+        failed: false,
         adjudicationsByKey,
-        ledger: buildAdjudicationLedger(adjudicationDocs, info, racedKeyIds),
+        ledger: buildAdjudicationLedger(present, info, racedKeyIds),
         omittedRaces,
+        documentCount: races.length,
     };
 }

@@ -337,12 +337,76 @@ describe('observedDescriptions', () => {
 });
 
 describe('getDefaultSrhRaceDetailModel', () => {
-    // The un-loaded state must be distinguishable from "loaded and empty",
-    // so the UI can show a skeleton rather than "no adjustments".
-    it('is marked unloaded and carries nothing', () => {
+    // Three states must stay distinguishable, because they mean different
+    // things to a reader: not loaded yet, loaded and genuinely empty, and
+    // failed. Collapsing the last two would report a broken fetch as
+    // "no adjustments this season".
+    it('is marked unloaded, not failed, and carries nothing', () => {
         const m = getDefaultSrhRaceDetailModel();
         expect(m.loaded).toBe(false);
+        expect(m.failed).toBe(false);
         expect(m.ledger).toEqual([]);
         expect(m.omittedRaces).toBe(0);
+        expect(m.documentCount).toBe(0);
+    });
+
+    it('no longer carries race results — nothing reads them', () => {
+        expect(getDefaultSrhRaceDetailModel()).not.toHaveProperty(
+            'resultsByKey'
+        );
+    });
+});
+
+describe('session naming', () => {
+    // iRacing numbers sessions backwards from the closing race, so simsession
+    // -2 is the league's HEAT 1. Deriving the name from the number gives
+    // "Heat 2" — off by the number of heats, and contradicting what the
+    // league and ldata-irweb both call it.
+    it('names simsession -2 as Heat 1, not Heat 2', () => {
+        const rows = buildAdjudicationLedger(
+            [
+                adjDoc(
+                    86551649,
+                    -2,
+                    [],
+                    [
+                        {
+                            adjustment_id: 1,
+                            cust_id: 585611,
+                            class_id: 0,
+                            points: 1,
+                            description: 'Fastest race lap',
+                        },
+                    ]
+                ),
+            ],
+            INFO,
+            RACED
+        );
+        expect(rows[0].sessionLabel).toBe('Heat 1');
+    });
+
+    it('names the closing race Feature', () => {
+        const rows = buildAdjudicationLedger(
+            [
+                adjDoc(
+                    86551649,
+                    0,
+                    [],
+                    [
+                        {
+                            adjustment_id: 2,
+                            cust_id: 585611,
+                            class_id: 0,
+                            points: 1,
+                            description: 'Pole position',
+                        },
+                    ]
+                ),
+            ],
+            INFO,
+            RACED
+        );
+        expect(rows[0].sessionLabel).toBe('Feature');
     });
 });
