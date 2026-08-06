@@ -25,6 +25,7 @@ import {
 import {
     getSrhSeasonInfo,
     getSrhSeasonStandings,
+    getSrhRaceResults,
 } from '@@/src/services/srhweb-service';
 import type {
     SeasonInfo,
@@ -41,6 +42,8 @@ import {
     seasonProgress,
     buildSrhTeamRows,
     driverDisplay,
+    recentRacedSessionKeys,
+    srhRecentFinishes,
     type PointsBreakdown,
     type PositionDelta,
     type SeasonProgress,
@@ -406,7 +409,7 @@ export async function getDriverStandingsModel(
     // links to this same view, and ranking one by `power_points` and the other
     // by championship points would put two different orders on one screen.
     if (srh) {
-        return buildSrhStandingsModel(
+        return await buildSrhStandingsModel(
             league,
             season,
             srh,
@@ -530,7 +533,7 @@ async function buildSrhFacts(
  * fallback path — srhweb carries none of that. What changes is the ranking,
  * the points, and everything hanging off them.
  */
-export function buildSrhStandingsModel(
+export async function buildSrhStandingsModel(
     league: string,
     season: string,
     srh: {
@@ -542,7 +545,7 @@ export function buildSrhStandingsModel(
     userTeamIdMap: Record<number, number>,
     teamInfoMap: Record<number, CLTI_Team>,
     summary_mode: boolean
-): DriverStandingsModel {
+): Promise<DriverStandingsModel> {
     const { facts, standings, info } = srh;
 
     const racedKeyIds = new Set(listRacedSessionKeys(info).map(sessionKeyId));
@@ -627,7 +630,45 @@ export function buildSrhStandingsModel(
     // labelled as such.
     ret.teams = buildTeamStandings(allDrivers, summary_mode);
     ret.srh = facts;
+
+    await enrichSrhRecentForm(allDrivers, info);
+
     return ret;
+}
+
+/**
+ * Fill the form strip from srhweb's own races.
+ *
+ * The fallback path's `enrichWithRecentForm` cannot serve here: it keys off
+ * `ldata-rsltsts`' simsession index, which does not necessarily carry a season
+ * simracerhub has scored — exactly the case this whole feature exists for. It
+ * would bail on the missing index and leave every strip empty.
+ *
+ * srhweb has its own schedule and its own results, so the strip is derived
+ * from those. Same window, same chronological order, same cost: three extra
+ * documents, matching what the fallback path already spends.
+ *
+ * Mutates in place and degrades silently — a failed fetch leaves a gap in the
+ * strip rather than taking the page down.
+ */
+async function enrichSrhRecentForm(
+    allDrivers: DriverModel[],
+    info: SeasonInfo
+): Promise<void> {
+    if (allDrivers.length === 0) return;
+
+    const recent = recentRacedSessionKeys(info);
+    if (recent.length === 0) return;
+
+    const races = await Promise.all(
+        recent.map(([subsession, simsession]) =>
+            getSrhRaceResults(subsession, simsession).catch(() => null)
+        )
+    );
+
+    for (const d of allDrivers) {
+        d.recentFinishes = srhRecentFinishes(Number(d.custId), races);
+    }
 }
 
 /**

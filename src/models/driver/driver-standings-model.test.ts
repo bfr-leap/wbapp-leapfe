@@ -1,4 +1,13 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+
+// buildSrhStandingsModel fills the form strip from srhweb's own races, which
+// means three fetches. Stub them: the strip's own logic is covered in
+// srh-standings-model.test.ts, and what matters here is the ranking.
+vi.mock('@@/src/services/srhweb-service', () => ({
+    getSrhSeasonInfo: vi.fn(),
+    getSrhSeasonStandings: vi.fn(),
+    getSrhRaceResults: vi.fn().mockResolvedValue(null),
+}));
 import {
     populateTeamInfoMaps,
     sortMembersByStandings,
@@ -672,8 +681,8 @@ describe('buildSrhStandingsModel', () => {
         },
     };
 
-    function build(summary = false) {
-        return buildSrhStandingsModel(
+    async function build(summary = false) {
+        return await buildSrhStandingsModel(
             '4534',
             '134456',
             SRH,
@@ -684,32 +693,36 @@ describe('buildSrhStandingsModel', () => {
         );
     }
 
-    it('takes position from the standings, not the array index', () => {
-        const positions = build().drivers.map((d) => d.position);
+    it('takes position from the standings, not the array index', async () => {
+        const positions = (await build()).drivers.map((d) => d.position);
         expect(positions).toEqual([1, 17, 17]);
     });
 
-    it('marks tied positions', () => {
-        const tied = build().drivers.filter((d) => d.srh?.isTied);
+    it('marks tied positions', async () => {
+        const tied = (await build()).drivers.filter((d) => d.srh?.isTied);
         expect(tied).toHaveLength(2);
         expect(tied.every((d) => d.position === 17)).toBe(true);
     });
 
     // The sentinel makes position_change meaningless — a debutant must not
     // render as a 15-place drop.
-    it('leaves positionChange undefined for a new entrant', () => {
-        const newcomer = build().drivers.find((d) => d.custId === '999999')!;
+    it('leaves positionChange undefined for a new entrant', async () => {
+        const newcomer = (await build()).drivers.find(
+            (d) => d.custId === '999999'
+        )!;
         expect(newcomer.positionChange).toBeUndefined();
         expect(newcomer.srh?.delta).toEqual({ kind: 'new' });
     });
 
-    it('sets positionChange for an established driver', () => {
-        const leader = build().drivers.find((d) => d.custId === '174470')!;
+    it('sets positionChange for an established driver', async () => {
+        const leader = (await build()).drivers.find(
+            (d) => d.custId === '174470'
+        )!;
         expect(leader.positionChange).toBe(0);
     });
 
-    it('computes gap to leader from the lowest position, not drivers[0]', () => {
-        const rows = build().drivers;
+    it('computes gap to leader from the lowest position, not drivers[0]', async () => {
+        const rows = (await build()).drivers;
         expect(
             rows.find((d) => d.custId === '174470')!.pointsBehindLeader
         ).toBe(0);
@@ -718,36 +731,44 @@ describe('buildSrhStandingsModel', () => {
         ).toBe(60);
     });
 
-    it('uses the sort_name split for driver names', () => {
-        const leader = build().drivers.find((d) => d.custId === '174470')!;
+    it('uses the sort_name split for driver names', async () => {
+        const leader = (await build()).drivers.find(
+            (d) => d.custId === '174470'
+        )!;
         expect(leader.firstName).toBe('Alpha');
         expect(leader.lastName).toBe('One');
     });
 
-    it('intersects counted races against the season’s raced sessions', () => {
-        const leader = build().drivers.find((d) => d.custId === '174470')!;
+    it('intersects counted races against the season’s raced sessions', async () => {
+        const leader = (await build()).drivers.find(
+            (d) => d.custId === '174470'
+        )!;
         expect(leader.srh?.counted).toHaveLength(2);
         expect(leader.srh?.unattributedStarts).toBe(0);
     });
 
-    it('reports starts no session accounts for', () => {
-        const newcomer = build().drivers.find((d) => d.custId === '999999')!;
+    it('reports starts no session accounts for', async () => {
+        const newcomer = (await build()).drivers.find(
+            (d) => d.custId === '999999'
+        )!;
         expect(newcomer.srh?.unattributedStarts).toBe(2);
     });
 
-    it('attaches season facts', () => {
-        const m = build();
+    it('attaches season facts', async () => {
+        const m = await build();
         expect(m.srh?.seasonName).toBe('Season 19');
         expect(m.srh?.dropWeeks).toBe(1);
     });
 
-    it('still trims to the top 4 in summary mode', () => {
-        expect(build(true).drivers.length).toBeLessThanOrEqual(4);
+    it('still trims to the top 4 in summary mode', async () => {
+        expect((await build(true)).drivers.length).toBeLessThanOrEqual(4);
     });
 
     // Guard for the surfaces that must never render these.
-    it('does not expose stage points or wins on a driver', () => {
-        const leader = build().drivers.find((d) => d.custId === '174470')!;
+    it('does not expose stage points or wins on a driver', async () => {
+        const leader = (await build()).drivers.find(
+            (d) => d.custId === '174470'
+        )!;
         expect(leader.srh).not.toHaveProperty('stagePoints');
         expect(leader.srh).not.toHaveProperty('stageWins');
     });

@@ -1,0 +1,14 @@
+{
+  "subsession_id": 87253846,
+  "simsession_number": 0,
+  "penalties": [],
+  "bonuses": [
+    {
+      "adjustment_id": 2658317,
+      "cust_id": 144017,
+      "class_id": 0,
+      "points": 1,
+      "description": "Fastest race lap"
+    }
+  ]
+}

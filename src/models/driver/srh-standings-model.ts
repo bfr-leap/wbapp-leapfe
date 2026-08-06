@@ -16,6 +16,7 @@ import type {
     DriverStanding,
     TeamStanding,
     RaceResult,
+    RaceResults,
     SessionKey,
 } from '@@/src/services/srhweb-types';
 
@@ -490,4 +491,46 @@ export function driverDisplay(
                 : parts[0] || `#${custId}`,
         countryCode: d.country_code,
     };
+}
+
+// ---------------------------------------------------------------------------
+// Recent form
+// ---------------------------------------------------------------------------
+
+/** How many recent races the form strip shows. Matches the fallback path. */
+export const SRH_FORM_WINDOW = 3;
+
+/**
+ * The last N raced sessions of a season, oldest → newest.
+ *
+ * The form strip reads left-to-right chronologically, and `listRacedSessionKeys`
+ * is already in calendar then session order, so this is just the tail.
+ */
+export function recentRacedSessionKeys(
+    info: SeasonInfo,
+    window: number = SRH_FORM_WINDOW
+): SessionKey[] {
+    const all = listRacedSessionKeys(info);
+    return all.slice(Math.max(0, all.length - window));
+}
+
+/**
+ * A driver's finishing positions across the given race documents.
+ *
+ * `null` where the driver has no row — they did not start, or the producer
+ * has not filed that driver's result. Both read the same way in the strip (a
+ * gap), which is correct: neither is a finishing position.
+ *
+ * A `null` document (fetch failed, or the race is not yet filed) also yields
+ * `null` for every driver rather than dropping the column, so the strip keeps
+ * its alignment across drivers.
+ */
+export function srhRecentFinishes(
+    custId: number,
+    racesChronological: (RaceResults | null)[]
+): (number | null)[] {
+    return racesChronological.map((race) => {
+        const row = race?.results?.[String(custId)];
+        return row ? row.position : null;
+    });
 }

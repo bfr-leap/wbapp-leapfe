@@ -17,6 +17,8 @@ import {
     eventLabel,
     buildSrhTeamRows,
     driverDisplay,
+    recentRacedSessionKeys,
+    srhRecentFinishes,
 } from './srh-standings-model';
 import type {
     SeasonInfo,
@@ -730,5 +732,64 @@ describe('driverDisplay', () => {
             countryCode: null,
         });
         expect(driverDisplay(999999, null).lastName).not.toMatch(/undefined/);
+    });
+});
+
+describe('recentRacedSessionKeys', () => {
+    // The form strip reads left-to-right chronologically, so this is the tail
+    // of the calendar, not the head.
+    it('returns the last three races, oldest first', () => {
+        const keys = recentRacedSessionKeys(makeSeason());
+        expect(keys).toHaveLength(3);
+        expect(keys).toEqual([
+            [87253846, 0],
+            [87426864, -2],
+            [87426864, 0],
+        ]);
+    });
+
+    it('returns everything when the season is shorter than the window', () => {
+        const info = makeSeason({ schedule: [makeEvent(86551649)] } as any);
+        expect(recentRacedSessionKeys(info)).toHaveLength(2);
+    });
+
+    it('returns nothing when no race has been run', () => {
+        const info = makeSeason({ schedule: [makeEvent(null)] } as any);
+        expect(recentRacedSessionKeys(info)).toEqual([]);
+    });
+});
+
+describe('srhRecentFinishes', () => {
+    const race = (positions: Record<string, number>) =>
+        ({
+            results: Object.fromEntries(
+                Object.entries(positions).map(([c, p]) => [c, { position: p }])
+            ),
+        }) as any;
+
+    it('reads finishing positions in order', () => {
+        expect(
+            srhRecentFinishes(174470, [
+                race({ '174470': 5 }),
+                race({ '174470': 2 }),
+                race({ '174470': 1 }),
+            ])
+        ).toEqual([5, 2, 1]);
+    });
+
+    // A driver with no row did not start, or the producer has not filed their
+    // result. Neither is a finishing position, so both read as a gap.
+    it('yields null where the driver has no row', () => {
+        expect(
+            srhRecentFinishes(174470, [race({ '999999': 1 }), race({ '174470': 3 })])
+        ).toEqual([null, 3]);
+    });
+
+    // A failed fetch must not shorten the strip — that would misalign it
+    // against every other driver's.
+    it('keeps its length when a race document is missing', () => {
+        expect(
+            srhRecentFinishes(174470, [null, race({ '174470': 3 }), null])
+        ).toEqual([null, 3, null]);
     });
 });
