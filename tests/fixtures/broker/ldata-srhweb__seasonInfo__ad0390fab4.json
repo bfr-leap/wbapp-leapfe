@@ -1,0 +1,502 @@
+{
+  "season_id": 134456,
+  "season_name": "Season 19",
+  "league_id": 4534,
+  "league_name": "League Zero",
+  "series_name": "Formula Series",
+  "drop_weeks": 1,
+  "keep_weeks": 4,
+  "allow_negative_race_points": true,
+  "allow_negative_standings_points": true,
+  "classes": [
+    {
+      "class_id": 0,
+      "class_name": "Overall"
+    }
+  ],
+  "schedule": [
+    {
+      "subsession_id": 86551649,
+      "sessions": [
+        {
+          "simsession_number": -4,
+          "session_type": "OPEN PRACTICE",
+          "is_race": false
+        },
+        {
+          "simsession_number": -3,
+          "session_type": "OPEN QUALIFYING",
+          "is_race": false
+        },
+        {
+          "simsession_number": -2,
+          "session_type": "RACE",
+          "is_race": true
+        },
+        {
+          "simsession_number": -1,
+          "session_type": "OPEN PRACTICE",
+          "is_race": false
+        },
+        {
+          "simsession_number": 0,
+          "session_type": "RACE",
+          "is_race": true
+        }
+      ],
+      "race_date": 1781755200,
+      "track": {
+        "track_id": 103,
+        "config_id": 523,
+        "track_name": "Circuit de Spa-Francorchamps",
+        "config_name": "Grand Prix Pits",
+        "length_km": 4.35,
+        "turns": 19
+      },
+      "event_name": null,
+      "is_chase": false,
+      "can_drop": true,
+      "counts_for_points": true
+    },
+    {
+      "subsession_id": 86727453,
+      "sessions": [
+        {
+          "simsession_number": -4,
+          "session_type": "OPEN PRACTICE",
+          "is_race": false
+        },
+        {
+          "simsession_number": -3,
+          "session_type": "OPEN QUALIFYING",
+          "is_race": false
+        },
+        {
+          "simsession_number": -2,
+          "session_type": "RACE",
+          "is_race": true
+        },
+        {
+          "simsession_number": -1,
+          "session_type": "OPEN PRACTICE",
+          "is_race": false
+        },
+        {
+          "simsession_number": 0,
+          "session_type": "RACE",
+          "is_race": true
+        }
+      ],
+      "race_date": 1782360000,
+      "track": {
+        "track_id": 185,
+        "config_id": 250,
+        "track_name": "Nürburgring Grand-Prix-Strecke",
+        "config_name": "Grand Prix",
+        "length_km": 3.2,
+        "turns": 16
+      },
+      "event_name": null,
+      "is_chase": false,
+      "can_drop": true,
+      "counts_for_points": true
+    },
+    {
+      "subsession_id": 86905345,
+      "sessions": [
+        {
+          "simsession_number": -4,
+          "session_type": "OPEN PRACTICE",
+          "is_race": false
+        },
+        {
+          "simsession_number": -3,
+          "session_type": "OPEN QUALIFYING",
+          "is_race": false
+        },
+        {
+          "simsession_number": -2,
+          "session_type": "RACE",
+          "is_race": true
+        },
+        {
+          "simsession_number": -1,
+          "session_type": "OPEN PRACTICE",
+          "is_race": false
+        },
+        {
+          "simsession_number": 0,
+          "session_type": "RACE",
+          "is_race": true
+        }
+      ],
+      "race_date": 1782964800,
+      "track": {
+        "track_id": 533,
+        "config_id": 572,
+        "track_name": "Autódromo Hermanos Rodríguez",
+        "config_name": "Grand Prix",
+        "length_km": 2.674,
+        "turns": 17
+      },
+      "event_name": null,
+      "is_chase": false,
+      "can_drop": true,
+      "counts_for_points": true
+    },
+    {
+      "subsession_id": 87253846,
+      "sessions": [
+        {
+          "simsession_number": -4,
+          "session_type": "OPEN PRACTICE",
+          "is_race": false
+        },
+        {
+          "simsession_number": -3,
+          "session_type": "OPEN QUALIFYING",
+          "is_race": false
+        },
+        {
+          "simsession_number": -2,
+          "session_type": "RACE",
+          "is_race": true
+        },
+        {
+          "simsession_number": -1,
+          "session_type": "OPEN PRACTICE",
+          "is_race": false
+        },
+        {
+          "simsession_number": 0,
+          "session_type": "RACE",
+          "is_race": true
+        }
+      ],
+      "race_date": 1784174400,
+      "track": {
+        "track_id": 406,
+        "config_id": 444,
+        "track_name": "Fuji International Speedway",
+        "config_name": "Grand Prix",
+        "length_km": 2.8334,
+        "turns": 16
+      },
+      "event_name": null,
+      "is_chase": false,
+      "can_drop": true,
+      "counts_for_points": true
+    },
+    {
+      "subsession_id": 87426864,
+      "sessions": [
+        {
+          "simsession_number": -4,
+          "session_type": "OPEN PRACTICE",
+          "is_race": false
+        },
+        {
+          "simsession_number": -3,
+          "session_type": "OPEN QUALIFYING",
+          "is_race": false
+        },
+        {
+          "simsession_number": -2,
+          "session_type": "RACE",
+          "is_race": true
+        },
+        {
+          "simsession_number": -1,
+          "session_type": "OPEN PRACTICE",
+          "is_race": false
+        },
+        {
+          "simsession_number": 0,
+          "session_type": "RACE",
+          "is_race": true
+        }
+      ],
+      "race_date": 1784779200,
+      "track": {
+        "track_id": 114,
+        "config_id": 168,
+        "track_name": "Suzuka International Racing Course",
+        "config_name": "Grand Prix",
+        "length_km": 3.609,
+        "turns": 17
+      },
+      "event_name": null,
+      "is_chase": false,
+      "can_drop": true,
+      "counts_for_points": true
+    },
+    {
+      "subsession_id": 87598316,
+      "sessions": [
+        {
+          "simsession_number": -4,
+          "session_type": "OPEN PRACTICE",
+          "is_race": false
+        },
+        {
+          "simsession_number": -3,
+          "session_type": "OPEN QUALIFYING",
+          "is_race": false
+        },
+        {
+          "simsession_number": -2,
+          "session_type": "RACE",
+          "is_race": true
+        },
+        {
+          "simsession_number": -1,
+          "session_type": "OPEN PRACTICE",
+          "is_race": false
+        },
+        {
+          "simsession_number": 0,
+          "session_type": "RACE",
+          "is_race": true
+        }
+      ],
+      "race_date": 1785384000,
+      "track": {
+        "track_id": 33,
+        "config_id": 585,
+        "track_name": "Barber Motorsports Park",
+        "config_name": "",
+        "length_km": 2.38,
+        "turns": 16
+      },
+      "event_name": null,
+      "is_chase": false,
+      "can_drop": true,
+      "counts_for_points": true
+    },
+    {
+      "subsession_id": null,
+      "sessions": [],
+      "race_date": 1785988800,
+      "track": {
+        "track_id": 11,
+        "config_id": 18,
+        "track_name": "Road America",
+        "config_name": "Full Course",
+        "length_km": 4.048,
+        "turns": 14
+      },
+      "event_name": null,
+      "is_chase": false,
+      "can_drop": true,
+      "counts_for_points": true
+    },
+    {
+      "subsession_id": null,
+      "sessions": [],
+      "race_date": 1786593600,
+      "track": {
+        "track_id": 457,
+        "config_id": 498,
+        "track_name": "Autodromo Internazionale del Mugello",
+        "config_name": "Grand Prix",
+        "length_km": 3.259,
+        "turns": 15
+      },
+      "event_name": null,
+      "is_chase": false,
+      "can_drop": true,
+      "counts_for_points": true
+    },
+    {
+      "subsession_id": null,
+      "sessions": [],
+      "race_date": 1787198400,
+      "track": {
+        "track_id": 172,
+        "config_id": 239,
+        "track_name": "Autodromo Nazionale Monza",
+        "config_name": "Grand Prix",
+        "length_km": 3.6,
+        "turns": 11
+      },
+      "event_name": null,
+      "is_chase": false,
+      "can_drop": true,
+      "counts_for_points": true
+    },
+    {
+      "subsession_id": null,
+      "sessions": [],
+      "race_date": 1787803200,
+      "track": {
+        "track_id": 468,
+        "config_id": 509,
+        "track_name": "Algarve International Circuit",
+        "config_name": "Grand Prix",
+        "length_km": 2.853,
+        "turns": 15
+      },
+      "event_name": null,
+      "is_chase": false,
+      "can_drop": true,
+      "counts_for_points": true
+    },
+    {
+      "subsession_id": null,
+      "sessions": [],
+      "race_date": 1788408000,
+      "track": {
+        "track_id": 32,
+        "config_id": 41,
+        "track_name": "[Legacy] Silverstone Circuit - 2008",
+        "config_name": "Grand Prix",
+        "length_km": 3.194,
+        "turns": 17
+      },
+      "event_name": null,
+      "is_chase": false,
+      "can_drop": true,
+      "counts_for_points": true
+    }
+  ],
+  "drivers": {
+    "116648": {
+      "cust_id": 116648,
+      "display_name": "Driver 9631",
+      "sort_name": "Driver7069, Test",
+      "country_code": "US"
+    },
+    "144017": {
+      "cust_id": 144017,
+      "display_name": "Driver 1367",
+      "sort_name": "Driver5139, Test",
+      "country_code": "US"
+    },
+    "145862": {
+      "cust_id": 145862,
+      "display_name": "Driver 1536",
+      "sort_name": "Driver2732, Test",
+      "country_code": "FR"
+    },
+    "151510": {
+      "cust_id": 151510,
+      "display_name": "Driver 7721",
+      "sort_name": "Driver1061, Test",
+      "country_code": "US"
+    },
+    "152730": {
+      "cust_id": 152730,
+      "display_name": "Driver 8025",
+      "sort_name": "Driver7373, Test",
+      "country_code": "CO"
+    },
+    "180678": {
+      "cust_id": 180678,
+      "display_name": "Driver 4331",
+      "sort_name": "Driver7465, Test",
+      "country_code": "US"
+    },
+    "251001": {
+      "cust_id": 251001,
+      "display_name": "Driver 6113",
+      "sort_name": "Driver6197, Test",
+      "country_code": "GB"
+    },
+    "270070": {
+      "cust_id": 270070,
+      "display_name": "Driver 9327",
+      "sort_name": "Driver1053, Test",
+      "country_code": "US"
+    },
+    "354152": {
+      "cust_id": 354152,
+      "display_name": "Driver 7486",
+      "sort_name": "Driver5794, Test",
+      "country_code": "MX"
+    },
+    "370970": {
+      "cust_id": 370970,
+      "display_name": "Driver 2243",
+      "sort_name": "Driver2311, Test",
+      "country_code": "US"
+    },
+    "410106": {
+      "cust_id": 410106,
+      "display_name": "Driver 1266",
+      "sort_name": "Driver5098, Test",
+      "country_code": "GB"
+    },
+    "430315": {
+      "cust_id": 430315,
+      "display_name": "Driver 2667",
+      "sort_name": "Driver1521, Test",
+      "country_code": "SCT"
+    },
+    "494130": {
+      "cust_id": 494130,
+      "display_name": "Driver 1483",
+      "sort_name": "Driver3663, Test",
+      "country_code": "US"
+    },
+    "544375": {
+      "cust_id": 544375,
+      "display_name": "Driver 6525",
+      "sort_name": "Driver6367, Test",
+      "country_code": "US"
+    },
+    "547334": {
+      "cust_id": 547334,
+      "display_name": "Driver 6717",
+      "sort_name": "Driver5473, Test",
+      "country_code": "LK"
+    },
+    "577083": {
+      "cust_id": 577083,
+      "display_name": "Driver 8001",
+      "sort_name": "Driver6539, Test",
+      "country_code": "CA"
+    },
+    "582721": {
+      "cust_id": 582721,
+      "display_name": "Driver 1049",
+      "sort_name": "Driver3861, Test",
+      "country_code": "AU"
+    },
+    "618204": {
+      "cust_id": 618204,
+      "display_name": "Driver 5686",
+      "sort_name": "Driver3670, Test",
+      "country_code": "CA"
+    },
+    "675517": {
+      "cust_id": 675517,
+      "display_name": "Driver 4197",
+      "sort_name": "Driver4167, Test",
+      "country_code": "US"
+    },
+    "735709": {
+      "cust_id": 735709,
+      "display_name": "Driver 4941",
+      "sort_name": "Driver6849, Test",
+      "country_code": "US"
+    },
+    "774792": {
+      "cust_id": 774792,
+      "display_name": "Driver 8187",
+      "sort_name": "Driver7393, Test",
+      "country_code": "US"
+    },
+    "880301": {
+      "cust_id": 880301,
+      "display_name": "Driver 3371",
+      "sort_name": "Driver3921, Test",
+      "country_code": "GB"
+    },
+    "906526": {
+      "cust_id": 906526,
+      "display_name": "Driver 8050",
+      "sort_name": "Driver5010, Test",
+      "country_code": "FR"
+    }
+  }
+}

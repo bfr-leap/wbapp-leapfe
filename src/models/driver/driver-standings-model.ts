@@ -22,6 +22,31 @@ import {
     getSimsessionResults,
 } from '@@/src/utils/fetch-util';
 
+import {
+    getSrhSeasonInfo,
+    getSrhSeasonStandings,
+} from '@@/src/services/srhweb-service';
+import type {
+    SeasonInfo,
+    SeasonStandings,
+    SessionKey,
+} from '@@/src/services/srhweb-types';
+import {
+    listRacedSessionKeys,
+    sessionKeyId,
+    splitDriverRaceLedger,
+    pointsBreakdown,
+    positionDelta,
+    rankByPosition,
+    seasonProgress,
+    buildSrhTeamRows,
+    driverDisplay,
+    type PointsBreakdown,
+    type PositionDelta,
+    type SeasonProgress,
+    type SrhTeamRow,
+} from './srh-standings-model';
+
 export interface TeamModel {
     position: number;
     points: number;
@@ -65,6 +90,60 @@ export interface DriverModel {
      *  moved down, 0 = unchanged. Undefined when there's no prior
      *  race to compare against (first round, or empty field). */
     positionChange?: number;
+    /** Present only when this league's standings come from srhweb. */
+    srh?: SrhDriverFacts;
+}
+
+/**
+ * Per-driver facts that only exist when the league is on simracerhub.
+ */
+export interface SrhDriverFacts {
+    custId: number;
+    /** Tied with at least one other driver on this position. */
+    isTied: boolean;
+    /** Race / bonus / penalty split behind the total. */
+    points: PointsBreakdown;
+    /** `new` for a debutant — see `positionDelta`. */
+    delta: PositionDelta;
+    /** Races that scored, and races the drop-week rules discarded. */
+    counted: SessionKey[];
+    dropped: SessionKey[];
+    /** Starts the standings claim that no race document accounts for. */
+    unattributedStarts: number;
+    starts: number;
+    racesCounted: number;
+    wins: number;
+    poles: number;
+    podiums: number;
+    top5: number;
+    top10: number;
+    lapsLed: number;
+    incidents: number;
+    /** simracerhub's own season rating. NOT the per-race rating — different
+     *  scale entirely, so it must never share a label with one. */
+    seasonRating: number;
+}
+
+/**
+ * Season-level facts that only exist when the league is on simracerhub.
+ */
+export interface SrhSeasonFacts {
+    seasonName: string;
+    seriesName: string;
+    leagueName: string;
+    /** Null when the season sets no such rule. */
+    dropWeeks: number | null;
+    keepWeeks: number | null;
+    classes: { class_id: number; class_name: string }[];
+    /** The class these standings are for. */
+    classId: number;
+    progress: SeasonProgress;
+    /** Calendar, including events not yet run — those carry a null subsession. */
+    schedule: SeasonInfo['schedule'];
+    /** Real team championship, empty for seasons that don't run one. */
+    teams: SrhTeamRow[];
+    /** The raw season document, for the surfaces that need the schedule. */
+    info: SeasonInfo;
 }
 
 export interface DriverStandingsModel {
@@ -72,6 +151,17 @@ export interface DriverStandingsModel {
     seasonId: string;
     drivers: DriverModel[];
     teams: TeamModel[];
+    /**
+     * Present only when `ldata-srhweb` covers this league and season —
+     * i.e. when the league scores its championship on simracerhub.
+     *
+     * When absent, every field above means exactly what it always did: the
+     * ranking is this app's own `power_points` computation. When present, the
+     * ranking and points are the league's authoritative published standings,
+     * and the extra surfaces (drop weeks, stewarding, real teams) have data
+     * behind them. Consumers that don't know about `srh` are unaffected.
+     */
+    srh?: SrhSeasonFacts;
 }
 
 export function getDefaultStandingsModel(): DriverStandingsModel {
@@ -260,22 +350,36 @@ export async function getDriverStandingsModel(
             MembersData | null,
             SeasonSimsessionIndex[] | null
         ]
-    >[
-        await getLeagueDriverStats(league),
-        await getCuratedLeagueTeamsInfo(league),
-        await getMembersData(league, season),
-        await getSeasonSimsessionIndex(league),
-    ];
+    >await Promise.all([
+        // These four are independent — awaiting them in sequence inside an
+        // array literal (as this did) serialised four round trips for no
+        // reason.
+        getLeagueDriverStats(league),
+        getCuratedLeagueTeamsInfo(league),
+        getMembersData(league, season),
+        getSeasonSimsessionIndex(league),
+    ]);
 
     if (isNaN(Number.parseInt(season))) {
         season = '';
     }
 
+    // Probe srhweb with the season the caller actually asked for, BEFORE the
+    // resolution loop below can rewrite it.
+    //
+    // That loop exists to pick a sensible default when `season` is empty or
+    // unknown, and it decides using `ldata-rsltsts`' simsession index. But
+    // srhweb is a different producer with its own coverage: a league can have
+    // a season scored on simracerhub that the rsltsts index has not caught up
+    // with. Resolving first would silently redirect an explicit request for
+    // that season to a different one and then report "no srhweb data" for it.
+    let srh = season ? await buildSrhFacts(league, season) : null;
+
     let selectedSeason = _seasonSimsessionIndex?.find(
         (s) => s.season_id.toString() === season
     );
 
-    if (!selectedSeason) {
+    if (!selectedSeason && !srh) {
         for (let i = 0; i < (_seasonSimsessionIndex?.length || 0); ++i) {
             if (_seasonSimsessionIndex?.[i].sessions.length > 0) {
                 selectedSeason = _seasonSimsessionIndex?.[i];
@@ -283,6 +387,10 @@ export async function getDriverStandingsModel(
             }
         }
         season = selectedSeason?.season_id?.toString() || '';
+        // The default we landed on may itself be an srhweb season.
+        if (season) {
+            srh = await buildSrhFacts(league, season);
+        }
     }
 
     let _seasonId = Number.parseInt(season);
@@ -291,6 +399,23 @@ export async function getDriverStandingsModel(
         _curatedLeagueTeamsInfo,
         _seasonId
     );
+
+    // `srh` was resolved above, before the season could be rewritten.
+    //
+    // Deliberately not gated on `summary_mode`: the home page's summary card
+    // links to this same view, and ranking one by `power_points` and the other
+    // by championship points would put two different orders on one screen.
+    if (srh) {
+        return buildSrhStandingsModel(
+            league,
+            season,
+            srh,
+            _membersData,
+            userTeamIdMap,
+            teamInfoMap,
+            summary_mode
+        );
+    }
 
     let sortedM = sortMembersByStandings(
         _membersData?.members || [],
@@ -339,6 +464,169 @@ export async function getDriverStandingsModel(
 
     await enrichWithRecentForm(allDrivers, league, season, selectedSeason);
 
+    return ret;
+}
+
+/**
+ * Fetch and assemble the srhweb season facts, or null when this league and
+ * season aren't in that dataset — which is the common case, and not an error.
+ *
+ * Returns null rather than throwing on every failure path: a missing document,
+ * an unscored season, a broker hiccup. The caller falls back to the computed
+ * standings, so the page degrades to what it rendered before this feature
+ * existed rather than to an error state.
+ */
+async function buildSrhFacts(
+    league: string,
+    season: string
+): Promise<{
+    facts: SrhSeasonFacts;
+    standings: SeasonStandings;
+    info: SeasonInfo;
+} | null> {
+    if (!league || !season) return null;
+
+    const info = await getSrhSeasonInfo(league, season).catch(() => null);
+    if (!info || !Array.isArray(info.classes) || info.classes.length === 0) {
+        return null;
+    }
+
+    // Every season in the lake is single-class, but the loop is the correct
+    // shape and costs nothing. The first class with a standings document wins
+    // — a class selector is a later concern, and multi-class is untested.
+    const perClass = await Promise.all(
+        info.classes.map((c) =>
+            getSrhSeasonStandings(league, season, c.class_id).catch(() => null)
+        )
+    );
+    const idx = perClass.findIndex((s) => s && s.drivers);
+    if (idx === -1) return null;
+    const standings = perClass[idx] as SeasonStandings;
+
+    return {
+        info,
+        standings,
+        facts: {
+            seasonName: info.season_name,
+            seriesName: info.series_name,
+            leagueName: info.league_name,
+            dropWeeks: info.drop_weeks,
+            keepWeeks: info.keep_weeks,
+            classes: info.classes,
+            classId: info.classes[idx].class_id,
+            progress: seasonProgress(info),
+            schedule: info.schedule,
+            teams: buildSrhTeamRows(standings, info),
+            info,
+        },
+    };
+}
+
+/**
+ * Build the view model from srhweb's published standings.
+ *
+ * Identity (licence, iRating, club, team chrome) still comes from
+ * `membersData` so `driver-tag.vue` renders exactly as it does on the
+ * fallback path — srhweb carries none of that. What changes is the ranking,
+ * the points, and everything hanging off them.
+ */
+export function buildSrhStandingsModel(
+    league: string,
+    season: string,
+    srh: {
+        facts: SrhSeasonFacts;
+        standings: SeasonStandings;
+        info: SeasonInfo;
+    },
+    membersData: MembersData | null,
+    userTeamIdMap: Record<number, number>,
+    teamInfoMap: Record<number, CLTI_Team>,
+    summary_mode: boolean
+): DriverStandingsModel {
+    const { facts, standings, info } = srh;
+
+    const racedKeyIds = new Set(listRacedSessionKeys(info).map(sessionKeyId));
+    const memberByCust = new Map<number, M_Member>();
+    for (const m of membersData?.members || []) {
+        memberByCust.set(m.cust_id, m);
+    }
+
+    const ranked = rankByPosition(Object.values(standings.drivers || {}));
+
+    // The leader is the driver on the lowest position, NOT the first array
+    // entry — positions tie, and the array is only sorted because we sorted it.
+    const leaderPoints = ranked.length ? ranked[0].total_points : 0;
+
+    const allDrivers: DriverModel[] = ranked.map((standing) => {
+        const member = memberByCust.get(standing.cust_id);
+        const ledger = splitDriverRaceLedger(standing, racedKeyIds);
+        const delta = positionDelta(standing);
+
+        // Prefer srhweb's own name: `sort_name` is already "Last, First",
+        // where splitting `display_name` mis-handles multi-word surnames.
+        const display = driverDisplay(standing.cust_id, info);
+        const memberView = member
+            ? getMemberViewFromM_Member(member, userTeamIdMap, teamInfoMap)
+            : null;
+
+        return {
+            position: standing.position,
+            points: standing.total_points,
+            clubId: memberView?.clubId ?? 0,
+            firstName: display.firstName || memberView?.firstName || '',
+            lastName: display.lastName || memberView?.lastName || '',
+            iRating: memberView?.iRating ?? '',
+            licenseLevel: memberView?.licenseLevel ?? '',
+            safetyRating: memberView?.safetyRating ?? '',
+            // srhweb team IDs are simracerhub's own space and don't resolve in
+            // this app; the curated map is the only linkable one.
+            teamName: memberView?.teamName ?? '',
+            teamId: memberView?.teamId ?? 0,
+            showStats: false,
+            custId: standing.cust_id.toString(),
+            stats: {
+                started: standing.starts,
+                poles: standing.poles,
+                wins: standing.wins,
+                podiums: standing.podiums,
+                top10: standing.top_10,
+                top20: -1,
+            },
+            pointsBehindLeader: leaderPoints - standing.total_points,
+            // Deliberately NOT set from srhweb for a debutant: the sentinel
+            // makes `position_change` meaningless there.
+            positionChange: delta.kind === 'change' ? delta.change : undefined,
+            srh: {
+                custId: standing.cust_id,
+                isTied: standing.isTied,
+                points: pointsBreakdown(standing),
+                delta,
+                counted: ledger.counted,
+                dropped: ledger.dropped,
+                unattributedStarts: ledger.unattributedStarts,
+                starts: standing.starts,
+                racesCounted: standing.races_counted,
+                wins: standing.wins,
+                poles: standing.poles,
+                podiums: standing.podiums,
+                top5: standing.top_5,
+                top10: standing.top_10,
+                lapsLed: standing.laps_led,
+                incidents: standing.incidents,
+                seasonRating: standing.rating,
+            },
+        } as DriverModel;
+    });
+
+    const ret: DriverStandingsModel = getDefaultStandingsModel();
+    ret.leagueId = league;
+    ret.seasonId = season;
+    ret.drivers = summary_mode ? allDrivers.slice(0, 4) : allDrivers;
+    // Curated teams stay on the existing path — srhweb's real team
+    // championship renders in its own component, where roster sums can be
+    // labelled as such.
+    ret.teams = buildTeamStandings(allDrivers, summary_mode);
+    ret.srh = facts;
     return ret;
 }
 
@@ -393,8 +681,8 @@ async function enrichWithRecentForm(
                 (s) => s.subsession_id === sess.subsession_id
             );
             const raceSim =
-                ssi?.simsessions.find((s) => s.type === 'race')?.simsession_id ??
-                ssi?.simsessions[0]?.simsession_id;
+                ssi?.simsessions.find((s) => s.type === 'race')
+                    ?.simsession_id ?? ssi?.simsessions[0]?.simsession_id;
             if (raceSim === undefined) return null;
             return await getSimsessionResults(
                 sess.subsession_id.toString(),

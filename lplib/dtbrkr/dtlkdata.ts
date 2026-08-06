@@ -11,6 +11,13 @@ const SCOPE_PARAMS = [
     'track',
     'sessionType',
     'custId',
+    // LOCAL ADDITION — not upstream. Addresses one championship table in
+    // `ldata-srhweb/seasonStandings`; without it that endpoint 404s, which
+    // this app renders as "no srhweb data" and silently falls back to the
+    // computed standings. `lplib-pull.sh` will delete this file wholesale —
+    // see ../README-DIVERGENCE.md and the tripwire at
+    // server/api/dtlkdata-scope-params.test.ts, which fails if this is lost.
+    'class',
 ] as const;
 
 export async function getDocument(query: {

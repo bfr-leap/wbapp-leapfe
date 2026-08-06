@@ -78,7 +78,14 @@ export const ROUTES = [
         label: 'Driver standings',
         url: '/?m=standings&league=4534&season=131502',
         section: 'main',
-        notes: 'Pure data table page. Watch row density and stripe contrast across viewports.',
+        notes: 'Pure data table page. Watch row density and stripe contrast across viewports. This season is NOT in ldata-srhweb, so it renders the computed-standings fallback — the srhweb surfaces must be absent here.',
+    },
+    {
+        slug: 'standings-srhweb',
+        label: 'Driver standings (simracerhub season)',
+        url: '/?m=standings&league=4534&season=134456',
+        section: 'main',
+        notes: 'The srhweb-backed variant: published positions, points breakdown bar, drop-week explorer, stewarding ledger and the real team championship. Check that ties (two drivers on P17, next is P19) render without renumbering, that the new entrant shows a NEW chip rather than a red position drop, and that drivers with unattributed starts carry their chip.',
     },
     {
         slug: 'season',

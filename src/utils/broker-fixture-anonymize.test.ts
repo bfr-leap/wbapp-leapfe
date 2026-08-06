@@ -190,3 +190,119 @@ describe('anonymizeBrokerDoc', () => {
         expect(anonymizeBrokerDoc(42)).toBe(42);
     });
 });
+
+// `ldata-srhweb` exercises three paths the earlier corpus never hit: a bare
+// number[] roster, a `"Last, First"` name field, and a free-text field that
+// must survive. Each of these was a real defect before this suite existed.
+describe('anonymizeBrokerDoc — ldata-srhweb', () => {
+    it('anonymizes TeamStanding.cust_ids', () => {
+        const out = anonymizeBrokerDoc({
+            cust_ids: [1047743, 1075458],
+        }) as Record<string, number[]>;
+
+        expect(out.cust_ids).toHaveLength(2);
+        expect(out.cust_ids).not.toContain(1047743);
+        expect(out.cust_ids).not.toContain(1075458);
+        expect(out.cust_ids.every((n) => typeof n === 'number')).toBe(true);
+    });
+
+    // The roster has to keep pointing at the same drivers after the pass —
+    // the `drivers` map's KEYS are rewritten by isCustKeyedMap, so a roster
+    // rewritten by a different rule (or not at all) would silently dangle.
+    it('keeps cust_ids joinable to the anonymized drivers map', () => {
+        const out = anonymizeBrokerDoc({
+            drivers: {
+                '1047743': { cust_id: 1047743, display_name: 'Real One' },
+                '1075458': { cust_id: 1075458, display_name: 'Real Two' },
+            },
+            teams: {
+                '33999': {
+                    team_id: 33999,
+                    team_name: 'Real Team',
+                    cust_ids: [1047743, 1075458],
+                },
+            },
+        }) as any;
+
+        const driverKeys = Object.keys(out.drivers);
+        const roster = out.teams[Object.keys(out.teams)[0]].cust_ids;
+
+        expect(driverKeys).toHaveLength(2);
+        for (const id of roster) {
+            expect(driverKeys).toContain(String(id));
+        }
+        // And the inner cust_id agrees with its own key.
+        for (const k of driverKeys) {
+            expect(out.drivers[k].cust_id).toBe(Number(k));
+        }
+    });
+
+    it('anonymizes sort_name but keeps the "Last, First" shape', () => {
+        const out = anonymizeBrokerDoc({
+            sort_name: 'Mayorga, Arturo',
+        }) as Record<string, string>;
+
+        expect(out.sort_name).not.toContain('Mayorga');
+        expect(out.sort_name).not.toContain('Arturo');
+        // Consumers split on ', ' to recover first/last — the fixture has to
+        // exercise that path, not the fallback.
+        expect(out.sort_name.split(', ')).toHaveLength(2);
+    });
+
+    // `description` is in PII_REDACT_KEYS because it is free text elsewhere.
+    // For srhweb it is a league-authored adjustment label, and it IS the
+    // stewarding ledger — redacting it blanks the feature in fixture mode
+    // and in every audit screenshot.
+    it('keeps adjudication descriptions when the namespace is srhweb', () => {
+        const doc = {
+            penalties: [
+                {
+                    adjustment_id: 500266,
+                    cust_id: 644931,
+                    points: 5,
+                    description: 'Major Penalty',
+                },
+            ],
+            bonuses: [{ adjustment_id: 2634534, description: 'Pole position' }],
+        };
+
+        const out = anonymizeBrokerDoc(doc, 'ldata-srhweb') as any;
+        expect(out.penalties[0].description).toBe('Major Penalty');
+        expect(out.bonuses[0].description).toBe('Pole position');
+        // The exemption is narrow — identity fields are still scrubbed.
+        expect(out.penalties[0].cust_id).not.toBe(644931);
+    });
+
+    it('still redacts description for every other namespace', () => {
+        const doc = { description: 'Contact between A and B at turn 4' };
+
+        expect((anonymizeBrokerDoc(doc) as any).description).toBe('[redacted]');
+        expect(
+            (anonymizeBrokerDoc(doc, 'ldata-stwdcfg') as any).description
+        ).toBe('[redacted]');
+    });
+
+    // Fixture filenames hash the query params, and counted_races/dropped_races
+    // are [subsession, simsession] pairs. Rewriting either would break the
+    // fixture key and orphan every recorded doc.
+    it('leaves subsession and simsession identifiers real', () => {
+        const out = anonymizeBrokerDoc(
+            {
+                subsession_id: 86551649,
+                simsession_number: -2,
+                counted_races: [
+                    [86551649, -2],
+                    [86551649, 0],
+                ],
+            },
+            'ldata-srhweb'
+        ) as any;
+
+        expect(out.subsession_id).toBe(86551649);
+        expect(out.simsession_number).toBe(-2);
+        expect(out.counted_races).toEqual([
+            [86551649, -2],
+            [86551649, 0],
+        ]);
+    });
+});

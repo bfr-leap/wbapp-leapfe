@@ -151,6 +151,12 @@ export const SMOKE_URLS: SmokeUrl[] = [
         url: '/?m=results&league=4534&season=131502&subsession=84522154&simsession=0',
     },
     { label: 'standings', url: '/?m=standings&league=4534&season=131502' },
+    // A season the simracerhub dataset covers — exercises the srhweb path
+    // and its extra surfaces. The line above stays as the fallback case.
+    {
+        label: 'standings (srhweb season)',
+        url: '/?m=standings&league=4534&season=134456',
+    },
     { label: 'season', url: '/?m=season&league=4534&season=131502' },
     { label: 'rulings', url: '/?m=rulings&league=4534&season=131502' },
     { label: 'driver', url: '/?m=driver&league=4534&driver=174470' },

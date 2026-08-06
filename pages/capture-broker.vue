@@ -305,6 +305,64 @@ const TUPLES: CaptureTuple[] = [
             sessionType: 'quali',
         },
     },
+
+    // -------------------------------------------------------------
+    // simracerhub championship data. Only league 4534 / season 134456
+    // is covered in the lake today; every other league falls back to
+    // the computed standings, so the negative case needs a fixture
+    // too — see audit/synthesize-fixtures.mjs.
+    // -------------------------------------------------------------
+    {
+        label: 'srhweb seasonInfo',
+        query: {
+            namespace: 'ldata-srhweb',
+            type: 'seasonInfo',
+            league: '4534',
+            season: '134456',
+        },
+    },
+    {
+        // class 0 is the synthetic single-class case, not a missing
+        // value — omitting it 404s.
+        label: 'srhweb seasonStandings (class 0)',
+        query: {
+            namespace: 'ldata-srhweb',
+            type: 'seasonStandings',
+            league: '4534',
+            season: '134456',
+            class: '0',
+        },
+    },
+    {
+        label: 'srhweb raceResults (feature, simsession 0)',
+        query: {
+            namespace: 'ldata-srhweb',
+            type: 'raceResults',
+            subsession: '86551649',
+            simsession: '0',
+        },
+    },
+    {
+        // A heat. Negative session numbers are races too, and the `n2`
+        // spelling in the dataset's filenames is a storage encoding —
+        // capture one so the signed form is exercised end to end.
+        label: 'srhweb raceResults (heat, simsession -2)',
+        query: {
+            namespace: 'ldata-srhweb',
+            type: 'raceResults',
+            subsession: '86551649',
+            simsession: '-2',
+        },
+    },
+    {
+        label: 'srhweb raceAdjudications (heat, simsession -2)',
+        query: {
+            namespace: 'ldata-srhweb',
+            type: 'raceAdjudications',
+            subsession: '86551649',
+            simsession: '-2',
+        },
+    },
 ];
 
 interface CaptureEntry {
@@ -329,7 +387,7 @@ const blob = computed(() => {
         .filter((e) => e.status === 'ok')
         .map((e) => ({
             query: e.query,
-            doc: anonymizeBrokerDoc(e.doc),
+            doc: anonymizeBrokerDoc(e.doc, e.query?.namespace),
         }));
     return JSON.stringify(
         { recordedAt: new Date().toISOString(), entries: payload },

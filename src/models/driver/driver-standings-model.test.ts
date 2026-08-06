@@ -6,6 +6,7 @@ import {
     getDefaultStandingsModel,
     computeRecentFinishes,
     computePositionChanges,
+    buildSrhStandingsModel,
 } from './driver-standings-model';
 import type {
     CuratedLeagueTeamsInfo,
@@ -507,5 +508,262 @@ describe('computePositionChanges', () => {
         const changes = computePositionChanges(drivers, lastRace);
         expect(changes.get('1')).toBe(1); // P2 → P1
         expect(changes.get('2')).toBe(-1); // P1 → P2
+    });
+});
+
+// ---------------------------------------------------------------------------
+// srhweb-backed standings
+//
+// The contract that matters here is additive: when a league is NOT on
+// simracerhub the model is byte-identical to what it always was, and when it
+// IS, the published position/points replace the computed ones without any
+// existing field changing meaning.
+// ---------------------------------------------------------------------------
+
+describe('buildSrhStandingsModel', () => {
+    const INFO: any = {
+        season_id: 134456,
+        season_name: 'Season 19',
+        league_id: 4534,
+        league_name: 'League Zero',
+        series_name: 'Formula Series',
+        drop_weeks: 1,
+        keep_weeks: 4,
+        classes: [{ class_id: 0, class_name: 'Overall' }],
+        schedule: [
+            {
+                subsession_id: 86551649,
+                sessions: [
+                    {
+                        simsession_number: -3,
+                        session_type: 'OPEN QUALIFYING',
+                        is_race: false,
+                    },
+                    {
+                        simsession_number: -2,
+                        session_type: 'RACE',
+                        is_race: true,
+                    },
+                    {
+                        simsession_number: 0,
+                        session_type: 'RACE',
+                        is_race: true,
+                    },
+                ],
+                race_date: 1781755200,
+                track: {
+                    track_id: 1,
+                    config_id: 2,
+                    track_name: 'Spa',
+                    config_name: 'GP',
+                    length_km: 4.3,
+                    turns: 19,
+                },
+                event_name: null,
+                is_chase: false,
+                can_drop: true,
+                counts_for_points: true,
+            },
+        ],
+        drivers: {
+            '174470': {
+                cust_id: 174470,
+                display_name: 'Alpha One',
+                sort_name: 'One, Alpha',
+                country_code: 'US',
+            },
+            '201632': {
+                cust_id: 201632,
+                display_name: 'Beta Two',
+                sort_name: 'Two, Beta',
+                country_code: 'GB',
+            },
+            '999999': {
+                cust_id: 999999,
+                display_name: 'New Guy',
+                sort_name: 'Guy, New',
+                country_code: 'CA',
+            },
+        },
+    };
+
+    function standing(over: any) {
+        return {
+            cust_id: 174470,
+            position: 1,
+            position_previous: 1,
+            position_change: 0,
+            total_points: 100,
+            race_points: 100,
+            bonus_points: 0,
+            penalty_points: 0,
+            stage_points: 0,
+            starts: 2,
+            wins: 1,
+            stage_wins: 0,
+            poles: 1,
+            podiums: 2,
+            top_5: 2,
+            top_10: 2,
+            laps: 40,
+            laps_led: 10,
+            incidents: 3,
+            corners: 500,
+            miles: 90,
+            rating: 900,
+            races_counted: 2,
+            counted_races: [
+                [86551649, -2],
+                [86551649, 0],
+            ],
+            dropped_races: [],
+            is_provisional: false,
+            car_ids: [152],
+            ...over,
+        };
+    }
+
+    // Two drivers tied on 17, one debutant carrying the -1 sentinel.
+    const STANDINGS: any = {
+        league_id: 4534,
+        season_id: 134456,
+        class_id: 0,
+        drivers: {
+            '174470': standing({}),
+            '201632': standing({
+                cust_id: 201632,
+                position: 17,
+                total_points: 40,
+            }),
+            '999999': standing({
+                cust_id: 999999,
+                position: 17,
+                position_previous: -1,
+                position_change: -15,
+                total_points: 40,
+                starts: 2,
+                counted_races: [],
+                dropped_races: [],
+            }),
+        },
+        teams: {},
+    };
+
+    const SRH: any = {
+        info: INFO,
+        standings: STANDINGS,
+        facts: {
+            seasonName: 'Season 19',
+            seriesName: 'Formula Series',
+            leagueName: 'League Zero',
+            dropWeeks: 1,
+            keepWeeks: 4,
+            classes: INFO.classes,
+            classId: 0,
+            progress: {
+                roundsRun: 1,
+                roundsTotal: 1,
+                racesRun: 2,
+                nextEventAt: null,
+            },
+            schedule: INFO.schedule,
+            teams: [],
+            info: INFO,
+        },
+    };
+
+    function build(summary = false) {
+        return buildSrhStandingsModel(
+            '4534',
+            '134456',
+            SRH,
+            null,
+            {},
+            {},
+            summary
+        );
+    }
+
+    it('takes position from the standings, not the array index', () => {
+        const positions = build().drivers.map((d) => d.position);
+        expect(positions).toEqual([1, 17, 17]);
+    });
+
+    it('marks tied positions', () => {
+        const tied = build().drivers.filter((d) => d.srh?.isTied);
+        expect(tied).toHaveLength(2);
+        expect(tied.every((d) => d.position === 17)).toBe(true);
+    });
+
+    // The sentinel makes position_change meaningless — a debutant must not
+    // render as a 15-place drop.
+    it('leaves positionChange undefined for a new entrant', () => {
+        const newcomer = build().drivers.find((d) => d.custId === '999999')!;
+        expect(newcomer.positionChange).toBeUndefined();
+        expect(newcomer.srh?.delta).toEqual({ kind: 'new' });
+    });
+
+    it('sets positionChange for an established driver', () => {
+        const leader = build().drivers.find((d) => d.custId === '174470')!;
+        expect(leader.positionChange).toBe(0);
+    });
+
+    it('computes gap to leader from the lowest position, not drivers[0]', () => {
+        const rows = build().drivers;
+        expect(
+            rows.find((d) => d.custId === '174470')!.pointsBehindLeader
+        ).toBe(0);
+        expect(
+            rows.find((d) => d.custId === '201632')!.pointsBehindLeader
+        ).toBe(60);
+    });
+
+    it('uses the sort_name split for driver names', () => {
+        const leader = build().drivers.find((d) => d.custId === '174470')!;
+        expect(leader.firstName).toBe('Alpha');
+        expect(leader.lastName).toBe('One');
+    });
+
+    it('intersects counted races against the season’s raced sessions', () => {
+        const leader = build().drivers.find((d) => d.custId === '174470')!;
+        expect(leader.srh?.counted).toHaveLength(2);
+        expect(leader.srh?.unattributedStarts).toBe(0);
+    });
+
+    it('reports starts no session accounts for', () => {
+        const newcomer = build().drivers.find((d) => d.custId === '999999')!;
+        expect(newcomer.srh?.unattributedStarts).toBe(2);
+    });
+
+    it('attaches season facts', () => {
+        const m = build();
+        expect(m.srh?.seasonName).toBe('Season 19');
+        expect(m.srh?.dropWeeks).toBe(1);
+    });
+
+    it('still trims to the top 4 in summary mode', () => {
+        expect(build(true).drivers.length).toBeLessThanOrEqual(4);
+    });
+
+    // Guard for the surfaces that must never render these.
+    it('does not expose stage points or wins on a driver', () => {
+        const leader = build().drivers.find((d) => d.custId === '174470')!;
+        expect(leader.srh).not.toHaveProperty('stagePoints');
+        expect(leader.srh).not.toHaveProperty('stageWins');
+    });
+});
+
+describe('getDefaultStandingsModel — fallback shape', () => {
+    // The regression guard: consumers that predate this feature must see
+    // exactly what they always saw.
+    it('carries no srh facts', () => {
+        const m = getDefaultStandingsModel();
+        expect(m.srh).toBeUndefined();
+        expect(Object.keys(m).sort()).toEqual([
+            'drivers',
+            'leagueId',
+            'seasonId',
+            'teams',
+        ]);
     });
 });
