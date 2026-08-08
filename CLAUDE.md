@@ -94,7 +94,9 @@ Events: `session_start`, `page_view`, `ui_interaction`, `error`,
 `trackUiEvent(component, action, label?, value?)`.
 
 Ingest is `POST /api/telemetry/events` (partial-batch accept, optional
-Clerk auth — verified user id is attached server-side). Accepted
+Clerk auth). Server-side enrichment attaches the verified user id,
+user agent, and client public IP — the IP stays raw on purpose; geo
+resolution happens later in the storage/analytics service. Accepted
 events go to `server/utils/telemetry-sink.ts`, which is deliberately
 log-and-forget: this app never stores telemetry. The long-term plan is
 for the sink to become a delegate call into a separate telemetry

@@ -172,6 +172,11 @@ export interface StoredTelemetryEvent {
     /** Verified Clerk user id when the batch carried a valid token. */
     userId?: string;
     userAgent?: string;
+    /** Client public IP as seen at ingest. Deliberately raw — geo
+     *  resolution (country/region/city) is the storage/analytics
+     *  service's job, and it can't recover the client IP later
+     *  because the delegate call originates from this app's server. */
+    clientIp?: string;
     event: TelemetryEvent;
 }
 

@@ -20,6 +20,11 @@ import { sinkTelemetryEvents } from '@@/server/utils/telemetry-sink';
  *  - Accepted events go to the sink (server/utils/telemetry-sink.ts):
  *    log-and-forget today, a delegate call into the external telemetry
  *    service later. This app never stores telemetry itself.
+ *  - Enrichment captures the client's public IP alongside the user
+ *    agent. Geo resolution is deliberately NOT done here — that's the
+ *    storage/analytics service's job. It has to be captured at ingest
+ *    though: once the sink delegates, the external service only sees
+ *    connections from this app's server, never the client's address.
  */
 export default defineEventHandler(
     async (event): Promise<TelemetryBatchResponse> => {
@@ -49,10 +54,16 @@ export default defineEventHandler(
             const receivedAt = Date.now();
             const userAgent: string | undefined =
                 req?.headers?.['user-agent'] || undefined;
+            // First hop of x-forwarded-for (set by the Vercel edge in
+            // production), falling back to the socket address for
+            // local dev. Spoofable in theory, fine for analytics.
+            const clientIp: string | undefined =
+                getRequestIP(event, { xForwardedFor: true }) || undefined;
             const records: StoredTelemetryEvent[] = valid.map((e) => ({
                 receivedAt,
                 ...(userId ? { userId } : {}),
                 ...(userAgent ? { userAgent } : {}),
+                ...(clientIp ? { clientIp } : {}),
                 event: e,
             }));
             try {
