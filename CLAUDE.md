@@ -96,9 +96,10 @@ Events: `session_start`, `page_view`, `ui_interaction`, `error`,
 Ingest is `POST /api/telemetry/events` (partial-batch accept, optional
 Clerk auth — verified user id is attached server-side). Storage goes
 through the `TelemetryStore` seam in `server/utils/telemetry-store.ts`;
-the current implementation is an in-memory ring buffer + log stub where
-the DB backend will plug in. `GET /api/telemetry/recent` shows recent
-events in dev (gated off in production unless `LEAP_TELEMETRY_DEBUG=1`).
+the current implementation is a log stub where the DB backend will plug
+in. This app owns the write path only — reading telemetry back out
+(dashboards, reports) is a separate consumer that queries the DB
+directly, so there is deliberately no read endpoint here.
 
 ## Common Commands
 

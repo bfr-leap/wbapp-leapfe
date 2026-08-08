@@ -21,32 +21,30 @@ function record(n: number): StoredTelemetryEvent {
 
 beforeEach(() => {
     setTelemetryStoreForTests(null);
-    vi.spyOn(console, 'log').mockImplementation(() => {});
 });
 
-describe('InMemoryTelemetryStore', () => {
-    it('returns ingested events most-recent-first', async () => {
-        const store = getTelemetryStore();
-        await store.ingest([record(1), record(2), record(3)]);
-        const recent = await store.recent(2);
-        expect(recent.map((r) => r.event.seq)).toEqual([3, 2]);
+describe('LoggingTelemetryStore', () => {
+    it('logs one summary line per ingested batch', async () => {
+        const log = vi.spyOn(console, 'log').mockImplementation(() => {});
+        await getTelemetryStore().ingest([record(1), record(2)]);
+        expect(log).toHaveBeenCalledTimes(1);
+        expect(log.mock.calls[0][0]).toMatch(/ingested 2 event\(s\)/);
+        log.mockRestore();
     });
 
-    it('bounds the ring buffer', async () => {
-        const store = getTelemetryStore();
-        for (let i = 0; i < 6; i++) {
-            await store.ingest(
-                Array.from({ length: 100 }, (_, j) => record(i * 100 + j))
-            );
-        }
-        const recent = await store.recent(1000);
-        expect(recent.length).toBeLessThanOrEqual(500);
-        expect(recent[0].event.seq).toBe(599);
+    it('is a singleton across getTelemetryStore calls', () => {
+        expect(getTelemetryStore()).toBe(getTelemetryStore());
     });
 
-    it('is a singleton across getTelemetryStore calls', async () => {
+    it('supports swapping in a fake store for tests', async () => {
+        const ingested: StoredTelemetryEvent[][] = [];
+        setTelemetryStoreForTests({
+            ingest: async (records) => {
+                ingested.push(records);
+            },
+        });
         await getTelemetryStore().ingest([record(1)]);
-        const recent = await getTelemetryStore().recent(10);
-        expect(recent).toHaveLength(1);
+        expect(ingested).toHaveLength(1);
+        expect(ingested[0][0].event.seq).toBe(1);
     });
 });
