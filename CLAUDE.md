@@ -12,7 +12,7 @@ iRacing league analytics application built with **Nuxt 3** (Vue 3). Displays dri
 -   **State:** Pinia (underutilized - most state lives in api-client cache)
 -   **Visualization:** D3.js v7
 -   **Styling:** Bootstrap 5 via CDN with custom dark theme
--   **Analytics:** Mixpanel
+-   **Analytics:** In-house telemetry pipeline (client SDK + `/api/telemetry/events`; DB backend pending)
 -   **Testing:** Vitest + @vue/test-utils + happy-dom
 -   **Linting:** ESLint via @nuxt/eslint + Prettier
 
@@ -61,12 +61,13 @@ lplib/           # Shared types and data broker
 
 Data access is organized by domain in `src/services/`:
 
-| Module               | Responsibility                                   |
-| -------------------- | ------------------------------------------------ |
-| `league-service.ts`  | League metadata, seasons, members, teams, tracks |
-| `results-service.ts` | Race results, driver stats, charts, telemetry    |
-| `user-service.ts`    | User state, features, iRacing account linking    |
-| `admin-service.ts`   | Admin schedule CRUD operations                   |
+| Module                 | Responsibility                                   |
+| ---------------------- | ------------------------------------------------ |
+| `league-service.ts`    | League metadata, seasons, members, teams, tracks |
+| `results-service.ts`   | Race results, driver stats, charts, telemetry    |
+| `user-service.ts`      | User state, features, iRacing account linking    |
+| `admin-service.ts`     | Admin schedule CRUD operations                   |
+| `telemetry-service.ts` | In-house analytics client (batching, flush)      |
 
 `src/utils/fetch-util.ts` re-exports everything for backwards compatibility. **New code should import from specific service modules.**
 
@@ -77,6 +78,27 @@ Data access is organized by domain in `src/services/`:
 -   **Component naming:** kebab-case filenames (e.g., `driver-standings.vue`)
 -   **Model naming:** `*-model.ts` files export a `get*Model()` async function
 -   **Test naming:** Co-located `*.test.ts` files next to the source file
+
+## Telemetry
+
+In-house replacement for the removed Mixpanel integration. The wire
+contract lives in `src/utils/telemetry-types.ts` (event union +
+validators, shared client/server); the client SDK is
+`src/services/telemetry-service.ts` (batching queue, page-hide flush
+via beacon/keepalive, never throws); app wiring is
+`plugins/telemetry.client.ts` (auto page views keyed by `?m=` mode,
+Clerk identify, error capture, page-load timing).
+
+Events: `session_start`, `page_view`, `ui_interaction`, `error`,
+`timing`, `identify`. Components emit interactions via
+`trackUiEvent(component, action, label?, value?)`.
+
+Ingest is `POST /api/telemetry/events` (partial-batch accept, optional
+Clerk auth — verified user id is attached server-side). Storage goes
+through the `TelemetryStore` seam in `server/utils/telemetry-store.ts`;
+the current implementation is an in-memory ring buffer + log stub where
+the DB backend will plug in. `GET /api/telemetry/recent` shows recent
+events in dev (gated off in production unless `LEAP_TELEMETRY_DEBUG=1`).
 
 ## Common Commands
 

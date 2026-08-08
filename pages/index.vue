@@ -19,6 +19,7 @@ import LeagueSeasonChip from '@@/src/components/nav/league-season-chip.vue';
 import TrackStatsChip from '@@/src/components/nav/track-stats-chip.vue';
 import ResultsScopeChip from '@@/src/components/nav/results-scope-chip.vue';
 import { selectChip } from '@@/src/utils/scope-chip-selector';
+import { trackUiEvent } from '@@/src/services/telemetry-service';
 import HomeView from '@@/src/views/HomeView.vue';
 
 const route = useRoute();
@@ -140,6 +141,11 @@ function getDefaultModel() {
         subsession_id: 0,
         simsession_id: 0,
     };
+}
+
+function onSignInClick(clerkOnClick: () => void) {
+    trackUiEvent('app-header', 'sign_in_click');
+    clerkOnClick();
 }
 
 interface LgSeasSubCtx {
@@ -387,7 +393,7 @@ const isEmbedMode = computed(() =>
                                 href="#"
                                 role="button"
                                 aria-label="Sign in"
-                                @click.prevent="onClick"
+                                @click.prevent="onSignInClick(onClick)"
                             >
                                 <svg
                                     viewBox="0 0 16 16"

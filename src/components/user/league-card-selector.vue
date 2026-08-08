@@ -9,6 +9,7 @@ import {
 } from '@@/src/models/user/league-card-selector-model';
 import type { LeagueCardSelectorEntry } from '@@/src/models/user/league-card-selector-model';
 import { getBootstrapModal } from '@@/src/utils/bootstrap-utils';
+import { trackUiEvent } from '@@/src/services/telemetry-service';
 
 const route = useRoute();
 
@@ -26,6 +27,11 @@ let _saveTimeout: ReturnType<typeof setTimeout> | 0 = 0;
 
 function onClick(league: LeagueCardSelectorEntry) {
     league.isActive = !league.isActive;
+    trackUiEvent(
+        'league-card-selector',
+        league.isActive ? 'league_enable' : 'league_disable',
+        league.name
+    );
 
     if (_saveTimeout) {
         clearTimeout(_saveTimeout);

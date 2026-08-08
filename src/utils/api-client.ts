@@ -27,6 +27,15 @@ export function setToken(token: string) {
     _token = token;
 }
 
+/**
+ * Current client auth token, or null when signed out / Clerk not yet
+ * hydrated. Used by the telemetry pipeline so its flushes carry the
+ * same auth the data layer uses.
+ */
+export async function getAuthToken(): Promise<string | null> {
+    return _auth?.getToken ? await _auth.getToken.value() : null;
+}
+
 // ---------------------------------------------------------------------------
 // Low-level fetch
 // ---------------------------------------------------------------------------

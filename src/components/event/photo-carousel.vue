@@ -8,6 +8,7 @@ import {
     onBeforeUnmount,
     nextTick,
 } from 'vue';
+import { trackUiEvent } from '@@/src/services/telemetry-service';
 
 export interface CarouselPhoto {
     src: string;
@@ -57,6 +58,11 @@ interface BootstrapCarouselInstance {
 const rootEl = ref<HTMLElement | null>(null);
 let carouselInstance: BootstrapCarouselInstance | null = null;
 
+function onSlid(e: Event) {
+    const to = (e as Event & { to?: number }).to;
+    trackUiEvent('photo-carousel', 'slide', props.id, to);
+}
+
 async function initCarousel() {
     if (!rootEl.value || visiblePhotos.value.length < 2) return;
     const { Carousel } = await import(
@@ -66,9 +72,11 @@ async function initCarousel() {
         ride: false,
         wrap: true,
     });
+    rootEl.value.addEventListener('slid.bs.carousel', onSlid);
 }
 
 function destroyCarousel() {
+    rootEl.value?.removeEventListener('slid.bs.carousel', onSlid);
     carouselInstance?.dispose();
     carouselInstance = null;
 }
