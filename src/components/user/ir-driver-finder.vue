@@ -5,6 +5,7 @@ import { useRoute } from 'vue-router';
 import { getLeagueRoster, defLgSeasSubCtx } from '@@/src/utils/fetch-util';
 import { setIrLinkDriver } from '@@/src/services/user-service';
 import { getBootstrapModal } from '@@/src/utils/bootstrap-utils';
+import { trackUiEvent } from '@@/src/services/telemetry-service';
 
 const emit = defineEmits<{ (e: 'linked'): void }>();
 const route = useRoute();
@@ -50,6 +51,7 @@ async function onSubmit() {
     const custId = findCustId(forms.name);
     if (!custId || submitting.value) return;
     submitting.value = true;
+    trackUiEvent('ir-driver-finder', 'link_submit');
     try {
         await setIrLinkDriver(String(custId));
         const el = document.getElementById('irDriverFinderModal');
