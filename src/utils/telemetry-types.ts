@@ -3,9 +3,10 @@
  * (src/services/telemetry-service.ts) and the ingest endpoint
  * (server/api/telemetry/events.post.ts).
  *
- * This is the contract the future DB backend will consume, so shapes
- * here should stay additive: new event names and optional props are
- * fine, renames and removals are breaking.
+ * This is the contract the external telemetry service will consume
+ * once ingest delegates to it (same pattern as data lake access), so
+ * shapes here should stay additive: new event names and optional
+ * props are fine, renames and removals are breaking.
  *
  * Design notes:
  *  - Every event carries the same envelope (ids, sequence, timestamp,
@@ -163,8 +164,9 @@ export interface TelemetryBatchResponse {
     errors?: { index: number; reason: string }[];
 }
 
-/** Server-side enrichment attached to each stored event. This is the
- *  record shape the DB backend will persist. */
+/** Server-side enrichment attached to each accepted event. This is
+ *  the record shape handed to the sink — and, later, forwarded to the
+ *  external telemetry service. */
 export interface StoredTelemetryEvent {
     receivedAt: number;
     /** Verified Clerk user id when the batch carried a valid token. */

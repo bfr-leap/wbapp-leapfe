@@ -4,7 +4,7 @@ import {
     type StoredTelemetryEvent,
     type TelemetryBatchResponse,
 } from '@@/src/utils/telemetry-types';
-import { getTelemetryStore } from '@@/server/utils/telemetry-store';
+import { sinkTelemetryEvents } from '@@/server/utils/telemetry-sink';
 
 /**
  * POST /api/telemetry/events — batch ingest for the in-house
@@ -17,8 +17,9 @@ import { getTelemetryStore } from '@@/server/utils/telemetry-store';
  *  - Auth is optional. Page-hide beacons arrive unauthenticated; when
  *    a Clerk token is present and verifies, the verified user id is
  *    attached server-side (client-sent `identify` props are advisory).
- *  - Storage goes through the TelemetryStore seam
- *    (server/utils/telemetry-store.ts) where the DB backend plugs in.
+ *  - Accepted events go to the sink (server/utils/telemetry-sink.ts):
+ *    log-and-forget today, a delegate call into the external telemetry
+ *    service later. This app never stores telemetry itself.
  */
 export default defineEventHandler(
     async (event): Promise<TelemetryBatchResponse> => {
@@ -55,11 +56,11 @@ export default defineEventHandler(
                 event: e,
             }));
             try {
-                await getTelemetryStore().ingest(records);
+                sinkTelemetryEvents(records);
             } catch (e) {
-                // Storage failures shouldn't bounce the client into
+                // Sink failures shouldn't bounce the client into
                 // retry loops — log and report the batch as accepted.
-                console.error('[telemetry] store ingest failed', e);
+                console.error('[telemetry] sink failed', e);
             }
         }
 

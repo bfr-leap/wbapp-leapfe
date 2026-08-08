@@ -12,7 +12,7 @@ iRacing league analytics application built with **Nuxt 3** (Vue 3). Displays dri
 -   **State:** Pinia (underutilized - most state lives in api-client cache)
 -   **Visualization:** D3.js v7
 -   **Styling:** Bootstrap 5 via CDN with custom dark theme
--   **Analytics:** In-house telemetry pipeline (client SDK + `/api/telemetry/events`; DB backend pending)
+-   **Analytics:** In-house telemetry pipeline (client SDK + `/api/telemetry/events`; ingest is log-and-forget until it delegates to the external telemetry service)
 -   **Testing:** Vitest + @vue/test-utils + happy-dom
 -   **Linting:** ESLint via @nuxt/eslint + Prettier
 
@@ -94,12 +94,13 @@ Events: `session_start`, `page_view`, `ui_interaction`, `error`,
 `trackUiEvent(component, action, label?, value?)`.
 
 Ingest is `POST /api/telemetry/events` (partial-batch accept, optional
-Clerk auth — verified user id is attached server-side). Storage goes
-through the `TelemetryStore` seam in `server/utils/telemetry-store.ts`;
-the current implementation is a log stub where the DB backend will plug
-in. This app owns the write path only — reading telemetry back out
-(dashboards, reports) is a separate consumer that queries the DB
-directly, so there is deliberately no read endpoint here.
+Clerk auth — verified user id is attached server-side). Accepted
+events go to `server/utils/telemetry-sink.ts`, which is deliberately
+log-and-forget: this app never stores telemetry. The long-term plan is
+for the sink to become a delegate call into a separate telemetry
+service (same pattern as data lake access), and dashboards/reports
+will read from that service — so there is no storage backend and no
+read endpoint here.
 
 ## Common Commands
 
