@@ -17,14 +17,21 @@ import { sinkTelemetryEvents } from '@@/server/utils/telemetry-sink';
  *  - Auth is optional. Page-hide beacons arrive unauthenticated; when
  *    a Clerk token is present and verifies, the verified user id is
  *    attached server-side (client-sent `identify` props are advisory).
- *  - Accepted events go to the sink (server/utils/telemetry-sink.ts):
- *    log-and-forget today, a delegate call into the external telemetry
- *    service later. This app never stores telemetry itself.
+ *  - Accepted events are forwarded by the sink
+ *    (server/utils/telemetry-sink.ts) to the usage service on
+ *    wbsvc-dtbrkrrd. This app never stores telemetry itself.
  *  - Enrichment captures the client's public IP alongside the user
  *    agent. Geo resolution is deliberately NOT done here — that's the
  *    storage/analytics service's job. It has to be captured at ingest
- *    though: once the sink delegates, the external service only sees
- *    connections from this app's server, never the client's address.
+ *    though: the delegate call originates from this app's server, so
+ *    the usage service never sees the client's address itself.
+ *  - A transient delegate failure answers 502 so the browser client
+ *    re-queues the batch and retries on its next tick (it retries 5xx
+ *    and network errors only, and its queue is bounded). The usage
+ *    service dedupes on retransmit, so this cannot double-count. A 4xx
+ *    from the delegate is permanent — a bad token or a contract
+ *    mismatch — so the batch is logged, dropped, and reported as
+ *    accepted rather than spinning the client forever.
  */
 export default defineEventHandler(
     async (event): Promise<TelemetryBatchResponse> => {
@@ -66,12 +73,14 @@ export default defineEventHandler(
                 ...(clientIp ? { clientIp } : {}),
                 event: e,
             }));
-            try {
-                sinkTelemetryEvents(records);
-            } catch (e) {
-                // Sink failures shouldn't bounce the client into
-                // retry loops — log and report the batch as accepted.
-                console.error('[telemetry] sink failed', e);
+            // `sentAt` is validated above, so it is a finite number here.
+            const sentAt = (body as { sentAt: number }).sentAt;
+            const result = await sinkTelemetryEvents(records, { sentAt });
+            if (!result.ok && result.retryable) {
+                throw createError({
+                    statusCode: 502,
+                    statusMessage: `Telemetry sink unavailable: ${result.reason}`,
+                });
             }
         }
 
