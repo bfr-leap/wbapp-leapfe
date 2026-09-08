@@ -12,7 +12,7 @@ iRacing league analytics application built with **Nuxt 3** (Vue 3). Displays dri
 -   **State:** Pinia (underutilized - most state lives in api-client cache)
 -   **Visualization:** D3.js v7
 -   **Styling:** Bootstrap 5 via CDN with custom dark theme
--   **Analytics:** In-house telemetry pipeline (client SDK + `/api/telemetry/events`; ingest is log-and-forget until it delegates to the external telemetry service)
+-   **Analytics:** In-house telemetry pipeline (client SDK + `/api/telemetry/events`; ingest forwards to the usage service on `wbsvc-dtbrkrrd`)
 -   **Testing:** Vitest + @vue/test-utils + happy-dom
 -   **Linting:** ESLint via @nuxt/eslint + Prettier
 
@@ -96,13 +96,29 @@ Events: `session_start`, `page_view`, `ui_interaction`, `error`,
 Ingest is `POST /api/telemetry/events` (partial-batch accept, optional
 Clerk auth). Server-side enrichment attaches the verified user id,
 user agent, and client public IP — the IP stays raw on purpose; geo
-resolution happens later in the storage/analytics service. Accepted
-events go to `server/utils/telemetry-sink.ts`, which is deliberately
-log-and-forget: this app never stores telemetry. The long-term plan is
-for the sink to become a delegate call into a separate telemetry
-service (same pattern as data lake access), and dashboards/reports
-will read from that service — so there is no storage backend and no
-read endpoint here.
+resolution happens later in the storage/analytics service, which
+cannot recover it because the delegate call comes from this app's
+server.
+
+Accepted events go to `server/utils/telemetry-sink.ts`, which forwards
+them to `POST {base}/usage/events` on `wbsvc-dtbrkrrd`. That service
+owns the schema, the dedup index and the query endpoints; this app
+still stores nothing and has no read surface. The sink is the whole of
+the coupling, so relocating usage storage later is a URL change.
+
+Sink config (all optional): `USAGE_SERVICE_URL` (falls back to
+`LEAP_DATA_BROKER_BASE_URL`, so a working broker config is already a
+working usage config), `USAGE_API_TOKEN`, `USAGE_SINK_TIMEOUT_MS`
+(default 5000), `USAGE_SINK_DISABLED=1` to drop events locally.
+
+Failure handling is deliberate. A transient delegate failure (5xx,
+timeout, network) answers **502**, which is what makes the browser
+client re-queue and retry on its next tick — it retries 5xx and
+network errors only, and its queue is bounded. The usage service
+dedupes retransmits, so retrying cannot double-count. A 4xx from the
+delegate is permanent (bad token, contract mismatch), so the batch is
+logged, dropped, and reported as accepted rather than spinning the
+client forever.
 
 ## Common Commands
 
@@ -194,3 +210,13 @@ Required in `.env`:
 -   `CLERK_SECRET_KEY` - Clerk backend key
 -   `CLERK_JWT_KEY` - JWT verification key
 -   `API_BASE_URL` - API base URL (defaults to http://localhost:3000)
+
+Optional, for the telemetry sink (see [Telemetry](#telemetry)):
+
+-   `USAGE_SERVICE_URL` - usage API base, including `/api`. Falls back to
+    `LEAP_DATA_BROKER_BASE_URL`, then to the same default lplib's data lake
+    client uses, so a working broker config needs no extra setup here.
+-   `USAGE_API_TOKEN` - shared secret for the usage service. Must match
+    `USAGE_API_TOKEN` there; omit on both sides for local dev.
+-   `USAGE_SINK_TIMEOUT_MS` - per-request timeout, default 5000
+-   `USAGE_SINK_DISABLED` - set to `1` to log and drop instead of forwarding
